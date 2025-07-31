@@ -84,7 +84,7 @@ export const ProductForm = () => {
           cost_unit: parseFloat(data.cost_unit),
           packaging_cost: parseFloat(data.packaging_cost || "0"),
           tax_rate: parseFloat(data.tax_rate || "0"),
-          category_id: data.category_id || null
+          category_id: data.category_id === "none" ? null : data.category_id || null
         }]);
       
       if (error) throw error;
@@ -116,7 +116,7 @@ export const ProductForm = () => {
           cost_unit: parseFloat(data.cost_unit),
           packaging_cost: parseFloat(data.packaging_cost || "0"),
           tax_rate: parseFloat(data.tax_rate || "0"),
-          category_id: data.category_id || null
+          category_id: data.category_id === "none" ? null : data.category_id || null
         })
         .eq("id", id);
       
@@ -173,7 +173,7 @@ export const ProductForm = () => {
       name: product.name,
       description: product.description || "",
       sku: product.sku || "",
-      category_id: product.category_id || "",
+      category_id: product.category_id || "none",
       cost_unit: product.cost_unit.toString(),
       packaging_cost: product.packaging_cost.toString(),
       tax_rate: product.tax_rate.toString()
@@ -239,7 +239,7 @@ export const ProductForm = () => {
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma categoria</SelectItem>
+                  <SelectItem value="none">Nenhuma categoria</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
