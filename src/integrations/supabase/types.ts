@@ -14,7 +14,274 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      commissions: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          id: string
+          marketplace_id: string | null
+          rate: number
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          marketplace_id?: string | null
+          rate: number
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          marketplace_id?: string | null
+          rate?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_marketplace_id_fkey"
+            columns: ["marketplace_id"]
+            isOneToOne: false
+            referencedRelation: "marketplaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_fixed_fee_rules: {
+        Row: {
+          created_at: string | null
+          id: string
+          marketplace_id: string | null
+          range_max: number | null
+          range_min: number | null
+          rule_type: string
+          updated_at: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          marketplace_id?: string | null
+          range_max?: number | null
+          range_min?: number | null
+          rule_type: string
+          updated_at?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          marketplace_id?: string | null
+          range_max?: number | null
+          range_min?: number | null
+          rule_type?: string
+          updated_at?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_fixed_fee_rules_marketplace_id_fkey"
+            columns: ["marketplace_id"]
+            isOneToOne: false
+            referencedRelation: "marketplaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplaces: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category_id: string | null
+          cost_unit: number
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          packaging_cost: number | null
+          sku: string | null
+          tax_rate: number | null
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          cost_unit: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          packaging_cost?: number | null
+          sku?: string | null
+          tax_rate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          cost_unit?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          packaging_cost?: number | null
+          sku?: string | null
+          tax_rate?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          id: string
+          marketplace_id: string | null
+          price_charged: number
+          product_id: string | null
+          quantity: number
+          sold_at: string
+        }
+        Insert: {
+          id?: string
+          marketplace_id?: string | null
+          price_charged: number
+          product_id?: string | null
+          quantity: number
+          sold_at?: string
+        }
+        Update: {
+          id?: string
+          marketplace_id?: string | null
+          price_charged?: number
+          product_id?: string | null
+          quantity?: number
+          sold_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_marketplace_id_fkey"
+            columns: ["marketplace_id"]
+            isOneToOne: false
+            referencedRelation: "marketplaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_rules: {
+        Row: {
+          created_at: string | null
+          free_shipping_threshold: number | null
+          id: string
+          marketplace_id: string | null
+          product_id: string | null
+          shipping_cost: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          free_shipping_threshold?: number | null
+          id?: string
+          marketplace_id?: string | null
+          product_id?: string | null
+          shipping_cost: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          free_shipping_threshold?: number | null
+          id?: string
+          marketplace_id?: string | null
+          product_id?: string | null
+          shipping_cost?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_rules_marketplace_id_fkey"
+            columns: ["marketplace_id"]
+            isOneToOne: false
+            referencedRelation: "marketplaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipping_rules_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
