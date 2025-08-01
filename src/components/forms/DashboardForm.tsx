@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -123,16 +123,47 @@ export const DashboardForm = () => {
     }
   };
 
+  // State to store real margins
+  const [realMargins, setRealMargins] = useState<{[key: string]: {margem_unitaria_real: number, margem_percentual_real: number}}>({});
+
+  // Calculate real margins when savedPricings change
+  useEffect(() => {
+    const calculateRealMargins = async () => {
+      if (savedPricings.length === 0) return;
+      
+      const newRealMargins: {[key: string]: {margem_unitaria_real: number, margem_percentual_real: number}} = {};
+      
+      for (const pricing of savedPricings) {
+        try {
+          const { data, error } = await supabase.rpc('calcular_margem_real', {
+            p_product_id: pricing.product_id,
+            p_marketplace_id: pricing.marketplace_id,
+            p_taxa_cartao: pricing.taxa_cartao,
+            p_provisao_desconto: pricing.provisao_desconto,
+            p_preco_praticado: pricing.preco_praticado
+          });
+
+          if (!error && data && typeof data === 'object') {
+            newRealMargins[pricing.marketplace_id] = {
+              margem_unitaria_real: (data as any).margem_unitaria_real,
+              margem_percentual_real: (data as any).margem_percentual_real
+            };
+          }
+        } catch (error) {
+          console.error('Erro ao calcular margem real:', error);
+        }
+      }
+      
+      setRealMargins(newRealMargins);
+    };
+
+    calculateRealMargins();
+  }, [savedPricings]);
+
   // Transform saved pricing data for display
   const results = savedPricings
     .map(pricing => {
-      // Calcular margem real baseada no preço praticado
-      const totalTaxasPercentuais = pricing.comissao + pricing.taxa_cartao + pricing.provisao_desconto;
-      const custosTotaisFixos = pricing.custo_total + pricing.valor_fixo + pricing.frete;
-      const custosPercentuais = pricing.preco_praticado * (totalTaxasPercentuais / 100);
-      const margem_real_unitaria = pricing.preco_praticado - custosTotaisFixos - custosPercentuais;
-      const margem_real_percentual = pricing.preco_praticado > 0 ? (margem_real_unitaria / pricing.preco_praticado) * 100 : 0;
-
+      const realMargin = realMargins[pricing.marketplace_id];
       return {
         marketplace_id: pricing.marketplace_id,
         marketplace_name: pricing.marketplaces?.name || 'Marketplace',
@@ -141,8 +172,8 @@ export const DashboardForm = () => {
         frete: pricing.frete,
         comissao: pricing.comissao,
         preco_sugerido: pricing.preco_sugerido,
-        margem_unitaria: margem_real_unitaria, // Margem real baseada no preço praticado
-        margem_percentual: margem_real_percentual, // Margem real percentual
+        margem_unitaria: realMargin?.margem_unitaria_real || pricing.margem_unitaria,
+        margem_percentual: realMargin?.margem_percentual_real || pricing.margem_percentual,
         preco_praticado: pricing.preco_praticado,
         taxa_cartao: pricing.taxa_cartao,
         provisao_desconto: pricing.provisao_desconto,
