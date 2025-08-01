@@ -89,76 +89,65 @@ export const PricingForm = () => {
     },
   });
 
-  // Calculate price mutation
-  const calculatePriceMutation = useMutation({
+  // Calculate both price and margin mutation
+  const calculateMutation = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.rpc("calcular_preco", {
+      const pricePromise = supabase.rpc("calcular_preco", {
         p_product_id: formData.product_id,
         p_marketplace_id: formData.marketplace_id,
         p_taxa_cartao: formData.taxa_cartao,
         p_provisao_desconto: formData.provisao_desconto,
         p_margem_desejada: formData.margem_desejada,
       });
-      if (error) throw error;
-      return data as unknown as PricingResult;
-    },
-    onSuccess: (data) => {
-      if ('error' in data) {
-        toast({
-          title: "Erro",
-          description: data.error as string,
-          variant: "destructive",
-        });
-      } else {
-        setPricingResult(data);
-        setMarginResult(null);
-        toast({
-          title: "Sucesso",
-          description: "Preço calculado com sucesso!",
-        });
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: "Erro",
-        description: "Erro ao calcular preço: " + error.message,
-        variant: "destructive",
-      });
-    },
-  });
 
-  // Calculate real margin mutation
-  const calculateMarginMutation = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("calcular_margem_real", {
-        p_product_id: formData.product_id,
-        p_marketplace_id: formData.marketplace_id,
-        p_taxa_cartao: formData.taxa_cartao,
-        p_provisao_desconto: formData.provisao_desconto,
-        p_preco_praticado: formData.preco_praticado,
-      });
-      if (error) throw error;
-      return data as unknown as MarginResult;
+      let marginPromise = null;
+      if (formData.preco_praticado > 0) {
+        marginPromise = supabase.rpc("calcular_margem_real", {
+          p_product_id: formData.product_id,
+          p_marketplace_id: formData.marketplace_id,
+          p_taxa_cartao: formData.taxa_cartao,
+          p_provisao_desconto: formData.provisao_desconto,
+          p_preco_praticado: formData.preco_praticado,
+        });
+      }
+
+      const [priceResult, marginResult] = await Promise.all([
+        pricePromise,
+        marginPromise
+      ]);
+
+      if (priceResult.error) throw priceResult.error;
+      if (marginResult && marginResult.error) throw marginResult.error;
+
+      return {
+        pricing: priceResult.data as unknown as PricingResult,
+        margin: marginResult ? marginResult.data as unknown as MarginResult : null
+      };
     },
     onSuccess: (data) => {
-      if ('error' in data) {
+      if ('error' in data.pricing) {
         toast({
           title: "Erro",
-          description: data.error as string,
+          description: data.pricing.error as string,
           variant: "destructive",
         });
       } else {
-        setMarginResult(data);
+        setPricingResult(data.pricing);
+        if (data.margin && !('error' in data.margin)) {
+          setMarginResult(data.margin);
+        } else {
+          setMarginResult(null);
+        }
         toast({
           title: "Sucesso",
-          description: "Margem real calculada com sucesso!",
+          description: "Cálculos realizados com sucesso!",
         });
       }
     },
     onError: (error) => {
       toast({
         title: "Erro",
-        description: "Erro ao calcular margem real: " + error.message,
+        description: "Erro ao calcular: " + error.message,
         variant: "destructive",
       });
     },
@@ -168,7 +157,7 @@ export const PricingForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleCalculatePrice = () => {
+  const handleCalculate = () => {
     if (!formData.product_id || !formData.marketplace_id) {
       toast({
         title: "Campos obrigatórios",
@@ -177,19 +166,7 @@ export const PricingForm = () => {
       });
       return;
     }
-    calculatePriceMutation.mutate();
-  };
-
-  const handleCalculateMargin = () => {
-    if (!formData.product_id || !formData.marketplace_id || formData.preco_praticado <= 0) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Selecione um produto, marketplace e informe o preço praticado",
-        variant: "destructive",
-      });
-      return;
-    }
-    calculateMarginMutation.mutate();
+    calculateMutation.mutate();
   };
 
   return (
@@ -286,35 +263,24 @@ export const PricingForm = () => {
           </div>
         </div>
 
-        <Button 
-          onClick={handleCalculatePrice} 
-          disabled={calculatePriceMutation.isPending}
-          className="w-full"
-        >
-          {calculatePriceMutation.isPending ? "Calculando..." : "Calcular Preço"}
-        </Button>
-
-        <Separator />
-
         <div>
-          <Label htmlFor="preco_praticado">Preço de Venda Praticado (R$)</Label>
+          <Label htmlFor="preco_praticado">Preço de Venda Praticado (R$) - Opcional</Label>
           <Input
             id="preco_praticado"
             type="number"
             step="0.01"
             value={formData.preco_praticado}
             onChange={(e) => handleInputChange("preco_praticado", parseFloat(e.target.value) || 0)}
-            placeholder="Ex: 199.90"
+            placeholder="Ex: 199.90 (se informado, calculará margem real também)"
           />
         </div>
 
         <Button 
-          onClick={handleCalculateMargin} 
-          disabled={calculateMarginMutation.isPending}
-          variant="outline"
+          onClick={handleCalculate} 
+          disabled={calculateMutation.isPending}
           className="w-full"
         >
-          {calculateMarginMutation.isPending ? "Calculando..." : "Calcular Margem Real"}
+          {calculateMutation.isPending ? "Calculando..." : "Calcular Preço Sugerido e Margem Real"}
         </Button>
       </div>
 
