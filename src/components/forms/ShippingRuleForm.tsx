@@ -158,13 +158,14 @@ export const ShippingRuleForm = () => {
 
   // Detectar automaticamente se uma regra já existe para produto + marketplace
   useEffect(() => {
-    if (formData.product_id && formData.marketplace_id && !editingId) {
+    if (formData.product_id && formData.marketplace_id) {
       const existingRule = shippingRules.find(rule => 
         rule.product_id === formData.product_id && 
         rule.marketplace_id === formData.marketplace_id
       );
       
-      if (existingRule) {
+      if (existingRule && !editingId) {
+        // Regra existe e não estamos em modo de edição - mudar para edição
         setFormData({
           product_id: existingRule.product_id,
           marketplace_id: existingRule.marketplace_id,
@@ -177,7 +178,24 @@ export const ShippingRuleForm = () => {
           description: "Esta combinação já existe. Modo de edição ativado.",
           variant: "default"
         });
+      } else if (!existingRule && editingId) {
+        // Não existe regra e estamos em modo de edição - voltar para criação
+        setEditingId(null);
+        setFormData({
+          product_id: formData.product_id,
+          marketplace_id: formData.marketplace_id,
+          shipping_cost: "",
+          free_shipping_threshold: ""
+        });
+        toast({ 
+          title: "Nova combinação", 
+          description: "Modo de criação ativado para esta nova combinação.",
+          variant: "default"
+        });
       }
+    } else if (editingId && (!formData.product_id || !formData.marketplace_id)) {
+      // Se está em modo de edição mas não tem produto ou marketplace selecionado, resetar
+      setEditingId(null);
     }
   }, [formData.product_id, formData.marketplace_id, shippingRules, editingId, toast]);
 
