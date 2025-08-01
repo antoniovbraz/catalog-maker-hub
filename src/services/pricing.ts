@@ -60,7 +60,7 @@ export class PricingService extends BaseService<SavedPricingType> {
     return data;
   }
 
-  async calcularMargemReal(productId: string, marketplaceId: string, taxaCartao: number, provisaoDesconto: number, precoPraticado: number): Promise<number> {
+  async calcularMargemReal(productId: string, marketplaceId: string, taxaCartao: number, provisaoDesconto: number, precoPraticado: number): Promise<any> {
     const { data, error } = await supabase.rpc('calcular_margem_real', {
       p_product_id: productId,
       p_marketplace_id: marketplaceId,
@@ -70,7 +70,11 @@ export class PricingService extends BaseService<SavedPricingType> {
     });
 
     if (error) this.handleError(error, 'Calcular margem real');
-    return typeof data === 'number' ? data : 0;
+    
+    console.log('Resposta da RPC calcular_margem_real:', data);
+    
+    // A função retorna um objeto JSON completo, não apenas um número
+    return data;
   }
 }
 

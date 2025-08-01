@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useMarketplaces } from "@/hooks/useMarketplaces";
-import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
+import { useCalculatePrice, useCalculateMargemReal, useSavePricing } from "@/hooks/usePricing";
 import { PricingFormData } from "@/types/pricing";
 import { formatarMoeda, formatarPercentual } from "@/utils/pricing";
 
@@ -22,6 +22,16 @@ interface PricingResult {
   margem_percentual: number;
   product_name: string;
   product_sku: string;
+}
+
+interface MargemRealResult {
+  custo_total: number;
+  valor_fixo: number;
+  frete: number;
+  comissao: number;
+  preco_praticado: number;
+  margem_unitaria_real: number;
+  margem_percentual_real: number;
 }
 
 export const PricingForm = () => {
@@ -39,12 +49,15 @@ export const PricingForm = () => {
     preco_praticado: 0
   });
   const [pricingResult, setPricingResult] = useState<PricingResult | null>(null);
+  const [margemRealResult, setMargemRealResult] = useState<MargemRealResult | null>(null);
 
   console.log('Estado atual do pricingResult:', pricingResult); // Debug temporário
+  console.log('Estado atual do margemRealResult:', margemRealResult); // Debug temporário
 
   const { data: products = [], isLoading: loadingProducts } = useProducts();
   const { data: marketplaces = [], isLoading: loadingMarketplaces } = useMarketplaces();
   const calculatePriceMutation = useCalculatePrice();
+  const calculateMargemRealMutation = useCalculateMargemReal();
   const savePricingMutation = useSavePricing();
 
   const handleInputChange = (field: keyof PricingFormData, value: string | number) => {
@@ -103,6 +116,12 @@ export const PricingForm = () => {
           comissao: typedResult.comissao || 0
         }));
         
+        // Se há preço praticado, calcular margem real também
+        if (formData.preco_praticado > 0) {
+          console.log('Calculando margem real para preço praticado:', formData.preco_praticado);
+          await calculateMargemReal();
+        }
+        
         console.log('Estado atualizado com sucesso');
       } else {
         console.error('Resultado inválido recebido:', result);
@@ -119,6 +138,31 @@ export const PricingForm = () => {
         description: "Erro ao calcular preço. Tente novamente.",
         variant: "destructive",
       });
+    }
+  };
+
+  const calculateMargemReal = async () => {
+    if (!formData.product_id || !formData.marketplace_id || !formData.preco_praticado || formData.preco_praticado <= 0) {
+      return;
+    }
+
+    try {
+      const result = await calculateMargemRealMutation.mutateAsync({
+        productId: formData.product_id,
+        marketplaceId: formData.marketplace_id,
+        taxaCartao: formData.taxa_cartao,
+        provisaoDesconto: formData.provisao_desconto,
+        precoPraticado: formData.preco_praticado
+      });
+
+      console.log('Resultado margem real recebido:', result);
+
+      if (result && typeof result === 'object') {
+        const typedResult = result as MargemRealResult;
+        setMargemRealResult(typedResult);
+      }
+    } catch (error) {
+      console.error('Erro ao calcular margem real:', error);
     }
   };
 
@@ -276,6 +320,16 @@ export const PricingForm = () => {
             >
               {calculatePriceMutation.isPending ? "Calculando..." : "Calcular Preço"}
             </Button>
+
+            {formData.preco_praticado > 0 && formData.product_id && formData.marketplace_id && (
+              <Button
+                onClick={calculateMargemReal}
+                disabled={calculateMargemRealMutation.isPending}
+                variant="outline"
+              >
+                {calculateMargemRealMutation.isPending ? "Calculando..." : "Calcular Margem Real"}
+              </Button>
+            )}
             
             {pricingResult && (
               <Button 
@@ -297,7 +351,7 @@ export const PricingForm = () => {
         </CardHeader>
         <CardContent>
           {pricingResult ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>Produto:</div>
                 <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
@@ -330,6 +384,53 @@ export const PricingForm = () => {
                 <div className="font-semibold">Margem Percentual:</div>
                 <div className="font-semibold">{formatarPercentual(pricingResult.margem_percentual || 0)}</div>
               </div>
+
+              {/* Seção de Margem Real - só aparece se houver cálculo */}
+              {margemRealResult && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
+                      📊 Análise do Preço Praticado
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>Preço Praticado:</div>
+                      <div className="font-medium text-orange-600 dark:text-orange-400">
+                        {formatarMoeda(margemRealResult.preco_praticado || 0)}
+                      </div>
+                      
+                      <div>Margem Real Unitária:</div>
+                      <div className="font-medium">
+                        {formatarMoeda(margemRealResult.margem_unitaria_real || 0)}
+                      </div>
+                      
+                      <div>Margem Real Percentual:</div>
+                      <div className={`font-medium ${
+                        (margemRealResult.margem_percentual_real || 0) < 0 
+                          ? 'text-destructive' 
+                          : 'text-green-600 dark:text-green-400'
+                      }`}>
+                        {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
+                      </div>
+                      
+                      {/* Indicador de comparação */}
+                      <div className="col-span-2 mt-2 pt-2 border-t">
+                        <div className="text-xs text-muted-foreground">
+                          {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
+                            <span className="text-amber-600 dark:text-amber-400">
+                              ⚠️ Margem real é menor que a desejada
+                            </span>
+                          ) : (
+                            <span className="text-green-600 dark:text-green-400">
+                              ✅ Margem real está dentro do esperado
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className="text-center text-muted-foreground py-8">

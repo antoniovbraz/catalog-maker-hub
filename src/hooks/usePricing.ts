@@ -41,6 +41,26 @@ export function useCalculatePrice() {
   });
 }
 
+export function useCalculateMargemReal() {
+  return useMutation({
+    mutationFn: (params: { productId: string; marketplaceId: string; taxaCartao: number; provisaoDesconto: number; precoPraticado: number }) => 
+      pricingService.calcularMargemReal(
+        params.productId,
+        params.marketplaceId,
+        params.taxaCartao,
+        params.provisaoDesconto,
+        params.precoPraticado
+      ),
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: `Erro ao calcular margem real: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 export function useSavePricing() {
   const queryClient = useQueryClient();
 
