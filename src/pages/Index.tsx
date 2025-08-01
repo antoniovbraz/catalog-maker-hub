@@ -23,7 +23,7 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="marketplaces" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="marketplaces">Marketplaces</TabsTrigger>
             <TabsTrigger value="categories">Categorias</TabsTrigger>
             <TabsTrigger value="products">Produtos</TabsTrigger>
@@ -31,6 +31,7 @@ const Index = () => {
             <TabsTrigger value="commissions">Comissões</TabsTrigger>
             <TabsTrigger value="fixedfees">Regras de valor fixo</TabsTrigger>
             <TabsTrigger value="sales">Vendas</TabsTrigger>
+            <TabsTrigger value="pricing" onClick={() => window.location.href = '/pricing'}>Precificação</TabsTrigger>
           </TabsList>
 
           <TabsContent value="marketplaces" className="mt-6">
