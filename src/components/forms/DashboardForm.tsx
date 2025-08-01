@@ -3,6 +3,7 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,9 +42,9 @@ export const DashboardForm = () => {
   const { toast } = useToast();
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedMarketplaces, setSelectedMarketplaces] = useState<string[]>([]);
-  const [taxaCartao] = useState<number>(2.5); // Default value
-  const [provisaoDesconto] = useState<number>(10); // Default value
-  const [margemDesejada] = useState<number>(25); // Default value
+  const [taxaCartao, setTaxaCartao] = useState<number>(10); // Changed to match PricingForm
+  const [provisaoDesconto, setProvisaoDesconto] = useState<number>(10);
+  const [margemDesejada, setMargemDesejada] = useState<number>(25);
   const [sortBy, setSortBy] = useState<SortOption>("margem_percentual");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -147,7 +148,7 @@ export const DashboardForm = () => {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -177,6 +178,47 @@ export const DashboardForm = () => {
                   )}
                 </SelectContent>
               </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Parâmetros de Cálculo
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="taxaCartao">Taxa de Cartão (%)</Label>
+              <Input
+                id="taxaCartao"
+                type="number"
+                step="0.1"
+                value={taxaCartao}
+                onChange={(e) => setTaxaCartao(parseFloat(e.target.value) || 0)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="provisaoDesconto">Provisão Desconto (%)</Label>
+              <Input
+                id="provisaoDesconto"
+                type="number"
+                step="0.1"
+                value={provisaoDesconto}
+                onChange={(e) => setProvisaoDesconto(parseFloat(e.target.value) || 0)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="margemDesejada">Margem Desejada (%)</Label>
+              <Input
+                id="margemDesejada"
+                type="number"
+                step="0.1"
+                value={margemDesejada}
+                onChange={(e) => setMargemDesejada(parseFloat(e.target.value) || 0)}
+              />
             </div>
           </CardContent>
         </Card>
@@ -332,10 +374,14 @@ export const DashboardForm = () => {
                       <div className="font-semibold text-green-600">{result.margem_percentual.toFixed(2)}%</div>
                     </div>
                     
-                    <div className="pt-2 border-t text-xs text-muted-foreground">
+                    <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
+                      <div className="font-medium text-foreground">Detalhamento:</div>
                       <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
                       <div>Frete: R$ {result.frete.toFixed(2)}</div>
                       <div>Comissão: {result.comissao.toFixed(2)}%</div>
+                      <div>Taxa Cartão: {taxaCartao.toFixed(1)}%</div>
+                      <div>Provisão Desc.: {provisaoDesconto.toFixed(1)}%</div>
+                      <div>Margem Alvo: {margemDesejada.toFixed(1)}%</div>
                     </div>
                   </CardContent>
                 </Card>
