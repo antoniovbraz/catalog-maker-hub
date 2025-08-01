@@ -29,7 +29,7 @@ const Index = () => {
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="shipping">Frete</TabsTrigger>
             <TabsTrigger value="commissions">Comissões</TabsTrigger>
-            <TabsTrigger value="fixedfees">Taxas Fixas</TabsTrigger>
+            <TabsTrigger value="fixedfees">Regras de valor fixo</TabsTrigger>
             <TabsTrigger value="sales">Vendas</TabsTrigger>
           </TabsList>
 
@@ -106,9 +106,9 @@ const Index = () => {
           <TabsContent value="fixedfees" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>Taxas Fixas</CardTitle>
+                <CardTitle>Regras de valor fixo</CardTitle>
                 <CardDescription>
-                  Configure taxas fixas por marketplace
+                  Configure regras de valor fixo por marketplace com diferentes tipos
                 </CardDescription>
               </CardHeader>
               <CardContent>

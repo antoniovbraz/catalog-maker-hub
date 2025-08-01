@@ -30,9 +30,9 @@ interface Marketplace {
 }
 
 const RULE_TYPES = [
-  { value: "constant", label: "Valor Constante" },
-  { value: "range", label: "Faixa de Valores" },
-  { value: "percentage", label: "Percentual" }
+  { value: "constante", label: "Constante" },
+  { value: "faixa", label: "Faixa" },
+  { value: "percentual", label: "Percentual" }
 ];
 
 export const FixedFeeRuleForm = () => {
@@ -187,7 +187,7 @@ export const FixedFeeRuleForm = () => {
     setEditingId(null);
   };
 
-  const showRangeFields = formData.rule_type === "range";
+  const showRangeFields = formData.rule_type === "faixa";
 
   return (
     <div className="space-y-6">
@@ -259,7 +259,7 @@ export const FixedFeeRuleForm = () => {
             
             <div>
               <Label htmlFor="value">
-                {formData.rule_type === "percentage" ? "Valor (%)" : "Valor (R$)"} *
+                {formData.rule_type === "percentual" ? "Valor (%)" : "Valor (R$)"} *
               </Label>
               <Input
                 id="value"
@@ -311,13 +311,13 @@ export const FixedFeeRuleForm = () => {
                       {RULE_TYPES.find(t => t.value === rule.rule_type)?.label}
                     </TableCell>
                     <TableCell>
-                      {rule.rule_type === "range" && rule.range_min !== null && rule.range_max !== null
-                        ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
-                        : "-"
-                      }
-                    </TableCell>
-                    <TableCell>
-                      {rule.rule_type === "percentage" 
+                       {rule.rule_type === "faixa" && rule.range_min !== null && rule.range_max !== null
+                         ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
+                         : "-"
+                       }
+                     </TableCell>
+                     <TableCell>
+                       {rule.rule_type === "percentual"
                         ? `${rule.value.toFixed(2)}%`
                         : `R$ ${rule.value.toFixed(2)}`
                       }
