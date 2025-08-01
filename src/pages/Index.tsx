@@ -6,6 +6,7 @@ import { ShippingRuleForm } from "@/components/forms/ShippingRuleForm";
 import { CommissionForm } from "@/components/forms/CommissionForm";
 import { FixedFeeRuleForm } from "@/components/forms/FixedFeeRuleForm";
 import { SalesForm } from "@/components/forms/SalesForm";
+import { PricingForm } from "@/components/forms/PricingForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -31,7 +32,7 @@ const Index = () => {
             <TabsTrigger value="commissions">Comissões</TabsTrigger>
             <TabsTrigger value="fixedfees">Regras de valor fixo</TabsTrigger>
             <TabsTrigger value="sales">Vendas</TabsTrigger>
-            <TabsTrigger value="pricing" onClick={() => window.location.href = '/pricing'}>Precificação</TabsTrigger>
+            <TabsTrigger value="pricing">Precificação</TabsTrigger>
           </TabsList>
 
           <TabsContent value="marketplaces" className="mt-6">
@@ -128,6 +129,20 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <SalesForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="pricing" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Precificação</CardTitle>
+                <CardDescription>
+                  Calcule preços sugeridos e margens de lucro
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PricingForm />
               </CardContent>
             </Card>
           </TabsContent>
