@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,105 +7,42 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit } from "lucide-react";
-
-interface Marketplace {
-  id: string;
-  name: string;
-  description: string | null;
-  url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { useMarketplaces, useCreateMarketplace, useUpdateMarketplace, useDeleteMarketplace } from "@/hooks/useMarketplaces";
+import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";
 
 export const MarketplaceForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<MarketplaceFormData>({
     name: "",
     description: "",
     url: ""
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: marketplaces = [], isLoading } = useQuery({
-    queryKey: ["marketplaces"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("marketplaces")
-        .select("*")
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      return data as Marketplace[];
-    }
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const { error } = await supabase
-        .from("marketplaces")
-        .insert([data]);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["marketplaces"] });
-      setFormData({ name: "", description: "", url: "" });
-      toast({ title: "Marketplace criado com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao criar marketplace", description: error.message, variant: "destructive" });
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: typeof formData }) => {
-      const { error } = await supabase
-        .from("marketplaces")
-        .update(data)
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["marketplaces"] });
-      setFormData({ name: "", description: "", url: "" });
-      setEditingId(null);
-      toast({ title: "Marketplace atualizado com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao atualizar marketplace", description: error.message, variant: "destructive" });
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("marketplaces")
-        .delete()
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["marketplaces"] });
-      toast({ title: "Marketplace excluído com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao excluir marketplace", description: error.message, variant: "destructive" });
-    }
-  });
+  const { data: marketplaces = [], isLoading } = useMarketplaces();
+  const createMutation = useCreateMarketplace();
+  const updateMutation = useUpdateMarketplace();
+  const deleteMutation = useDeleteMarketplace();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
+      updateMutation.mutate({ id: editingId, data: formData }, {
+        onSuccess: () => {
+          setFormData({ name: "", description: "", url: "" });
+          setEditingId(null);
+        }
+      });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(formData, {
+        onSuccess: () => {
+          setFormData({ name: "", description: "", url: "" });
+        }
+      });
     }
   };
 
-  const handleEdit = (marketplace: Marketplace) => {
+  const handleEdit = (marketplace: MarketplaceType) => {
     setFormData({
       name: marketplace.name,
       description: marketplace.description || "",

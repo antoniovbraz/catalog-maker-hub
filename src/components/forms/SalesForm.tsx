@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,196 +9,77 @@ import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-
-interface Sale {
-  id: string;
-  product_id: string;
-  marketplace_id: string;
-  price_charged: number;
-  quantity: number;
-  sold_at: string;
-  products?: {
-    name: string;
-  };
-  marketplaces?: {
-    name: string;
-  };
-}
-
-interface Product {
-  id: string;
-  name: string;
-}
-
-interface Marketplace {
-  id: string;
-  name: string;
-}
+import { useSales, useCreateSale, useUpdateSale, useDeleteSale } from "@/hooks/useSales";
+import { useProducts } from "@/hooks/useProducts";
+import { useMarketplaces } from "@/hooks/useMarketplaces";
+import { SaleWithDetails, SaleFormData } from "@/types/sales";
+import { formatarMoeda } from "@/utils/pricing";
 
 export const SalesForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SaleFormData>({
     product_id: "",
     marketplace_id: "",
-    price_charged: "",
-    quantity: "1",
-    sold_at: new Date().toISOString().slice(0, 16) // Current datetime for datetime-local input
+    price_charged: 0,
+    quantity: 1,
+    sold_at: new Date().toISOString()
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
-  const { data: products = [] } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("id, name")
-        .order("name");
-      
-      if (error) throw error;
-      return data as Product[];
-    }
-  });
-
-  const { data: marketplaces = [] } = useQuery({
-    queryKey: ["marketplaces"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("marketplaces")
-        .select("id, name")
-        .order("name");
-      
-      if (error) throw error;
-      return data as Marketplace[];
-    }
-  });
-
-  const { data: sales = [], isLoading } = useQuery({
-    queryKey: ["sales"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sales")
-        .select(`
-          *,
-          products (name),
-          marketplaces (name)
-        `)
-        .order("sold_at", { ascending: false });
-      
-      if (error) throw error;
-      return data as Sale[];
-    }
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const { error } = await supabase
-        .from("sales")
-        .insert([{
-          product_id: data.product_id,
-          marketplace_id: data.marketplace_id,
-          price_charged: parseFloat(data.price_charged),
-          quantity: parseInt(data.quantity),
-          sold_at: new Date(data.sold_at).toISOString()
-        }]);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sales"] });
-      setFormData({
-        product_id: "",
-        marketplace_id: "",
-        price_charged: "",
-        quantity: "1",
-        sold_at: new Date().toISOString().slice(0, 16)
-      });
-      toast({ title: "Venda registrada com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao registrar venda", description: error.message, variant: "destructive" });
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const { error } = await supabase
-        .from("sales")
-        .update({
-          product_id: data.product_id,
-          marketplace_id: data.marketplace_id,
-          price_charged: parseFloat(data.price_charged),
-          quantity: parseInt(data.quantity),
-          sold_at: new Date(data.sold_at).toISOString()
-        })
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sales"] });
-      setFormData({
-        product_id: "",
-        marketplace_id: "",
-        price_charged: "",
-        quantity: "1",
-        sold_at: new Date().toISOString().slice(0, 16)
-      });
-      setEditingId(null);
-      toast({ title: "Venda atualizada com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao atualizar venda", description: error.message, variant: "destructive" });
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("sales")
-        .delete()
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sales"] });
-      toast({ title: "Venda excluída com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao excluir venda", description: error.message, variant: "destructive" });
-    }
-  });
+  const { data: products = [] } = useProducts();
+  const { data: marketplaces = [] } = useMarketplaces();
+  const { data: sales = [], isLoading } = useSales();
+  const createMutation = useCreateSale();
+  const updateMutation = useUpdateSale();
+  const deleteMutation = useDeleteSale();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
+      updateMutation.mutate({ id: editingId, data: formData }, {
+        onSuccess: () => {
+          resetForm();
+        }
+      });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(formData, {
+        onSuccess: () => {
+          resetForm();
+        }
+      });
     }
   };
 
-  const handleEdit = (sale: Sale) => {
+  const resetForm = () => {
     setFormData({
-      product_id: sale.product_id,
-      marketplace_id: sale.marketplace_id,
-      price_charged: sale.price_charged.toString(),
-      quantity: sale.quantity.toString(),
-      sold_at: new Date(sale.sold_at).toISOString().slice(0, 16)
+      product_id: "",
+      marketplace_id: "",
+      price_charged: 0,
+      quantity: 1,
+      sold_at: new Date().toISOString()
+    });
+    setEditingId(null);
+  };
+
+  const handleEdit = (sale: SaleWithDetails) => {
+    setFormData({
+      product_id: sale.product_id || "",
+      marketplace_id: sale.marketplace_id || "",
+      price_charged: sale.price_charged,
+      quantity: sale.quantity,
+      sold_at: sale.sold_at
     });
     setEditingId(sale.id);
   };
 
-  const handleCancelEdit = () => {
-    setFormData({
-      product_id: "",
-      marketplace_id: "",
-      price_charged: "",
-      quantity: "1",
-      sold_at: new Date().toISOString().slice(0, 16)
-    });
-    setEditingId(null);
+  // Convert ISO date to datetime-local format for input
+  const formatDateForInput = (isoDate: string) => {
+    return new Date(isoDate).toISOString().slice(0, 16);
+  };
+
+  // Convert datetime-local input to ISO string
+  const formatDateFromInput = (dateString: string) => {
+    return new Date(dateString).toISOString();
   };
 
   return (
@@ -214,14 +93,17 @@ export const SalesForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="product">Produto *</Label>
-                <Select value={formData.product_id} onValueChange={(value) => setFormData(prev => ({ ...prev, product_id: value }))}>
+                <Select 
+                  value={formData.product_id} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, product_id: value }))}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um produto" />
                   </SelectTrigger>
                   <SelectContent>
                     {products.map((product) => (
                       <SelectItem key={product.id} value={product.id}>
-                        {product.name}
+                        {product.name} {product.sku ? `(${product.sku})` : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -230,7 +112,10 @@ export const SalesForm = () => {
               
               <div>
                 <Label htmlFor="marketplace">Marketplace *</Label>
-                <Select value={formData.marketplace_id} onValueChange={(value) => setFormData(prev => ({ ...prev, marketplace_id: value }))}>
+                <Select 
+                  value={formData.marketplace_id} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, marketplace_id: value }))}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um marketplace" />
                   </SelectTrigger>
@@ -253,7 +138,7 @@ export const SalesForm = () => {
                   type="number"
                   step="0.01"
                   value={formData.price_charged}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price_charged: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, price_charged: parseFloat(e.target.value) || 0 }))}
                   required
                 />
               </div>
@@ -265,7 +150,7 @@ export const SalesForm = () => {
                   type="number"
                   min="1"
                   value={formData.quantity}
-                  onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
                   required
                 />
               </div>
@@ -275,8 +160,8 @@ export const SalesForm = () => {
                 <Input
                   id="sold_at"
                   type="datetime-local"
-                  value={formData.sold_at}
-                  onChange={(e) => setFormData(prev => ({ ...prev, sold_at: e.target.value }))}
+                  value={formatDateForInput(formData.sold_at)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, sold_at: formatDateFromInput(e.target.value) }))}
                   required
                 />
               </div>
@@ -287,7 +172,7 @@ export const SalesForm = () => {
                 {editingId ? "Atualizar" : "Registrar"}
               </Button>
               {editingId && (
-                <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                <Button type="button" variant="outline" onClick={resetForm}>
                   Cancelar
                 </Button>
               )}
@@ -321,9 +206,9 @@ export const SalesForm = () => {
                   <TableRow key={sale.id}>
                     <TableCell className="font-medium">{sale.products?.name}</TableCell>
                     <TableCell>{sale.marketplaces?.name}</TableCell>
-                    <TableCell>R$ {sale.price_charged.toFixed(2)}</TableCell>
+                    <TableCell>{formatarMoeda(sale.price_charged)}</TableCell>
                     <TableCell>{sale.quantity}</TableCell>
-                    <TableCell>R$ {(sale.price_charged * sale.quantity).toFixed(2)}</TableCell>
+                    <TableCell>{formatarMoeda(sale.price_charged * sale.quantity)}</TableCell>
                     <TableCell>
                       {format(new Date(sale.sold_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                     </TableCell>
