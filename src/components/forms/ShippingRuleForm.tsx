@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit } from "lucide-react";
+import { handleSupabaseError } from "@/utils/errors";
 
 interface ShippingRule {
   id: string;
@@ -90,61 +91,47 @@ export const ShippingRuleForm = () => {
     }
   });
 
-  const createMutation = useMutation({
+  const upsertMutation = useMutation({
     mutationFn: async (data: any) => {
       const { error } = await supabase
         .from("shipping_rules")
-        .insert([{
+        .upsert({
           ...data,
           shipping_cost: parseFloat(data.shipping_cost),
           free_shipping_threshold: parseFloat(data.free_shipping_threshold || "0")
-        }]);
+        }, {
+          onConflict: 'product_id,marketplace_id',
+          ignoreDuplicates: false
+        });
       
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shipping_rules"] });
-      setFormData({
-        product_id: "",
-        marketplace_id: "",
-        shipping_cost: "",
-        free_shipping_threshold: ""
+      resetForm();
+      toast({ 
+        title: editingId ? "Regra de frete atualizada com sucesso!" : "Regra de frete criada com sucesso!" 
       });
-      toast({ title: "Regra de frete criada com sucesso!" });
     },
     onError: (error) => {
-      toast({ title: "Erro ao criar regra de frete", description: error.message, variant: "destructive" });
+      const friendlyMessage = handleSupabaseError(error);
+      toast({ 
+        title: "Erro ao salvar regra de frete", 
+        description: friendlyMessage, 
+        variant: "destructive" 
+      });
     }
   });
 
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const { error } = await supabase
-        .from("shipping_rules")
-        .update({
-          ...data,
-          shipping_cost: parseFloat(data.shipping_cost),
-          free_shipping_threshold: parseFloat(data.free_shipping_threshold || "0")
-        })
-        .eq("id", id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["shipping_rules"] });
-      setFormData({
-        product_id: "",
-        marketplace_id: "",
-        shipping_cost: "",
-        free_shipping_threshold: ""
-      });
-      setEditingId(null);
-      toast({ title: "Regra de frete atualizada com sucesso!" });
-    },
-    onError: (error) => {
-      toast({ title: "Erro ao atualizar regra de frete", description: error.message, variant: "destructive" });
-    }
-  });
+  const resetForm = () => {
+    setFormData({
+      product_id: "",
+      marketplace_id: "",
+      shipping_cost: "",
+      free_shipping_threshold: ""
+    });
+    setEditingId(null);
+  };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -160,17 +147,45 @@ export const ShippingRuleForm = () => {
       toast({ title: "Regra de frete excluída com sucesso!" });
     },
     onError: (error) => {
-      toast({ title: "Erro ao excluir regra de frete", description: error.message, variant: "destructive" });
+      const friendlyMessage = handleSupabaseError(error);
+      toast({ 
+        title: "Erro ao excluir regra de frete", 
+        description: friendlyMessage, 
+        variant: "destructive" 
+      });
     }
   });
 
+  // Detectar automaticamente se uma regra já existe para produto + marketplace
+  useEffect(() => {
+    if (formData.product_id && formData.marketplace_id && !editingId) {
+      const existingRule = shippingRules.find(rule => 
+        rule.product_id === formData.product_id && 
+        rule.marketplace_id === formData.marketplace_id
+      );
+      
+      if (existingRule) {
+        setFormData({
+          product_id: existingRule.product_id,
+          marketplace_id: existingRule.marketplace_id,
+          shipping_cost: existingRule.shipping_cost.toString(),
+          free_shipping_threshold: existingRule.free_shipping_threshold.toString()
+        });
+        setEditingId(existingRule.id);
+        toast({ 
+          title: "Regra encontrada", 
+          description: "Esta combinação já existe. Modo de edição ativado.",
+          variant: "default"
+        });
+      }
+    }
+  }, [formData.product_id, formData.marketplace_id, shippingRules, editingId, toast]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
+    
+    const dataToSave = editingId ? { id: editingId, ...formData } : formData;
+    upsertMutation.mutate(dataToSave);
   };
 
   const handleEdit = (rule: ShippingRule) => {
@@ -184,13 +199,7 @@ export const ShippingRuleForm = () => {
   };
 
   const handleCancelEdit = () => {
-    setFormData({
-      product_id: "",
-      marketplace_id: "",
-      shipping_cost: "",
-      free_shipping_threshold: ""
-    });
-    setEditingId(null);
+    resetForm();
   };
 
   return (
@@ -261,7 +270,7 @@ export const ShippingRuleForm = () => {
             </div>
             
             <div className="flex gap-2">
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+              <Button type="submit" disabled={upsertMutation.isPending}>
                 {editingId ? "Atualizar" : "Criar"}
               </Button>
               {editingId && (
