@@ -67,7 +67,7 @@ export const ProductForm = () => {
       name: product.name,
       description: product.description || "",
       sku: product.sku || "",
-      category_id: product.category_id || "",
+      category_id: product.category_id || "none",
       cost_unit: product.cost_unit || 0,
       packaging_cost: product.packaging_cost || 0,
       tax_rate: product.tax_rate || 0
@@ -120,7 +120,7 @@ export const ProductForm = () => {
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma categoria</SelectItem>
+                  <SelectItem value="none">Nenhuma categoria</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}

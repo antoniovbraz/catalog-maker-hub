@@ -101,7 +101,7 @@ export const CommissionForm = () => {
                     <SelectValue placeholder="Selecione uma categoria (ou deixe vazio para padrão)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Padrão (todas as categorias)</SelectItem>
+                    <SelectItem value="default">Padrão (todas as categorias)</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
