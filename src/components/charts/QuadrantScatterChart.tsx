@@ -1,0 +1,121 @@
+import React from "react";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+
+interface ProductStrategy {
+  product_id: string;
+  product_name: string;
+  marketplace_name: string;
+  giro_percentage: number;
+  margin_percentage: number;
+  quadrant: "alta_margem_alto_giro" | "alta_margem_baixo_giro" | "baixa_margem_alto_giro" | "baixa_margem_baixo_giro";
+  total_revenue: number;
+}
+
+interface QuadrantScatterChartProps {
+  data: ProductStrategy[];
+  margeLimitAlta: number;
+  giroLimitAlto: number;
+}
+
+const getQuadrantColor = (quadrant: ProductStrategy["quadrant"]) => {
+  switch (quadrant) {
+    case "alta_margem_alto_giro": return "#22c55e"; // green
+    case "alta_margem_baixo_giro": return "#3b82f6"; // blue
+    case "baixa_margem_alto_giro": return "#eab308"; // yellow
+    case "baixa_margem_baixo_giro": return "#ef4444"; // red
+    default: return "#6b7280";
+  }
+};
+
+export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
+  data,
+  margeLimitAlta,
+  giroLimitAlto,
+}) => {
+  const scatterData = data.map((item, index) => ({
+    x: item.giro_percentage,
+    y: item.margin_percentage,
+    z: Math.log(item.total_revenue + 1) * 5, // Size based on revenue
+    name: item.product_name,
+    marketplace: item.marketplace_name,
+    quadrant: item.quadrant,
+    revenue: item.total_revenue,
+    index,
+  }));
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-muted-foreground text-xs">{data.marketplace}</p>
+          <p>Margem: {data.y.toFixed(1)}%</p>
+          <p>Giro: {data.x.toFixed(1)}%</p>
+          <p>Receita: R$ {data.revenue.toFixed(2)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="h-80 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <ScatterChart
+          margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          
+          {/* Reference lines */}
+          <XAxis 
+            type="number" 
+            dataKey="x" 
+            name="Giro %" 
+            domain={[0, 'dataMax + 2']}
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis 
+            type="number" 
+            dataKey="y" 
+            name="Margem %" 
+            domain={[0, 'dataMax + 5']}
+            tick={{ fontSize: 12 }}
+          />
+          
+          {/* Quadrant dividers */}
+          <line 
+            x1={`${giroLimitAlto}%`} 
+            y1="0%" 
+            x2={`${giroLimitAlto}%`} 
+            y2="100%" 
+            stroke="hsl(var(--muted-foreground))" 
+            strokeDasharray="5,5" 
+            opacity={0.5}
+          />
+          <line 
+            x1="0%" 
+            y1={`${100 - (margeLimitAlta / Math.max(...data.map(d => d.margin_percentage)) * 100)}%`} 
+            x2="100%" 
+            y2={`${100 - (margeLimitAlta / Math.max(...data.map(d => d.margin_percentage)) * 100)}%`} 
+            stroke="hsl(var(--muted-foreground))" 
+            strokeDasharray="5,5" 
+            opacity={0.5}
+          />
+          
+          <Tooltip content={<CustomTooltip />} />
+          
+          <Scatter data={scatterData}>
+            {scatterData.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={getQuadrantColor(entry.quadrant)}
+                fillOpacity={0.8}
+              />
+            ))}
+          </Scatter>
+        </ScatterChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};

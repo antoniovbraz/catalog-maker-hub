@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { TrendingUp, TrendingDown, BarChart3, Target, Package } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3, Target, Package, PieChart, ScatterChart } from "lucide-react";
+import { QuadrantScatterChart } from "@/components/charts/QuadrantScatterChart";
+import { QuadrantDonutChart } from "@/components/charts/QuadrantDonutChart";
+import { RevenueByQuadrantChart } from "@/components/charts/RevenueByQuadrantChart";
 
 interface SalesData {
   product_id: string;
@@ -261,7 +264,7 @@ export const StrategyForm = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">
                     {strategyAnalysis.quadrantCounts.alta_margem_alto_giro}
@@ -287,6 +290,44 @@ export const StrategyForm = () => {
                   <div className="text-sm text-muted-foreground">❓ Questionáveis</div>
                 </div>
               </div>
+              
+              {/* Subtle Charts */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <PieChart className="h-4 w-4" />
+                    Distribuição dos Quadrantes
+                  </h4>
+                  <QuadrantDonutChart quadrantCounts={strategyAnalysis.quadrantCounts} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Receita por Quadrante
+                  </h4>
+                  <RevenueByQuadrantChart data={strategyAnalysis.products} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Strategic Positioning Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ScatterChart className="h-5 w-5" />
+                Posicionamento Estratégico
+              </CardTitle>
+              <CardDescription>
+                Visualização da posição de cada produto na matriz margem x giro
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <QuadrantScatterChart 
+                data={strategyAnalysis.products}
+                margeLimitAlta={margeLimitAlta}
+                giroLimitAlto={giroLimitAlto}
+              />
             </CardContent>
           </Card>
 
