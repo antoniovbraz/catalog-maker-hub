@@ -125,23 +125,32 @@ export const DashboardForm = () => {
 
   // Transform saved pricing data for display
   const results = savedPricings
-    .map(pricing => ({
-      marketplace_id: pricing.marketplace_id,
-      marketplace_name: pricing.marketplaces?.name || 'Marketplace',
-      custo_total: pricing.custo_total,
-      valor_fixo: pricing.valor_fixo,
-      frete: pricing.frete,
-      comissao: pricing.comissao,
-      preco_sugerido: pricing.preco_sugerido,
-      margem_unitaria: pricing.margem_unitaria,
-      margem_percentual: pricing.margem_percentual,
-      preco_praticado: pricing.preco_praticado,
-      taxa_cartao: pricing.taxa_cartao,
-      provisao_desconto: pricing.provisao_desconto,
-      margem_desejada: pricing.margem_desejada,
-      product_name: pricing.products?.name || '',
-      product_sku: pricing.products?.sku || '',
-    }))
+    .map(pricing => {
+      // Calcular margem real baseada no preço praticado
+      const totalTaxasPercentuais = pricing.comissao + pricing.taxa_cartao + pricing.provisao_desconto;
+      const custosTotaisFixos = pricing.custo_total + pricing.valor_fixo + pricing.frete;
+      const custosPercentuais = pricing.preco_praticado * (totalTaxasPercentuais / 100);
+      const margem_real_unitaria = pricing.preco_praticado - custosTotaisFixos - custosPercentuais;
+      const margem_real_percentual = pricing.preco_praticado > 0 ? (margem_real_unitaria / pricing.preco_praticado) * 100 : 0;
+
+      return {
+        marketplace_id: pricing.marketplace_id,
+        marketplace_name: pricing.marketplaces?.name || 'Marketplace',
+        custo_total: pricing.custo_total,
+        valor_fixo: pricing.valor_fixo,
+        frete: pricing.frete,
+        comissao: pricing.comissao,
+        preco_sugerido: pricing.preco_sugerido,
+        margem_unitaria: margem_real_unitaria, // Margem real baseada no preço praticado
+        margem_percentual: margem_real_percentual, // Margem real percentual
+        preco_praticado: pricing.preco_praticado,
+        taxa_cartao: pricing.taxa_cartao,
+        provisao_desconto: pricing.provisao_desconto,
+        margem_desejada: pricing.margem_desejada,
+        product_name: pricing.products?.name || '',
+        product_sku: pricing.products?.sku || '',
+      };
+    })
     .sort((a, b) => {
       const aValue = a[sortBy];
       const bValue = b[sortBy];
