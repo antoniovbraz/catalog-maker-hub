@@ -173,6 +173,7 @@ export const PricingForm = () => {
           preco_sugerido: pricingResult.preco_sugerido,
           margem_unitaria: pricingResult.margem_unitaria,
           margem_percentual: pricingResult.margem_percentual,
+          preco_praticado: formData.preco_praticado || 0,
         }, {
           onConflict: 'product_id,marketplace_id'
         });

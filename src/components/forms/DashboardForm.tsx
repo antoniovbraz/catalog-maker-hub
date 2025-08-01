@@ -35,6 +35,7 @@ interface SavedPricing {
   preco_sugerido: number;
   margem_unitaria: number;
   margem_percentual: number;
+  preco_praticado: number;
   created_at: string;
   updated_at: string;
 }
@@ -134,6 +135,7 @@ export const DashboardForm = () => {
       preco_sugerido: pricing.preco_sugerido,
       margem_unitaria: pricing.margem_unitaria,
       margem_percentual: pricing.margem_percentual,
+      preco_praticado: pricing.preco_praticado,
       taxa_cartao: pricing.taxa_cartao,
       provisao_desconto: pricing.provisao_desconto,
       margem_desejada: pricing.margem_desejada,
@@ -325,7 +327,7 @@ export const DashboardForm = () => {
                         <DollarSign className="h-3 w-3 text-muted-foreground" />
                         <span className="text-muted-foreground">Preço:</span>
                       </div>
-                      <div className="font-bold text-lg">R$ {result.preco_sugerido.toFixed(2)}</div>
+                      <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
                       
                       <div className="flex items-center gap-1">
                         <TrendingUp className="h-3 w-3 text-green-600" />

@@ -248,6 +248,7 @@ export type Database = {
           margem_percentual: number
           margem_unitaria: number
           marketplace_id: string
+          preco_praticado: number | null
           preco_sugerido: number
           product_id: string
           provisao_desconto: number
@@ -265,6 +266,7 @@ export type Database = {
           margem_percentual: number
           margem_unitaria: number
           marketplace_id: string
+          preco_praticado?: number | null
           preco_sugerido: number
           product_id: string
           provisao_desconto?: number
@@ -282,6 +284,7 @@ export type Database = {
           margem_percentual?: number
           margem_unitaria?: number
           marketplace_id?: string
+          preco_praticado?: number | null
           preco_sugerido?: number
           product_id?: string
           provisao_desconto?: number
