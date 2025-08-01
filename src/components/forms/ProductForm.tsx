@@ -174,9 +174,9 @@ export const ProductForm = () => {
       description: product.description || "",
       sku: product.sku || "",
       category_id: product.category_id || "none",
-      cost_unit: product.cost_unit.toString(),
-      packaging_cost: product.packaging_cost.toString(),
-      tax_rate: product.tax_rate.toString()
+      cost_unit: (product.cost_unit || 0).toString(),
+      packaging_cost: (product.packaging_cost || 0).toString(),
+      tax_rate: (product.tax_rate || 0).toString()
     });
     setEditingId(product.id);
   };
@@ -323,7 +323,7 @@ export const ProductForm = () => {
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.sku}</TableCell>
                     <TableCell>{product.categories?.name || "Sem categoria"}</TableCell>
-                    <TableCell>R$ {product.cost_unit.toFixed(2)}</TableCell>
+                    <TableCell>R$ {(product.cost_unit || 0).toFixed(2)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <Button
