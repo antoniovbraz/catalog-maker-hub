@@ -119,7 +119,22 @@ export const PricingForm = () => {
         // Se há preço praticado, calcular margem real também
         if (formData.preco_praticado > 0) {
           console.log('Calculando margem real para preço praticado:', formData.preco_praticado);
-          await calculateMargemReal();
+          
+          try {
+            const margemResult = await calculateMargemRealMutation.mutateAsync({
+              productId: formData.product_id,
+              marketplaceId: formData.marketplace_id,
+              taxaCartao: formData.taxa_cartao,
+              provisaoDesconto: formData.provisao_desconto,
+              precoPraticado: formData.preco_praticado
+            });
+
+            if (margemResult && typeof margemResult === 'object') {
+              setMargemRealResult(margemResult as MargemRealResult);
+            }
+          } catch (error) {
+            console.error('Erro ao calcular margem real:', error);
+          }
         }
         
         console.log('Estado atualizado com sucesso');
@@ -141,30 +156,6 @@ export const PricingForm = () => {
     }
   };
 
-  const calculateMargemReal = async () => {
-    if (!formData.product_id || !formData.marketplace_id || !formData.preco_praticado || formData.preco_praticado <= 0) {
-      return;
-    }
-
-    try {
-      const result = await calculateMargemRealMutation.mutateAsync({
-        productId: formData.product_id,
-        marketplaceId: formData.marketplace_id,
-        taxaCartao: formData.taxa_cartao,
-        provisaoDesconto: formData.provisao_desconto,
-        precoPraticado: formData.preco_praticado
-      });
-
-      console.log('Resultado margem real recebido:', result);
-
-      if (result && typeof result === 'object') {
-        const typedResult = result as MargemRealResult;
-        setMargemRealResult(typedResult);
-      }
-    } catch (error) {
-      console.error('Erro ao calcular margem real:', error);
-    }
-  };
 
   const handleSave = async () => {
     if (!pricingResult) {
@@ -315,21 +306,11 @@ export const PricingForm = () => {
           <div className="flex gap-2">
             <Button
               onClick={handleCalculate}
-              disabled={calculatePriceMutation.isPending}
+              disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
               className="flex-1"
             >
-              {calculatePriceMutation.isPending ? "Calculando..." : "Calcular Preço"}
+              {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "Calcular"}
             </Button>
-
-            {formData.preco_praticado > 0 && formData.product_id && formData.marketplace_id && (
-              <Button
-                onClick={calculateMargemReal}
-                disabled={calculateMargemRealMutation.isPending}
-                variant="outline"
-              >
-                {calculateMargemRealMutation.isPending ? "Calculando..." : "Calcular Margem Real"}
-              </Button>
-            )}
             
             {pricingResult && (
               <Button 

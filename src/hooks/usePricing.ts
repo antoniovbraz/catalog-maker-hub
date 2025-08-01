@@ -66,7 +66,21 @@ export function useSavePricing() {
 
   return useMutation({
     mutationFn: (data: PricingFormData & { preco_sugerido: number; margem_unitaria: number; margem_percentual: number }) => 
-      pricingService.create(data),
+      pricingService.upsert({
+        product_id: data.product_id,
+        marketplace_id: data.marketplace_id,
+        custo_total: data.custo_total,
+        valor_fixo: data.valor_fixo,
+        frete: data.frete,
+        comissao: data.comissao,
+        taxa_cartao: data.taxa_cartao,
+        provisao_desconto: data.provisao_desconto,
+        margem_desejada: data.margem_desejada,
+        preco_sugerido: data.preco_sugerido,
+        preco_praticado: data.preco_praticado,
+        margem_unitaria: data.margem_unitaria,
+        margem_percentual: data.margem_percentual
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY] });
       toast({

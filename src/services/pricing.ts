@@ -76,6 +76,20 @@ export class PricingService extends BaseService<SavedPricingType> {
     // A função retorna um objeto JSON completo, não apenas um número
     return data;
   }
+
+  async upsert(data: Omit<SavedPricingType, 'id' | 'created_at' | 'updated_at'>): Promise<SavedPricingType> {
+    const { data: result, error } = await supabase
+      .from('saved_pricing')
+      .upsert(data, {
+        onConflict: 'product_id,marketplace_id',
+        ignoreDuplicates: false
+      })
+      .select()
+      .single();
+    
+    if (error) this.handleError(error, 'Salvar/atualizar precificação');
+    return result;
+  }
 }
 
 export const pricingService = new PricingService();
