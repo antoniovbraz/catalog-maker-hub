@@ -11,8 +11,111 @@ import { DashboardForm } from "@/components/forms/DashboardForm";
 import { StrategyForm } from "@/components/forms/StrategyForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  horizontalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from "lucide-react";
+
+// Definição das abas com suas configurações
+interface TabItem {
+  id: string;
+  label: string;
+  value: string;
+}
+
+const defaultTabs: TabItem[] = [
+  { id: "dashboard", label: "Dashboard", value: "dashboard" },
+  { id: "strategy", label: "Estratégia", value: "strategy" },
+  { id: "marketplaces", label: "Marketplaces", value: "marketplaces" },
+  { id: "categories", label: "Categorias", value: "categories" },
+  { id: "products", label: "Produtos", value: "products" },
+  { id: "shipping", label: "Frete", value: "shipping" },
+  { id: "commissions", label: "Comissões", value: "commissions" },
+  { id: "fixedfees", label: "Regras de valor fixo", value: "fixedfees" },
+  { id: "sales", label: "Vendas", value: "sales" },
+  { id: "pricing", label: "Precificação", value: "pricing" },
+];
+
+// Componente para cada aba drag-and-drop
+interface SortableTabProps {
+  tab: TabItem;
+}
+
+const SortableTab = ({ tab }: SortableTabProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: tab.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <TabsTrigger 
+      ref={setNodeRef} 
+      style={style} 
+      value={tab.value}
+      className="group relative"
+      {...attributes}
+    >
+      <div className="flex items-center gap-1">
+        <span>{tab.label}</span>
+        <div 
+          {...listeners} 
+          className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical className="h-3 w-3 text-muted-foreground" />
+        </div>
+      </div>
+    </TabsTrigger>
+  );
+};
 
 const Index = () => {
+  const [tabs, setTabs] = useState<TabItem[]>(defaultTabs);
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setTabs((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
@@ -25,19 +128,23 @@ const Index = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="strategy">Estratégia</TabsTrigger>
-            <TabsTrigger value="marketplaces">Marketplaces</TabsTrigger>
-            <TabsTrigger value="categories">Categorias</TabsTrigger>
-            <TabsTrigger value="products">Produtos</TabsTrigger>
-            <TabsTrigger value="shipping">Frete</TabsTrigger>
-            <TabsTrigger value="commissions">Comissões</TabsTrigger>
-            <TabsTrigger value="fixedfees">Regras de valor fixo</TabsTrigger>
-            <TabsTrigger value="sales">Vendas</TabsTrigger>
-            <TabsTrigger value="pricing">Precificação</TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext 
+              items={tabs.map(tab => tab.id)} 
+              strategy={horizontalListSortingStrategy}
+            >
+              <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
+                {tabs.map((tab) => (
+                  <SortableTab key={tab.id} tab={tab} />
+                ))}
+              </TabsList>
+            </SortableContext>
+          </DndContext>
 
           <TabsContent value="dashboard" className="mt-6">
             <Card>
