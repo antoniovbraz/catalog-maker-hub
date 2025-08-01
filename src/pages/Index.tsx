@@ -9,6 +9,14 @@ import { SalesForm } from "@/components/forms/SalesForm";
 import { PricingForm } from "@/components/forms/PricingForm";
 import { DashboardForm } from "@/components/forms/DashboardForm";
 import { StrategyForm } from "@/components/forms/StrategyForm";
+
+// Dashboard avançado imports
+import { PricingComparisonChart } from "@/components/charts/PricingComparisonChart";
+import { MarginAnalysisChart } from "@/components/charts/MarginAnalysisChart";
+import { RecommendationsPanel } from "@/components/dashboard/RecommendationsPanel";
+import { MarketplacePerformanceTable } from "@/components/dashboard/MarketplacePerformanceTable";
+import { usePricingComparisons, useBulkPricingCalculations } from "@/hooks/useBulkPricing";
+import { generateRecommendations } from "@/utils/recommendations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -95,6 +103,11 @@ const SortableTab = ({ tab }: SortableTabProps) => {
 const Index = () => {
   const [tabs, setTabs] = useState<TabItem[]>(defaultTabs);
   const [activeTab, setActiveTab] = useState("dashboard");
+  
+  // Hooks para dashboard avançado
+  const { data: comparisons = [] } = usePricingComparisons();
+  const { data: bulkResults = [] } = useBulkPricingCalculations();
+  const recommendations = generateRecommendations(comparisons, bulkResults);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -147,17 +160,40 @@ const Index = () => {
           </DndContext>
 
           <TabsContent value="dashboard" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Dashboard - Comparação de Preços</CardTitle>
-                <CardDescription>
-                  Compare preços e margens entre diferentes marketplaces para um produto
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <DashboardForm />
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              {/* Dashboard Avançado */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <PricingComparisonChart comparisons={comparisons} />
+                <MarginAnalysisChart comparisons={comparisons} />
+              </div>
+              
+              <MarketplacePerformanceTable comparisons={comparisons} />
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <RecommendationsPanel 
+                    recommendations={recommendations}
+                    onRecommendationClick={(rec) => {
+                      console.log('Recomendação clicada:', rec);
+                      // Aqui poderia navegar para a aba relevante
+                    }}
+                  />
+                </div>
+                
+                {/* Dashboard Form original como ferramenta complementar */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Análise Individual</CardTitle>
+                    <CardDescription>
+                      Ferramenta para análise específica de produto
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <DashboardForm />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="strategy" className="mt-6">
