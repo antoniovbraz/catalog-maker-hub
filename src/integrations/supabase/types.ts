@@ -287,7 +287,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calcular_margem_real: {
+        Args: {
+          p_product_id: string
+          p_marketplace_id: string
+          p_taxa_cartao: number
+          p_provisao_desconto: number
+          p_preco_praticado: number
+        }
+        Returns: Json
+      }
+      calcular_preco: {
+        Args: {
+          p_product_id: string
+          p_marketplace_id: string
+          p_taxa_cartao: number
+          p_provisao_desconto: number
+          p_margem_desejada: number
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
