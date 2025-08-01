@@ -8,6 +8,7 @@ import { FixedFeeRuleForm } from "@/components/forms/FixedFeeRuleForm";
 import { SalesForm } from "@/components/forms/SalesForm";
 import { PricingForm } from "@/components/forms/PricingForm";
 import { DashboardForm } from "@/components/forms/DashboardForm";
+import { StrategyForm } from "@/components/forms/StrategyForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -25,8 +26,9 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-9">
+          <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="strategy">Estratégia</TabsTrigger>
             <TabsTrigger value="marketplaces">Marketplaces</TabsTrigger>
             <TabsTrigger value="categories">Categorias</TabsTrigger>
             <TabsTrigger value="products">Produtos</TabsTrigger>
@@ -47,6 +49,20 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <DashboardForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="strategy" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Estratégia de Precificação</CardTitle>
+                <CardDescription>
+                  Analise produtos por margem e giro de vendas usando matriz estratégica
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <StrategyForm />
               </CardContent>
             </Card>
           </TabsContent>
