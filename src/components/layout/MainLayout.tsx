@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
 
@@ -16,10 +16,7 @@ export function MainLayout({ children, activeTab, onTabChange }: MainLayoutProps
         <AppSidebar activeTab={activeTab} onTabChange={onTabChange} />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="h-12 flex items-center border-b bg-sidebar-border/10">
-            <SidebarTrigger className="ml-2" />
-            <AppHeader />
-          </header>
+          <AppHeader />
           
           <main className="flex-1 overflow-auto">
             {children}

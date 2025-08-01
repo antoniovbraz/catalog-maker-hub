@@ -9,7 +9,9 @@ import {
   DollarSign, 
   BarChart3, 
   Calculator,
-  GripVertical
+  GripVertical,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -45,6 +47,7 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 const defaultMenuItems = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard },
@@ -118,7 +121,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const [menuItems, setMenuItems] = useState(defaultMenuItems);
 
@@ -144,13 +147,13 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
 
   return (
     <Sidebar className="border-r-0 bg-sidebar">
-      <SidebarHeader className="p-6">
+      <SidebarHeader className="p-6 relative">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
             <Calculator className="w-5 h-5 text-white" />
           </div>
           {!collapsed && (
-            <div>
+            <div className="flex-1">
               <h2 className="text-lg font-bold text-sidebar-foreground">
                 Catalog Maker
               </h2>
@@ -160,6 +163,23 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
             </div>
           )}
         </div>
+        
+        {/* Botão de colapsar sutil */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className={cn(
+            "absolute top-6 w-6 h-6 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-full transition-all duration-200",
+            collapsed ? "right-2" : "right-4"
+          )}
+        >
+          {collapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <ChevronLeft className="w-4 h-4" />
+          )}
+        </Button>
       </SidebarHeader>
 
       <SidebarContent>
