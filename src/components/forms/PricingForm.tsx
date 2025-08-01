@@ -153,6 +153,38 @@ export const PricingForm = () => {
     },
   });
 
+  // Save pricing
+  const savePricingMutation = useMutation({
+    mutationFn: async () => {
+      if (!pricingResult) throw new Error("Nenhum cálculo para salvar");
+      
+      const { error } = await supabase
+        .from("saved_pricing")
+        .upsert({
+          product_id: formData.product_id,
+          marketplace_id: formData.marketplace_id,
+          taxa_cartao: formData.taxa_cartao,
+          provisao_desconto: formData.provisao_desconto,
+          margem_desejada: formData.margem_desejada,
+          custo_total: pricingResult.custo_total,
+          valor_fixo: pricingResult.valor_fixo,
+          frete: pricingResult.frete,
+          comissao: pricingResult.comissao,
+          preco_sugerido: pricingResult.preco_sugerido,
+          margem_unitaria: pricingResult.margem_unitaria,
+          margem_percentual: pricingResult.margem_percentual,
+        });
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "Precificação salva com sucesso!" });
+    },
+    onError: (error) => {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    }
+  });
+
   const handleInputChange = (field: keyof PricingFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -274,14 +306,26 @@ export const PricingForm = () => {
             placeholder="Ex: 199.90 (se informado, calculará margem real também)"
           />
         </div>
-
-        <Button 
-          onClick={handleCalculate} 
-          disabled={calculateMutation.isPending}
-          className="w-full"
-        >
-          {calculateMutation.isPending ? "Calculando..." : "Calcular Preço Sugerido e Margem Real"}
-        </Button>
+        
+        <div className="flex gap-2">
+          <Button
+            onClick={handleCalculate}
+            disabled={calculateMutation.isPending}
+            className="flex-1"
+          >
+            {calculateMutation.isPending ? "Calculando..." : "Calcular Preço Sugerido e Margem Real"}
+          </Button>
+          
+          {pricingResult && (
+            <Button 
+              onClick={() => savePricingMutation.mutate()}
+              disabled={savePricingMutation.isPending}
+              variant="secondary"
+            >
+              {savePricingMutation.isPending ? "Salvando..." : "Salvar Precificação"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Results Section */}

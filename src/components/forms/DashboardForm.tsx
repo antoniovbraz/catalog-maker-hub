@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,9 +21,13 @@ interface Marketplace {
   name: string;
 }
 
-interface DashboardResult {
+interface SavedPricing {
+  id: string;
+  product_id: string;
   marketplace_id: string;
-  marketplace_name: string;
+  taxa_cartao: number;
+  provisao_desconto: number;
+  margem_desejada: number;
   custo_total: number;
   valor_fixo: number;
   frete: number;
@@ -32,8 +35,8 @@ interface DashboardResult {
   preco_sugerido: number;
   margem_unitaria: number;
   margem_percentual: number;
-  product_name: string;
-  product_sku: string;
+  created_at: string;
+  updated_at: string;
 }
 
 type SortOption = "margem_percentual" | "margem_unitaria" | "preco_sugerido";
@@ -42,9 +45,6 @@ export const DashboardForm = () => {
   const { toast } = useToast();
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedMarketplaces, setSelectedMarketplaces] = useState<string[]>([]);
-  const [taxaCartao, setTaxaCartao] = useState<number>(10); // Changed to match PricingForm
-  const [provisaoDesconto, setProvisaoDesconto] = useState<number>(10);
-  const [margemDesejada, setMargemDesejada] = useState<number>(25);
   const [sortBy, setSortBy] = useState<SortOption>("margem_percentual");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -74,36 +74,26 @@ export const DashboardForm = () => {
     },
   });
 
-  // Calculate prices for all selected marketplaces
-  const priceQueries = useQueries({
-    queries: selectedMarketplaces.map((marketplaceId) => ({
-      queryKey: ["calculate-price", selectedProductId, marketplaceId, taxaCartao, provisaoDesconto, margemDesejada],
-      queryFn: async () => {
-        if (!selectedProductId) return null;
-        
-        const { data, error } = await supabase.rpc("calcular_preco", {
-          p_product_id: selectedProductId,
-          p_marketplace_id: marketplaceId,
-          p_taxa_cartao: taxaCartao,
-          p_provisao_desconto: provisaoDesconto,
-          p_margem_desejada: margemDesejada,
-        });
-        
-        if (error) throw error;
-        
-        const result = data as any;
-        if ('error' in result) return null;
-        
-        const marketplace = marketplaces.find(m => m.id === marketplaceId);
-        
-        return {
-          marketplace_id: marketplaceId,
-          marketplace_name: marketplace?.name || 'Marketplace',
-          ...result
-        } as DashboardResult;
-      },
-      enabled: !!selectedProductId && selectedMarketplaces.length > 0,
-    }))
+  // Fetch saved pricing for selected product and marketplaces
+  const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery({
+    queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
+    queryFn: async () => {
+      if (!selectedProductId || selectedMarketplaces.length === 0) return [];
+      
+      const { data, error } = await supabase
+        .from("saved_pricing")
+        .select(`
+          *,
+          products!saved_pricing_product_id_fkey(name, sku),
+          marketplaces!saved_pricing_marketplace_id_fkey(name)
+        `)
+        .eq("product_id", selectedProductId)
+        .in("marketplace_id", selectedMarketplaces);
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedProductId && selectedMarketplaces.length > 0,
   });
 
   const handleMarketplaceToggle = (marketplaceId: string) => {
@@ -132,10 +122,24 @@ export const DashboardForm = () => {
     }
   };
 
-  // Get results and sort them
-  const results = priceQueries
-    .map(query => query.data)
-    .filter((result): result is DashboardResult => result !== null)
+  // Transform saved pricing data for display
+  const results = savedPricings
+    .map(pricing => ({
+      marketplace_id: pricing.marketplace_id,
+      marketplace_name: pricing.marketplaces?.name || 'Marketplace',
+      custo_total: pricing.custo_total,
+      valor_fixo: pricing.valor_fixo,
+      frete: pricing.frete,
+      comissao: pricing.comissao,
+      preco_sugerido: pricing.preco_sugerido,
+      margem_unitaria: pricing.margem_unitaria,
+      margem_percentual: pricing.margem_percentual,
+      taxa_cartao: pricing.taxa_cartao,
+      provisao_desconto: pricing.provisao_desconto,
+      margem_desejada: pricing.margem_desejada,
+      product_name: pricing.products?.name || '',
+      product_sku: pricing.products?.sku || '',
+    }))
     .sort((a, b) => {
       const aValue = a[sortBy];
       const bValue = b[sortBy];
@@ -143,18 +147,21 @@ export const DashboardForm = () => {
       return (aValue - bValue) * multiplier;
     });
 
-  const isLoading = priceQueries.some(query => query.isLoading);
+  const isLoading = loadingSavedPricings;
 
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
               Seleção de Produto
             </CardTitle>
+            <CardDescription>
+              Selecione um produto para comparar suas precificações salvas
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div>
@@ -178,47 +185,6 @@ export const DashboardForm = () => {
                   )}
                 </SelectContent>
               </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Parâmetros de Cálculo
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="taxaCartao">Taxa de Cartão (%)</Label>
-              <Input
-                id="taxaCartao"
-                type="number"
-                step="0.1"
-                value={taxaCartao}
-                onChange={(e) => setTaxaCartao(parseFloat(e.target.value) || 0)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="provisaoDesconto">Provisão Desconto (%)</Label>
-              <Input
-                id="provisaoDesconto"
-                type="number"
-                step="0.1"
-                value={provisaoDesconto}
-                onChange={(e) => setProvisaoDesconto(parseFloat(e.target.value) || 0)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="margemDesejada">Margem Desejada (%)</Label>
-              <Input
-                id="margemDesejada"
-                type="number"
-                step="0.1"
-                value={margemDesejada}
-                onChange={(e) => setMargemDesejada(parseFloat(e.target.value) || 0)}
-              />
             </div>
           </CardContent>
         </Card>
@@ -379,9 +345,9 @@ export const DashboardForm = () => {
                       <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
                       <div>Frete: R$ {result.frete.toFixed(2)}</div>
                       <div>Comissão: {result.comissao.toFixed(2)}%</div>
-                      <div>Taxa Cartão: {taxaCartao.toFixed(1)}%</div>
-                      <div>Provisão Desc.: {provisaoDesconto.toFixed(1)}%</div>
-                      <div>Margem Alvo: {margemDesejada.toFixed(1)}%</div>
+                      <div>Taxa Cartão: {result.taxa_cartao.toFixed(1)}%</div>
+                      <div>Provisão Desc.: {result.provisao_desconto.toFixed(1)}%</div>
+                      <div>Margem Alvo: {result.margem_desejada.toFixed(1)}%</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -390,8 +356,11 @@ export const DashboardForm = () => {
           ) : (
             <Card>
               <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">
-                  Nenhum resultado encontrado. Verifique se o produto possui dados configurados para os marketplaces selecionados.
+                <p className="text-muted-foreground mb-2">
+                  Nenhuma precificação salva encontrada para os marketplaces selecionados.
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Use a aba "Precificação" para calcular e salvar precificações primeiro.
                 </p>
               </CardContent>
             </Card>
@@ -402,8 +371,11 @@ export const DashboardForm = () => {
       {!selectedProductId && (
         <Card>
           <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">
-              Selecione um produto para começar a comparação
+            <p className="text-muted-foreground mb-2">
+              Selecione um produto e marketplaces para ver as precificações salvas
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Use a aba "Precificação" para calcular e salvar precificações primeiro.
             </p>
           </CardContent>
         </Card>

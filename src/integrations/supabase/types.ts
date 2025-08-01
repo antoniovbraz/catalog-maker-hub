@@ -237,6 +237,75 @@ export type Database = {
           },
         ]
       }
+      saved_pricing: {
+        Row: {
+          comissao: number
+          created_at: string
+          custo_total: number
+          frete: number
+          id: string
+          margem_desejada: number
+          margem_percentual: number
+          margem_unitaria: number
+          marketplace_id: string
+          preco_sugerido: number
+          product_id: string
+          provisao_desconto: number
+          taxa_cartao: number
+          updated_at: string
+          valor_fixo: number
+        }
+        Insert: {
+          comissao?: number
+          created_at?: string
+          custo_total: number
+          frete?: number
+          id?: string
+          margem_desejada?: number
+          margem_percentual: number
+          margem_unitaria: number
+          marketplace_id: string
+          preco_sugerido: number
+          product_id: string
+          provisao_desconto?: number
+          taxa_cartao?: number
+          updated_at?: string
+          valor_fixo?: number
+        }
+        Update: {
+          comissao?: number
+          created_at?: string
+          custo_total?: number
+          frete?: number
+          id?: string
+          margem_desejada?: number
+          margem_percentual?: number
+          margem_unitaria?: number
+          marketplace_id?: string
+          preco_sugerido?: number
+          product_id?: string
+          provisao_desconto?: number
+          taxa_cartao?: number
+          updated_at?: string
+          valor_fixo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_pricing_marketplace_id_fkey"
+            columns: ["marketplace_id"]
+            isOneToOne: false
+            referencedRelation: "marketplaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_pricing_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shipping_rules: {
         Row: {
           created_at: string | null
