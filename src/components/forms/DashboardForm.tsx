@@ -8,7 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, TrendingUp, DollarSign, Package, Target, GripVertical } from "lucide-react";
+import { ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Package, Target, GripVertical } from "lucide-react";
+import { MiniSparkline } from "@/components/common/MiniSparkline";
+import { MiniProgressBar } from "@/components/common/MiniProgressBar";
+import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { 
   DndContext, 
   closestCenter, 
@@ -98,74 +101,125 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
     cursor: isDragging ? 'grabbing' : 'grab',
   };
 
+  // Simular dados históricos para sparkline (em um app real, viriam do banco)
+  const sparklineData = Array.from({ length: 7 }, () => Math.random() * 10 + result.margem_percentual);
+
   return (
     <Card 
       ref={setNodeRef} 
       style={style} 
-      className={`relative ${isDragging ? 'z-50' : ''}`}
+      className={`
+        group relative bg-gradient-to-br from-card to-card/50
+        transition-all duration-300 ease-in-out
+        hover:shadow-elegant hover:border-primary/30
+        hover:scale-[1.02] hover:bg-gradient-to-br hover:from-card hover:to-primary/5
+        ${isDragging ? 'z-50 rotate-1 scale-105 shadow-elegant' : ''}
+      `}
       {...attributes}
     >
       {index === 0 && (
-        <Badge className="absolute -top-2 -right-2 bg-green-500">
-          Melhor
+        <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-scale-in">
+          🏆 Melhor
         </Badge>
       )}
+      <div {...listeners} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 touch-none">
+        <GripVertical className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors cursor-grab active:cursor-grabbing" />
+      </div>
+      
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span className="truncate">{result.marketplace_name}</span>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline">#{index + 1}</Badge>
-            <div {...listeners} className="touch-none">
-              <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing" />
-            </div>
+          <div className="flex items-center gap-3">
+            <span className="truncate">{result.marketplace_name}</span>
+            <EnhancedTooltip
+              title="Performance da Margem"
+              details={[
+                { label: "Margem Atual", value: result.margem_percentual, format: "percentage" },
+                { label: "Meta de Margem", value: result.margem_desejada, format: "percentage" },
+                { label: "Preço Sugerido", value: result.preco_sugerido, format: "currency" },
+                { label: "Margem Unitária", value: result.margem_unitaria, format: "currency" }
+              ]}
+            >
+              <div className="flex items-center gap-1">
+                <Badge variant={result.margem_percentual >= 15 ? "default" : "secondary"}>
+                  {result.margem_percentual.toFixed(1)}%
+                </Badge>
+                {result.margem_percentual >= result.margem_desejada ? (
+                  <TrendingUp className="h-3 w-3 text-success" />
+                ) : (
+                  <TrendingDown className="h-3 w-3 text-warning" />
+                )}
+              </div>
+            </EnhancedTooltip>
           </div>
+          <MiniSparkline 
+            data={sparklineData} 
+            color={result.margem_percentual >= 15 ? "hsl(var(--success))" : "hsl(var(--warning))"}
+          />
         </CardTitle>
       </CardHeader>
+      
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="flex items-center gap-1">
-            <Package className="h-3 w-3 text-muted-foreground" />
-            <span className="text-muted-foreground">Custo:</span>
+        <MiniProgressBar 
+          value={result.margem_percentual} 
+          target={result.margem_desejada} 
+          label="Meta de Margem"
+          className="mb-3"
+        />
+        
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Package className="h-3 w-3" />
+              <span>Custo Total</span>
+            </div>
+            <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
           </div>
-          <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
           
-          <div className="flex items-center gap-1">
-            <DollarSign className="h-3 w-3 text-muted-foreground" />
-            <span className="text-muted-foreground">Preço:</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <DollarSign className="h-3 w-3" />
+              <span>Preço Praticado</span>
+            </div>
+            <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
           </div>
-          <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
           
-          <div className="flex items-center gap-1">
-            <TrendingUp className="h-3 w-3 text-green-600" />
-            <span className="text-muted-foreground">Margem R$:</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <TrendingUp className="h-3 w-3" />
+              <span>Margem R$</span>
+            </div>
+            <div className="font-semibold text-success">R$ {result.margem_unitaria.toFixed(2)}</div>
           </div>
-          <div className="font-semibold text-green-600">R$ {result.margem_unitaria.toFixed(2)}</div>
           
-          <div className="flex items-center gap-1">
-            <TrendingUp className="h-3 w-3 text-green-600" />
-            <span className="text-muted-foreground">Margem %:</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Target className="h-3 w-3" />
+              <span>Comissão</span>
+            </div>
+            <div className="font-medium">{result.comissao.toFixed(2)}%</div>
           </div>
-          <div className="font-semibold text-green-600">{result.margem_percentual.toFixed(2)}%</div>
         </div>
         
-        <div className="pt-2 border-t">
-          <div className="text-xs font-medium text-foreground mb-2">Para atingir {result.margem_desejada.toFixed(1)}% de margem:</div>
-          <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm">
+        <div className="pt-3 border-t border-border/50">
+          <div className="text-xs font-medium text-foreground mb-2">
+            Para atingir {result.margem_desejada.toFixed(1)}% de margem:
+          </div>
+          <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 p-3 rounded-lg">
             <div className="flex items-center justify-between">
-              <span className="text-blue-700 dark:text-blue-300">Pratique o preço:</span>
-              <span className="font-bold text-blue-800 dark:text-blue-200">R$ {result.preco_sugerido.toFixed(2)}</span>
+              <span className="text-primary font-medium">Preço Sugerido:</span>
+              <span className="font-bold text-primary">R$ {result.preco_sugerido.toFixed(2)}</span>
             </div>
           </div>
         </div>
         
-        <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
-          <div className="font-medium text-foreground">Detalhamento:</div>
-          <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
-          <div>Frete: R$ {result.frete.toFixed(2)}</div>
-          <div>Comissão: {result.comissao.toFixed(2)}%</div>
-          <div>Taxa Cartão: {result.taxa_cartao.toFixed(1)}%</div>
-          <div>Provisão Desc.: {result.provisao_desconto.toFixed(1)}%</div>
-          <div>Margem Alvo: {result.margem_desejada.toFixed(1)}%</div>
+        <div className="pt-2 border-t border-border/30 text-xs text-muted-foreground space-y-1">
+          <div className="font-medium text-foreground mb-2">Detalhamento:</div>
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+            <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
+            <div>Frete: R$ {result.frete.toFixed(2)}</div>
+            <div>Taxa Cartão: {result.taxa_cartao.toFixed(1)}%</div>
+            <div>Prov. Desc.: {result.provisao_desconto.toFixed(1)}%</div>
+          </div>
         </div>
       </CardContent>
     </Card>

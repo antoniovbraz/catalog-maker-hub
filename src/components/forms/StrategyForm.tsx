@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { TrendingUp, TrendingDown, BarChart3, Target, Package, PieChart, ScatterChart } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3, Target, Package, PieChart, ScatterChart, AlertTriangle, Star } from "lucide-react";
+import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { QuadrantScatterChart } from "@/components/charts/QuadrantScatterChart";
 import { QuadrantDonutChart } from "@/components/charts/QuadrantDonutChart";
 import { RevenueByQuadrantChart } from "@/components/charts/RevenueByQuadrantChart";
@@ -265,64 +266,109 @@ export const StrategyForm = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {strategyAnalysis.quadrantCounts.alta_margem_alto_giro}
+                <EnhancedTooltip
+                  title="Produtos Estrela"
+                  details={[
+                    { label: "Estratégia", value: "Manter preços e investir em marketing", format: "text" },
+                    { label: "Performance", value: "Excelente", format: "text" }
+                  ]}
+                >
+                  <div className="text-center p-3 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-help">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <Star className="h-4 w-4 text-green-600" />
+                      <div className="text-2xl font-bold text-green-600">
+                        {strategyAnalysis.quadrantCounts.alta_margem_alto_giro}
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">⭐ Estrelas</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">⭐ Estrelas</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {strategyAnalysis.quadrantCounts.alta_margem_baixo_giro}
+                </EnhancedTooltip>
+                
+                <EnhancedTooltip
+                  title="Produtos Joia"
+                  details={[
+                    { label: "Estratégia", value: "Aumentar promoções para acelerar vendas", format: "text" },
+                    { label: "Performance", value: "Boa margem, baixo volume", format: "text" }
+                  ]}
+                >
+                  <div className="text-center p-3 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors cursor-help">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {strategyAnalysis.quadrantCounts.alta_margem_baixo_giro}
+                    </div>
+                    <div className="text-sm text-muted-foreground">💎 Joias</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">💎 Joias</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {strategyAnalysis.quadrantCounts.baixa_margem_alto_giro}
+                </EnhancedTooltip>
+                
+                <EnhancedTooltip
+                  title="Produtos Movimento"
+                  details={[
+                    { label: "Estratégia", value: "Melhorar margem ou usar para atrair clientes", format: "text" },
+                    { label: "Performance", value: "Alto volume, baixa margem", format: "text" }
+                  ]}
+                >
+                  <div className="text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 transition-colors cursor-help">
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {strategyAnalysis.quadrantCounts.baixa_margem_alto_giro}
+                    </div>
+                    <div className="text-sm text-muted-foreground">🔄 Movimento</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">🔄 Movimento</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">
-                    {strategyAnalysis.quadrantCounts.baixa_margem_baixo_giro}
+                </EnhancedTooltip>
+                
+                <EnhancedTooltip
+                  title="Produtos Questionáveis"
+                  details={[
+                    { label: "Estratégia", value: "Considerar descontinuar ou reposicionar", format: "text" },
+                    { label: "Performance", value: "Crítica", format: "text" }
+                  ]}
+                >
+                  <div className="text-center p-3 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 transition-colors cursor-help">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <AlertTriangle className="h-4 w-4 text-red-600" />
+                      <div className="text-2xl font-bold text-red-600">
+                        {strategyAnalysis.quadrantCounts.baixa_margem_baixo_giro}
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">❓ Questionáveis</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">❓ Questionáveis</div>
-                </div>
+                </EnhancedTooltip>
               </div>
               
-              {/* Subtle Charts */}
+              {/* Subtle Charts with Enhanced Animations */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
+                <div className="transition-all duration-300 hover:scale-[1.02]">
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <PieChart className="h-4 w-4" />
+                    <PieChart className="h-4 w-4 text-primary" />
                     Distribuição dos Quadrantes
                   </h4>
-                  <QuadrantDonutChart quadrantCounts={strategyAnalysis.quadrantCounts} />
+                  <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-4">
+                    <QuadrantDonutChart quadrantCounts={strategyAnalysis.quadrantCounts} />
+                  </div>
                 </div>
-                <div>
+                <div className="transition-all duration-300 hover:scale-[1.02]">
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
+                    <BarChart3 className="h-4 w-4 text-primary" />
                     Receita por Quadrante
                   </h4>
-                  <RevenueByQuadrantChart data={strategyAnalysis.products} />
+                  <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-4">
+                    <RevenueByQuadrantChart data={strategyAnalysis.products} />
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Strategic Positioning Chart */}
-          <Card>
+          <Card className="transition-all duration-300 hover:shadow-elegant">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ScatterChart className="h-5 w-5" />
+                <ScatterChart className="h-5 w-5 text-primary" />
                 Posicionamento Estratégico
               </CardTitle>
               <CardDescription>
                 Visualização da posição de cada produto na matriz margem x giro
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-gradient-to-br from-card to-card/50">
               <QuadrantScatterChart 
                 data={strategyAnalysis.products}
                 margeLimitAlta={margeLimitAlta}

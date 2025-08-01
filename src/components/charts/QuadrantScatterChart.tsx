@@ -47,12 +47,23 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
-          <p className="font-medium">{data.name}</p>
-          <p className="text-muted-foreground text-xs">{data.marketplace}</p>
-          <p>Margem: {data.y.toFixed(1)}%</p>
-          <p>Giro: {data.x.toFixed(1)}%</p>
-          <p>Receita: R$ {data.revenue.toFixed(2)}</p>
+        <div className="bg-background border rounded-lg shadow-elegant p-3 text-sm animate-fade-in">
+          <p className="font-semibold text-primary">{data.name}</p>
+          <p className="text-muted-foreground text-xs mb-2">{data.marketplace}</p>
+          <div className="space-y-1">
+            <div className="flex justify-between">
+              <span>Margem:</span>
+              <span className="font-medium">{data.y.toFixed(1)}%</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Giro:</span>
+              <span className="font-medium">{data.x.toFixed(1)}%</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Receita:</span>
+              <span className="font-medium">R$ {data.revenue.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
       );
     }
