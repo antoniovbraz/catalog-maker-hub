@@ -8,7 +8,24 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, TrendingUp, DollarSign, Package, Target } from "lucide-react";
+import { ArrowUpDown, TrendingUp, DollarSign, Package, Target, GripVertical } from "lucide-react";
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Product {
   id: string;
@@ -42,12 +59,126 @@ interface SavedPricing {
 
 type SortOption = "margem_percentual" | "margem_unitaria" | "preco_sugerido";
 
+// Componente para card drag-and-drop individual
+interface SortableCardProps {
+  result: {
+    marketplace_id: string;
+    marketplace_name: string;
+    custo_total: number;
+    valor_fixo: number;
+    frete: number;
+    comissao: number;
+    preco_sugerido: number;
+    margem_unitaria: number;
+    margem_percentual: number;
+    preco_praticado: number;
+    taxa_cartao: number;
+    provisao_desconto: number;
+    margem_desejada: number;
+    product_name: string;
+    product_sku: string;
+  };
+  index: number;
+}
+
+const SortableCard = ({ result, index }: SortableCardProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: result.marketplace_id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+  };
+
+  return (
+    <Card 
+      ref={setNodeRef} 
+      style={style} 
+      className={`relative ${isDragging ? 'z-50' : ''}`}
+      {...attributes}
+    >
+      {index === 0 && (
+        <Badge className="absolute -top-2 -right-2 bg-green-500">
+          Melhor
+        </Badge>
+      )}
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span className="truncate">{result.marketplace_name}</span>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">#{index + 1}</Badge>
+            <div {...listeners} className="touch-none">
+              <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing" />
+            </div>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex items-center gap-1">
+            <Package className="h-3 w-3 text-muted-foreground" />
+            <span className="text-muted-foreground">Custo:</span>
+          </div>
+          <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
+          
+          <div className="flex items-center gap-1">
+            <DollarSign className="h-3 w-3 text-muted-foreground" />
+            <span className="text-muted-foreground">Preço:</span>
+          </div>
+          <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
+          
+          <div className="flex items-center gap-1">
+            <TrendingUp className="h-3 w-3 text-green-600" />
+            <span className="text-muted-foreground">Margem R$:</span>
+          </div>
+          <div className="font-semibold text-green-600">R$ {result.margem_unitaria.toFixed(2)}</div>
+          
+          <div className="flex items-center gap-1">
+            <TrendingUp className="h-3 w-3 text-green-600" />
+            <span className="text-muted-foreground">Margem %:</span>
+          </div>
+          <div className="font-semibold text-green-600">{result.margem_percentual.toFixed(2)}%</div>
+        </div>
+        
+        <div className="pt-2 border-t">
+          <div className="text-xs font-medium text-foreground mb-2">Para atingir {result.margem_desejada.toFixed(1)}% de margem:</div>
+          <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-blue-700 dark:text-blue-300">Pratique o preço:</span>
+              <span className="font-bold text-blue-800 dark:text-blue-200">R$ {result.preco_sugerido.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
+          <div className="font-medium text-foreground">Detalhamento:</div>
+          <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
+          <div>Frete: R$ {result.frete.toFixed(2)}</div>
+          <div>Comissão: {result.comissao.toFixed(2)}%</div>
+          <div>Taxa Cartão: {result.taxa_cartao.toFixed(1)}%</div>
+          <div>Provisão Desc.: {result.provisao_desconto.toFixed(1)}%</div>
+          <div>Margem Alvo: {result.margem_desejada.toFixed(1)}%</div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export const DashboardForm = () => {
   const { toast } = useToast();
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedMarketplaces, setSelectedMarketplaces] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("margem_percentual");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [cardOrder, setCardOrder] = useState<string[]>([]);
 
   // Fetch products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
@@ -160,8 +291,8 @@ export const DashboardForm = () => {
     calculateRealMargins();
   }, [savedPricings]);
 
-  // Transform saved pricing data for display
-  const results = savedPricings
+  // Transform and organize saved pricing data for display
+  const transformedResults = savedPricings
     .map(pricing => {
       const realMargin = realMargins[pricing.marketplace_id];
       return {
@@ -188,6 +319,37 @@ export const DashboardForm = () => {
       const multiplier = sortOrder === "asc" ? 1 : -1;
       return (aValue - bValue) * multiplier;
     });
+
+  // Organize results based on drag-and-drop order or default sorting
+  const results = cardOrder.length > 0 && cardOrder.length === transformedResults.length
+    ? cardOrder.map(id => transformedResults.find(r => r.marketplace_id === id)).filter(Boolean) as typeof transformedResults
+    : transformedResults;
+
+  // Update card order when transformed results change
+  useEffect(() => {
+    if (transformedResults.length > 0 && cardOrder.length === 0) {
+      setCardOrder(transformedResults.map(r => r.marketplace_id));
+    }
+  }, [transformedResults, cardOrder.length]);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = cardOrder.indexOf(active.id as string);
+      const newIndex = cardOrder.indexOf(over.id as string);
+      
+      setCardOrder((items) => arrayMove(items, oldIndex, newIndex));
+    }
+  };
 
   const isLoading = loadingSavedPricings;
 
@@ -341,70 +503,26 @@ export const DashboardForm = () => {
               ))}
             </div>
           ) : results.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {results.map((result, index) => (
-                <Card key={result.marketplace_id} className="relative">
-                  {index === 0 && (
-                    <Badge className="absolute -top-2 -right-2 bg-green-500">
-                      Melhor
-                    </Badge>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span className="truncate">{result.marketplace_name}</span>
-                      <Badge variant="outline">#{index + 1}</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Package className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">Custo:</span>
-                      </div>
-                      <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
-                      
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">Preço:</span>
-                      </div>
-                      <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
-                      
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3 text-green-600" />
-                        <span className="text-muted-foreground">Margem R$:</span>
-                      </div>
-                      <div className="font-semibold text-green-600">R$ {result.margem_unitaria.toFixed(2)}</div>
-                      
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3 text-green-600" />
-                        <span className="text-muted-foreground">Margem %:</span>
-                      </div>
-                      <div className="font-semibold text-green-600">{result.margem_percentual.toFixed(2)}%</div>
-                    </div>
-                    
-                    <div className="pt-2 border-t">
-                      <div className="text-xs font-medium text-foreground mb-2">Para atingir {result.margem_desejada.toFixed(1)}% de margem:</div>
-                      <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm">
-                        <div className="flex items-center justify-between">
-                          <span className="text-blue-700 dark:text-blue-300">Pratique o preço:</span>
-                          <span className="font-bold text-blue-800 dark:text-blue-200">R$ {result.preco_sugerido.toFixed(2)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
-                      <div className="font-medium text-foreground">Detalhamento:</div>
-                      <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
-                      <div>Frete: R$ {result.frete.toFixed(2)}</div>
-                      <div>Comissão: {result.comissao.toFixed(2)}%</div>
-                      <div>Taxa Cartão: {result.taxa_cartao.toFixed(1)}%</div>
-                      <div>Provisão Desc.: {result.provisao_desconto.toFixed(1)}%</div>
-                      <div>Margem Alvo: {result.margem_desejada.toFixed(1)}%</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext 
+                items={cardOrder} 
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {results.map((result, index) => (
+                    <SortableCard 
+                      key={result.marketplace_id} 
+                      result={result} 
+                      index={index}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           ) : (
             <Card>
               <CardContent className="text-center py-8">
