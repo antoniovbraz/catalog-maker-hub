@@ -9,144 +9,17 @@ import { SalesForm } from "@/components/forms/SalesForm";
 import { PricingForm } from "@/components/forms/PricingForm";
 import { DashboardForm } from "@/components/forms/DashboardForm";
 import { StrategyForm } from "@/components/forms/StrategyForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  sortableKeyboardCoordinates, 
-  horizontalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from "lucide-react";
-
-// Definição das abas com suas configurações
-interface TabItem {
-  id: string;
-  label: string;
-  value: string;
-}
-
-const defaultTabs: TabItem[] = [
-  { id: "dashboard", label: "Dashboard", value: "dashboard" },
-  { id: "strategy", label: "Estratégia", value: "strategy" },
-  { id: "marketplaces", label: "Marketplaces", value: "marketplaces" },
-  { id: "categories", label: "Categorias", value: "categories" },
-  { id: "products", label: "Produtos", value: "products" },
-  { id: "shipping", label: "Frete", value: "shipping" },
-  { id: "commissions", label: "Comissões", value: "commissions" },
-  { id: "fixedfees", label: "Regras de valor fixo", value: "fixedfees" },
-  { id: "sales", label: "Vendas", value: "sales" },
-  { id: "pricing", label: "Precificação", value: "pricing" },
-];
-
-// Componente para cada aba drag-and-drop
-interface SortableTabProps {
-  tab: TabItem;
-}
-
-const SortableTab = ({ tab }: SortableTabProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: tab.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <TabsTrigger 
-      ref={setNodeRef} 
-      style={style} 
-      value={tab.value}
-      className="group relative"
-      {...attributes}
-    >
-      <div className="flex items-center gap-1">
-        <span>{tab.label}</span>
-        <div 
-          {...listeners} 
-          className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-        >
-          <GripVertical className="h-3 w-3 text-muted-foreground" />
-        </div>
-      </div>
-    </TabsTrigger>
-  );
-};
 
 const Index = () => {
-  const [tabs, setTabs] = useState<TabItem[]>(defaultTabs);
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // Drag and drop sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setTabs((items) => {
-        const oldIndex = items.findIndex(item => item.id === active.id);
-        const newIndex = items.findIndex(item => item.id === over.id);
-        
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
-  return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Sistema de Gestão de Marketplace
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Gerencie marketplaces, categorias, produtos e regras de frete
-          </p>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext 
-              items={tabs.map(tab => tab.id)} 
-              strategy={horizontalListSortingStrategy}
-            >
-              <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
-                {tabs.map((tab) => (
-                  <SortableTab key={tab.id} tab={tab} />
-                ))}
-              </TabsList>
-            </SortableContext>
-          </DndContext>
-
-          <TabsContent value="dashboard" className="mt-6">
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Dashboard - Comparação de Preços</CardTitle>
@@ -158,9 +31,11 @@ const Index = () => {
                 <DashboardForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="strategy" className="mt-6">
+          </div>
+        );
+      case "estrategia":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Estratégia de Precificação</CardTitle>
@@ -172,9 +47,11 @@ const Index = () => {
                 <StrategyForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="marketplaces" className="mt-6">
+          </div>
+        );
+      case "marketplaces":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Gerenciar Marketplaces</CardTitle>
@@ -186,9 +63,11 @@ const Index = () => {
                 <MarketplaceForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="categories" className="mt-6">
+          </div>
+        );
+      case "categorias":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Gerenciar Categorias</CardTitle>
@@ -200,9 +79,11 @@ const Index = () => {
                 <CategoryForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="products" className="mt-6">
+          </div>
+        );
+      case "produtos":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Gerenciar Produtos</CardTitle>
@@ -214,9 +95,11 @@ const Index = () => {
                 <ProductForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="shipping" className="mt-6">
+          </div>
+        );
+      case "frete":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Regras de Frete</CardTitle>
@@ -228,9 +111,11 @@ const Index = () => {
                 <ShippingRuleForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="commissions" className="mt-6">
+          </div>
+        );
+      case "comissoes":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Comissões</CardTitle>
@@ -242,9 +127,11 @@ const Index = () => {
                 <CommissionForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="fixedfees" className="mt-6">
+          </div>
+        );
+      case "taxas-fixas":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Regras de valor fixo</CardTitle>
@@ -256,9 +143,11 @@ const Index = () => {
                 <FixedFeeRuleForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="sales" className="mt-6">
+          </div>
+        );
+      case "vendas":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Vendas</CardTitle>
@@ -270,9 +159,11 @@ const Index = () => {
                 <SalesForm />
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="pricing" className="mt-6">
+          </div>
+        );
+      case "precificacao":
+        return (
+          <div className="p-6">
             <Card>
               <CardHeader>
                 <CardTitle>Precificação</CardTitle>
@@ -284,10 +175,31 @@ const Index = () => {
                 <PricingForm />
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="p-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dashboard - Comparação de Preços</CardTitle>
+                <CardDescription>
+                  Compare preços e margens entre diferentes marketplaces para um produto
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DashboardForm />
+              </CardContent>
+            </Card>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      {renderContent()}
+    </MainLayout>
   );
 };
 
