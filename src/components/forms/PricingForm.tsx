@@ -40,6 +40,8 @@ export const PricingForm = () => {
   });
   const [pricingResult, setPricingResult] = useState<PricingResult | null>(null);
 
+  console.log('Estado atual do pricingResult:', pricingResult); // Debug temporário
+
   const { data: products = [], isLoading: loadingProducts } = useProducts();
   const { data: marketplaces = [], isLoading: loadingMarketplaces } = useMarketplaces();
   const calculatePriceMutation = useCalculatePrice();
@@ -66,6 +68,14 @@ export const PricingForm = () => {
       return;
     }
 
+    console.log('Iniciando cálculo com dados:', {
+      product_id: formData.product_id,
+      marketplace_id: formData.marketplace_id,
+      taxa_cartao: formData.taxa_cartao,
+      provisao_desconto: formData.provisao_desconto,
+      margem_desejada: formData.margem_desejada
+    });
+
     try {
       const result = await calculatePriceMutation.mutateAsync({
         productId: formData.product_id,
@@ -75,19 +85,40 @@ export const PricingForm = () => {
         margemDesejada: formData.margem_desejada
       });
 
-      if (typeof result === 'object' && result !== null) {
-        setPricingResult(result as PricingResult);
+      console.log('Resultado recebido da API:', result);
+
+      // Verificar se temos um resultado válido
+      if (result && typeof result === 'object') {
+        const typedResult = result as PricingResult;
+        console.log('Definindo resultado no estado:', typedResult);
+        
+        setPricingResult(typedResult);
+        
         // Atualizar form data com os valores calculados
         setFormData(prev => ({
           ...prev,
-          custo_total: (result as any).custo_total || 0,
-          valor_fixo: (result as any).valor_fixo || 0,
-          frete: (result as any).frete || 0,
-          comissao: (result as any).comissao || 0
+          custo_total: typedResult.custo_total || 0,
+          valor_fixo: typedResult.valor_fixo || 0,
+          frete: typedResult.frete || 0,
+          comissao: typedResult.comissao || 0
         }));
+        
+        console.log('Estado atualizado com sucesso');
+      } else {
+        console.error('Resultado inválido recebido:', result);
+        toast({
+          title: "Erro",
+          description: "Resposta inválida do servidor",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Erro ao calcular preço:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao calcular preço. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
