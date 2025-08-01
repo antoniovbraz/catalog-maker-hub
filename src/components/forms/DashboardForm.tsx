@@ -171,7 +171,7 @@ export const DashboardForm = () => {
                   ) : (
                     products.map((product) => (
                       <SelectItem key={product.id} value={product.id}>
-                        {product.name} ({product.sku})
+                        {product.name}{product.sku ? ` (${product.sku})` : ''}
                       </SelectItem>
                     ))
                   )}
