@@ -46,8 +46,14 @@ export const PricingForm = () => {
   const savePricingMutation = useSavePricing();
 
   const handleInputChange = (field: keyof PricingFormData, value: string | number) => {
-    const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
-    setFormData(prev => ({ ...prev, [field]: numericValue }));
+    if (field === 'product_id' || field === 'marketplace_id') {
+      // Manter como string para IDs
+      setFormData(prev => ({ ...prev, [field]: value }));
+    } else {
+      // Converter para número para campos numéricos
+      const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
+      setFormData(prev => ({ ...prev, [field]: numericValue }));
+    }
   };
 
   const handleCalculate = async () => {
@@ -120,19 +126,26 @@ export const PricingForm = () => {
               <Label htmlFor="product">Produto *</Label>
               <Select 
                 value={formData.product_id} 
-                onValueChange={(value) => handleInputChange("product_id", value)}
+                onValueChange={(value) => {
+                  console.log('Product selected:', value);
+                  handleInputChange("product_id", value);
+                }}
               >
-                <SelectTrigger>
+                <SelectTrigger className="relative z-0">
                   <SelectValue placeholder="Selecione um produto" />
                 </SelectTrigger>
-               <SelectContent>
+               <SelectContent className="z-[200] bg-popover border shadow-lg">
                  {loadingProducts ? (
                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                  ) : products.length === 0 ? (
                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum produto encontrado</div>
                  ) : (
                    products.map((product) => (
-                     <SelectItem key={product.id} value={product.id}>
+                     <SelectItem 
+                       key={product.id} 
+                       value={product.id}
+                       className="cursor-pointer hover:bg-accent"
+                     >
                        {product.name} {product.sku ? `(${product.sku})` : ''}
                      </SelectItem>
                    ))
@@ -145,19 +158,26 @@ export const PricingForm = () => {
               <Label htmlFor="marketplace">Marketplace *</Label>
               <Select 
                 value={formData.marketplace_id} 
-                onValueChange={(value) => handleInputChange("marketplace_id", value)}
+                onValueChange={(value) => {
+                  console.log('Marketplace selected:', value);
+                  handleInputChange("marketplace_id", value);
+                }}
               >
-                <SelectTrigger>
+                <SelectTrigger className="relative z-0">
                   <SelectValue placeholder="Selecione um marketplace" />
                 </SelectTrigger>
-               <SelectContent>
+               <SelectContent className="z-[200] bg-popover border shadow-lg">
                  {loadingMarketplaces ? (
                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                  ) : marketplaces.length === 0 ? (
                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum marketplace encontrado</div>
                  ) : (
                    marketplaces.map((marketplace) => (
-                     <SelectItem key={marketplace.id} value={marketplace.id}>
+                     <SelectItem 
+                       key={marketplace.id} 
+                       value={marketplace.id}
+                       className="cursor-pointer hover:bg-accent"
+                     >
                        {marketplace.name}
                      </SelectItem>
                    ))
