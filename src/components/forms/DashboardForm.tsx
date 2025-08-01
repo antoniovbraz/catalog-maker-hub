@@ -340,6 +340,16 @@ export const DashboardForm = () => {
                       <div className="font-semibold text-green-600">{result.margem_percentual.toFixed(2)}%</div>
                     </div>
                     
+                    <div className="pt-2 border-t">
+                      <div className="text-xs font-medium text-foreground mb-2">Para atingir {result.margem_desejada.toFixed(1)}% de margem:</div>
+                      <div className="bg-blue-50 dark:bg-blue-950 p-2 rounded text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-blue-700 dark:text-blue-300">Pratique o preço:</span>
+                          <span className="font-bold text-blue-800 dark:text-blue-200">R$ {result.preco_sugerido.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <div className="pt-2 border-t text-xs text-muted-foreground space-y-1">
                       <div className="font-medium text-foreground">Detalhamento:</div>
                       <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
