@@ -181,7 +181,7 @@ export const PricingForm = () => {
   };
 
   const handleCalculateMargin = () => {
-    if (!formData.product_id || !formData.marketplace_id || !formData.preco_praticado) {
+    if (!formData.product_id || !formData.marketplace_id || formData.preco_praticado <= 0) {
       toast({
         title: "Campos obrigatórios",
         description: "Selecione um produto, marketplace e informe o preço praticado",
@@ -206,17 +206,19 @@ export const PricingForm = () => {
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um produto" />
               </SelectTrigger>
-              <SelectContent>
-                {loadingProducts ? (
-                  <SelectItem value="loading">Carregando...</SelectItem>
-                ) : (
-                  products.map((product) => (
-                    <SelectItem key={product.id} value={product.id}>
-                      {product.name} ({product.sku})
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
+               <SelectContent>
+                 {loadingProducts ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                 ) : products.length === 0 ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum produto encontrado</div>
+                 ) : (
+                   products.map((product) => (
+                     <SelectItem key={product.id} value={product.id}>
+                       {product.name} {product.sku ? `(${product.sku})` : ''}
+                     </SelectItem>
+                   ))
+                 )}
+               </SelectContent>
             </Select>
           </div>
 
@@ -229,17 +231,19 @@ export const PricingForm = () => {
               <SelectTrigger>
                 <SelectValue placeholder="Selecione um marketplace" />
               </SelectTrigger>
-              <SelectContent>
-                {loadingMarketplaces ? (
-                  <SelectItem value="loading">Carregando...</SelectItem>
-                ) : (
-                  marketplaces.map((marketplace) => (
-                    <SelectItem key={marketplace.id} value={marketplace.id}>
-                      {marketplace.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
+               <SelectContent>
+                 {loadingMarketplaces ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                 ) : marketplaces.length === 0 ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum marketplace encontrado</div>
+                 ) : (
+                   marketplaces.map((marketplace) => (
+                     <SelectItem key={marketplace.id} value={marketplace.id}>
+                       {marketplace.name}
+                     </SelectItem>
+                   ))
+                 )}
+               </SelectContent>
             </Select>
           </div>
         </div>
@@ -321,31 +325,31 @@ export const PricingForm = () => {
             <h4 className="font-semibold text-lg">Preço Sugerido</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>Produto:</div>
-              <div className="font-medium">{pricingResult.product_name}</div>
+              <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
               
               <div>SKU:</div>
-              <div className="font-medium">{pricingResult.product_sku}</div>
+              <div className="font-medium">{pricingResult.product_sku || 'N/A'}</div>
               
               <div>Custo Total:</div>
-              <div className="font-medium">R$ {pricingResult.custo_total.toFixed(2)}</div>
+              <div className="font-medium">R$ {(pricingResult.custo_total || 0).toFixed(2)}</div>
               
               <div>Valor Fixo:</div>
-              <div className="font-medium">R$ {pricingResult.valor_fixo.toFixed(2)}</div>
+              <div className="font-medium">R$ {(pricingResult.valor_fixo || 0).toFixed(2)}</div>
               
               <div>Frete:</div>
-              <div className="font-medium">R$ {pricingResult.frete.toFixed(2)}</div>
+              <div className="font-medium">R$ {(pricingResult.frete || 0).toFixed(2)}</div>
               
               <div>Comissão:</div>
-              <div className="font-medium">{pricingResult.comissao.toFixed(2)}%</div>
+              <div className="font-medium">{(pricingResult.comissao || 0).toFixed(2)}%</div>
               
               <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
-              <div className="text-lg font-bold text-primary">R$ {pricingResult.preco_sugerido.toFixed(2)}</div>
+              <div className="text-lg font-bold text-primary">R$ {(pricingResult.preco_sugerido || 0).toFixed(2)}</div>
               
               <div className="font-semibold">Margem Unitária:</div>
-              <div className="font-semibold">R$ {pricingResult.margem_unitaria.toFixed(2)}</div>
+              <div className="font-semibold">R$ {(pricingResult.margem_unitaria || 0).toFixed(2)}</div>
               
               <div className="font-semibold">Margem Percentual:</div>
-              <div className="font-semibold">{pricingResult.margem_percentual.toFixed(2)}%</div>
+              <div className="font-semibold">{(pricingResult.margem_percentual || 0).toFixed(2)}%</div>
             </div>
           </div>
         )}
@@ -356,25 +360,25 @@ export const PricingForm = () => {
             <h4 className="font-semibold text-lg">Margem Real</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>Custo Total:</div>
-              <div className="font-medium">R$ {marginResult.custo_total.toFixed(2)}</div>
+              <div className="font-medium">R$ {(marginResult.custo_total || 0).toFixed(2)}</div>
               
               <div>Valor Fixo:</div>
-              <div className="font-medium">R$ {marginResult.valor_fixo.toFixed(2)}</div>
+              <div className="font-medium">R$ {(marginResult.valor_fixo || 0).toFixed(2)}</div>
               
               <div>Frete:</div>
-              <div className="font-medium">R$ {marginResult.frete.toFixed(2)}</div>
+              <div className="font-medium">R$ {(marginResult.frete || 0).toFixed(2)}</div>
               
               <div>Comissão:</div>
-              <div className="font-medium">{marginResult.comissao.toFixed(2)}%</div>
+              <div className="font-medium">{(marginResult.comissao || 0).toFixed(2)}%</div>
               
               <div className="text-lg font-bold">Preço Praticado:</div>
-              <div className="text-lg font-bold">R$ {marginResult.preco_praticado.toFixed(2)}</div>
+              <div className="font-medium">R$ {(marginResult.preco_praticado || 0).toFixed(2)}</div>
               
               <div className="font-semibold text-green-600">Margem Real Unitária:</div>
-              <div className="font-semibold text-green-600">R$ {marginResult.margem_unitaria_real.toFixed(2)}</div>
+              <div className="font-semibold text-green-600">R$ {(marginResult.margem_unitaria_real || 0).toFixed(2)}</div>
               
               <div className="font-semibold text-green-600">Margem Real Percentual:</div>
-              <div className="font-semibold text-green-600">{marginResult.margem_percentual_real.toFixed(2)}%</div>
+              <div className="font-semibold text-green-600">{(marginResult.margem_percentual_real || 0).toFixed(2)}%</div>
             </div>
           </div>
         )}
