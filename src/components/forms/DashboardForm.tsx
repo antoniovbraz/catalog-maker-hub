@@ -370,13 +370,6 @@ export const DashboardForm = () => {
         return prev;
       }
 
-      // Trigger recalculation when marketplaces change (with debounce via setTimeout)
-      if (selectedProductId && newMarketplaces.length > 0) {
-        setTimeout(() => {
-          recalculateAndSave(selectedProductId, newMarketplaces);
-        }, 500);
-      }
-
       return newMarketplaces;
     });
   };
@@ -487,13 +480,6 @@ export const DashboardForm = () => {
     }
   };
 
-  // Trigger recalculation when product changes
-  useEffect(() => {
-    if (selectedProductId && selectedMarketplaces.length > 0) {
-      recalculateAndSave(selectedProductId, selectedMarketplaces);
-    }
-  }, [selectedProductId, recalculateAndSave]);
-
   const isLoading = loadingSavedPricings || isRecalculating;
 
   return (
@@ -573,6 +559,26 @@ export const DashboardForm = () => {
             </div>
           </CardContent>
         </Card>
+      
+      {/* Manual recalculation button */}
+      {selectedProductId && selectedMarketplaces.length > 0 && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => recalculateAndSave(selectedProductId, selectedMarketplaces)}
+            disabled={isRecalculating}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {isRecalculating ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            Atualizar com dados mais recentes
+          </Button>
+        </div>
+      )}
       </div>
 
       {/* Sort Controls */}

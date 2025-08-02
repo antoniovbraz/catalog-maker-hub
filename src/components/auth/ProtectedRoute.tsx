@@ -19,30 +19,12 @@ export function ProtectedRoute({
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
-    // Only check for redirect after loading is complete
+    // Only set redirect state once when loading is complete and we have the final auth state
     if (!loading) {
-      if (!user || !profile) {
-        setShouldRedirect(true);
-      } else if (requiredRole) {
-        const roleHierarchy = {
-          'user': 1,
-          'admin': 2,
-          'super_admin': 3
-        };
-
-        const userLevel = roleHierarchy[profile.role];
-        const requiredLevel = roleHierarchy[requiredRole];
-
-        if (userLevel < requiredLevel) {
-          setShouldRedirect(false); // Don't redirect, show access denied
-        } else {
-          setShouldRedirect(false);
-        }
-      } else {
-        setShouldRedirect(false);
-      }
+      const needsRedirect = !user || !profile;
+      setShouldRedirect(needsRedirect);
     }
-  }, [loading, user, profile, requiredRole]);
+  }, [loading, user, profile]);
 
   if (loading) {
     return (
