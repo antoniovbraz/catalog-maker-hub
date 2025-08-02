@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Package, Target, GripVertical } from "lucide-react";
+import { ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Package, Target, GripVertical, RefreshCw } from "lucide-react";
 import { MiniSparkline } from "@/components/common/MiniSparkline";
 import { MiniProgressBar } from "@/components/common/MiniProgressBar";
 import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
+import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
+import { PRICING_CONFIG } from "@/lib/config";
 import { 
   DndContext, 
   closestCenter, 
@@ -233,6 +235,11 @@ export const DashboardForm = () => {
   const [sortBy, setSortBy] = useState<SortOption>("margem_percentual");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [cardOrder, setCardOrder] = useState<string[]>([]);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+
+  // Hooks para cálculo e salvamento
+  const calculatePrice = useCalculatePrice();
+  const savePricing = useSavePricing();
 
   // Fetch products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
@@ -282,13 +289,79 @@ export const DashboardForm = () => {
     enabled: !!selectedProductId && selectedMarketplaces.length > 0,
   });
 
+  // Função para recalcular e salvar automaticamente
+  const recalculateAndSave = useCallback(async (productId: string, marketplaceIds: string[]) => {
+    if (!productId || marketplaceIds.length === 0) return;
+
+    setIsRecalculating(true);
+    
+    try {
+      // Valores padrão para cálculo (podem ser configuráveis no futuro)
+      const defaultParams = {
+        taxaCartao: PRICING_CONFIG.DEFAULT_TAXA_CARTAO,
+        provisaoDesconto: PRICING_CONFIG.DEFAULT_PROVISAO_DESCONTO,
+        margemDesejada: 25, // Margem padrão de 25%
+      };
+
+      // Processar cada marketplace em paralelo
+      const promises = marketplaceIds.map(async (marketplaceId) => {
+        try {
+          // Calcular preço atualizado
+          const calculationResult = await calculatePrice.mutateAsync({
+            productId,
+            marketplaceId,
+            taxaCartao: defaultParams.taxaCartao,
+            provisaoDesconto: defaultParams.provisaoDesconto,
+            margemDesejada: defaultParams.margemDesejada,
+          });
+
+          if (calculationResult && typeof calculationResult === 'object') {
+            const result = calculationResult as any;
+            
+            // Salvar automaticamente os dados atualizados
+            await savePricing.mutateAsync({
+              product_id: productId,
+              marketplace_id: marketplaceId,
+              custo_total: result.custo_total,
+              valor_fixo: result.valor_fixo,
+              frete: result.frete,
+              comissao: result.comissao,
+              taxa_cartao: defaultParams.taxaCartao,
+              provisao_desconto: defaultParams.provisaoDesconto,
+              margem_desejada: defaultParams.margemDesejada,
+              preco_praticado: result.preco_sugerido, // Usar preço sugerido como praticado inicialmente
+              preco_sugerido: result.preco_sugerido,
+              margem_unitaria: result.margem_unitaria,
+              margem_percentual: result.margem_percentual,
+            });
+          }
+        } catch (error) {
+          console.error(`Erro ao recalcular marketplace ${marketplaceId}:`, error);
+        }
+      });
+
+      await Promise.all(promises);
+      
+      toast({
+        title: "Dados atualizados",
+        description: `Preços recalculados com as configurações mais atuais para ${marketplaceIds.length} marketplace(s)`,
+      });
+    } catch (error) {
+      console.error('Erro durante recálculo automático:', error);
+    } finally {
+      setIsRecalculating(false);
+    }
+  }, [calculatePrice, savePricing, toast]);
+
   const handleMarketplaceToggle = (marketplaceId: string) => {
     setSelectedMarketplaces(prev => {
-      if (prev.includes(marketplaceId)) {
-        return prev.filter(id => id !== marketplaceId);
-      } else if (prev.length < 6) {
-        return [...prev, marketplaceId];
-      } else {
+      const newMarketplaces = prev.includes(marketplaceId)
+        ? prev.filter(id => id !== marketplaceId)
+        : prev.length < 6
+          ? [...prev, marketplaceId]
+          : prev;
+
+      if (newMarketplaces.length >= 6 && !prev.includes(marketplaceId)) {
         toast({
           title: "Limite atingido",
           description: "Você pode selecionar no máximo 6 marketplaces",
@@ -296,6 +369,15 @@ export const DashboardForm = () => {
         });
         return prev;
       }
+
+      // Trigger recalculation when marketplaces change (with debounce via setTimeout)
+      if (selectedProductId && newMarketplaces.length > 0) {
+        setTimeout(() => {
+          recalculateAndSave(selectedProductId, newMarketplaces);
+        }, 500);
+      }
+
+      return newMarketplaces;
     });
   };
 
@@ -405,7 +487,14 @@ export const DashboardForm = () => {
     }
   };
 
-  const isLoading = loadingSavedPricings;
+  // Trigger recalculation when product changes
+  useEffect(() => {
+    if (selectedProductId && selectedMarketplaces.length > 0) {
+      recalculateAndSave(selectedProductId, selectedMarketplaces);
+    }
+  }, [selectedProductId, recalculateAndSave]);
+
+  const isLoading = loadingSavedPricings || isRecalculating;
 
   return (
     <div className="space-y-6">
@@ -453,9 +542,10 @@ export const DashboardForm = () => {
               <Target className="h-5 w-5" />
               Marketplaces
               <Badge variant="secondary">{selectedMarketplaces.length}/6</Badge>
+              {isRecalculating && <RefreshCw className="h-4 w-4 animate-spin text-primary" />}
             </CardTitle>
             <CardDescription>
-              Selecione até 6 marketplaces para comparar
+              Selecione até 6 marketplaces para comparar - os dados serão atualizados automaticamente
             </CardDescription>
           </CardHeader>
           <CardContent>
