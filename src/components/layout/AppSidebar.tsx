@@ -11,6 +11,7 @@ import {
   Calculator,
   Crown,
   Settings,
+  Shield,
   GripVertical,
   ChevronLeft,
   ChevronRight,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
   DndContext,
@@ -128,6 +130,8 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const [menuItems, setMenuItems] = useState(defaultMenuItems);
+  const { profile } = useAuth();
+  const location = useLocation();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -148,8 +152,6 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
       });
     }
   }
-
-  const location = useLocation();
 
   return (
     <Sidebar className="border-r-0 bg-sidebar">
@@ -257,6 +259,36 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Admin Section - Only for Super Admins */}
+        {profile?.role === 'super_admin' && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
+              {!collapsed ? "Administração" : ""}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
+                      location.pathname === '/admin'
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    <Link to="/admin">
+                      <Shield className="w-5 h-5 shrink-0" />
+                      {!collapsed && <span className="font-medium">Dashboard Admin</span>}
+                      {collapsed && <div className="sr-only">Dashboard Admin</div>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   );

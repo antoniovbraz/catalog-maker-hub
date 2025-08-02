@@ -10,10 +10,13 @@ import { PricingForm } from "@/components/forms/PricingForm";
 import { DashboardForm } from "@/components/forms/DashboardForm";
 import { StrategyForm } from "@/components/forms/StrategyForm";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   const renderContent = () => {
     switch (activeTab) {
@@ -197,9 +200,18 @@ const Index = () => {
   };
 
   return (
-    <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
-      {renderContent()}
-    </MainLayout>
+    <>
+      <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
+        {renderContent()}
+      </MainLayout>
+      
+      {showOnboarding && (
+        <OnboardingTour 
+          onComplete={completeOnboarding}
+          onSkip={skipOnboarding}
+        />
+      )}
+    </>
   );
 };
 

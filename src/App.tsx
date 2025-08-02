@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Subscription />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requiredRole="super_admin">
+                  <AdminDashboard />
                 </ProtectedRoute>
               } 
             />
