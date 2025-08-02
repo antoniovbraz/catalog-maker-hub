@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
+import { authService } from "./auth";
 
 export abstract class BaseService<T = any> {
   protected tableName: string;
@@ -33,14 +34,34 @@ export abstract class BaseService<T = any> {
   }
 
   async create(data: Partial<T>): Promise<T> {
+    // Adicionar tenant_id automaticamente se a tabela suporta
+    const dataWithTenant = await this.addTenantId(data);
+    
     const { data: result, error } = await supabase
       .from(this.tableName as any)
-      .insert(data as any)
+      .insert(dataWithTenant as any)
       .select()
       .single();
     
     if (error) throw new Error(`Erro ao criar ${this.tableName}: ${error.message}`);
     return result as T;
+  }
+
+  protected async addTenantId(data: Partial<T>): Promise<Partial<T>> {
+    // Tabelas que precisam de tenant_id
+    const tablesWithTenant = [
+      'products', 'categories', 'marketplaces', 'sales', 
+      'saved_pricing', 'commissions', 'marketplace_fixed_fee_rules', 'shipping_rules'
+    ];
+    
+    if (tablesWithTenant.includes(this.tableName)) {
+      const tenantId = await authService.getCurrentTenantId();
+      if (tenantId) {
+        return { ...data, tenant_id: tenantId } as Partial<T>;
+      }
+    }
+    
+    return data;
   }
 
   async update(id: string, data: Partial<T>): Promise<T> {
