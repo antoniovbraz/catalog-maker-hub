@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit } from "lucide-react";
 import { useProductsWithCategories, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
@@ -24,7 +23,6 @@ export const ProductForm = () => {
     tax_rate: 0
   });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const { data: categories = [] } = useCategories();
   const { data: products = [], isLoading } = useProductsWithCategories();

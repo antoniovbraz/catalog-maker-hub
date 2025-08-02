@@ -6,12 +6,10 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Check, Crown, Zap, Star, ArrowRight, Infinity } from 'lucide-react';
 import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '@/hooks/useSubscription';
-import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/common/EmptyState';
 
 export default function Subscription() {
-  const { user } = useAuth();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   
   const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();

@@ -1,19 +1,17 @@
 import { 
-  LayoutDashboard, 
-  Target, 
-  Store, 
-  FolderOpen, 
-  Package, 
-  Truck, 
-  Percent, 
-  DollarSign, 
-  BarChart3, 
+  LayoutDashboard,
+  Target,
+  Store,
+  FolderOpen,
+  Package,
+  Truck,
+  Percent,
+  DollarSign,
+  BarChart3,
   Calculator,
   Crown,
   Settings,
   Shield,
-  ChevronLeft,
-  ChevronRight,
   Zap,
   Activity,
   ChevronDown,
@@ -39,7 +37,6 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const mainMenuItems = [

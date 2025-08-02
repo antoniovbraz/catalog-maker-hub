@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { testUtils } from '../setup';
 import { formatarMoeda, formatarPercentual, calcularMargemRealLocal, calcularMargemUnitariaLocal } from '@/utils/pricing';
 

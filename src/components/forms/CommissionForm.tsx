@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit, Info } from "lucide-react";
 import { useMarketplaces } from "@/hooks/useMarketplaces";
 import { useCategories } from "@/hooks/useCategories";
@@ -22,7 +21,6 @@ export const CommissionForm = () => {
     rate: 0
   });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const { data: marketplaces = [] } = useMarketplaces();
   const { data: categories = [] } = useCategories();

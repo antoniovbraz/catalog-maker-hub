@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -274,7 +274,7 @@ export const DashboardForm = () => {
   });
 
   // Fetch saved pricing for selected product and marketplaces
-  const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery({
+  const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery<SavedPricing[]>({
     queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
     queryFn: async () => {
       if (!selectedProductId || selectedMarketplaces.length === 0) return [];
