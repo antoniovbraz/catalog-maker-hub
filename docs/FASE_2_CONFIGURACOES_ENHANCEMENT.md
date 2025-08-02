@@ -17,14 +17,14 @@
 - ✅ Cores específicas para páginas de configuração
 - ✅ Suporte a gradientes e sombras elegantes
 
-#### **3. Páginas Enhanced Implementadas**
-- ✅ `MarketplacesEnhanced` - Layout two-column com formulário inteligente
+#### **3. Páginas Implementadas**
+- ✅ `Marketplaces` - Layout two-column com formulário inteligente
 - ✅ `CommissionFormEnhanced` - Seções organizadas com preview de impacto
-- ✅ `CommissionsEnhanced` - Visualização moderna com estatísticas
-- ✅ `ProductsEnhanced` - Formulário multi-seção com custos e impostos
+- ✅ `Commissions` - Visualização moderna com estatísticas
+- ✅ `Products` - Formulário multi-seção com custos e impostos
 - ✅ `ProductFormEnhanced` - Seções organizadas (Básico + Custos)
-- ✅ `CategoriesEnhanced` - Interface moderna para organização
-- ✅ `FixedFeesEnhanced` - Base implementada para taxas fixas
+- ✅ `Categories` - Interface moderna para organização
+- ✅ `FixedFees` - Base implementada para taxas fixas
 
 ### 🔄 **PRÓXIMOS PASSOS - FASE 2 FINAL (30%)**
 
