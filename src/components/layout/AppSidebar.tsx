@@ -162,15 +162,14 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
 }
 
 export function AppSidebar() {
-  const { state, toggleSidebar } = useSidebar();
+  const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { profile } = useAuth();
   const location = useLocation();
 
-
   return (
-    <Sidebar className="border-r-0 bg-sidebar">
-      <SidebarHeader className="p-6 relative">
+    <Sidebar collapsible="icon" className="border-r-0 bg-sidebar">
+      <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
             <Zap className="w-5 h-5 text-primary" />
@@ -186,23 +185,6 @@ export function AppSidebar() {
             </div>
           )}
         </div>
-        
-        {/* Botão de colapsar sutil */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className={cn(
-            "absolute top-6 w-6 h-6 text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-full transition-all duration-200",
-            collapsed ? "right-2" : "right-4"
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <ChevronLeft className="w-4 h-4" />
-          )}
-        </Button>
       </SidebarHeader>
 
       <SidebarContent className="space-y-4">
