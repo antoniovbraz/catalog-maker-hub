@@ -45,7 +45,7 @@ const RULE_TYPES = [
   { 
     value: "percentual", 
     label: "Percentual",
-    description: "Percentual aplicado sobre o valor do produto"
+    description: "Percentual aplicado sobre o valor do produto dentro de uma faixa específica"
   }
 ];
 
@@ -224,7 +224,7 @@ export const FixedFeeRuleForm = () => {
     setEditingId(null);
   };
 
-  const showRangeFields = formData.rule_type === "faixa";
+  const showRangeFields = formData.rule_type === "faixa" || formData.rule_type === "percentual";
 
   return (
     <div className="space-y-6">
@@ -290,24 +290,26 @@ export const FixedFeeRuleForm = () => {
             {showRangeFields && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="range_min">Valor Mínimo (R$)</Label>
+                  <Label htmlFor="range_min">Valor Mínimo (R$) *</Label>
                   <Input
                     id="range_min"
                     type="number"
                     step="0.01"
                     value={formData.range_min}
                     onChange={(e) => setFormData(prev => ({ ...prev, range_min: e.target.value }))}
+                    required
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="range_max">Valor Máximo (R$)</Label>
+                  <Label htmlFor="range_max">Valor Máximo (R$) *</Label>
                   <Input
                     id="range_max"
                     type="number"
                     step="0.01"
                     value={formData.range_max}
                     onChange={(e) => setFormData(prev => ({ ...prev, range_max: e.target.value }))}
+                    required
                   />
                 </div>
               </div>
@@ -367,9 +369,9 @@ export const FixedFeeRuleForm = () => {
                       {RULE_TYPES.find(t => t.value === rule.rule_type)?.label}
                     </TableCell>
                     <TableCell>
-                       {rule.rule_type === "faixa" && rule.range_min !== null && rule.range_max !== null
+                       {(rule.rule_type === "faixa" || rule.rule_type === "percentual") && rule.range_min !== null && rule.range_max !== null
                          ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
-                         : "-"
+                         : rule.rule_type === "constante" ? "Todas as faixas" : "-"
                        }
                      </TableCell>
                      <TableCell>
