@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AuthContextType, Profile } from '@/types/auth';
 import { authService } from '@/services/auth';
 import { toast } from '@/hooks/use-toast';
+import { useLogger } from '@/utils/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -12,6 +13,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const logger = useLogger('AuthContext');
 
   useEffect(() => {
     let isMounted = true;
@@ -19,15 +21,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Function to fetch profile safely
     const fetchProfile = async (userId: string) => {
       try {
-        console.log('[AuthContext] Fetching profile for user:', userId);
+        logger.debug('Fetching profile for user', { userId });
         const profileData = await authService.getCurrentProfile();
         if (isMounted) {
-          console.log('[AuthContext] Profile fetched:', !!profileData);
+          logger.debug('Profile fetched', { hasProfile: !!profileData });
           setProfile(profileData);
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        logger.error('Error fetching profile', error);
         if (isMounted) {
           setProfile(null);
           setLoading(false);
@@ -40,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (event, session) => {
         if (!isMounted) return;
         
-        console.log('[AuthContext] Auth state change:', { event, hasUser: !!session?.user });
+        logger.debug('Auth state change', { event, hasUser: !!session?.user });
         
         setSession(session);
         setUser(session?.user ?? null);
@@ -62,11 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for existing session
     const initializeAuth = async () => {
       try {
-        console.log('[AuthContext] Initializing auth...');
+        logger.debug('Initializing auth...');
         const { data: { session } } = await supabase.auth.getSession();
         if (!isMounted) return;
-        
-        console.log('[AuthContext] Initial session:', !!session?.user);
+
+        logger.debug('Initial session', { hasUser: !!session?.user });
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -76,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        logger.error('Error initializing auth', error);
         if (isMounted) {
           setLoading(false);
         }
@@ -161,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: "Até logo!"
       });
     } catch (error) {
-      console.error('Error signing out:', error);
+      logger.error('Error signing out', error);
       toast({
         title: "Erro no logout",
         description: "Tente novamente",

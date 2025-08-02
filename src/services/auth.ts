@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import { Profile } from "@/types/auth";
+import { logger } from "@/utils/logger";
 
 export class AuthService extends BaseService<Profile> {
   constructor() {
@@ -47,7 +48,7 @@ export class AuthService extends BaseService<Profile> {
       .single();
 
     if (error) {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile', 'AuthService', error);
       return null;
     }
 

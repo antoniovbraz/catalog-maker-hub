@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { useLogger } from '@/utils/logger';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -17,12 +18,13 @@ export function ProtectedRoute({
   const { user, profile, loading } = useAuth();
   const location = useLocation();
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const logger = useLogger('ProtectedRoute');
 
   useEffect(() => {
     // Only set redirect state once when loading is complete and we have the final auth state
     if (!loading) {
       const needsRedirect = !user || !profile;
-      console.log('[ProtectedRoute] Auth check:', { user: !!user, profile: !!profile, needsRedirect, pathname: location.pathname });
+      logger.debug('Auth check', { user: !!user, profile: !!profile, needsRedirect, pathname: location.pathname });
       setShouldRedirect(needsRedirect);
     }
   }, [loading, user, profile, location.pathname]);

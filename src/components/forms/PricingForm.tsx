@@ -11,6 +11,7 @@ import { useMarketplaces } from "@/hooks/useMarketplaces";
 import { useCalculatePrice, useCalculateMargemReal, useSavePricing } from "@/hooks/usePricing";
 import { PricingFormData } from "@/types/pricing";
 import { formatarMoeda, formatarPercentual } from "@/utils/pricing";
+import { useLogger } from "@/utils/logger";
 
 interface PricingResult {
   custo_total: number;
@@ -36,6 +37,7 @@ interface MargemRealResult {
 
 export const PricingForm = () => {
   const { toast } = useToast();
+  const logger = useLogger('PricingForm');
   const [formData, setFormData] = useState<PricingFormData>({
     product_id: "",
     marketplace_id: "",
@@ -124,7 +126,7 @@ export const PricingForm = () => {
               setMargemRealResult(margemResult as MargemRealResult);
             }
           } catch (error) {
-            console.error('Erro ao calcular margem real:', error);
+            logger.error('Erro ao calcular margem real', error);
           }
         }
         
@@ -138,7 +140,7 @@ export const PricingForm = () => {
         });
       }
     } catch (error) {
-      console.error('Erro ao calcular preço:', error);
+      logger.error('Erro ao calcular preço', error);
       toast({
         title: "Erro",
         description: "Erro ao calcular preço. Tente novamente.",
@@ -166,7 +168,7 @@ export const PricingForm = () => {
         margem_percentual: pricingResult.margem_percentual
       });
     } catch (error) {
-      console.error('Erro ao salvar precificação:', error);
+      logger.error('Erro ao salvar precificação', error);
     }
   };
 

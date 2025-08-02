@@ -149,7 +149,7 @@ export class PricingService extends BaseService<SavedPricingType> {
           logger.debug(`Precificação atualizada: ${pricing.products?.name} - ${pricing.marketplaces?.name}`, 'PricingService');
           
         } catch (error) {
-          console.error(`Erro ao recalcular precificação para produto ${pricing.product_id}:`, error);
+          logger.error(`Erro ao recalcular precificação para produto ${pricing.product_id}`, 'PricingService', error);
           errorCount++;
         }
       }
@@ -158,7 +158,7 @@ export class PricingService extends BaseService<SavedPricingType> {
       return { updated: updatedCount, errors: errorCount };
       
     } catch (error) {
-      console.error('Erro geral no recálculo automático:', error);
+      logger.error('Erro geral no recálculo automático', 'PricingService', error);
       throw new Error('Falha no recálculo automático das precificações');
     }
   }

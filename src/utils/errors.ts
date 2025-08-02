@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger';
+
 export class ValidationError extends Error {
   constructor(message: string) {
     super(message);
@@ -58,9 +60,8 @@ export function handleSupabaseError(error: any): string {
  * Log de erro para desenvolvimento
  */
 export function logError(error: Error, context?: string): void {
-  console.error(`[${context || 'ERROR'}]:`, {
+  logger.error(error.message, context || 'ERROR', {
     name: error.name,
-    message: error.message,
     stack: error.stack,
     timestamp: new Date().toISOString(),
   });

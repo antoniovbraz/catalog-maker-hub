@@ -15,6 +15,7 @@ import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
 import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
 import { PRICING_CONFIG } from "@/lib/config";
+import { useLogger } from "@/utils/logger";
 import { 
   DndContext, 
   closestCenter, 
@@ -231,6 +232,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
 
 export const DashboardForm = () => {
   const { toast } = useToast();
+  const logger = useLogger('DashboardForm');
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedMarketplaces, setSelectedMarketplaces] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("margem_percentual");
@@ -340,7 +342,7 @@ export const DashboardForm = () => {
             });
           }
         } catch (error) {
-          console.error(`Erro ao recalcular marketplace ${marketplaceId}:`, error);
+          logger.error(`Erro ao recalcular marketplace ${marketplaceId}`, error);
         }
       });
 
@@ -351,7 +353,7 @@ export const DashboardForm = () => {
         description: `Preços recalculados com as configurações mais atuais para ${marketplaceIds.length} marketplace(s)`,
       });
     } catch (error) {
-      console.error('Erro durante recálculo automático:', error);
+      logger.error('Erro durante recálculo automático', error);
     } finally {
       setIsRecalculating(false);
     }
@@ -414,7 +416,7 @@ export const DashboardForm = () => {
             };
           }
         } catch (error) {
-          console.error('Erro ao calcular margem real:', error);
+          logger.error('Erro ao calcular margem real', error);
         }
       }
       

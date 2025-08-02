@@ -38,7 +38,7 @@ export function useAutomaticPricingUpdate() {
       });
       
     } catch (error) {
-      console.error('Erro no recálculo automático:', error);
+      logger.error('Erro no recálculo automático', 'useAutomaticPricingUpdate', error);
       toast({
         title: "Erro na atualização",
         description: "Falha ao recalcular precificações automaticamente",
