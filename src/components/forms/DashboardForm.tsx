@@ -13,6 +13,7 @@ import { MiniSparkline } from "@/components/common/MiniSparkline";
 import { MiniProgressBar } from "@/components/common/MiniProgressBar";
 import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
+import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
 import { PRICING_CONFIG } from "@/lib/config";
 import { 
   DndContext, 
@@ -240,6 +241,9 @@ export const DashboardForm = () => {
   // Hooks para cálculo e salvamento
   const calculatePrice = useCalculatePrice();
   const savePricing = useSavePricing();
+
+  // Hook para atualização automática das precificações
+  useAutomaticPricingUpdate();
 
   // Fetch products
   const { data: products = [], isLoading: loadingProducts } = useQuery({

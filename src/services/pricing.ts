@@ -90,6 +90,77 @@ export class PricingService extends BaseService<SavedPricingType> {
     if (error) this.handleError(error, 'Salvar/atualizar precificação');
     return result;
   }
+
+  async recalculateAllPricing(): Promise<{ updated: number; errors: number }> {
+    console.log('Iniciando recálculo automático de todas as precificações...');
+    
+    try {
+      // Buscar todas as precificações salvas
+      const savedPricings = await this.getAllWithDetails();
+      
+      let updatedCount = 0;
+      let errorCount = 0;
+      
+      // Recalcular cada precificação
+      for (const pricing of savedPricings) {
+        try {
+          // Calcular novo preço
+          const newPricing = await this.calcularPreco(
+            pricing.product_id,
+            pricing.marketplace_id,
+            pricing.taxa_cartao,
+            pricing.provisao_desconto,
+            pricing.margem_desejada
+          );
+
+          // Calcular margem real se tiver preço praticado
+          let margemReal = null;
+          if (pricing.preco_praticado > 0) {
+            margemReal = await this.calcularMargemReal(
+              pricing.product_id,
+              pricing.marketplace_id,
+              pricing.taxa_cartao,
+              pricing.provisao_desconto,
+              pricing.preco_praticado
+            );
+          }
+
+          // Atualizar precificação com novos valores
+          const updatedData = {
+            product_id: pricing.product_id,
+            marketplace_id: pricing.marketplace_id,
+            custo_total: newPricing.custo_total,
+            valor_fixo: newPricing.valor_fixo,
+            frete: newPricing.frete,
+            comissao: newPricing.comissao,
+            taxa_cartao: pricing.taxa_cartao,
+            provisao_desconto: pricing.provisao_desconto,
+            margem_desejada: pricing.margem_desejada,
+            preco_sugerido: newPricing.preco_sugerido,
+            preco_praticado: pricing.preco_praticado,
+            margem_unitaria: newPricing.margem_unitaria,
+            margem_percentual: newPricing.margem_percentual
+          };
+
+          await this.upsert(updatedData);
+          updatedCount++;
+          
+          console.log(`Precificação atualizada: ${pricing.products?.name} - ${pricing.marketplaces?.name}`);
+          
+        } catch (error) {
+          console.error(`Erro ao recalcular precificação para produto ${pricing.product_id}:`, error);
+          errorCount++;
+        }
+      }
+
+      console.log(`Recálculo concluído: ${updatedCount} atualizadas, ${errorCount} erros`);
+      return { updated: updatedCount, errors: errorCount };
+      
+    } catch (error) {
+      console.error('Erro geral no recálculo automático:', error);
+      throw new Error('Falha no recálculo automático das precificações');
+    }
+  }
 }
 
 export const pricingService = new PricingService();

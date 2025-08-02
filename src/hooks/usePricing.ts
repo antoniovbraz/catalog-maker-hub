@@ -119,3 +119,25 @@ export function useDeleteSavedPricing() {
     },
   });
 }
+
+export function useRecalculateAllPricing() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => pricingService.recalculateAllPricing(),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY] });
+      toast({
+        title: "Recálculo concluído",
+        description: `${result.updated} precificações atualizadas${result.errors > 0 ? ` (${result.errors} erros)` : ''}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
