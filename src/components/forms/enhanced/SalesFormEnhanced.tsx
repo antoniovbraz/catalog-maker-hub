@@ -7,6 +7,8 @@ import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { SalesForm } from "@/components/forms/SalesForm";
+import { useToast } from "@/hooks/use-toast";
+import { salesService } from "@/services/sales";
 
 interface Sale {
   id: string;
@@ -22,6 +24,7 @@ interface Sale {
 export function SalesFormEnhanced() {
   const [showForm, setShowForm] = useState(false);
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
+  const { toast } = useToast();
 
   const { data: sales = [], isLoading, refetch } = useQuery({
     queryKey: ['sales'],
@@ -129,9 +132,22 @@ export function SalesFormEnhanced() {
     {
       label: "Excluir",
       icon: <Trash2 className="w-4 h-4" />,
-      onClick: (sale: Sale) => {
-        // TODO: Implement delete
-        console.log("Delete sale:", sale.id);
+      onClick: async (sale: Sale) => {
+        try {
+          await salesService.delete(sale.id);
+          toast({
+            title: "Sucesso",
+            description: "Venda excluída com sucesso!",
+          });
+          await refetch();
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Erro ao excluir venda";
+          toast({
+            title: "Erro",
+            description: message,
+            variant: "destructive",
+          });
+        }
       },
       variant: "destructive" as const
     }

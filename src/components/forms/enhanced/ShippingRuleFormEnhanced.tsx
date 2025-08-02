@@ -7,6 +7,8 @@ import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { ShippingRuleForm } from "@/components/forms/ShippingRuleForm";
+import { useToast } from "@/hooks/use-toast";
+import { shippingRulesService } from "@/services/shipping-rules";
 
 interface ShippingRule {
   id: string;
@@ -20,6 +22,7 @@ interface ShippingRule {
 export function ShippingRuleFormEnhanced() {
   const [showForm, setShowForm] = useState(false);
   const [editingRule, setEditingRule] = useState<ShippingRule | null>(null);
+  const { toast } = useToast();
 
   const { data: shippingRules = [], isLoading, refetch } = useQuery({
     queryKey: ['shipping-rules'],
@@ -91,9 +94,22 @@ export function ShippingRuleFormEnhanced() {
     {
       label: "Excluir",
       icon: <Trash2 className="w-4 h-4" />,
-      onClick: (rule: ShippingRule) => {
-        // TODO: Implement delete
-        console.log("Delete rule:", rule.id);
+      onClick: async (rule: ShippingRule) => {
+        try {
+          await shippingRulesService.delete(rule.id);
+          toast({
+            title: "Sucesso",
+            description: "Regra de frete excluída com sucesso!",
+          });
+          await refetch();
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Erro ao excluir regra";
+          toast({
+            title: "Erro",
+            description: message,
+            variant: "destructive",
+          });
+        }
       },
       variant: "destructive" as const
     }
