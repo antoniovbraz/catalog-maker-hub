@@ -19,11 +19,19 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Tests with coverage
-echo "🧪 Executando testes com cobertura..."
-npm run test:coverage
+# Tests
+echo "🧪 Executando testes..."
+npm test
 if [ $? -ne 0 ]; then
     echo "❌ Erro nos testes"
+    exit 1
+fi
+
+# Tests with coverage
+echo "📊 Gerando relatório de cobertura..."
+npm run test:coverage
+if [ $? -ne 0 ]; then
+    echo "❌ Erro na cobertura dos testes"
     exit 1
 fi
 
