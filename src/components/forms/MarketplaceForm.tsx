@@ -3,23 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit } from "lucide-react";
-import { useMarketplaces, useCreateMarketplace, useUpdateMarketplace, useDeleteMarketplace } from "@/hooks/useMarketplaces";
+import { Trash2, Edit, ChevronRight } from "lucide-react";
+import { useMarketplacesHierarchical, useMarketplaceParents, useCreateMarketplace, useUpdateMarketplace, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";
+import { MarketplaceTooltip } from "@/components/common/MarketplaceTooltip";
 
 export const MarketplaceForm = () => {
   const [formData, setFormData] = useState<MarketplaceFormData>({
     name: "",
     description: "",
-    url: ""
+    url: "",
+    parent_marketplace_id: null
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const { data: marketplaces = [], isLoading } = useMarketplaces();
+  const { data: hierarchicalMarketplaces = [], isLoading } = useMarketplacesHierarchical();
+  const { data: parentMarketplaces = [] } = useMarketplaceParents();
   const createMutation = useCreateMarketplace();
   const updateMutation = useUpdateMarketplace();
   const deleteMutation = useDeleteMarketplace();
@@ -29,14 +34,14 @@ export const MarketplaceForm = () => {
     if (editingId) {
       updateMutation.mutate({ id: editingId, data: formData }, {
         onSuccess: () => {
-          setFormData({ name: "", description: "", url: "" });
+          setFormData({ name: "", description: "", url: "", parent_marketplace_id: null });
           setEditingId(null);
         }
       });
     } else {
       createMutation.mutate(formData, {
         onSuccess: () => {
-          setFormData({ name: "", description: "", url: "" });
+          setFormData({ name: "", description: "", url: "", parent_marketplace_id: null });
         }
       });
     }
@@ -46,13 +51,14 @@ export const MarketplaceForm = () => {
     setFormData({
       name: marketplace.name,
       description: marketplace.description || "",
-      url: marketplace.url || ""
+      url: marketplace.url || "",
+      parent_marketplace_id: marketplace.parent_marketplace_id || null
     });
     setEditingId(marketplace.id);
   };
 
   const handleCancelEdit = () => {
-    setFormData({ name: "", description: "", url: "" });
+    setFormData({ name: "", description: "", url: "", parent_marketplace_id: null });
     setEditingId(null);
   };
 
@@ -92,6 +98,29 @@ export const MarketplaceForm = () => {
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
               />
             </div>
+
+            <div>
+              <Label htmlFor="parent">Marketplace Pai (opcional)</Label>
+              <Select
+                value={formData.parent_marketplace_id || ""}
+                onValueChange={(value) => setFormData(prev => ({ 
+                  ...prev, 
+                  parent_marketplace_id: value || null 
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um marketplace pai" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhum (marketplace independente)</SelectItem>
+                  {parentMarketplaces.map((parent) => (
+                    <SelectItem key={parent.id} value={parent.id}>
+                      {parent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             
             <div className="flex gap-2">
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
@@ -115,44 +144,82 @@ export const MarketplaceForm = () => {
           {isLoading ? (
             <p>Carregando...</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Descrição</TableHead>
-                  <TableHead>URL</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {marketplaces.map((marketplace) => (
-                  <TableRow key={marketplace.id}>
-                    <TableCell className="font-medium">{marketplace.name}</TableCell>
-                    <TableCell>{marketplace.description}</TableCell>
-                    <TableCell>{marketplace.url}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(marketplace)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deleteMutation.mutate(marketplace.id)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div className="space-y-4">
+              {hierarchicalMarketplaces.map((hierarchy) => (
+                <div key={hierarchy.parent.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-lg">{hierarchy.parent.name}</h3>
+                      <MarketplaceTooltip 
+                        marketplaceName={hierarchy.parent.name} 
+                        metadata={hierarchy.parent.marketplace_metadata as Record<string, any>} 
+                      />
+                      {hierarchy.children.length > 0 && (
+                        <Badge variant="secondary">{hierarchy.children.length} modalidades</Badge>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(hierarchy.parent)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteMutation.mutate(hierarchy.parent.id)}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {hierarchy.parent.description}
+                  </p>
+                  
+                  {hierarchy.children.length > 0 && (
+                    <div className="ml-4 space-y-2">
+                      {hierarchy.children.map((child) => (
+                        <div key={child.id} className="flex items-center justify-between p-3 bg-muted rounded-md">
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">{child.name}</span>
+                            <MarketplaceTooltip 
+                              marketplaceName={child.name} 
+                              metadata={child.marketplace_metadata as Record<string, any>} 
+                            />
+                            <span className="text-sm text-muted-foreground">
+                              {child.description}
+                            </span>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEdit(child)}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteMutation.mutate(child.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

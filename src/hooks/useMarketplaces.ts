@@ -13,6 +13,22 @@ export function useMarketplaces() {
   });
 }
 
+export function useMarketplacesHierarchical() {
+  return useQuery({
+    queryKey: [MARKETPLACES_QUERY_KEY, 'hierarchical'],
+    queryFn: () => marketplacesService.getHierarchical(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useMarketplaceParents() {
+  return useQuery({
+    queryKey: [MARKETPLACES_QUERY_KEY, 'parents'],
+    queryFn: () => marketplacesService.getParents(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useMarketplace(id: string) {
   return useQuery({
     queryKey: [MARKETPLACES_QUERY_KEY, id],

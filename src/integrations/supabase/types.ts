@@ -135,7 +135,9 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          marketplace_metadata: Json | null
           name: string
+          parent_marketplace_id: string | null
           tenant_id: string | null
           updated_at: string
           url: string | null
@@ -144,7 +146,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          marketplace_metadata?: Json | null
           name: string
+          parent_marketplace_id?: string | null
           tenant_id?: string | null
           updated_at?: string
           url?: string | null
@@ -153,12 +157,22 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          marketplace_metadata?: Json | null
           name?: string
+          parent_marketplace_id?: string | null
           tenant_id?: string | null
           updated_at?: string
           url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "marketplaces_parent_marketplace_id_fkey"
+            columns: ["parent_marketplace_id"]
+            isOneToOne: false
+            referencedRelation: "marketplaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
