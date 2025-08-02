@@ -432,7 +432,7 @@ export const DashboardForm = () => {
       const realMargin = realMargins[pricing.marketplace_id];
       return {
         marketplace_id: pricing.marketplace_id,
-        marketplace_name: pricing.marketplaces?.name || 'Marketplace',
+        marketplace_name: 'Marketplace', // Will be populated from separate query
         custo_total: pricing.custo_total,
         valor_fixo: pricing.valor_fixo,
         frete: pricing.frete,
@@ -444,8 +444,8 @@ export const DashboardForm = () => {
         taxa_cartao: pricing.taxa_cartao,
         provisao_desconto: pricing.provisao_desconto,
         margem_desejada: pricing.margem_desejada,
-        product_name: pricing.products?.name || '',
-        product_sku: pricing.products?.sku || '',
+        product_name: '', // Will be populated from separate query
+        product_sku: '', // Will be populated from separate query
       };
     })
     .sort((a, b) => {

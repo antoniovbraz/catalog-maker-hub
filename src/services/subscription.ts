@@ -15,7 +15,7 @@ export class SubscriptionService extends BaseService<SubscriptionPlan> {
       .order('sort_order', { ascending: true });
     
     if (error) throw new Error(`Erro ao buscar planos: ${error.message}`);
-    return data || [];
+    return (data || []) as unknown as SubscriptionPlan[];
   }
 
   async getCurrentSubscription(userId: string): Promise<Subscription | null> {
@@ -33,7 +33,7 @@ export class SubscriptionService extends BaseService<SubscriptionPlan> {
       throw new Error(`Erro ao buscar assinatura: ${error.message}`);
     }
     
-    return data;
+    return data as unknown as Subscription;
   }
 
   async getUserUsage(userId: string, resourceType?: string): Promise<UsageTracking[]> {
