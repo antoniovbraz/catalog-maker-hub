@@ -102,17 +102,17 @@ export const MarketplaceForm = () => {
             <div>
               <Label htmlFor="parent">Marketplace Pai (opcional)</Label>
               <Select
-                value={formData.parent_marketplace_id || ""}
+                value={formData.parent_marketplace_id || "none"}
                 onValueChange={(value) => setFormData(prev => ({ 
                   ...prev, 
-                  parent_marketplace_id: value || null 
+                  parent_marketplace_id: value === "none" ? null : value 
                 }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione um marketplace pai" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum (marketplace independente)</SelectItem>
+                  <SelectItem value="none">Nenhum (marketplace independente)</SelectItem>
                   {parentMarketplaces.map((parent) => (
                     <SelectItem key={parent.id} value={parent.id}>
                       {parent.name}
