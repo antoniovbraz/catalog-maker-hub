@@ -20,6 +20,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          tenant_id: string | null
           updated_at: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          tenant_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          tenant_id?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -45,6 +48,7 @@ export type Database = {
           id: string
           marketplace_id: string | null
           rate: number
+          tenant_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -53,6 +57,7 @@ export type Database = {
           id?: string
           marketplace_id?: string | null
           rate: number
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -61,6 +66,7 @@ export type Database = {
           id?: string
           marketplace_id?: string | null
           rate?: number
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -88,6 +94,7 @@ export type Database = {
           range_max: number | null
           range_min: number | null
           rule_type: string
+          tenant_id: string | null
           updated_at: string | null
           value: number
         }
@@ -98,6 +105,7 @@ export type Database = {
           range_max?: number | null
           range_min?: number | null
           rule_type: string
+          tenant_id?: string | null
           updated_at?: string | null
           value: number
         }
@@ -108,6 +116,7 @@ export type Database = {
           range_max?: number | null
           range_min?: number | null
           rule_type?: string
+          tenant_id?: string | null
           updated_at?: string | null
           value?: number
         }
@@ -127,6 +136,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          tenant_id: string | null
           updated_at: string
           url: string | null
         }
@@ -135,6 +145,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          tenant_id?: string | null
           updated_at?: string
           url?: string | null
         }
@@ -143,6 +154,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          tenant_id?: string | null
           updated_at?: string
           url?: string | null
         }
@@ -159,6 +171,7 @@ export type Database = {
           packaging_cost: number | null
           sku: string | null
           tax_rate: number | null
+          tenant_id: string | null
           updated_at: string
         }
         Insert: {
@@ -171,6 +184,7 @@ export type Database = {
           packaging_cost?: number | null
           sku?: string | null
           tax_rate?: number | null
+          tenant_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -183,6 +197,7 @@ export type Database = {
           packaging_cost?: number | null
           sku?: string | null
           tax_rate?: number | null
+          tenant_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -195,6 +210,51 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          is_active: boolean
+          phone: string | null
+          plan_expires_at: string | null
+          plan_type: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          is_active?: boolean
+          phone?: string | null
+          plan_expires_at?: string | null
+          plan_type?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          plan_expires_at?: string | null
+          plan_type?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sales: {
         Row: {
           id: string
@@ -203,6 +263,7 @@ export type Database = {
           product_id: string | null
           quantity: number
           sold_at: string
+          tenant_id: string | null
         }
         Insert: {
           id?: string
@@ -211,6 +272,7 @@ export type Database = {
           product_id?: string | null
           quantity: number
           sold_at?: string
+          tenant_id?: string | null
         }
         Update: {
           id?: string
@@ -219,6 +281,7 @@ export type Database = {
           product_id?: string | null
           quantity?: number
           sold_at?: string
+          tenant_id?: string | null
         }
         Relationships: [
           {
@@ -253,6 +316,7 @@ export type Database = {
           product_id: string
           provisao_desconto: number
           taxa_cartao: number
+          tenant_id: string | null
           updated_at: string
           valor_fixo: number
         }
@@ -271,6 +335,7 @@ export type Database = {
           product_id: string
           provisao_desconto?: number
           taxa_cartao?: number
+          tenant_id?: string | null
           updated_at?: string
           valor_fixo?: number
         }
@@ -289,6 +354,7 @@ export type Database = {
           product_id?: string
           provisao_desconto?: number
           taxa_cartao?: number
+          tenant_id?: string | null
           updated_at?: string
           valor_fixo?: number
         }
@@ -317,6 +383,7 @@ export type Database = {
           marketplace_id: string | null
           product_id: string | null
           shipping_cost: number
+          tenant_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -326,6 +393,7 @@ export type Database = {
           marketplace_id?: string | null
           product_id?: string | null
           shipping_cost: number
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -335,6 +403,7 @@ export type Database = {
           marketplace_id?: string | null
           product_id?: string | null
           shipping_cost?: number
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -381,7 +450,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "super_admin" | "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -508,6 +577,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["super_admin", "admin", "user"],
+    },
   },
 } as const
