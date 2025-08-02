@@ -109,7 +109,7 @@ export function useAutomaticPricingUpdate() {
       supabase.removeChannel(fixedFeesChannel);
       supabase.removeChannel(shippingChannel);
     };
-  }, [queryClient]);
+  }, []); // Removida a dependência do queryClient para evitar loops
 
   return {
     triggerManualUpdate: () => handleRulesUpdate('manual', 'manual_trigger')
