@@ -5,13 +5,15 @@ import { AppHeader } from "./AppHeader";
 
 interface MainLayoutProps {
   children: ReactNode;
+  activeTab: string;
+  onTabChange: (tabId: string) => void;
 }
 
-export function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children, activeTab, onTabChange }: MainLayoutProps) {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
+        <AppSidebar activeTab={activeTab} onTabChange={onTabChange} />
         
         <div className="flex-1 flex flex-col overflow-hidden">
           <AppHeader />
