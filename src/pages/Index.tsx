@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { MarketplaceForm } from "@/components/forms/MarketplaceForm";
 import { CategoryForm } from "@/components/forms/CategoryForm";
 import { ProductForm } from "@/components/forms/ProductForm";
@@ -9,13 +8,13 @@ import { SalesForm } from "@/components/forms/SalesForm";
 import { PricingForm } from "@/components/forms/PricingForm";
 import { DashboardForm } from "@/components/forms/DashboardForm";
 import { StrategyForm } from "@/components/forms/StrategyForm";
-import { MainLayout } from "@/components/layout/MainLayout";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { useOnboarding } from "@/hooks/useOnboarding";
+import { useLayout } from "@/contexts/LayoutContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const { activeTab, setActiveTab } = useLayout();
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   const renderContent = () => {
@@ -201,9 +200,7 @@ const Index = () => {
 
   return (
     <>
-      <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
-        {renderContent()}
-      </MainLayout>
+      {renderContent()}
       
       {showOnboarding && (
         <OnboardingTour 

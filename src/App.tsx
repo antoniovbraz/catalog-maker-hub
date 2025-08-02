@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SharedLayout } from "@/components/layout/SharedLayout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
@@ -26,7 +27,9 @@ const App = () => (
               path="/" 
               element={
                 <ProtectedRoute>
-                  <Index />
+                  <SharedLayout>
+                    <Index />
+                  </SharedLayout>
                 </ProtectedRoute>
               } 
             />
@@ -34,7 +37,9 @@ const App = () => (
               path="/subscription" 
               element={
                 <ProtectedRoute>
-                  <Subscription />
+                  <SharedLayout>
+                    <Subscription />
+                  </SharedLayout>
                 </ProtectedRoute>
               } 
             />
@@ -42,7 +47,9 @@ const App = () => (
               path="/admin" 
               element={
                 <ProtectedRoute requiredRole="super_admin">
-                  <AdminDashboard />
+                  <SharedLayout>
+                    <AdminDashboard />
+                  </SharedLayout>
                 </ProtectedRoute>
               } 
             />
