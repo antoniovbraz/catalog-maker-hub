@@ -2,11 +2,20 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SharedLayout } from "@/components/layout/SharedLayout";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
+import Strategy from "./pages/Strategy";
+import Marketplaces from "./pages/Marketplaces";
+import Categories from "./pages/Categories";
+import Products from "./pages/Products";
+import Shipping from "./pages/Shipping";
+import Commissions from "./pages/Commissions";
+import FixedFees from "./pages/FixedFees";
+import Sales from "./pages/Sales";
+import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -23,16 +32,111 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            
+            {/* Price Pilot Routes */}
             <Route 
-              path="/" 
+              path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <SharedLayout>
-                    <Index />
+                    <Dashboard />
                   </SharedLayout>
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/strategy" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Strategy />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/marketplaces" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Marketplaces />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/categories" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Categories />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/products" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Products />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/shipping" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Shipping />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/commissions" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Commissions />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/fixed-fees" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <FixedFees />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/sales" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Sales />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pricing" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Pricing />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Account Routes */}
             <Route 
               path="/subscription" 
               element={
@@ -43,6 +147,8 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            
+            {/* Admin Routes */}
             <Route 
               path="/admin" 
               element={
@@ -53,7 +159,8 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
