@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
 import { authService } from "./auth";
 
-export abstract class BaseService<T = any> {
+export abstract class BaseService<T extends Record<string, unknown> = Record<string, unknown>> {
   protected tableName: string;
 
   constructor(tableName: string) {
@@ -11,7 +11,7 @@ export abstract class BaseService<T = any> {
 
   async getAll(): Promise<T[]> {
     const { data, error } = await supabase
-      .from(this.tableName as any)
+      .from(this.tableName)
       .select('*')
       .order('created_at', { ascending: false });
     
@@ -21,7 +21,7 @@ export abstract class BaseService<T = any> {
 
   async getById(id: string): Promise<T | null> {
     const { data, error } = await supabase
-      .from(this.tableName as any)
+      .from(this.tableName)
       .select('*')
       .eq('id', id)
       .single();
