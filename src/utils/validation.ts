@@ -1,14 +1,14 @@
 /**
  * Valida se um valor é um número positivo
  */
-export function isPositiveNumber(value: any): boolean {
+export function isPositiveNumber(value: unknown): value is number {
   return typeof value === 'number' && value >= 0 && !isNaN(value);
 }
 
 /**
  * Valida se um valor é um percentual válido (0-100)
  */
-export function isValidPercentage(value: any): boolean {
+export function isValidPercentage(value: unknown): value is number {
   return isPositiveNumber(value) && value <= 100;
 }
 

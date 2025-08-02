@@ -50,7 +50,15 @@ const RULE_TYPES = [
 ];
 
 export const FixedFeeRuleForm = () => {
-  const [formData, setFormData] = useState({
+  interface FixedFeeRuleFormData {
+    marketplace_id: string;
+    rule_type: string;
+    range_min: string;
+    range_max: string;
+    value: string;
+  }
+
+  const [formData, setFormData] = useState<FixedFeeRuleFormData>({
     marketplace_id: "",
     rule_type: "",
     range_min: "",
@@ -91,7 +99,7 @@ export const FixedFeeRuleForm = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: FixedFeeRuleFormData) => {
       const { error } = await supabase
         .from("marketplace_fixed_fee_rules")
         .insert([{
@@ -126,7 +134,7 @@ export const FixedFeeRuleForm = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async ({ id, data }: { id: string; data: FixedFeeRuleFormData }) => {
       const { error } = await supabase
         .from("marketplace_fixed_fee_rules")
         .update({
