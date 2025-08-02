@@ -14,11 +14,15 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
-  Zap
+  Zap,
+  Activity,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 import {
   Sidebar,
@@ -29,26 +33,36 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-const menuItems = [
+const mainMenuItems = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "strategy", title: "Estratégia", icon: Target, path: "/strategy" },
+];
+
+const configMenuItems = [
   { id: "marketplaces", title: "Marketplaces", icon: Store, path: "/marketplaces" },
   { id: "categories", title: "Categorias", icon: FolderOpen, path: "/categories" },
-  { id: "products", title: "Produtos", icon: Package, path: "/products" },
   { id: "shipping", title: "Frete", icon: Truck, path: "/shipping" },
   { id: "commissions", title: "Comissões", icon: Percent, path: "/commissions" },
   { id: "fixed-fees", title: "Taxas Fixas", icon: DollarSign, path: "/fixed-fees" },
+];
+
+const operationsMenuItems = [
+  { id: "products", title: "Produtos", icon: Package, path: "/products" },
   { id: "sales", title: "Vendas", icon: BarChart3, path: "/sales" },
   { id: "pricing", title: "Precificação", icon: Calculator, path: "/pricing" },
 ];
 
 interface MenuItemProps {
-  item: typeof menuItems[0];
+  item: typeof mainMenuItems[0];
   collapsed: boolean;
   isActive: boolean;
 }
@@ -71,6 +85,78 @@ function MenuItem({ item, collapsed, isActive }: MenuItemProps) {
           {collapsed && <div className="sr-only">{item.title}</div>}
         </Link>
       </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
+interface CollapsibleMenuGroupProps {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: typeof configMenuItems;
+  collapsed: boolean;
+  location: ReturnType<typeof useLocation>;
+}
+
+function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }: CollapsibleMenuGroupProps) {
+  const [isOpen, setIsOpen] = useState(() => {
+    const stored = localStorage.getItem(`sidebar-group-${title.toLowerCase()}`);
+    return stored !== null ? JSON.parse(stored) : true;
+  });
+
+  const hasActiveItem = items.some(item => location.pathname === item.path);
+
+  useEffect(() => {
+    if (hasActiveItem && !isOpen) {
+      setIsOpen(true);
+    }
+  }, [hasActiveItem, isOpen]);
+
+  useEffect(() => {
+    localStorage.setItem(`sidebar-group-${title.toLowerCase()}`, JSON.stringify(isOpen));
+  }, [isOpen, title]);
+
+  return (
+    <SidebarMenuItem>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton className="w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200">
+            <Icon className="w-5 h-5 shrink-0" />
+            {!collapsed && (
+              <>
+                <span className="font-medium">{title}</span>
+                {isOpen ? (
+                  <ChevronUp className="w-4 h-4 ml-auto" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 ml-auto" />
+                )}
+              </>
+            )}
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        {!collapsed && (
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {items.map((item) => (
+                <SidebarMenuSubItem key={item.id}>
+                  <SidebarMenuSubButton
+                    asChild
+                    className={cn(
+                      location.pathname === item.path
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    <Link to={item.path}>
+                      <item.icon className="w-4 h-4 shrink-0" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        )}
+      </Collapsible>
     </SidebarMenuItem>
   );
 }
@@ -120,14 +206,14 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="space-y-4">
-        {/* Price Pilot Navigation */}
+        {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
-            {!collapsed ? "Price Pilot" : ""}
+            {!collapsed ? "Principal" : ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
+              {mainMenuItems.map((item) => (
                 <MenuItem
                   key={item.id}
                   item={item}
@@ -135,6 +221,24 @@ export function AppSidebar() {
                   isActive={location.pathname === item.path}
                 />
               ))}
+              
+              {/* Configurações Group */}
+              <CollapsibleMenuGroup
+                title="Configurações"
+                icon={Settings}
+                items={configMenuItems}
+                collapsed={collapsed}
+                location={location}
+              />
+              
+              {/* Operações Group */}
+              <CollapsibleMenuGroup
+                title="Operações"
+                icon={Activity}
+                items={operationsMenuItems}
+                collapsed={collapsed}
+                location={location}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
