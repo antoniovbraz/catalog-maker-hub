@@ -4,6 +4,7 @@ import { pricingService } from "@/services/pricing";
 import { toast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { PRICING_QUERY_KEY } from "./usePricing";
+import { logger } from "@/utils/logger";
 
 export function useAutomaticPricingUpdate() {
   const queryClient = useQueryClient();
@@ -12,11 +13,11 @@ export function useAutomaticPricingUpdate() {
   const handleRulesUpdate = async (tableName: string, eventType: string) => {
     // Evitar múltiplas execuções simultâneas
     if (isUpdatingRef.current) {
-      console.log('Recálculo já em andamento, ignorando evento...');
+      logger.debug('Recálculo já em andamento, ignorando evento...', 'useAutomaticPricingUpdate');
       return;
     }
 
-    console.log(`Detectada mudança na tabela ${tableName} (${eventType})`);
+    logger.info(`Detectada mudança na tabela ${tableName} (${eventType})`, 'useAutomaticPricingUpdate');
     
     isUpdatingRef.current = true;
     
@@ -49,7 +50,7 @@ export function useAutomaticPricingUpdate() {
   };
 
   useEffect(() => {
-    console.log('Configurando listeners de atualização automática...');
+    logger.info('Configurando listeners de atualização automática...', 'useAutomaticPricingUpdate');
     
     // Canal para mudanças nas comissões
     const commissionsChannel = supabase
@@ -62,7 +63,7 @@ export function useAutomaticPricingUpdate() {
           table: 'commissions'
         },
         (payload) => {
-          console.log('Mudança detectada em commissions:', payload);
+          logger.debug('Mudança detectada em commissions', 'useAutomaticPricingUpdate', payload);
           handleRulesUpdate('commissions', payload.eventType);
         }
       )
@@ -79,7 +80,7 @@ export function useAutomaticPricingUpdate() {
           table: 'marketplace_fixed_fee_rules'
         },
         (payload) => {
-          console.log('Mudança detectada em marketplace_fixed_fee_rules:', payload);
+          logger.debug('Mudança detectada em marketplace_fixed_fee_rules', 'useAutomaticPricingUpdate', payload);
           handleRulesUpdate('marketplace_fixed_fee_rules', payload.eventType);
         }
       )
@@ -96,7 +97,7 @@ export function useAutomaticPricingUpdate() {
           table: 'shipping_rules'
         },
         (payload) => {
-          console.log('Mudança detectada em shipping_rules:', payload);
+          logger.debug('Mudança detectada em shipping_rules', 'useAutomaticPricingUpdate', payload);
           handleRulesUpdate('shipping_rules', payload.eventType);
         }
       )
@@ -104,7 +105,7 @@ export function useAutomaticPricingUpdate() {
 
     // Cleanup dos canais
     return () => {
-      console.log('Removendo listeners de atualização automática...');
+      logger.info('Removendo listeners de atualização automática...', 'useAutomaticPricingUpdate');
       supabase.removeChannel(commissionsChannel);
       supabase.removeChannel(fixedFeesChannel);
       supabase.removeChannel(shippingChannel);

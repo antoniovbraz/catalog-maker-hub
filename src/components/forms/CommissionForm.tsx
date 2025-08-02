@@ -11,27 +11,8 @@ import { useMarketplaces } from "@/hooks/useMarketplaces";
 import { useCategories } from "@/hooks/useCategories";
 import { formatarPercentual } from "@/utils/pricing";
 
-// TODO: Criar hooks e types para commissions quando necessário
-interface Commission {
-  id: string;
-  marketplace_id: string;
-  category_id: string | null;
-  rate: number;
-  created_at: string;
-  updated_at: string;
-  marketplaces?: {
-    name: string;
-  };
-  categories?: {
-    name: string;
-  };
-}
-
-interface CommissionFormData {
-  marketplace_id: string;
-  category_id: string;
-  rate: number;
-}
+import { CommissionFormData } from "@/types/commissions";
+import { useCommissionsWithDetails, useCreateCommission, useUpdateCommission, useDeleteCommission } from "@/hooks/useCommissions";
 
 export const CommissionForm = () => {
   const [formData, setFormData] = useState<CommissionFormData>({
@@ -45,13 +26,22 @@ export const CommissionForm = () => {
   const { data: marketplaces = [] } = useMarketplaces();
   const { data: categories = [] } = useCategories();
   
-  // TODO: Implementar hooks específicos para commissions
-  // Por enquanto, mantendo a lógica básica para demonstrar a estrutura
+  const { data: commissions = [], isLoading } = useCommissionsWithDetails();
+  const createMutation = useCreateCommission();
+  const updateMutation = useUpdateCommission();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implementar lógica de criação/atualização usando hooks
-    toast({ title: "Funcionalidade em desenvolvimento" });
+    
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+    
+    if (!updateMutation.isError && !createMutation.isError) {
+      resetForm();
+    }
   };
 
   const resetForm = () => {
@@ -146,10 +136,39 @@ export const CommissionForm = () => {
           <CardTitle>Comissões Cadastradas</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground py-8">
-            Implementação dos hooks de comissões pendente.<br/>
-            Use a aba Comissões do sistema antigo por enquanto.
-          </div>
+          {isLoading ? (
+            <div className="text-center py-8">Carregando...</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Marketplace</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Taxa</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {commissions.map((commission) => (
+                  <TableRow key={commission.id}>
+                    <TableCell>{commission.marketplaces?.name}</TableCell>
+                    <TableCell>{commission.categories?.name || 'Padrão'}</TableCell>
+                    <TableCell>{formatarPercentual(commission.rate)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

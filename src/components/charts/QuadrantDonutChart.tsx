@@ -1,5 +1,6 @@
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { ChartTooltipProps, ChartLegendProps } from '@/types/charts';
 
 interface QuadrantCounts {
   alta_margem_alto_giro: number;
@@ -54,17 +55,17 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: ChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0];
       const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : 0;
       return (
         <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
           <div className="flex items-center gap-2">
-            <span>{data.payload.emoji}</span>
+            <span>{String(data.payload.emoji || '')}</span>
             <span className="font-medium">{data.name}</span>
           </div>
-          <p className="text-muted-foreground text-xs">{data.payload.description}</p>
+          <p className="text-muted-foreground text-xs">{String(data.payload.description || '')}</p>
           <p>{data.value} produtos ({percentage}%)</p>
         </div>
       );
@@ -72,18 +73,18 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
     return null;
   };
 
-  const CustomLegend = ({ payload }: any) => {
+  const CustomLegend = ({ payload }: ChartLegendProps) => {
     return (
       <div className="flex flex-wrap justify-center gap-4 mt-4">
-        {payload.map((entry: any, index: number) => (
+        {payload?.map((entry, index: number) => (
           <div key={index} className="flex items-center gap-2 text-sm">
             <div 
               className="w-3 h-3 rounded-full" 
               style={{ backgroundColor: entry.color }}
             />
-            <span>{entry.payload.emoji} {entry.value}</span>
+            <span>{String(entry.payload?.emoji || '')} {entry.value}</span>
             <span className="text-muted-foreground">
-              ({entry.payload.value})
+              ({String(entry.payload?.value || '')})
             </span>
           </div>
         ))}

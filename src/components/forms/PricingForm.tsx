@@ -51,8 +51,6 @@ export const PricingForm = () => {
   const [pricingResult, setPricingResult] = useState<PricingResult | null>(null);
   const [margemRealResult, setMargemRealResult] = useState<MargemRealResult | null>(null);
 
-  console.log('Estado atual do pricingResult:', pricingResult); // Debug temporário
-  console.log('Estado atual do margemRealResult:', margemRealResult); // Debug temporário
 
   const { data: products = [], isLoading: loadingProducts } = useProducts();
   const { data: marketplaces = [], isLoading: loadingMarketplaces } = useMarketplaces();
@@ -81,13 +79,6 @@ export const PricingForm = () => {
       return;
     }
 
-    console.log('Iniciando cálculo com dados:', {
-      product_id: formData.product_id,
-      marketplace_id: formData.marketplace_id,
-      taxa_cartao: formData.taxa_cartao,
-      provisao_desconto: formData.provisao_desconto,
-      margem_desejada: formData.margem_desejada
-    });
 
     try {
       const result = await calculatePriceMutation.mutateAsync({
@@ -98,12 +89,12 @@ export const PricingForm = () => {
         margemDesejada: formData.margem_desejada
       });
 
-      console.log('Resultado recebido da API:', result);
+      
 
       // Verificar se temos um resultado válido
       if (result && typeof result === 'object') {
         const typedResult = result as PricingResult;
-        console.log('Definindo resultado no estado:', typedResult);
+        
         
         setPricingResult(typedResult);
         
@@ -118,7 +109,7 @@ export const PricingForm = () => {
         
         // Se há preço praticado, calcular margem real também
         if (formData.preco_praticado > 0) {
-          console.log('Calculando margem real para preço praticado:', formData.preco_praticado);
+          
           
           try {
             const margemResult = await calculateMargemRealMutation.mutateAsync({
@@ -137,9 +128,9 @@ export const PricingForm = () => {
           }
         }
         
-        console.log('Estado atualizado com sucesso');
+        
       } else {
-        console.error('Resultado inválido recebido:', result);
+        
         toast({
           title: "Erro",
           description: "Resposta inválida do servidor",
@@ -193,7 +184,7 @@ export const PricingForm = () => {
               <Select 
                 value={formData.product_id} 
                 onValueChange={(value) => {
-                  console.log('Product selected:', value);
+                  
                   handleInputChange("product_id", value);
                 }}
               >
@@ -225,7 +216,7 @@ export const PricingForm = () => {
               <Select 
                 value={formData.marketplace_id} 
                 onValueChange={(value) => {
-                  console.log('Marketplace selected:', value);
+                  
                   handleInputChange("marketplace_id", value);
                 }}
               >

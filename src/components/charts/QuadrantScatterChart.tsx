@@ -1,5 +1,6 @@
 import React from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { ChartTooltipProps } from '@/types/charts';
 
 interface ProductStrategy {
   product_id: string;
@@ -43,25 +44,31 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
     index,
   }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: ChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const name = String(data.name || '');
+      const marketplace = String(data.marketplace || '');
+      const y = Number(data.y || 0);
+      const x = Number(data.x || 0);
+      const revenue = Number(data.revenue || 0);
+      
       return (
         <div className="bg-background border rounded-lg shadow-elegant p-3 text-sm animate-fade-in">
-          <p className="font-semibold text-primary">{data.name}</p>
-          <p className="text-muted-foreground text-xs mb-2">{data.marketplace}</p>
+          <p className="font-semibold text-primary">{name}</p>
+          <p className="text-muted-foreground text-xs mb-2">{marketplace}</p>
           <div className="space-y-1">
             <div className="flex justify-between">
               <span>Margem:</span>
-              <span className="font-medium">{data.y.toFixed(1)}%</span>
+              <span className="font-medium">{y.toFixed(1)}%</span>
             </div>
             <div className="flex justify-between">
               <span>Giro:</span>
-              <span className="font-medium">{data.x.toFixed(1)}%</span>
+              <span className="font-medium">{x.toFixed(1)}%</span>
             </div>
             <div className="flex justify-between">
               <span>Receita:</span>
-              <span className="font-medium">R$ {data.revenue.toFixed(2)}</span>
+              <span className="font-medium">R$ {revenue.toFixed(2)}</span>
             </div>
           </div>
         </div>

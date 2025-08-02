@@ -1,6 +1,7 @@
 import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { formatarMoeda } from "@/utils/pricing";
+import { ChartTooltipProps } from '@/types/charts';
 
 interface ProductStrategy {
   product_id: string;
@@ -41,15 +42,19 @@ export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ 
     };
   }).filter(item => item.productCount > 0);
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const totalRevenue = Number(data.totalRevenue || 0);
+      const avgRevenue = Number(data.avgRevenue || 0);
+      const productCount = Number(data.productCount || 0);
+      
       return (
         <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
-          <p className="font-medium">{label}</p>
-          <p>Receita Total: {formatarMoeda(data.totalRevenue)}</p>
-          <p>Receita Média: {formatarMoeda(data.avgRevenue)}</p>
-          <p>Produtos: {data.productCount}</p>
+          <p className="font-medium">{String(label || '')}</p>
+          <p>Receita Total: {formatarMoeda(totalRevenue)}</p>
+          <p>Receita Média: {formatarMoeda(avgRevenue)}</p>
+          <p>Produtos: {productCount}</p>
         </div>
       );
     }

@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import { SavedPricingType, PricingCalculationParams, MargemRealParams } from "@/types/pricing";
+import { logger } from "@/utils/logger";
 
 export class PricingService extends BaseService<SavedPricingType> {
   constructor() {
@@ -54,7 +55,7 @@ export class PricingService extends BaseService<SavedPricingType> {
 
     if (error) this.handleError(error, 'Calcular preço');
     
-    console.log('Resposta da RPC calcular_preco:', data);
+    logger.debug('Resposta da RPC calcular_preco', 'PricingService', data);
     
     // A função retorna um objeto JSON completo, não apenas um número
     return data;
@@ -71,7 +72,7 @@ export class PricingService extends BaseService<SavedPricingType> {
 
     if (error) this.handleError(error, 'Calcular margem real');
     
-    console.log('Resposta da RPC calcular_margem_real:', data);
+    logger.debug('Resposta da RPC calcular_margem_real', 'PricingService', data);
     
     // A função retorna um objeto JSON completo, não apenas um número
     return data;
@@ -92,7 +93,7 @@ export class PricingService extends BaseService<SavedPricingType> {
   }
 
   async recalculateAllPricing(): Promise<{ updated: number; errors: number }> {
-    console.log('Iniciando recálculo automático de todas as precificações...');
+    logger.info('Iniciando recálculo automático de todas as precificações...', 'PricingService');
     
     try {
       // Buscar todas as precificações salvas
@@ -145,7 +146,7 @@ export class PricingService extends BaseService<SavedPricingType> {
           await this.upsert(updatedData);
           updatedCount++;
           
-          console.log(`Precificação atualizada: ${pricing.products?.name} - ${pricing.marketplaces?.name}`);
+          logger.debug(`Precificação atualizada: ${pricing.products?.name} - ${pricing.marketplaces?.name}`, 'PricingService');
           
         } catch (error) {
           console.error(`Erro ao recalcular precificação para produto ${pricing.product_id}:`, error);
@@ -153,7 +154,7 @@ export class PricingService extends BaseService<SavedPricingType> {
         }
       }
 
-      console.log(`Recálculo concluído: ${updatedCount} atualizadas, ${errorCount} erros`);
+      logger.info(`Recálculo concluído: ${updatedCount} atualizadas, ${errorCount} erros`, 'PricingService');
       return { updated: updatedCount, errors: errorCount };
       
     } catch (error) {
