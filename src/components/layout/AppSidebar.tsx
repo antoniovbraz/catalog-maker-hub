@@ -1,5 +1,4 @@
-import { 
-  LayoutDashboard,
+import {
   Target,
   Store,
   FolderOpen,
@@ -40,7 +39,6 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const mainMenuItems = [
-  { id: "dashboard", title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { id: "strategy", title: "Estratégia", icon: Target, path: "/strategy" },
 ];
 
