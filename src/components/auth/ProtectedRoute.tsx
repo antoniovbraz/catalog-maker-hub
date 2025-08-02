@@ -22,9 +22,10 @@ export function ProtectedRoute({
     // Only set redirect state once when loading is complete and we have the final auth state
     if (!loading) {
       const needsRedirect = !user || !profile;
+      console.log('[ProtectedRoute] Auth check:', { user: !!user, profile: !!profile, needsRedirect, pathname: location.pathname });
       setShouldRedirect(needsRedirect);
     }
-  }, [loading, user, profile]);
+  }, [loading, user, profile, location.pathname]);
 
   if (loading) {
     return (

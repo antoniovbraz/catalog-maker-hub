@@ -19,14 +19,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Function to fetch profile safely
     const fetchProfile = async (userId: string) => {
       try {
+        console.log('[AuthContext] Fetching profile for user:', userId);
         const profileData = await authService.getCurrentProfile();
         if (isMounted) {
+          console.log('[AuthContext] Profile fetched:', !!profileData);
           setProfile(profileData);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
         if (isMounted) {
           setProfile(null);
+          setLoading(false);
         }
       }
     };
@@ -36,34 +40,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (event, session) => {
         if (!isMounted) return;
         
+        console.log('[AuthContext] Auth state change:', { event, hasUser: !!session?.user });
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchProfile(session.user.id);
+          // Defer profile fetch to avoid blocking auth state update
+          setTimeout(() => {
+            if (isMounted) {
+              fetchProfile(session.user.id);
+            }
+          }, 0);
         } else {
           setProfile(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
     // Check for existing session
     const initializeAuth = async () => {
       try {
+        console.log('[AuthContext] Initializing auth...');
         const { data: { session } } = await supabase.auth.getSession();
         if (!isMounted) return;
         
+        console.log('[AuthContext] Initial session:', !!session?.user);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           await fetchProfile(session.user.id);
+        } else {
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-      } finally {
         if (isMounted) {
           setLoading(false);
         }
