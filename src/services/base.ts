@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
 import { authService } from "./auth";
 
-export abstract class BaseService<T extends Record<string, unknown> = Record<string, unknown>> {
+export abstract class BaseService<T = any> {
   protected tableName: string;
 
   constructor(tableName: string) {
@@ -11,7 +11,7 @@ export abstract class BaseService<T extends Record<string, unknown> = Record<str
 
   async getAll(): Promise<T[]> {
     const { data, error } = await supabase
-      .from(this.tableName)
+      .from(this.tableName as any)
       .select('*')
       .order('created_at', { ascending: false });
     
@@ -21,7 +21,7 @@ export abstract class BaseService<T extends Record<string, unknown> = Record<str
 
   async getById(id: string): Promise<T | null> {
     const { data, error } = await supabase
-      .from(this.tableName)
+      .from(this.tableName as any)
       .select('*')
       .eq('id', id)
       .single();
@@ -61,7 +61,7 @@ export abstract class BaseService<T extends Record<string, unknown> = Record<str
       }
     }
     
-    return data;
+    return data as T;
   }
 
   async update(id: string, data: Partial<T>): Promise<T> {
@@ -86,7 +86,6 @@ export abstract class BaseService<T extends Record<string, unknown> = Record<str
   }
 
   protected handleError(error: PostgrestError, operation: string): never {
-    console.error(`${operation} error in ${this.tableName}:`, error);
     throw new Error(`${operation} falhou: ${error.message}`);
   }
 }
