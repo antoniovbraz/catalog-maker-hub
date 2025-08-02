@@ -5,13 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, Info } from "lucide-react";
 import { useMarketplaces } from "@/hooks/useMarketplaces";
 import { useCategories } from "@/hooks/useCategories";
 import { formatarPercentual } from "@/utils/pricing";
 
-import { CommissionFormData } from "@/types/commissions";
+import { CommissionFormData, CommissionWithDetails } from "@/types/commissions";
 import { useCommissionsWithDetails, useCreateCommission, useUpdateCommission, useDeleteCommission } from "@/hooks/useCommissions";
 
 export const CommissionForm = () => {
@@ -29,19 +30,32 @@ export const CommissionForm = () => {
   const { data: commissions = [], isLoading } = useCommissionsWithDetails();
   const createMutation = useCreateCommission();
   const updateMutation = useUpdateCommission();
+  const deleteMutation = useDeleteCommission();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
+    // Converter "default" para null e percentual para decimal antes de enviar
+    const dataToSubmit = {
+      ...formData,
+      category_id: formData.category_id === "default" ? null : formData.category_id || null,
+      rate: formData.rate / 100 // Converter percentual (14) para decimal (0.14)
+    };
     
-    if (!updateMutation.isError && !createMutation.isError) {
-      resetForm();
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, data: dataToSubmit });
+    } else {
+      createMutation.mutate(dataToSubmit);
     }
+  };
+
+  const handleEdit = (commission: CommissionWithDetails) => {
+    setFormData({
+      marketplace_id: commission.marketplace_id,
+      category_id: commission.category_id || "default",
+      rate: commission.rate * 100 // Converter de decimal para percentual na interface
+    });
+    setEditingId(commission.id);
   };
 
   const resetForm = () => {
@@ -103,7 +117,19 @@ export const CommissionForm = () => {
             </div>
             
             <div>
-              <Label htmlFor="rate">Taxa de Comissão (%)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="rate">Taxa de Comissão (%)</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="w-4 h-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Digite o valor em percentual. Ex: 14 para 14%</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <Input
                 id="rate"
                 type="number"
@@ -112,7 +138,7 @@ export const CommissionForm = () => {
                 max="100"
                 value={formData.rate}
                 onChange={(e) => setFormData(prev => ({ ...prev, rate: parseFloat(e.target.value) || 0 }))}
-                placeholder="Ex: 13.5 para 13.5%"
+                placeholder="Ex: 14 para 14%"
                 required
               />
             </div>
@@ -153,13 +179,22 @@ export const CommissionForm = () => {
                   <TableRow key={commission.id}>
                     <TableCell>{commission.marketplaces?.name}</TableCell>
                     <TableCell>{commission.categories?.name || 'Padrão'}</TableCell>
-                    <TableCell>{formatarPercentual(commission.rate)}</TableCell>
+                    <TableCell>{formatarPercentual(commission.rate * 100)}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEdit(commission)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => deleteMutation.mutate(commission.id)}
+                          disabled={deleteMutation.isPending}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>

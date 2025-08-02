@@ -28,7 +28,7 @@ export function handleSupabaseError(error: any): string {
   }
   
   if (error?.code === '23505') {
-    return 'Este registro já existe';
+    return 'Já existe uma regra para esta combinação de marketplace e categoria';
   }
   
   if (error?.code === '23503') {
@@ -41,6 +41,14 @@ export function handleSupabaseError(error: any): string {
   
   if (error?.message?.includes('foreign key')) {
     return 'Referência inválida: verifique os dados relacionados';
+  }
+  
+  if (error?.message?.includes('invalid input syntax for type uuid')) {
+    return 'ID inválido fornecido. Verifique os dados selecionados';
+  }
+  
+  if (error?.message?.includes('violates check constraint')) {
+    return 'Dados inválidos: verifique se todos os valores estão dentro dos limites permitidos';
   }
   
   return error?.message || 'Erro inesperado';

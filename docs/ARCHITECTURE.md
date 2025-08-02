@@ -79,6 +79,25 @@ const form = useForm<ProductFormData>({
 4. **Maintainability**: SOLID principles
 5. **Testing**: Jest + Testing Library
 
+## 💰 **REGRAS DE NEGÓCIO - COMISSÕES**
+
+### **Cadastro de Comissões**
+- **Padrão (Global)**: Deixe o campo categoria vazio para criar uma comissão que se aplica a todas as categorias do marketplace
+- **Específica**: Selecione uma categoria para criar uma comissão que só se aplica àquela categoria
+- **Prioridade**: Comissões específicas por categoria têm prioridade sobre comissões padrão
+- **Formato**: Digite apenas o número em percentual (ex: 14 para 14%)
+
+### **Comissões da Shopee**
+- **Limite Máximo**: R$ 100,00 por transação
+- **Taxa Padrão**: 14% para produtos no Programa Frete Grátis
+- **Taxa Alternativa**: 20% para produtos fora do Programa Frete Grátis
+- **Cálculo**: Sistema aplica automaticamente o limite máximo de R$ 100
+
+### **Produtos sem Categoria**
+- Selecione "Nenhuma categoria" ao cadastrar produtos
+- Sistema converte automaticamente para valor nulo no banco
+- Comissões padrão se aplicam a produtos sem categoria
+
 ## 🚀 **DEPLOY & CI/CD**
 - Supabase migrations automáticas
 - Edge Functions auto-deploy

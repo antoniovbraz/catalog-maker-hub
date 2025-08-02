@@ -85,6 +85,7 @@ export function useCreateCommission() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.withDetails });
       toast({
         title: "Comissão criada",
         description: "A comissão foi criada com sucesso.",
@@ -123,6 +124,7 @@ export function useUpdateCommission() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.withDetails });
       toast({
         title: "Comissão atualizada",
         description: "A comissão foi atualizada com sucesso.",
@@ -148,6 +150,7 @@ export function useDeleteCommission() {
     mutationFn: (id: string) => commissionsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.withDetails });
       toast({
         title: "Comissão excluída",
         description: "A comissão foi excluída com sucesso.",

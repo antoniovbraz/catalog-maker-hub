@@ -7,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, Info } from "lucide-react";
+import { handleSupabaseError } from "@/utils/errors";
 
 interface FixedFeeRule {
   id: string;
@@ -30,9 +32,21 @@ interface Marketplace {
 }
 
 const RULE_TYPES = [
-  { value: "constante", label: "Constante" },
-  { value: "faixa", label: "Faixa" },
-  { value: "percentual", label: "Percentual" }
+  { 
+    value: "constante", 
+    label: "Constante",
+    description: "Valor fixo aplicado independente do preço do produto"
+  },
+  { 
+    value: "faixa", 
+    label: "Faixa",
+    description: "Valor aplicado quando o preço estiver dentro de uma faixa específica"
+  },
+  { 
+    value: "percentual", 
+    label: "Percentual",
+    description: "Percentual aplicado sobre o valor do produto"
+  }
 ];
 
 export const FixedFeeRuleForm = () => {
@@ -102,7 +116,12 @@ export const FixedFeeRuleForm = () => {
       toast({ title: "Taxa fixa criada com sucesso!" });
     },
     onError: (error) => {
-      toast({ title: "Erro ao criar taxa fixa", description: error.message, variant: "destructive" });
+      const friendlyMessage = handleSupabaseError(error);
+      toast({ 
+        title: "Erro ao criar taxa fixa", 
+        description: friendlyMessage, 
+        variant: "destructive" 
+      });
     }
   });
 
@@ -134,7 +153,12 @@ export const FixedFeeRuleForm = () => {
       toast({ title: "Taxa fixa atualizada com sucesso!" });
     },
     onError: (error) => {
-      toast({ title: "Erro ao atualizar taxa fixa", description: error.message, variant: "destructive" });
+      const friendlyMessage = handleSupabaseError(error);
+      toast({ 
+        title: "Erro ao atualizar taxa fixa", 
+        description: friendlyMessage, 
+        variant: "destructive" 
+      });
     }
   });
 
@@ -152,7 +176,12 @@ export const FixedFeeRuleForm = () => {
       toast({ title: "Taxa fixa excluída com sucesso!" });
     },
     onError: (error) => {
-      toast({ title: "Erro ao excluir taxa fixa", description: error.message, variant: "destructive" });
+      const friendlyMessage = handleSupabaseError(error);
+      toast({ 
+        title: "Erro ao excluir taxa fixa", 
+        description: friendlyMessage, 
+        variant: "destructive" 
+      });
     }
   });
 
@@ -215,7 +244,26 @@ export const FixedFeeRuleForm = () => {
               </div>
               
               <div>
-                <Label htmlFor="rule_type">Tipo de Regra *</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="rule_type">Tipo de Regra *</Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="w-4 h-4 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-sm">
+                        <div className="space-y-2">
+                          {RULE_TYPES.map((type) => (
+                            <div key={type.value}>
+                              <p className="font-medium">{type.label}:</p>
+                              <p className="text-sm">{type.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <Select value={formData.rule_type} onValueChange={(value) => setFormData(prev => ({ ...prev, rule_type: value, range_min: "", range_max: "" }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tipo" />

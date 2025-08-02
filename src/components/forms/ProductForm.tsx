@@ -34,14 +34,23 @@ export const ProductForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Converter "none" para undefined/null antes de enviar
+    const dataToSubmit = {
+      ...formData,
+      category_id: formData.category_id === "none" ? undefined : formData.category_id,
+      sku: formData.sku || undefined,
+      description: formData.description || undefined
+    };
+    
     if (editingId) {
-      updateMutation.mutate({ id: editingId, data: formData }, {
+      updateMutation.mutate({ id: editingId, data: dataToSubmit }, {
         onSuccess: () => {
           resetForm();
         }
       });
     } else {
-      createMutation.mutate(formData, {
+      createMutation.mutate(dataToSubmit, {
         onSuccess: () => {
           resetForm();
         }
