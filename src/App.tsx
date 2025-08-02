@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SharedLayout } from "@/components/layout/SharedLayout";
+import Dashboard from "./pages/Dashboard";
 import Strategy from "./pages/Strategy";
 import Marketplaces from "./pages/Marketplaces";
 import Categories from "./pages/Categories";
@@ -32,9 +33,19 @@ const App = () => (
           <Routes>
             {/* Auth route - now inside AuthProvider context */}
             <Route path="/auth" element={<Auth />} />
-            <Route path="/" element={<Navigate to="/strategy" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             
             {/* Price Pilot Routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <Dashboard />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/strategy" 
               element={

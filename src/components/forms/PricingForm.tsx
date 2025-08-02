@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Calculator } from "lucide-react";
-import { SmartForm } from "@/components/ui/smart-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +35,7 @@ interface MargemRealResult {
   margem_percentual_real: number;
 }
 
-function PricingForm() {
+export const PricingForm = () => {
   const { toast } = useToast();
   const logger = useLogger('PricingForm');
   const [formData, setFormData] = useState<PricingFormData>({
@@ -54,6 +52,7 @@ function PricingForm() {
   });
   const [pricingResult, setPricingResult] = useState<PricingResult | null>(null);
   const [margemRealResult, setMargemRealResult] = useState<MargemRealResult | null>(null);
+
 
   const { data: products = [], isLoading: loadingProducts } = useProducts();
   const { data: marketplaces = [], isLoading: loadingMarketplaces } = useMarketplaces();
@@ -82,6 +81,7 @@ function PricingForm() {
       return;
     }
 
+
     try {
       const result = await calculatePriceMutation.mutateAsync({
         productId: formData.product_id,
@@ -91,12 +91,15 @@ function PricingForm() {
         margemDesejada: formData.margem_desejada
       });
 
+      
+
       // Verificar se temos um resultado válido
       if (result && typeof result === 'object') {
         const typedResult = result as PricingResult;
-
+        
+        
         setPricingResult(typedResult);
-
+        
         // Atualizar form data com os valores calculados
         setFormData(prev => ({
           ...prev,
@@ -105,9 +108,11 @@ function PricingForm() {
           frete: typedResult.frete || 0,
           comissao: typedResult.comissao || 0
         }));
-
+        
         // Se há preço praticado, calcular margem real também
         if (formData.preco_praticado > 0) {
+          
+          
           try {
             const margemResult = await calculateMargemRealMutation.mutateAsync({
               productId: formData.product_id,
@@ -124,7 +129,10 @@ function PricingForm() {
             logger.error('Erro ao calcular margem real', error);
           }
         }
+        
+        
       } else {
+        
         toast({
           title: "Erro",
           description: "Resposta inválida do servidor",
@@ -140,6 +148,7 @@ function PricingForm() {
       });
     }
   };
+
 
   const handleSave = async () => {
     if (!pricingResult) {
@@ -174,62 +183,70 @@ function PricingForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="product">Produto *</Label>
-              <Select
-                value={formData.product_id}
+              <Select 
+                value={formData.product_id} 
                 onValueChange={(value) => {
+                  
                   handleInputChange("product_id", value);
                 }}
               >
                 <SelectTrigger className="relative z-0">
                   <SelectValue placeholder="Selecione um produto" />
                 </SelectTrigger>
-                <SelectContent className="z-[200] bg-popover border shadow-lg">
-                  {loadingProducts ? (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
-                  ) : products.length === 0 ? (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum produto encontrado</div>
-                  ) : (
-                    products.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        {product.name} {product.sku ? `(${product.sku})` : ''}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
+               <SelectContent className="z-[200] bg-popover border shadow-lg">
+                 {loadingProducts ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                 ) : products.length === 0 ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum produto encontrado</div>
+                 ) : (
+                   products.map((product) => (
+                     <SelectItem 
+                       key={product.id} 
+                       value={product.id}
+                       className="cursor-pointer hover:bg-accent"
+                     >
+                       {product.name} {product.sku ? `(${product.sku})` : ''}
+                     </SelectItem>
+                   ))
+                 )}
+               </SelectContent>
               </Select>
             </div>
 
             <div>
               <Label htmlFor="marketplace">Marketplace *</Label>
-              <Select
-                value={formData.marketplace_id}
+              <Select 
+                value={formData.marketplace_id} 
                 onValueChange={(value) => {
+                  
                   handleInputChange("marketplace_id", value);
                 }}
               >
                 <SelectTrigger className="relative z-0">
                   <SelectValue placeholder="Selecione um marketplace" />
                 </SelectTrigger>
-                <SelectContent className="z-[200] bg-popover border shadow-lg">
-                  {loadingMarketplaces ? (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
-                  ) : marketplaces.length === 0 ? (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum marketplace encontrado</div>
-                  ) : (
-                    marketplaces.map((marketplace) => (
-                      <SelectItem key={marketplace.id} value={marketplace.id}>
-                        {marketplace.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
+               <SelectContent className="z-[200] bg-popover border shadow-lg">
+                 {loadingMarketplaces ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                 ) : marketplaces.length === 0 ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum marketplace encontrado</div>
+                 ) : (
+                   marketplaces.map((marketplace) => (
+                     <SelectItem 
+                       key={marketplace.id} 
+                       value={marketplace.id}
+                       className="cursor-pointer hover:bg-accent"
+                     >
+                       {marketplace.name}
+                     </SelectItem>
+                   ))
+                 )}
+               </SelectContent>
               </Select>
             </div>
           </div>
 
-          <Separator />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="taxa_cartao">Taxa de Cartão (%)</Label>
               <Input
@@ -238,17 +255,19 @@ function PricingForm() {
                 step="0.01"
                 value={formData.taxa_cartao}
                 onChange={(e) => handleInputChange("taxa_cartao", e.target.value)}
+                placeholder="Ex: 2.5"
               />
             </div>
 
             <div>
-              <Label htmlFor="provisao_desconto">Provisão para Desconto (%)</Label>
+              <Label htmlFor="provisao_desconto">Provisão de Desconto (%)</Label>
               <Input
                 id="provisao_desconto"
                 type="number"
                 step="0.01"
                 value={formData.provisao_desconto}
                 onChange={(e) => handleInputChange("provisao_desconto", e.target.value)}
+                placeholder="Ex: 10"
               />
             </div>
 
@@ -260,37 +279,41 @@ function PricingForm() {
                 step="0.01"
                 value={formData.margem_desejada}
                 onChange={(e) => handleInputChange("margem_desejada", e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="preco_praticado">Preço Praticado (R$)</Label>
-              <Input
-                id="preco_praticado"
-                type="number"
-                step="0.01"
-                value={formData.preco_praticado}
-                onChange={(e) => handleInputChange("preco_praticado", e.target.value)}
+                placeholder="Ex: 25"
               />
             </div>
           </div>
 
+          <div>
+            <Label htmlFor="preco_praticado">Preço de Venda Praticado (R$) - Opcional</Label>
+            <Input
+              id="preco_praticado"
+              type="number"
+              step="0.01"
+              value={formData.preco_praticado}
+              onChange={(e) => handleInputChange("preco_praticado", e.target.value)}
+              placeholder="Ex: 199.90"
+            />
+          </div>
+          
           <div className="flex gap-2">
             <Button
-              type="button"
               onClick={handleCalculate}
-              disabled={calculatePriceMutation.isPending}
+              disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
+              className="flex-1"
             >
-              Calcular
+              {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "Calcular"}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleSave}
-              disabled={!pricingResult || savePricingMutation.isPending}
-            >
-              Salvar Configuração
-            </Button>
+            
+            {pricingResult && (
+              <Button 
+                onClick={handleSave}
+                disabled={savePricingMutation.isPending}
+                variant="secondary"
+              >
+                {savePricingMutation.isPending ? "Salvando..." : "Salvar"}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -298,69 +321,98 @@ function PricingForm() {
       {/* Results Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Resultados</CardTitle>
+          <CardTitle>Resultado do Cálculo</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           {pricingResult ? (
-            <div className="space-y-2">
-              <div>
-                <p className="text-sm text-muted-foreground">Preço Sugerido</p>
-                <p className="text-2xl font-bold">{formatarMoeda(pricingResult.preco_sugerido)}</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>Produto:</div>
+                <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
+                
+                <div>SKU:</div>
+                <div className="font-medium">{pricingResult.product_sku || 'N/A'}</div>
+                
+                <Separator className="col-span-2 my-2" />
+                
+                <div>Custo Total:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.custo_total || 0)}</div>
+                
+                <div>Valor Fixo:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.valor_fixo || 0)}</div>
+                
+                <div>Frete:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.frete || 0)}</div>
+                
+                <div>Comissão:</div>
+                <div className="font-medium">{formatarPercentual(pricingResult.comissao || 0)}</div>
+                
+                <Separator className="col-span-2 my-2" />
+                
+                <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
+                <div className="text-lg font-bold text-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
+                
+                <div className="font-semibold">Margem Unitária:</div>
+                <div className="font-semibold">{formatarMoeda(pricingResult.margem_unitaria || 0)}</div>
+                
+                <div className="font-semibold">Margem Percentual:</div>
+                <div className="font-semibold">{formatarPercentual(pricingResult.margem_percentual || 0)}</div>
               </div>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Margem Unitária</p>
-                  <p className="text-lg">{formatarMoeda(pricingResult.margem_unitaria)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Margem %</p>
-                  <p className="text-lg">{formatarPercentual(pricingResult.margem_percentual)}</p>
-                </div>
-              </div>
+
+              {/* Seção de Margem Real - só aparece se houver cálculo */}
+              {margemRealResult && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
+                      📊 Análise do Preço Praticado
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>Preço Praticado:</div>
+                      <div className="font-medium text-orange-600 dark:text-orange-400">
+                        {formatarMoeda(margemRealResult.preco_praticado || 0)}
+                      </div>
+                      
+                      <div>Margem Real Unitária:</div>
+                      <div className="font-medium">
+                        {formatarMoeda(margemRealResult.margem_unitaria_real || 0)}
+                      </div>
+                      
+                      <div>Margem Real Percentual:</div>
+                      <div className={`font-medium ${
+                        (margemRealResult.margem_percentual_real || 0) < 0 
+                          ? 'text-destructive' 
+                          : 'text-green-600 dark:text-green-400'
+                      }`}>
+                        {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
+                      </div>
+                      
+                      {/* Indicador de comparação */}
+                      <div className="col-span-2 mt-2 pt-2 border-t">
+                        <div className="text-xs text-muted-foreground">
+                          {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
+                            <span className="text-amber-600 dark:text-amber-400">
+                              ⚠️ Margem real é menor que a desejada
+                            </span>
+                          ) : (
+                            <span className="text-green-600 dark:text-green-400">
+                              ✅ Margem real está dentro do esperado
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground">Nenhum resultado disponível</p>
-          )}
-
-          {margemRealResult && (
-            <div className="mt-4">
-              <Separator className="my-4" />
-              <h4 className="text-sm font-medium">Margem Real com Preço Praticado</h4>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                <div>
-                  <p className="text-sm text-muted-foreground">Margem Unitária Real</p>
-                  <p className="text-lg">{formatarMoeda(margemRealResult.margem_unitaria_real)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Margem % Real</p>
-                  <p className="text-lg">{formatarPercentual(margemRealResult.margem_percentual_real)}</p>
-                </div>
-              </div>
+            <div className="text-center text-muted-foreground py-8">
+              Preencha os campos e clique em "Calcular" para ver os resultados
             </div>
           )}
         </CardContent>
       </Card>
     </div>
   );
-}
-
-export function PricingFormEnhanced() {
-  const sections = [
-    {
-      id: "calculadora",
-      title: "Calculadora de Preços",
-      description: "Configure custos, margens e marketplace para calcular preços sugeridos",
-      icon: <Calculator className="h-5 w-5" />,
-      children: (
-        <PricingForm />
-      )
-    }
-  ];
-
-  return (
-    <SmartForm
-      title="Calculadora de Precificação"
-      sections={sections}
-    />
-  );
-}
+};

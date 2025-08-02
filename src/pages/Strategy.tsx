@@ -1,7 +1,22 @@
-import StrategyEnhanced from "./enhanced/StrategyEnhanced";
+import { StrategyForm } from "@/components/forms/StrategyForm";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Strategy = () => {
-  return <StrategyEnhanced />;
+  return (
+    <div className="p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Estratégia de Precificação</CardTitle>
+          <CardDescription>
+            Analise produtos por margem e giro de vendas usando matriz estratégica
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <StrategyForm />
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 export default Strategy;
