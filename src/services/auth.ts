@@ -17,7 +17,7 @@ export class AuthService extends BaseService<Profile> {
   }
 
   async signUp(email: string, password: string, fullName?: string) {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${import.meta.env.VITE_AUTH_REDIRECT_URL || window.location.origin}/`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
