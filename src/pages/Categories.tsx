@@ -1,5 +1,5 @@
 import { Tag, Plus } from "lucide-react";
-import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
+import { ConfigurationPageLayout } from "@/components/layout";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { CategoryFormEnhanced } from "@/components/forms/enhanced/CategoryFormEnhanced";
 import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
