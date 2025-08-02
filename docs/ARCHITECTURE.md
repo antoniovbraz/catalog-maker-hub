@@ -1,21 +1,20 @@
-# ARQUITETURA CATALOG MAKER HUB
+# Arquitetura Catalog Maker Hub
 
-## 📐 **VISÃO GERAL**
+## Visão Geral
 Sistema SaaS para gestão de marketplace e precificação com arquitetura moderna e escalável.
 
-## 🏗️ **STACK TECNOLÓGICA**
-- **Frontend**: React 18 + TypeScript + Vite
-- **Backend**: Supabase (PostgreSQL + Edge Functions)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **State**: React Query + Context API
-- **Validação**: Zod + React Hook Form
+## Stack Tecnológica
+- Frontend: React 18, TypeScript e Vite
+- Backend: Supabase (PostgreSQL e Edge Functions)
+- Styling: Tailwind CSS e shadcn/ui
+- State: React Query e Context API
+- Validação: Zod e React Hook Form
 
-## 📁 **ESTRUTURA DE PASTAS**
-
+## Estrutura de Pastas
 ```
 src/
 ├── components/          # Componentes React
-│   ├── ui/             # shadcn/ui (NÃO MODIFICAR)
+│   ├── ui/             # shadcn/ui (não modificar)
 │   ├── forms/          # Formulários de negócio
 │   ├── charts/         # Visualizações de dados
 │   ├── layout/         # Layout e navegação
@@ -28,9 +27,8 @@ src/
 └── pages/              # Páginas da aplicação
 ```
 
-## 🔄 **PADRÕES ARQUITETURAIS**
-
-### **Service Layer Pattern**
+## Padrões Arquiteturais
+### Service Layer
 ```typescript
 // services/products.ts
 export class ProductsService extends BaseService<ProductType> {
@@ -40,7 +38,7 @@ export class ProductsService extends BaseService<ProductType> {
 }
 ```
 
-### **Hook Pattern**
+### Hook Pattern
 ```typescript
 // hooks/useProducts.ts
 export function useProducts() {
@@ -52,7 +50,7 @@ export function useProducts() {
 }
 ```
 
-### **Form Pattern**
+### Form Pattern
 ```typescript
 // Zod + React Hook Form + shadcn/ui
 const form = useForm<ProductFormData>({
@@ -60,46 +58,52 @@ const form = useForm<ProductFormData>({
 });
 ```
 
-## 🔐 **SEGURANÇA (RLS)**
+## Segurança (RLS)
 - Row Level Security habilitado em todas as tabelas
-- Policies baseadas em tenant_id
+- Policies baseadas em `tenant_id`
 - Super admin com acesso total
-- Validações client + server side
+- Validações no cliente e no servidor
 
-## 📊 **GERENCIAMENTO DE ESTADO**
-- **Server State**: React Query (cache, sync, optimistic updates)
-- **Client State**: useState, useReducer
-- **Global State**: Context API para auth
-- **Form State**: React Hook Form
+## Gerenciamento de Estado
+- Server State: React Query (cache, sincronização e atualizações otimistas)
+- Client State: useState e useReducer
+- Global State: Context API para autenticação
+- Form State: React Hook Form
 
-## 🎯 **PRINCÍPIOS DE QUALIDADE**
-1. **Type Safety**: TypeScript strict mode
-2. **Error Handling**: Centralizado com logger
-3. **Performance**: Lazy loading + memoização
-4. **Maintainability**: SOLID principles
-5. **Testing**: Jest + Testing Library
+## Princípios de Qualidade
+1. Type Safety: TypeScript em modo estrito
+2. Error Handling: centralizado com logger
+3. Performance: lazy loading e memoização
+4. Maintainability: princípios SOLID
+5. Testing: Vitest e Testing Library
 
-## 💰 **REGRAS DE NEGÓCIO - COMISSÕES**
+## Regras de Negócio - Comissões
+### Cadastro de Comissões
+- Padrão (global): deixe o campo categoria vazio para aplicar a todas as categorias
+- Específica: selecione uma categoria para aplicar apenas a ela
+- Prioridade: comissões específicas têm precedência sobre as padrões
+- Formato: utilizar apenas números percentuais (ex.: 14 para 14%)
 
-### **Cadastro de Comissões**
-- **Padrão (Global)**: Deixe o campo categoria vazio para criar uma comissão que se aplica a todas as categorias do marketplace
-- **Específica**: Selecione uma categoria para criar uma comissão que só se aplica àquela categoria
-- **Prioridade**: Comissões específicas por categoria têm prioridade sobre comissões padrão
-- **Formato**: Digite apenas o número em percentual (ex: 14 para 14%)
+### Comissões da Shopee
+- Limite máximo: R$ 100,00 por transação
+- Taxa padrão: 14% para produtos no Programa Frete Grátis
+- Taxa alternativa: 20% para produtos fora do Programa Frete Grátis
+- Cálculo: o sistema aplica automaticamente o limite máximo de R$ 100
 
-### **Comissões da Shopee**
-- **Limite Máximo**: R$ 100,00 por transação
-- **Taxa Padrão**: 14% para produtos no Programa Frete Grátis
-- **Taxa Alternativa**: 20% para produtos fora do Programa Frete Grátis
-- **Cálculo**: Sistema aplica automaticamente o limite máximo de R$ 100
-
-### **Produtos sem Categoria**
+### Produtos sem Categoria
 - Selecione "Nenhuma categoria" ao cadastrar produtos
-- Sistema converte automaticamente para valor nulo no banco
+- O sistema converte automaticamente para valor nulo no banco
 - Comissões padrão se aplicam a produtos sem categoria
 
-## 🚀 **DEPLOY & CI/CD**
-- Supabase migrations automáticas
-- Edge Functions auto-deploy
-- Vercel/Netlify para frontend
-- GitHub Actions para qualidade
+## Deploy e CI/CD
+A entrega contínua é gerenciada por GitHub Actions. Cada push ou Pull Request executa um pipeline que:
+1. Instala dependências e valida o lint (`npm run lint`).
+2. Executa a suíte de testes (`npm test`).
+3. Gera o build do frontend (`npm run build`).
+4. Aplica migrações e atualiza Edge Functions no Supabase.
+5. Publica o frontend em Vercel ou Netlify.
+
+Segredos e variáveis de ambiente são mantidos como secrets do repositório. O merge em `main` requer aprovação e execução bem-sucedida do pipeline.
+
+Este documento será atualizado conforme novas necessidades surgirem.
+
