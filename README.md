@@ -11,8 +11,11 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 1. Clone o repositório: `git clone <URL-do-repositório>`
 2. Acesse a pasta do projeto: `cd catalog-maker-hub`
 3. Instale as dependências: `npm install`
-4. Configure as variáveis de ambiente no arquivo `.env`
+4. Copie o arquivo `.env.example` para `.env` e ajuste as variáveis de ambiente conforme necessário
 5. Inicie o ambiente de desenvolvimento: `npm run dev`
+
+## Variáveis de Ambiente
+- `VITE_AUTH_REDIRECT_URL`: URL utilizada pelo Supabase para redirecionar o usuário após o cadastro. Caso não seja definida, o aplicativo utilizará `window.location.origin`.
 
 ## Scripts Disponíveis
 - `npm run dev` – inicia o servidor de desenvolvimento
