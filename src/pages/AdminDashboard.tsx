@@ -4,11 +4,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DataTable } from '@/components/common/DataTable';
+import { DataTable, Column } from '@/components/common/DataTable';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Crown, Users, TrendingUp, DollarSign, Activity, Settings, UserPlus, BarChart3 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
+interface UserTableRow {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  role: string;
+  company_name: string | null;
+  created_at: string;
+  is_active: boolean;
+}
+
+interface SubscriptionTableRow {
+  id: string;
+  user?: {
+    full_name: string | null;
+    email: string | null;
+  } | null;
+  plan?: {
+    display_name?: string;
+    price_monthly?: number;
+  } | null;
+  status: string;
+  current_period_end?: string | null;
+}
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -33,20 +57,20 @@ export default function AdminDashboard() {
   // Queries para dados do admin
   const { data: allUsers, isLoading: usersLoading } = useQuery({
     queryKey: ['admin-users'],
-    queryFn: async () => {
+    queryFn: async (): Promise<UserTableRow[]> => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
-      return data;
+      return (data as unknown) as UserTableRow[];
     }
   });
 
   const { data: allSubscriptions, isLoading: subscriptionsLoading } = useQuery({
     queryKey: ['admin-subscriptions'],
-    queryFn: async () => {
+    queryFn: async (): Promise<SubscriptionTableRow[]> => {
       const { data, error } = await supabase
         .from('subscriptions')
         .select(`
@@ -55,9 +79,9 @@ export default function AdminDashboard() {
           user:profiles(full_name, email)
         `)
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
-      return data;
+      return (data as unknown) as SubscriptionTableRow[];
     }
   });
 
@@ -118,92 +142,86 @@ export default function AdminDashboard() {
     }
   ];
 
-  const userColumns = [
+  const userColumns: Column<UserTableRow>[] = [
     {
-      key: "name",
-      header: "Nome",
-      accessorKey: "full_name",
-      cell: ({ row }: any) => (
+      key: 'full_name',
+      header: 'Nome',
+      render: (_value, item) => (
         <div>
-          <div className="font-medium">{row.original.full_name || 'N/A'}</div>
-          <div className="text-sm text-muted-foreground">{row.original.email}</div>
+          <div className="font-medium">{item.full_name || 'N/A'}</div>
+          <div className="text-sm text-muted-foreground">{item.email}</div>
         </div>
       )
     },
     {
-      key: "role",
-      header: "Role",
-      accessorKey: "role",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.role === 'super_admin' ? 'destructive' : 'secondary'}>
-          {row.original.role}
+      key: 'role',
+      header: 'Role',
+      render: (_value, item) => (
+        <Badge variant={item.role === 'super_admin' ? 'destructive' : 'secondary'}>
+          {item.role}
         </Badge>
       )
     },
     {
-      key: "company",
-      header: "Empresa",
-      accessorKey: "company_name"
+      key: 'company_name',
+      header: 'Empresa'
     },
     {
-      key: "created",
-      header: "Criado em",
-      accessorKey: "created_at",
-      cell: ({ row }: any) => new Date(row.original.created_at).toLocaleDateString('pt-BR')
+      key: 'created_at',
+      header: 'Criado em',
+      render: (value) => new Date(String(value)).toLocaleDateString('pt-BR')
     },
     {
-      key: "status",
-      header: "Status",
-      accessorKey: "is_active",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-          {row.original.is_active ? 'Ativo' : 'Inativo'}
+      key: 'is_active',
+      header: 'Status',
+      render: (_value, item) => (
+        <Badge variant={item.is_active ? 'default' : 'secondary'}>
+          {item.is_active ? 'Ativo' : 'Inativo'}
         </Badge>
       )
     }
   ];
 
-  const subscriptionColumns = [
+  const subscriptionColumns: Column<SubscriptionTableRow>[] = [
     {
-      key: "user",
-      header: "Usuário",
-      cell: ({ row }: any) => (
+      key: 'user.full_name',
+      header: 'Usuário',
+      render: (_value, item) => (
         <div>
-          <div className="font-medium">{row.original.user?.full_name || 'N/A'}</div>
-          <div className="text-sm text-muted-foreground">{row.original.user?.email}</div>
+          <div className="font-medium">{item.user?.full_name || 'N/A'}</div>
+          <div className="text-sm text-muted-foreground">{item.user?.email}</div>
         </div>
       )
     },
     {
-      key: "plan",
-      header: "Plano",
-      cell: ({ row }: any) => (
+      key: 'plan.display_name',
+      header: 'Plano',
+      render: (_value, item) => (
         <Badge variant="outline">
-          {row.original.plan?.display_name}
+          {item.plan?.display_name}
         </Badge>
       )
     },
     {
-      key: "status",
-      header: "Status",
-      accessorKey: "status",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.status === 'active' ? 'default' : 'secondary'}>
-          {row.original.status}
+      key: 'status',
+      header: 'Status',
+      render: (_value, item) => (
+        <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
+          {item.status}
         </Badge>
       )
     },
     {
-      key: "value",
-      header: "Valor Mensal",
-      cell: ({ row }: any) => `R$ ${(row.original.plan?.price_monthly || 0).toFixed(2)}`
+      key: 'plan.price_monthly',
+      header: 'Valor Mensal',
+      render: (_value, item) => `R$ ${(item.plan?.price_monthly || 0).toFixed(2)}`
     },
     {
-      key: "period",
-      header: "Período",
-      cell: ({ row }: any) => {
-        if (!row.original.current_period_end) return 'N/A';
-        return new Date(row.original.current_period_end).toLocaleDateString('pt-BR');
+      key: 'current_period_end',
+      header: 'Período',
+      render: (_value, item) => {
+        if (!item.current_period_end) return 'N/A';
+        return new Date(item.current_period_end).toLocaleDateString('pt-BR');
       }
     }
   ];

@@ -148,18 +148,21 @@ describe('DataTable Component', () => {
 
   it('deve renderizar conteúdo customizado com render function', () => {
     const customColumns = [
-      { 
-        key: 'name', 
-        header: 'Nome' 
+      {
+        key: 'name',
+        header: 'Nome'
       },
-      { 
-        key: 'status', 
+      {
+        key: 'status',
         header: 'Status',
-        render: (value: string) => (
-          <span className={value === 'active' ? 'text-green-500' : 'text-red-500'}>
-            {value.toUpperCase()}
-          </span>
-        )
+        render: (value) => {
+          const status = value as string;
+          return (
+            <span className={status === 'active' ? 'text-green-500' : 'text-red-500'}>
+              {status.toUpperCase()}
+            </span>
+          );
+        }
       },
     ];
 

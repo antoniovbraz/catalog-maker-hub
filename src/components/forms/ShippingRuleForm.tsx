@@ -38,7 +38,14 @@ interface Marketplace {
 }
 
 export const ShippingRuleForm = () => {
-  const [formData, setFormData] = useState({
+  interface ShippingRuleFormData {
+    product_id: string;
+    marketplace_id: string;
+    shipping_cost: string;
+    free_shipping_threshold: string;
+  }
+
+  const [formData, setFormData] = useState<ShippingRuleFormData>({
     product_id: "",
     marketplace_id: "",
     shipping_cost: "",
@@ -92,7 +99,7 @@ export const ShippingRuleForm = () => {
   });
 
   const upsertMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ShippingRuleFormData & { id?: string }) => {
       const { error } = await supabase
         .from("shipping_rules")
         .upsert({

@@ -7,8 +7,8 @@ export interface SubscriptionPlan {
   price_yearly?: number;
   stripe_price_id_monthly?: string;
   stripe_price_id_yearly?: string;
-  features: any; // JSONB
-  limits: any; // JSONB
+  features: PlanFeatures; // JSONB
+  limits: UsageLimits; // JSONB
   is_active: boolean;
   sort_order: number;
   created_at: string;
