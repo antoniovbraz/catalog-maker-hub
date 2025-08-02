@@ -9,11 +9,15 @@ import {
   DollarSign, 
   BarChart3, 
   Calculator,
+  Crown,
+  Settings,
   GripVertical,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from "lucide-react";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   DndContext,
@@ -145,20 +149,22 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
     }
   }
 
+  const location = useLocation();
+
   return (
     <Sidebar className="border-r-0 bg-sidebar">
       <SidebarHeader className="p-6 relative">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <Calculator className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <Zap className="w-5 h-5 text-primary" />
           </div>
           {!collapsed && (
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-sidebar-foreground">
-                Catalog Maker
+              <h2 className="text-lg font-bold text-sidebar-foreground bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Peepers Hub
               </h2>
               <p className="text-xs text-sidebar-foreground/70">
-                Hub de Precificação
+                Price Pilot
               </p>
             </div>
           )}
@@ -182,10 +188,11 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
         </Button>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="space-y-4">
+        {/* Price Pilot Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
-            {!collapsed ? "Navegação" : ""}
+            {!collapsed ? "Price Pilot" : ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <DndContext
@@ -207,6 +214,47 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
                 </SidebarMenu>
               </SortableContext>
             </DndContext>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Account & Settings */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
+            {!collapsed ? "Conta" : ""}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  className={cn(
+                    "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
+                    location.pathname === '/subscription'
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  <Link to="/subscription">
+                    <Crown className="w-5 h-5 shrink-0" />
+                    {!collapsed && <span className="font-medium">Assinaturas</span>}
+                    {collapsed && <div className="sr-only">Assinaturas</div>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className={cn(
+                    "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
+                    "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  <Settings className="w-5 h-5 shrink-0" />
+                  {!collapsed && <span className="font-medium">Configurações</span>}
+                  {collapsed && <div className="sr-only">Configurações</div>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
