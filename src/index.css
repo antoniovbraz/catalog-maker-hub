@@ -56,9 +56,17 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(258 56% 52%), hsl(270 56% 60%));
     --gradient-card: linear-gradient(135deg, hsl(258 56% 52%), hsl(258 56% 45%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(258 56% 52% / 0.02));
+    --gradient-config: linear-gradient(135deg, hsl(258 56% 52%), hsl(270 56% 60%));
     --shadow-elegant: 0 10px 30px -10px hsl(258 56% 52% / 0.2);
     --shadow-card: 0 4px 20px hsl(258 56% 52% / 0.15);
     --shadow-hover: 0 8px 25px -8px hsl(258 56% 52% / 0.25);
+    --shadow-form: 0 2px 10px hsl(258 56% 52% / 0.1);
+    
+    /* Configuration page specific colors */
+    --config-primary: 258 56% 52%;
+    --config-secondary: 220 13% 95%;
+    --config-accent: 142 76% 36%;
+    --config-warning: 38 92% 50%;
   }
 
   .dark {
