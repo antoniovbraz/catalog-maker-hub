@@ -5,9 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit, ChevronRight } from "lucide-react";
 import { useMarketplacesHierarchical, useMarketplaceParents, useCreateMarketplace, useUpdateMarketplace, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";
@@ -21,7 +19,6 @@ export const MarketplaceForm = () => {
     parent_marketplace_id: null
   });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const { data: hierarchicalMarketplaces = [], isLoading } = useMarketplacesHierarchical();
   const { data: parentMarketplaces = [] } = useMarketplaceParents();

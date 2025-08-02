@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
-import { SavedPricingType, PricingCalculationParams, MargemRealParams } from "@/types/pricing";
+import { SavedPricingType } from "@/types/pricing";
 import { logger } from "@/utils/logger";
 
 export class PricingService extends BaseService<SavedPricingType> {
@@ -115,9 +115,8 @@ export class PricingService extends BaseService<SavedPricingType> {
           );
 
           // Calcular margem real se tiver preço praticado
-          let margemReal = null;
           if (pricing.preco_praticado > 0) {
-            margemReal = await this.calcularMargemReal(
+            await this.calcularMargemReal(
               pricing.product_id,
               pricing.marketplace_id,
               pricing.taxa_cartao,

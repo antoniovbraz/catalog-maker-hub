@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
-import { MarketplaceType, MarketplaceWithChildren, MarketplaceHierarchy } from "@/types/marketplaces";
+import { MarketplaceType, MarketplaceHierarchy } from "@/types/marketplaces";
 
 export class MarketplacesService extends BaseService<MarketplaceType> {
   constructor() {

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { TrendingUp, TrendingDown, BarChart3, Target, Package, PieChart, ScatterChart, AlertTriangle, Star } from "lucide-react";
+import { TrendingUp, BarChart3, Target, Package, PieChart, ScatterChart, AlertTriangle, Star } from "lucide-react";
 import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { QuadrantScatterChart } from "@/components/charts/QuadrantScatterChart";
 import { QuadrantDonutChart } from "@/components/charts/QuadrantDonutChart";
