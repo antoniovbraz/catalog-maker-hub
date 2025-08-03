@@ -38,65 +38,37 @@ export default function AdminDashboard() {
   const { profile } = useAuth();
   const isSuperAdmin = profile?.role === 'super_admin';
 
-  // Queries para dados do admin
-  const { data: allUsers, isLoading: usersLoading } = useQuery({
-    queryKey: ['admin-users'],
+  // Query única otimizada para todos os dados do admin
+  const { data: adminData, isLoading: adminLoading, error: adminError } = useQuery({
+    queryKey: ['admin-dashboard-data'],
     enabled: isSuperAdmin,
-    queryFn: async (): Promise<UserTableRow[]> => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return (data as unknown) as UserTableRow[];
-    }
-  });
-
-  const { data: allSubscriptions, isLoading: subscriptionsLoading } = useQuery({
-    queryKey: ['admin-subscriptions'],
-    enabled: isSuperAdmin,
-    queryFn: async (): Promise<SubscriptionTableRow[]> => {
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select(`
-          *,
-          plan:subscription_plans(*),
-          user:profiles(full_name, email)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return (data as unknown) as SubscriptionTableRow[];
-    }
-  });
-
-  const { data: revenue, isLoading: revenueLoading } = useQuery({
-    queryKey: ['admin-revenue'],
-    enabled: isSuperAdmin,
+    staleTime: 5 * 60 * 1000, // 5 minutos de cache
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select(`
-          *,
-          plan:subscription_plans(price_monthly, price_yearly)
-        `)
-        .eq('status', 'active');
-      
-      if (error) throw error;
-      
-      // Calcular receita mensal total
-      const monthlyRevenue = data?.reduce((total, sub) => {
-        return total + (sub.plan?.price_monthly || 0);
-      }, 0) || 0;
-      
-      return {
-        monthly: monthlyRevenue,
-        yearly: monthlyRevenue * 12,
-        activeSubscriptions: data?.length || 0
-      };
+      try {
+        // Query otimizada com CTEs para buscar todos os dados em uma única requisição
+        const { data, error } = await supabase.rpc('get_admin_dashboard_data');
+        
+        if (error) {
+          console.error('Admin dashboard query error:', error);
+          throw new Error(`Erro ao carregar dados do admin: ${error.message}`);
+        }
+
+        return data;
+      } catch (error) {
+        console.error('Admin dashboard error:', error);
+        throw error;
+      }
     }
   });
+
+  // Separar dados da query única
+  const allUsers = adminData?.users || [];
+  const allSubscriptions = adminData?.subscriptions || [];
+  const revenue = adminData?.revenue || {
+    monthly: 0,
+    yearly: 0,
+    activeSubscriptions: 0
+  };
 
   if (!isSuperAdmin) {
     return (
