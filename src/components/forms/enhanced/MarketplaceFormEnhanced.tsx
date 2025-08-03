@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Store, Link, Network } from '@/components/ui/icons';
+import { Store, Link, Network, Tag } from '@/components/ui/icons';
 import { SmartForm } from "@/components/ui/smart-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useMarketplaceParents, useCreateMarketplace, useUpdateMarketplace } from "@/hooks/useMarketplaces";
+import { Badge } from "@/components/ui/badge";
+import { useMarketplacePlatforms, useCreateMarketplace, useUpdateMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";
 
 interface MarketplaceFormEnhancedProps {
@@ -21,12 +22,14 @@ export function MarketplaceFormEnhanced({
     name: "",
     description: "",
     url: "",
-    parent_marketplace_id: null
+    platform_id: null,
+    marketplace_type: "modality",
+    category_restrictions: [],
   });
 
   const [isDirty, setIsDirty] = useState(false);
 
-  const { data: parentMarketplaces = [] } = useMarketplaceParents();
+  const { data: platforms = [] } = useMarketplacePlatforms();
   const createMutation = useCreateMarketplace();
   const updateMutation = useUpdateMarketplace();
 
@@ -39,7 +42,11 @@ export function MarketplaceFormEnhanced({
         name: editingMarketplace.name,
         description: editingMarketplace.description || "",
         url: editingMarketplace.url || "",
-        parent_marketplace_id: editingMarketplace.parent_marketplace_id || null
+        platform_id: editingMarketplace.platform_id,
+        marketplace_type: editingMarketplace.marketplace_type,
+        category_restrictions: Array.isArray(editingMarketplace.category_restrictions) 
+          ? editingMarketplace.category_restrictions as string[]
+          : [],
       });
       setIsDirty(false);
     } else {
@@ -47,13 +54,15 @@ export function MarketplaceFormEnhanced({
         name: "",
         description: "",
         url: "",
-        parent_marketplace_id: null
+        platform_id: null,
+        marketplace_type: "modality",
+        category_restrictions: [],
       });
       setIsDirty(false);
     }
   }, [editingMarketplace]);
 
-  const handleInputChange = (field: keyof MarketplaceFormData, value: string | null) => {
+  const handleInputChange = (field: keyof MarketplaceFormData, value: string | null | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setIsDirty(true);
   };
@@ -75,7 +84,9 @@ export function MarketplaceFormEnhanced({
             name: "",
             description: "",
             url: "",
-            parent_marketplace_id: null
+            platform_id: null,
+            marketplace_type: "modality",
+            category_restrictions: [],
           });
           setIsDirty(false);
         }
@@ -88,7 +99,9 @@ export function MarketplaceFormEnhanced({
       name: "",
       description: "",
       url: "",
-      parent_marketplace_id: null
+      platform_id: null,
+      marketplace_type: "modality",
+      category_restrictions: [],
     });
     setIsDirty(false);
     onCancelEdit?.();
@@ -104,12 +117,12 @@ export function MarketplaceFormEnhanced({
       children: (
         <div className="space-y-md">
           <div>
-            <Label htmlFor="name">Nome do Marketplace *</Label>
+            <Label htmlFor="name">Nome *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
-              placeholder="Ex: Mercado Livre, Amazon, Shopee"
+              placeholder="Ex: Mercado Livre Clássico, Shopee Frete Grátis"
               required
             />
           </div>
@@ -120,9 +133,35 @@ export function MarketplaceFormEnhanced({
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Descreva as características deste marketplace"
+              placeholder="Descreva as características desta modalidade"
               rows={3}
             />
+          </div>
+
+          <div>
+            <Label htmlFor="marketplace_type">Tipo</Label>
+            <Select
+              value={formData.marketplace_type}
+              onValueChange={(value) => handleInputChange("marketplace_type", value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="platform">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="default">Plataforma</Badge>
+                    <span>Ex: Mercado Livre, Shopee</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="modality">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">Modalidade</Badge>
+                    <span>Ex: ML Clássico, Shopee Frete Grátis</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )
@@ -150,33 +189,57 @@ export function MarketplaceFormEnhanced({
     },
     {
       id: "hierarchy",
-      title: "Hierarquia",
-      description: "Defina a relação com outros marketplaces",
+      title: "Plataforma",
+      description: "Defina a plataforma pai para modalidades",
       icon: <Network className="w-4 h-4" />,
       children: (
         <div>
-          <Label htmlFor="parent">Marketplace Pai (opcional)</Label>
+          <Label htmlFor="platform">Plataforma (para modalidades)</Label>
           <Select
-            value={formData.parent_marketplace_id || "none"}
+            value={formData.platform_id || "none"}
             onValueChange={(value) => handleInputChange(
-              "parent_marketplace_id", 
+              "platform_id", 
               value === "none" ? null : value
             )}
+            disabled={formData.marketplace_type === "platform"}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Selecione um marketplace pai" />
+              <SelectValue placeholder="Selecione uma plataforma" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Nenhum (marketplace independente)</SelectItem>
-              {parentMarketplaces.map((parent) => (
-                <SelectItem key={parent.id} value={parent.id}>
-                  {parent.name}
+              <SelectItem value="none">Nenhuma (para plataformas)</SelectItem>
+              {platforms.map((platform) => (
+                <SelectItem key={platform.id} value={platform.id}>
+                  {platform.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground mt-1">
-            Use para criar modalidades (ex: ML Clássico como filho de Mercado Livre)
+            {formData.marketplace_type === "platform" 
+              ? "Plataformas não precisam de plataforma pai" 
+              : "Modalidades devem ter uma plataforma pai"}
+          </p>
+        </div>
+      )
+    },
+    {
+      id: "restrictions",
+      title: "Restrições de Categoria",
+      description: "Defina quais categorias podem usar esta modalidade",
+      icon: <Tag className="w-4 h-4" />,
+      children: (
+        <div>
+          <Label htmlFor="restrictions">Categorias Permitidas</Label>
+          <Input
+            id="restrictions"
+            value={Array.isArray(formData.category_restrictions) ? formData.category_restrictions.join(", ") : ""}
+            onChange={(e) => handleInputChange("category_restrictions", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+            placeholder="livros, books (deixe vazio para todas as categorias)"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Separe por vírgula. Deixe vazio para permitir todas as categorias.
+            Ex: "livros, books" para modalidades específicas de livros.
           </p>
         </div>
       )
@@ -186,14 +249,14 @@ export function MarketplaceFormEnhanced({
   return (
     <SmartForm
       title={isEditing ? "Editar Marketplace" : "Novo Marketplace"}
-      description={isEditing ? "Atualize as informações do marketplace" : "Configure um novo marketplace para suas vendas"}
+      description={isEditing ? "Atualize as informações" : "Configure uma nova plataforma ou modalidade"}
       sections={sections}
       isEditing={isEditing}
       isDirty={isDirty}
       isSubmitting={isSubmitting}
       onSubmit={handleSubmit}
       onCancel={isEditing ? handleCancel : undefined}
-      submitLabel={isEditing ? "Atualizar Marketplace" : "Criar Marketplace"}
+      submitLabel={isEditing ? "Atualizar" : "Criar"}
     />
   );
 }

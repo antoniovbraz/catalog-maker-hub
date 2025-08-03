@@ -21,10 +21,19 @@ export function useMarketplacesHierarchical() {
   });
 }
 
-export function useMarketplaceParents() {
+export function useMarketplacePlatforms() {
   return useQuery({
-    queryKey: [MARKETPLACES_QUERY_KEY, 'parents'],
-    queryFn: () => marketplacesService.getParents(),
+    queryKey: [MARKETPLACES_QUERY_KEY, 'platforms'],
+    queryFn: () => marketplacesService.getPlatforms(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useMarketplaceModalities(platformId?: string, categoryId?: string) {
+  return useQuery({
+    queryKey: [MARKETPLACES_QUERY_KEY, 'modalities', platformId, categoryId],
+    queryFn: () => platformId ? marketplacesService.getModalitiesByPlatform(platformId, categoryId) : Promise.resolve([]),
+    enabled: !!platformId,
     staleTime: 5 * 60 * 1000,
   });
 }

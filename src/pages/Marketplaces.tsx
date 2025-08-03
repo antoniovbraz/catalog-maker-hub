@@ -30,8 +30,13 @@ const Marketplaces = () => {
       render: (marketplace: MarketplaceType) => (
         <div className="flex items-center gap-2">
           <span className="font-medium">{marketplace.name}</span>
-          {marketplace.parent_marketplace_id && (
-            <StatusBadge status="configured" label="Modalidade" size="sm" />
+          <StatusBadge 
+            status={marketplace.marketplace_type === 'platform' ? 'configured' : 'warning'} 
+            label={marketplace.marketplace_type === 'platform' ? 'Plataforma' : 'Modalidade'} 
+            size="sm" 
+          />
+          {marketplace.marketplace_type === 'modality' && marketplace.platform_id && (
+            <span className="text-xs text-muted-foreground">↳</span>
           )}
         </div>
       )

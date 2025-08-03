@@ -132,34 +132,46 @@ export type Database = {
       }
       marketplaces: {
         Row: {
+          category_restrictions: Json | null
           created_at: string
           description: string | null
           id: string
           marketplace_metadata: Json | null
+          marketplace_type:
+            | Database["public"]["Enums"]["marketplace_type"]
+            | null
           name: string
-          parent_marketplace_id: string | null
+          platform_id: string | null
           tenant_id: string | null
           updated_at: string
           url: string | null
         }
         Insert: {
+          category_restrictions?: Json | null
           created_at?: string
           description?: string | null
           id?: string
           marketplace_metadata?: Json | null
+          marketplace_type?:
+            | Database["public"]["Enums"]["marketplace_type"]
+            | null
           name: string
-          parent_marketplace_id?: string | null
+          platform_id?: string | null
           tenant_id?: string | null
           updated_at?: string
           url?: string | null
         }
         Update: {
+          category_restrictions?: Json | null
           created_at?: string
           description?: string | null
           id?: string
           marketplace_metadata?: Json | null
+          marketplace_type?:
+            | Database["public"]["Enums"]["marketplace_type"]
+            | null
           name?: string
-          parent_marketplace_id?: string | null
+          platform_id?: string | null
           tenant_id?: string | null
           updated_at?: string
           url?: string | null
@@ -167,7 +179,7 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "marketplaces_parent_marketplace_id_fkey"
-            columns: ["parent_marketplace_id"]
+            columns: ["platform_id"]
             isOneToOne: false
             referencedRelation: "marketplaces"
             referencedColumns: ["id"]
@@ -631,6 +643,7 @@ export type Database = {
       }
     }
     Enums: {
+      marketplace_type: "platform" | "modality"
       user_role: "super_admin" | "admin" | "user"
     }
     CompositeTypes: {
@@ -759,6 +772,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      marketplace_type: ["platform", "modality"],
       user_role: ["super_admin", "admin", "user"],
     },
   },

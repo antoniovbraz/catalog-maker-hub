@@ -1,12 +1,16 @@
 import { z } from "zod";
 import { Json } from "@/integrations/supabase/types";
 
+export type MarketplaceTypeEnum = 'platform' | 'modality';
+
 export interface MarketplaceType {
   id: string;
   name: string;
   description?: string;
   url?: string;
-  parent_marketplace_id?: string | null;
+  platform_id?: string | null;
+  marketplace_type: MarketplaceTypeEnum;
+  category_restrictions?: Json;
   marketplace_metadata?: Json;
   created_at: string;
   updated_at: string;
@@ -25,7 +29,9 @@ export const marketplaceSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   description: z.string().optional(),
   url: z.string().url("URL deve ser válida").optional().or(z.literal("")),
-  parent_marketplace_id: z.string().uuid().optional().nullable(),
+  platform_id: z.string().uuid().optional().nullable(),
+  marketplace_type: z.enum(['platform', 'modality']).default('modality'),
+  category_restrictions: z.array(z.string()).optional().default([]),
   marketplace_metadata: z.record(z.any()).optional(),
 });
 

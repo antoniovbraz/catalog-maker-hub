@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
-import { useMarketplaces } from "@/hooks/useMarketplaces";
+import { useMarketplacePlatforms, useMarketplaceModalities } from "@/hooks/useMarketplaces";
+import { useCategories } from "@/hooks/useCategories";
 import { useCalculatePrice, useCalculateMargemReal, useSavePricing } from "@/hooks/usePricing";
 import { PricingFormData } from "@/types/pricing";
 import { formatarMoeda, formatarPercentual } from "@/utils/pricing";
@@ -50,12 +51,19 @@ export const PricingForm = () => {
     margem_desejada: 0,
     preco_praticado: 0
   });
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
   const [pricingResult, setPricingResult] = useState<PricingResult | null>(null);
   const [margemRealResult, setMargemRealResult] = useState<MargemRealResult | null>(null);
 
-
   const { data: products = [], isLoading: loadingProducts } = useProducts();
-  const { data: marketplaces = [], isLoading: loadingMarketplaces } = useMarketplaces();
+  const { data: platforms = [], isLoading: loadingPlatforms } = useMarketplacePlatforms();
+  
+  // Buscar categoria do produto selecionado
+  const selectedProduct = products.find(p => p.id === formData.product_id);
+  const { data: modalities = [], isLoading: loadingModalities } = useMarketplaceModalities(
+    selectedPlatform, 
+    selectedProduct?.category_id
+  );
   const calculatePriceMutation = useCalculatePrice();
   const calculateMargemRealMutation = useCalculateMargemReal();
   const savePricingMutation = useSavePricing();
@@ -219,37 +227,73 @@ export const PricingForm = () => {
             </div>
 
               <div>
-                <Label htmlFor="marketplace" className="text-sm font-medium">Marketplace *</Label>
-              <Select 
-                value={formData.marketplace_id} 
-                onValueChange={(value) => {
-                  
-                  handleInputChange("marketplace_id", value);
-                }}
-              >
-                <SelectTrigger className="relative z-0">
-                  <SelectValue placeholder="Selecione um marketplace" />
-                </SelectTrigger>
-               <SelectContent className="z-[200] bg-popover border shadow-lg">
-                 {loadingMarketplaces ? (
-                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
-                 ) : marketplaces.length === 0 ? (
-                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum marketplace encontrado</div>
-                 ) : (
-                   marketplaces.map((marketplace) => (
-                     <SelectItem 
-                       key={marketplace.id} 
-                       value={marketplace.id}
-                       className="cursor-pointer hover:bg-accent"
-                     >
-                       {marketplace.name}
-                     </SelectItem>
-                   ))
-                 )}
-               </SelectContent>
-              </Select>
+                <Label htmlFor="platform" className="text-sm font-medium">Plataforma *</Label>
+                <Select 
+                  value={selectedPlatform} 
+                  onValueChange={(value) => {
+                    setSelectedPlatform(value);
+                    // Limpar modalidade selecionada ao trocar plataforma
+                    handleInputChange("marketplace_id", "");
+                  }}
+                >
+                  <SelectTrigger className="relative z-0">
+                    <SelectValue placeholder="Selecione uma plataforma" />
+                  </SelectTrigger>
+                  <SelectContent className="z-[200] bg-popover border shadow-lg">
+                    {loadingPlatforms ? (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                    ) : platforms.length === 0 ? (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhuma plataforma encontrada</div>
+                    ) : (
+                      platforms.map((platform) => (
+                        <SelectItem 
+                          key={platform.id} 
+                          value={platform.id}
+                          className="cursor-pointer hover:bg-accent"
+                        >
+                          {platform.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            </div>
+            
+            {selectedPlatform && (
+              <div>
+                <Label htmlFor="marketplace" className="text-sm font-medium">Modalidade *</Label>
+                <Select 
+                  value={formData.marketplace_id} 
+                  onValueChange={(value) => handleInputChange("marketplace_id", value)}
+                >
+                  <SelectTrigger className="relative z-0">
+                    <SelectValue placeholder="Selecione uma modalidade" />
+                  </SelectTrigger>
+                  <SelectContent className="z-[200] bg-popover border shadow-lg">
+                    {loadingModalities ? (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                    ) : modalities.length === 0 ? (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                        {selectedProduct?.category_id 
+                          ? "Nenhuma modalidade disponível para esta categoria" 
+                          : "Nenhuma modalidade encontrada"}
+                      </div>
+                    ) : (
+                      modalities.map((modality) => (
+                        <SelectItem 
+                          key={modality.id} 
+                          value={modality.id}
+                          className="cursor-pointer hover:bg-accent"
+                        >
+                          {modality.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           {/* Seção de Configurações */}

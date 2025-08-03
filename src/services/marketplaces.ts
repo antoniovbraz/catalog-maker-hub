@@ -28,47 +28,61 @@ export class MarketplacesService extends BaseService<MarketplaceType> {
     const allMarketplaces = data || [];
     const hierarchies: MarketplaceHierarchy[] = [];
     
-    // Encontrar marketplaces pais (sem parent_marketplace_id)
-    const parents = allMarketplaces.filter(m => !m.parent_marketplace_id);
+    // Encontrar plataformas (marketplace_type = 'platform')
+    const platforms = allMarketplaces.filter(m => m.marketplace_type === 'platform');
     
-    // Para cada pai, encontrar seus filhos
-    parents.forEach(parent => {
-      const children = allMarketplaces.filter(m => m.parent_marketplace_id === parent.id);
-      hierarchies.push({ parent, children });
+    // Para cada plataforma, encontrar suas modalidades
+    platforms.forEach(platform => {
+      const modalities = allMarketplaces.filter(m => m.platform_id === platform.id);
+      hierarchies.push({ parent: platform, children: modalities });
     });
     
-    // Adicionar marketplaces sem hierarquia (que não são pais nem filhos)
-    const orphans = allMarketplaces.filter(m => 
-      !m.parent_marketplace_id && 
-      !allMarketplaces.some(child => child.parent_marketplace_id === m.id)
+    // Adicionar modalidades órfãs (sem plataforma pai)
+    const orphanModalities = allMarketplaces.filter(m => 
+      m.marketplace_type === 'modality' && 
+      !m.platform_id
     );
     
-    orphans.forEach(orphan => {
+    orphanModalities.forEach(orphan => {
       hierarchies.push({ parent: orphan, children: [] });
     });
     
     return hierarchies;
   }
 
-  async getParents(): Promise<MarketplaceType[]> {
+  async getPlatforms(): Promise<MarketplaceType[]> {
     const { data, error } = await supabase
       .from('marketplaces')
       .select('*')
-      .is('parent_marketplace_id', null)
+      .eq('marketplace_type', 'platform')
       .order('name');
     
-    if (error) this.handleError(error, 'Buscar marketplaces pais');
+    if (error) this.handleError(error, 'Buscar plataformas');
     return data || [];
   }
 
-  async getChildren(parentId: string): Promise<MarketplaceType[]> {
-    const { data, error } = await supabase
+  async getModalitiesByPlatform(platformId: string, categoryId?: string): Promise<MarketplaceType[]> {
+    let query = supabase
       .from('marketplaces')
       .select('*')
-      .eq('parent_marketplace_id', parentId)
-      .order('name');
+      .eq('platform_id', platformId)
+      .eq('marketplace_type', 'modality');
     
-    if (error) this.handleError(error, 'Buscar marketplaces filhos');
+    const { data, error } = await query.order('name');
+    
+    if (error) this.handleError(error, 'Buscar modalidades da plataforma');
+    
+    // Filtrar por categoria se especificada
+    if (categoryId && data) {
+      return data.filter(modality => {
+        if (!modality.category_restrictions || (Array.isArray(modality.category_restrictions) && modality.category_restrictions.length === 0)) {
+          return true; // Sem restrições = todas as categorias
+        }
+        // Verificar se a categoria está nas restrições
+        return Array.isArray(modality.category_restrictions) && modality.category_restrictions.includes(categoryId);
+      });
+    }
+    
     return data || [];
   }
 
