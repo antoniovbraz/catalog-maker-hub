@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { Heading, Text } from "@/components/ui/typography";
 import { useLogger } from "@/utils/logger";
 
 const NotFound = () => {
@@ -16,8 +17,12 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
+        <Heading variant="h1" className="mb-md">
+          404
+        </Heading>
+        <Text className="text-gray-600 text-h4 mb-md">
+          Oops! Page not found
+        </Text>
         <a href="/" className="text-blue-500 hover:text-blue-700 underline">
           Return to Home
         </a>
@@ -27,3 +32,4 @@ const NotFound = () => {
 };
 
 export default NotFound;
+

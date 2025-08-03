@@ -106,11 +106,29 @@ export default {
 					}
 				}
 			},
-			animation: {
-				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
-		}
-	},
-	plugins: [require("tailwindcss-animate")],
+                        animation: {
+                                'accordion-down': 'accordion-down 0.2s ease-out',
+                                'accordion-up': 'accordion-up 0.2s ease-out'
+                        },
+                        fontSize: {
+                                h1: 'var(--font-h1)',
+                                h2: 'var(--font-h2)',
+                                h3: 'var(--font-h3)',
+                                h4: 'var(--font-h4)',
+                                h5: 'var(--font-h5)',
+                                h6: 'var(--font-h6)',
+                                body: 'var(--font-body)',
+                                caption: 'var(--font-caption)'
+                        },
+                        spacing: {
+                                xs: 'var(--spacing-xs)',
+                                sm: 'var(--spacing-sm)',
+                                md: 'var(--spacing-md)',
+                                lg: 'var(--spacing-lg)',
+                                xl: 'var(--spacing-xl)',
+                                '2xl': 'var(--spacing-2xl)'
+                        }
+                }
+        },
+        plugins: [require("tailwindcss-animate")],
 } satisfies Config;
