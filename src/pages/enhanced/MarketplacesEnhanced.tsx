@@ -1,4 +1,4 @@
-import { Store, Plus, Upload, Download } from "lucide-react";
+import { Store, Plus, Upload, Download } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { SmartForm } from "@/components/ui/smart-form";
 import { DataVisualization } from "@/components/ui/data-visualization";

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Home } from "lucide-react";
+import { Home } from '@/components/ui/icons';
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {

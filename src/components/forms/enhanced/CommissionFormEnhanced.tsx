@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Percent, Store, Tag, Calculator } from "lucide-react";
+import { Percent, Store, Tag, Calculator } from '@/components/ui/icons';
 import { SmartForm } from "@/components/ui/smart-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

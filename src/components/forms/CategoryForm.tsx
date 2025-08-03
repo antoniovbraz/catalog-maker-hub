@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FolderOpen, Save, X, AlertCircle } from "lucide-react";
+import { FolderOpen, Save, X, AlertCircle } from '@/components/ui/icons';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType, CategoryFormData } from "@/types/categories";
 import { DataTable, Column } from "@/components/common/DataTable";

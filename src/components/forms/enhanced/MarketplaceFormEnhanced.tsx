@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Store, Link, FileText, Network } from "lucide-react";
+import { Store, Link, FileText, Network } from '@/components/ui/icons';
 import { SmartForm } from "@/components/ui/smart-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

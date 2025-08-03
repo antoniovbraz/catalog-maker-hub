@@ -16,7 +16,7 @@ import {
   Activity,
   ChevronDown,
   ChevronUp
-} from "lucide-react";
+} from '@/components/ui/icons';
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ChevronRight, Home } from "lucide-react";
+import { ChevronRight, Home } from '@/components/ui/icons';
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
