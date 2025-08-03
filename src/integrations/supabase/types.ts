@@ -613,6 +613,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_admin_dashboard_data: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]

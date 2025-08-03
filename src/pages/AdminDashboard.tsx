@@ -34,41 +34,135 @@ interface SubscriptionTableRow {
   current_period_end?: string | null;
 }
 
+interface AdminDashboardData {
+  users: UserTableRow[];
+  subscriptions: SubscriptionTableRow[];
+  revenue: {
+    monthly: number;
+    yearly: number;
+    activeSubscriptions: number;
+  };
+}
+
 export default function AdminDashboard() {
   const { profile } = useAuth();
   const isSuperAdmin = profile?.role === 'super_admin';
 
-  // Query única otimizada para todos os dados do admin
-  const { data: adminData, isLoading: adminLoading, error: adminError } = useQuery({
-    queryKey: ['admin-dashboard-data'],
+  // Queries otimizadas separadas com error handling e cache
+  const { data: allUsers, isLoading: usersLoading, error: usersError } = useQuery({
+    queryKey: ['admin-users'],
     enabled: isSuperAdmin,
     staleTime: 5 * 60 * 1000, // 5 minutos de cache
-    queryFn: async () => {
+    queryFn: async (): Promise<UserTableRow[]> => {
       try {
-        // Query otimizada com CTEs para buscar todos os dados em uma única requisição
-        const { data, error } = await supabase.rpc('get_admin_dashboard_data');
-        
-        if (error) {
-          console.error('Admin dashboard query error:', error);
-          throw new Error(`Erro ao carregar dados do admin: ${error.message}`);
-        }
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, role, company_name, created_at, is_active')
+          .order('created_at', { ascending: false });
 
-        return data;
+        if (error) {
+          console.error('Users query error:', error);
+          throw new Error(`Erro ao buscar usuários: ${error.message}`);
+        }
+        return (data || []) as UserTableRow[];
       } catch (error) {
-        console.error('Admin dashboard error:', error);
+        console.error('Users fetch error:', error);
         throw error;
       }
     }
   });
 
-  // Separar dados da query única
-  const allUsers = adminData?.users || [];
-  const allSubscriptions = adminData?.subscriptions || [];
-  const revenue = adminData?.revenue || {
-    monthly: 0,
-    yearly: 0,
-    activeSubscriptions: 0
-  };
+  const { data: allSubscriptions, isLoading: subscriptionsLoading, error: subscriptionsError } = useQuery({
+    queryKey: ['admin-subscriptions'],
+    enabled: isSuperAdmin,
+    staleTime: 5 * 60 * 1000, // 5 minutos de cache
+    queryFn: async (): Promise<SubscriptionTableRow[]> => {
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select(`
+            id,
+            status,
+            current_period_end,
+            profiles!subscriptions_user_id_fkey(full_name, email),
+            subscription_plans!subscriptions_plan_id_fkey(display_name, price_monthly)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Subscriptions query error:', error);
+          throw new Error(`Erro ao buscar assinaturas: ${error.message}`);
+        }
+        
+        // Transformar dados para o formato esperado
+        const transformedData = (data || []).map((sub: any) => ({
+          id: sub.id,
+          status: sub.status,
+          current_period_end: sub.current_period_end,
+          user: sub.profiles,
+          plan: sub.subscription_plans
+        }));
+        
+        return transformedData as SubscriptionTableRow[];
+      } catch (error) {
+        console.error('Subscriptions fetch error:', error);
+        throw error;
+      }
+    }
+  });
+
+  const { data: revenue, isLoading: revenueLoading, error: revenueError } = useQuery({
+    queryKey: ['admin-revenue'],
+    enabled: isSuperAdmin,
+    staleTime: 2 * 60 * 1000, // 2 minutos de cache (mais frequente)
+    queryFn: async () => {
+      try {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select(`
+            subscription_plans!subscriptions_plan_id_fkey(price_monthly)
+          `)
+          .eq('status', 'active');
+        
+        if (error) {
+          console.error('Revenue query error:', error);
+          throw new Error(`Erro ao calcular receita: ${error.message}`);
+        }
+        
+        // Calcular receita total no frontend de forma otimizada
+        const monthlyRevenue = (data || []).reduce((total, sub: any) => {
+          return total + (sub.subscription_plans?.price_monthly || 0);
+        }, 0);
+        
+        return {
+          monthly: monthlyRevenue,
+          yearly: monthlyRevenue * 12,
+          activeSubscriptions: data?.length || 0
+        };
+      } catch (error) {
+        console.error('Revenue calculation error:', error);
+        throw error;
+      }
+    }
+  });
+
+  // Verificar erros e mostrar mensagem apropriada
+  if (usersError || subscriptionsError || revenueError) {
+    const errorMessage = usersError?.message || subscriptionsError?.message || revenueError?.message || 'Erro desconhecido';
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Crown className="h-16 w-16 text-destructive mx-auto mb-md" />
+          <Heading variant="h2" className="text-destructive mb-sm">
+            Erro ao Carregar Dados
+          </Heading>
+          <Text className="text-muted-foreground">
+            {errorMessage}
+          </Text>
+        </div>
+      </div>
+    );
+  }
 
   if (!isSuperAdmin) {
     return (
@@ -201,10 +295,53 @@ export default function AdminDashboard() {
     }
   ];
 
-  if (usersLoading || subscriptionsLoading || revenueLoading) {
+  // Loading state otimizado com skeleton específico por seção
+  const isLoading = usersLoading || subscriptionsLoading || revenueLoading;
+  
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Carregando dashboard..." />
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="space-y-2">
+            <div className="h-8 w-64 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 w-32 bg-muted rounded animate-pulse" />
+            <div className="h-9 w-36 bg-muted rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-card rounded-lg border p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                  <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+                </div>
+                <div className="h-12 w-12 bg-muted rounded-full animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Content skeleton */}
+        <div className="space-y-4">
+          <div className="h-10 w-96 bg-muted rounded animate-pulse" />
+          <div className="bg-card rounded-lg border p-6">
+            <div className="space-y-4">
+              <div className="h-6 w-48 bg-muted rounded animate-pulse" />
+              <div className="space-y-2">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-12 bg-muted rounded animate-pulse" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
