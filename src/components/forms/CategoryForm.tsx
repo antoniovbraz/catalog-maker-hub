@@ -163,7 +163,7 @@ export const CategoryForm = () => {
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
       <Card className="shadow-card border border-border/50">
-        <CardHeader className="bg-gradient-primary text-white">
+        <CardHeader className="bg-card">
           <CardTitle className="text-xl flex items-center gap-2">
             <FolderOpen className="w-6 h-6" />
             {editingId ? "Editar Categoria" : "Nova Categoria"}

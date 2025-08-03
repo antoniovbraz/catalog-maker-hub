@@ -42,7 +42,11 @@ interface QuadrantCounts {
   baixa_margem_baixo_giro: number;
 }
 
-export const StrategyForm = () => {
+interface StrategyFormProps {
+  onCancel?: () => void;
+}
+
+export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
   const [margeLimitAlta, setMargeLimitAlta] = useState<number>(10);
   const [giroLimitAlto, setGiroLimitAlto] = useState<number>(5);
   const [isCalculated, setIsCalculated] = useState<boolean>(false);
@@ -247,13 +251,25 @@ export const StrategyForm = () => {
               />
             </div>
 
-            <Button 
-              onClick={handleCalculate} 
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? "Calculando..." : "Analisar Estratégia"}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleCalculate} 
+                disabled={isLoading}
+                className="flex-1"
+              >
+                {isLoading ? "Calculando..." : "Analisar Estratégia"}
+              </Button>
+              {onCancel && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onCancel}
+                  className="min-w-[100px]"
+                >
+                  Cancelar
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

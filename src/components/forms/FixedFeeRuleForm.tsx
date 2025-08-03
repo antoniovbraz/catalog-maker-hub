@@ -49,7 +49,11 @@ const RULE_TYPES = [
   }
 ];
 
-export const FixedFeeRuleForm = () => {
+interface FixedFeeRuleFormProps {
+  onCancel?: () => void;
+}
+
+export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
   interface FixedFeeRuleFormData {
     marketplace_id: string;
     rule_type: string;
@@ -333,11 +337,9 @@ export const FixedFeeRuleForm = () => {
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                 {editingId ? "Atualizar" : "Criar"}
               </Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={handleCancelEdit}>
-                  Cancelar
-                </Button>
-              )}
+              <Button type="button" variant="outline" onClick={onCancel || handleCancelEdit}>
+                Cancelar
+              </Button>
             </div>
           </form>
         </CardContent>

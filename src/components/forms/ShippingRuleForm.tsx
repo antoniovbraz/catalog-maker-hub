@@ -37,7 +37,11 @@ interface Marketplace {
   name: string;
 }
 
-export const ShippingRuleForm = () => {
+interface ShippingRuleFormProps {
+  onCancel?: () => void;
+}
+
+export const ShippingRuleForm = ({ onCancel }: ShippingRuleFormProps) => {
   interface ShippingRuleFormData {
     product_id: string;
     marketplace_id: string;
@@ -298,11 +302,9 @@ export const ShippingRuleForm = () => {
               <Button type="submit" disabled={upsertMutation.isPending}>
                 {editingId ? "Atualizar" : "Criar"}
               </Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={handleCancelEdit}>
-                  Cancelar
-                </Button>
-              )}
+              <Button type="button" variant="outline" onClick={onCancel || handleCancelEdit}>
+                Cancelar
+              </Button>
             </div>
           </form>
         </CardContent>

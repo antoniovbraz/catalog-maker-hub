@@ -248,7 +248,7 @@ export const ProductForm = () => {
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
       <Card className="shadow-card border border-border/50">
-        <CardHeader className="bg-gradient-primary text-white">
+        <CardHeader className="bg-card">
           <CardTitle className="text-xl flex items-center gap-2">
             <Package className="w-6 h-6" />
             {editingId ? "Editar Produto" : "Novo Produto"}

@@ -14,7 +14,11 @@ import { useMarketplaces } from "@/hooks/useMarketplaces";
 import { SaleWithDetails, SaleFormData } from "@/types/sales";
 import { formatarMoeda } from "@/utils/pricing";
 
-export const SalesForm = () => {
+interface SalesFormProps {
+  onCancel?: () => void;
+}
+
+export const SalesForm = ({ onCancel }: SalesFormProps) => {
   const [formData, setFormData] = useState<SaleFormData>({
     product_id: "",
     marketplace_id: "",
@@ -169,11 +173,9 @@ export const SalesForm = () => {
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                 {editingId ? "Atualizar" : "Registrar"}
               </Button>
-              {editingId && (
-                <Button type="button" variant="outline" onClick={resetForm}>
-                  Cancelar
-                </Button>
-              )}
+              <Button type="button" variant="outline" onClick={onCancel || resetForm}>
+                Cancelar
+              </Button>
             </div>
           </form>
         </CardContent>
