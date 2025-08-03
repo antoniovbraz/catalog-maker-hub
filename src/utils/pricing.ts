@@ -1,6 +1,7 @@
 /**
  * Calcula a margem real baseada no preço de venda praticado
  * Função auxiliar para validações locais quando necessário
+ * IMPORTANTE: Deve manter consistência com calcular_margem_real do servidor
  */
 export function calcularMargemRealLocal(
   precoVenda: number,
@@ -9,10 +10,12 @@ export function calcularMargemRealLocal(
   frete: number,
   comissao: number,
   taxaCartao: number,
-  provisaoDesconto: number
+  provisaoDesconto: number,
+  taxRate: number = 0
 ): number {
   const totalCustos = custoTotal + valorFixo + frete;
-  const totalTaxas = (precoVenda * (comissao + taxaCartao + provisaoDesconto)) / 100;
+  const comissaoLimitada = Math.min(precoVenda * comissao / 100, 100.00);
+  const totalTaxas = comissaoLimitada + (precoVenda * (taxaCartao + provisaoDesconto + taxRate)) / 100;
   
   return ((precoVenda - totalCustos - totalTaxas) / precoVenda) * 100;
 }
@@ -20,6 +23,7 @@ export function calcularMargemRealLocal(
 /**
  * Calcula a margem unitária em valor absoluto
  * Função auxiliar para validações locais quando necessário
+ * IMPORTANTE: Deve manter consistência com calcular_preco e calcular_margem_real do servidor
  */
 export function calcularMargemUnitariaLocal(
   precoVenda: number,
@@ -28,10 +32,12 @@ export function calcularMargemUnitariaLocal(
   frete: number,
   comissao: number,
   taxaCartao: number,
-  provisaoDesconto: number
+  provisaoDesconto: number,
+  taxRate: number = 0
 ): number {
   const totalCustos = custoTotal + valorFixo + frete;
-  const totalTaxas = (precoVenda * (comissao + taxaCartao + provisaoDesconto)) / 100;
+  const comissaoLimitada = Math.min(precoVenda * comissao / 100, 100.00);
+  const totalTaxas = comissaoLimitada + (precoVenda * (taxaCartao + provisaoDesconto + taxRate)) / 100;
   
   return precoVenda - totalCustos - totalTaxas;
 }

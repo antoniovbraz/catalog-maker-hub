@@ -42,12 +42,15 @@ describe('Pricing Utils', () => {
         15,  // frete
         12,  // comissao
         3.5, // taxaCartao
-        2    // provisaoDesconto
+        2,   // provisaoDesconto
+        3    // taxRate
       );
 
-      // Margem = ((200 - 100 - 10 - 15 - (200 * 17.5 / 100)) / 200) * 100
-      // Margem = ((200 - 125 - 35) / 200) * 100 = (40 / 200) * 100 = 20%
-      expect(result).toBeCloseTo(20, 1);
+      // Margem = ((200 - 100 - 10 - 15 - comissaoLimitada - (200 * 8.5 / 100)) / 200) * 100
+      // comissaoLimitada = min(200 * 12 / 100, 100) = 24
+      // totalTaxas = 24 + (200 * 8.5 / 100) = 24 + 17 = 41
+      // Margem = ((200 - 125 - 41) / 200) * 100 = (34 / 200) * 100 = 17%
+      expect(result).toBeCloseTo(17, 1);
     });
 
     it('deve retornar margem negativa quando custos excedem receita', () => {
@@ -58,7 +61,8 @@ describe('Pricing Utils', () => {
         15,  // frete
         12,  // comissao
         3.5, // taxaCartao
-        2    // provisaoDesconto
+        2,   // provisaoDesconto
+        0    // taxRate
       );
 
       expect(result).toBeLessThan(0);
@@ -72,7 +76,8 @@ describe('Pricing Utils', () => {
         0,   // frete
         0,   // comissao
         0,   // taxaCartao
-        0    // provisaoDesconto
+        0,   // provisaoDesconto
+        0    // taxRate
       );
 
       expect(result).toBe(100); // 100% de margem
@@ -88,12 +93,15 @@ describe('Pricing Utils', () => {
         15,  // frete
         12,  // comissao
         3.5, // taxaCartao
-        2    // provisaoDesconto
+        2,   // provisaoDesconto
+        3    // taxRate
       );
 
-      // Margem unitária = 200 - 100 - 10 - 15 - (200 * 17.5 / 100)
-      // = 200 - 125 - 35 = 40
-      expect(result).toBeCloseTo(40, 1);
+      // Margem unitária = 200 - 100 - 10 - 15 - comissaoLimitada - (200 * 8.5 / 100)
+      // comissaoLimitada = min(200 * 12 / 100, 100) = 24
+      // totalTaxas = 24 + (200 * 8.5 / 100) = 24 + 17 = 41
+      // = 200 - 125 - 41 = 34
+      expect(result).toBeCloseTo(34, 1);
     });
 
     it('deve retornar valor negativo quando custos excedem receita', () => {
@@ -104,7 +112,8 @@ describe('Pricing Utils', () => {
         15,  // frete
         12,  // comissao
         3.5, // taxaCartao
-        2    // provisaoDesconto
+        2,   // provisaoDesconto
+        0    // taxRate
       );
 
       expect(result).toBeLessThan(0);
