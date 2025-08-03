@@ -141,14 +141,14 @@ const CommissionsEnhanced = () => {
       progressTotal={totalCommissions}
     >
       {/* Form Column */}
-      <div className="xl:col-span-5 space-y-6">
+      <div className="xl:col-span-5 space-y-lg">
         <CommissionFormEnhanced
           editingCommission={editingCommission}
           onCancelEdit={() => setEditingCommission(null)}
         />
         
         {/* Quick Stats Card */}
-        <div className="bg-card rounded-lg p-6 border">
+        <div className="bg-card rounded-lg p-lg border">
           <h3 className="font-semibold mb-4">Estatísticas Rápidas</h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">

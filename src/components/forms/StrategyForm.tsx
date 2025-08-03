@@ -204,7 +204,7 @@ export const StrategyForm = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       {/* Controls */}
       <Card>
         <CardHeader>
@@ -340,7 +340,7 @@ export const StrategyForm = () => {
                     <PieChart className="h-4 w-4 text-primary" />
                     Distribuição dos Quadrantes
                   </h4>
-                  <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-4">
+                  <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
                     <QuadrantDonutChart quadrantCounts={strategyAnalysis.quadrantCounts} />
                   </div>
                 </div>
@@ -349,7 +349,7 @@ export const StrategyForm = () => {
                     <BarChart3 className="h-4 w-4 text-primary" />
                     Receita por Quadrante
                   </h4>
-                  <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-4">
+                  <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
                     <RevenueByQuadrantChart data={strategyAnalysis.products} />
                   </div>
                 </div>
@@ -401,12 +401,12 @@ export const StrategyForm = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                    <div className="space-y-xs max-h-32 overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "alta_margem_baixo_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-1 bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-white rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -429,12 +429,12 @@ export const StrategyForm = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                    <div className="space-y-xs max-h-32 overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "alta_margem_alto_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-1 bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-white rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -457,12 +457,12 @@ export const StrategyForm = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                    <div className="space-y-xs max-h-32 overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "baixa_margem_baixo_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-1 bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-white rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -485,12 +485,12 @@ export const StrategyForm = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                    <div className="space-y-xs max-h-32 overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "baixa_margem_alto_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-1 bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-white rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -521,7 +521,7 @@ export const StrategyForm = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-md">
                 {(["alta_margem_alto_giro", "alta_margem_baixo_giro", "baixa_margem_alto_giro", "baixa_margem_baixo_giro"] as const).map((quadrant) => {
                   const products = strategyAnalysis.products.filter(p => p.quadrant === quadrant);
                   if (products.length === 0) return null;

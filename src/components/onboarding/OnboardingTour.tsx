@@ -90,7 +90,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-md">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center pb-2">
           <div className="flex items-center justify-between mb-4">
@@ -114,7 +114,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-lg">
           {/* Steps Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {steps.map((s, index) => (

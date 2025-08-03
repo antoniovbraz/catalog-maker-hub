@@ -134,7 +134,7 @@ export const CategoryForm = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-xl">
       {/* Form Section */}
       <Card className="shadow-form border border-border/50">
         <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
@@ -143,10 +143,10 @@ export const CategoryForm = () => {
             {editingId ? "✏️ Editar Categoria" : "➕ Nova Categoria"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="space-y-lg p-lg">
+          <form onSubmit={handleSubmit} className="space-y-lg">
             {/* Seção de Informações */}
-            <div className="space-y-4">
+            <div className="space-y-md">
               <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
                 📂 Informações da Categoria
               </h3>

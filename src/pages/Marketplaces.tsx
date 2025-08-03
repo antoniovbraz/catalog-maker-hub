@@ -3,9 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const Marketplaces = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       {/* Page Header */}
-      <div className="space-y-2">
+      <div className="space-y-sm">
         <h1 className="text-3xl font-bold tracking-tight">🏪 Marketplaces</h1>
         <p className="text-muted-foreground">
           Cadastre e gerencie os marketplaces onde seus produtos são vendidos
@@ -14,7 +14,7 @@ const Marketplaces = () => {
 
       {/* Main Content */}
       <Card className="shadow-card border-0 bg-gradient-subtle">
-        <CardContent className="p-6">
+        <CardContent className="p-lg">
           <MarketplaceForm />
         </CardContent>
       </Card>

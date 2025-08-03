@@ -20,7 +20,7 @@ export const MiniProgressBar: React.FC<MiniProgressBarProps> = ({
   const trend = isAboveTarget ? "up" : "down";
   
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={`space-y-xs ${className}`}>
       <div className="flex items-center justify-between text-xs">
         {label && <span className="text-muted-foreground">{label}</span>}
         <div className="flex items-center gap-1">

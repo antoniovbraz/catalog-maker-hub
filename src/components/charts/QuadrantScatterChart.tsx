@@ -57,7 +57,7 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
         <div className="bg-background border rounded-lg shadow-elegant p-3 text-sm animate-fade-in">
           <p className="font-semibold text-primary">{name}</p>
           <p className="text-muted-foreground text-xs mb-2">{marketplace}</p>
-          <div className="space-y-1">
+          <div className="space-y-xs">
             <div className="flex justify-between">
               <span>Margem:</span>
               <span className="font-medium">{y.toFixed(1)}%</span>

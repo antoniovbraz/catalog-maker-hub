@@ -179,9 +179,9 @@ export const PricingForm = () => {
         <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
           <CardTitle className="text-xl">📊 Calculadora de Preços</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 p-6">
+        <CardContent className="space-y-lg p-lg">
           {/* Seção de Seleção */}
-          <div className="space-y-4">
+          <div className="space-y-md">
             <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
               🎯 Seleção de Produto e Marketplace
             </h3>
@@ -253,7 +253,7 @@ export const PricingForm = () => {
           </div>
 
           {/* Seção de Configurações */}
-          <div className="space-y-4">
+          <div className="space-y-md">
             <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
               ⚙️ Configurações de Margem
             </h3>
@@ -297,7 +297,7 @@ export const PricingForm = () => {
           </div>
 
           {/* Seção de Análise */}
-          <div className="space-y-4">
+          <div className="space-y-md">
             <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
               📈 Análise de Preço Praticado
             </h3>
@@ -343,9 +343,9 @@ export const PricingForm = () => {
         <CardHeader className="bg-gradient-card text-white rounded-t-lg">
           <CardTitle className="text-xl">📊 Resultado do Cálculo</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-lg">
           {pricingResult ? (
-            <div className="space-y-4">
+            <div className="space-y-md">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>Produto:</div>
                 <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
@@ -383,7 +383,7 @@ export const PricingForm = () => {
               {margemRealResult && (
                 <>
                   <Separator className="my-4" />
-                  <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="bg-muted/50 p-md rounded-lg">
                     <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
                       📊 Análise do Preço Praticado
                     </h4>

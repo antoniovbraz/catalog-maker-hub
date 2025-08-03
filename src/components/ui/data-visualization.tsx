@@ -187,7 +187,7 @@ export function DataVisualization<T extends { id: string }>({
   if (isLoading) {
     return (
       <Card className={className}>
-        <CardContent className="p-6">
+        <CardContent className="p-lg">
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
             <p className="text-muted-foreground mt-2">Carregando...</p>
@@ -256,7 +256,7 @@ export function DataVisualization<T extends { id: string }>({
             </div>
           )
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-md">
             {renderTableView()}
             
             {/* Pagination */}

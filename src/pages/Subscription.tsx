@@ -115,11 +115,11 @@ export default function Subscription() {
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-md">
             <h4 className="font-semibold mb-3">Uso do Período Atual</h4>
             
             {/* Products Usage */}
-            <div className="space-y-2">
+            <div className="space-y-sm">
               <div className="flex justify-between text-sm">
                 <span>Produtos</span>
                 <span>
@@ -134,7 +134,7 @@ export default function Subscription() {
             </div>
 
             {/* API Calls Usage */}
-            <div className="space-y-2">
+            <div className="space-y-sm">
               <div className="flex justify-between text-sm">
                 <span>Chamadas API</span>
                 <span>
@@ -153,7 +153,7 @@ export default function Subscription() {
 
       {/* Billing Cycle Toggle */}
       <div className="flex justify-center mb-8">
-        <div className="bg-muted p-1 rounded-lg">
+        <div className="bg-muted p-xs rounded-lg">
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -223,11 +223,11 @@ export default function Subscription() {
                 </div>
               </CardHeader>
 
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-md">
                 {/* Features */}
-                <div className="space-y-2">
+                <div className="space-y-sm">
                   <h4 className="font-semibold text-sm">Recursos inclusos:</h4>
-                  <ul className="space-y-1 text-sm">
+                  <ul className="space-y-xs text-sm">
                     {Object.entries(plan.features || {}).map(([feature, enabled]) => {
                       if (!enabled) return null;
                       
@@ -257,9 +257,9 @@ export default function Subscription() {
                 <Separator />
 
                 {/* Limits */}
-                <div className="space-y-2">
+                <div className="space-y-sm">
                   <h4 className="font-semibold text-sm">Limites:</h4>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
+                  <ul className="space-y-xs text-sm text-muted-foreground">
                     {Object.entries(plan.limits || {}).map(([limit, value]) => {
                       const limitLabels: Record<string, string> = {
                         products: 'Produtos',

@@ -266,7 +266,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => (
           <Card key={index} className="border-0 shadow-md">
-            <CardContent className="p-6">
+            <CardContent className="p-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="users" className="space-y-6">
+      <Tabs defaultValue="users" className="space-y-lg">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="w-4 h-4" />
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="users" className="space-y-6">
+        <TabsContent value="users" className="space-y-lg">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -322,7 +322,7 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="subscriptions" className="space-y-6">
+        <TabsContent value="subscriptions" className="space-y-lg">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -342,7 +342,7 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-lg">
           <div className="grid gap-6">
             <Card>
               <CardHeader>

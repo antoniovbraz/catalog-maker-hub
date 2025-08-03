@@ -3,9 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const Pricing = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       {/* Page Header */}
-      <div className="space-y-2">
+      <div className="space-y-sm">
         <h1 className="text-3xl font-bold tracking-tight">Precificação</h1>
         <p className="text-muted-foreground">
           Calcule preços sugeridos e margens de lucro para seus produtos
@@ -14,7 +14,7 @@ const Pricing = () => {
 
       {/* Main Content */}
       <Card className="shadow-card border-0 bg-gradient-subtle">
-        <CardContent className="p-6">
+        <CardContent className="p-lg">
           <PricingForm />
         </CardContent>
       </Card>

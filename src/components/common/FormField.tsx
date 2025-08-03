@@ -36,7 +36,7 @@ export function FormField({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-sm", className)}>
       <Label htmlFor={name} className={required ? "after:content-['*'] after:text-destructive after:ml-1" : ""}>
         {label}
       </Label>

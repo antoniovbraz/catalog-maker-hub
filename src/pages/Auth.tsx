@@ -109,9 +109,9 @@ export default function Auth() {
               </TabsList>
 
               {/* Login Form */}
-              <TabsContent value="login" className="space-y-4">
-                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-                  <div className="space-y-2">
+              <TabsContent value="login" className="space-y-md">
+                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-md">
+                  <div className="space-y-sm">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
                       id="login-email"
@@ -127,7 +127,7 @@ export default function Auth() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-sm">
                     <Label htmlFor="login-password">Senha</Label>
                     <div className="relative">
                       <Input
@@ -165,9 +165,9 @@ export default function Auth() {
               </TabsContent>
 
               {/* Sign Up Form */}
-              <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={signUpForm.handleSubmit(onSignUp)} className="space-y-4">
-                  <div className="space-y-2">
+              <TabsContent value="signup" className="space-y-md">
+                <form onSubmit={signUpForm.handleSubmit(onSignUp)} className="space-y-md">
+                  <div className="space-y-sm">
                     <Label htmlFor="signup-name">Nome Completo</Label>
                     <Input
                       id="signup-name"
@@ -183,7 +183,7 @@ export default function Auth() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-sm">
                     <Label htmlFor="signup-company">Empresa (Opcional)</Label>
                     <Input
                       id="signup-company"
@@ -193,7 +193,7 @@ export default function Auth() {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-sm">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
@@ -209,7 +209,7 @@ export default function Auth() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-sm">
                     <Label htmlFor="signup-password">Senha</Label>
                     <div className="relative">
                       <Input
@@ -240,7 +240,7 @@ export default function Auth() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-sm">
                     <Label htmlFor="signup-confirm-password">Confirmar Senha</Label>
                     <Input
                       id="signup-confirm-password"
