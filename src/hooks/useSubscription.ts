@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { subscriptionService } from '@/services/subscription';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import type { Subscription } from '@/types/subscription';
 
 export function useSubscriptionPlans() {
   return useQuery({
@@ -79,9 +80,9 @@ export function useSubscriptionMutations() {
     }
   });
   
-  const updateSubscription = useMutation({
-    mutationFn: ({ userId, updates }: { userId: string; updates: any }) =>
-      subscriptionService.updateSubscription(userId, updates),
+    const updateSubscription = useMutation({
+      mutationFn: ({ userId, updates }: { userId: string; updates: Partial<Subscription> }) =>
+        subscriptionService.updateSubscription(userId, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['current-subscription'] });
       toast({

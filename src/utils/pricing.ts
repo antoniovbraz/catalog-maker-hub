@@ -39,12 +39,14 @@ export function calcularMargemUnitariaLocal(
 /**
  * Formata valor monetário
  */
-export function formatarMoeda(valor: number): string {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(valor);
-}
+  export function formatarMoeda(valor: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
+      .format(valor)
+      .replace(/\u00A0/g, ' ');
+  }
 
 /**
  * Formata percentual

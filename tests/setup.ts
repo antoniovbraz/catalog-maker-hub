@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
-import { afterEach, beforeAll, vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 
 // Limpa após cada teste
 afterEach(() => {
@@ -32,12 +32,7 @@ const mockSupabaseClient = {
 };
 
 // Mock das funções de toast
-const mockToast = {
-  success: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-  warning: vi.fn(),
-};
+const mockToast = vi.fn();
 
 // Mock do React Query
 const mockQueryClient = {
@@ -46,44 +41,41 @@ const mockQueryClient = {
   getQueryData: vi.fn(),
 };
 
-// Disponibiliza mocks globalmente
-beforeAll(() => {
-  // Mock do Supabase
-  vi.doMock('@/integrations/supabase/client', () => ({
-    supabase: mockSupabaseClient,
-  }));
+// Mock do Supabase
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: mockSupabaseClient,
+}));
 
-  // Mock do toast
-  vi.doMock('@/components/ui/use-toast', () => ({
-    toast: mockToast,
-    useToast: () => ({ toast: mockToast }),
-  }));
+// Mock do toast
+vi.mock('@/components/ui/use-toast', () => ({
+  toast: mockToast,
+  useToast: () => ({ toast: mockToast }),
+}));
 
-  // Mock do React Router
-  vi.doMock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom');
-    return {
-      ...actual,
-      useNavigate: () => vi.fn(),
-      useParams: () => ({}),
-      useLocation: () => ({ pathname: '/' }),
-    };
-  });
+// Mock do React Router
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+    useParams: () => ({}),
+    useLocation: () => ({ pathname: '/' }),
+  };
+});
 
-  // Mock do window.matchMedia para componentes responsivos
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(), // Deprecated
-      removeListener: vi.fn(), // Deprecated
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  });
+// Mock do window.matchMedia para componentes responsivos
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // Deprecated
+    removeListener: vi.fn(), // Deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
 });
 
 // Utilitários para testes
@@ -141,7 +133,7 @@ export const testUtils = {
     vi.clearAllMocks();
     mockSupabaseClient.from.mockClear();
     mockSupabaseClient.rpc.mockClear();
-    Object.values(mockToast).forEach(fn => fn.mockClear());
+    mockToast.mockClear();
     Object.values(mockQueryClient).forEach(fn => fn.mockClear());
   },
 };

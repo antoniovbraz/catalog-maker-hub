@@ -99,15 +99,20 @@ export const StrategyForm = () => {
               p_margem_desejada: 25,
             });
 
-            if (error || !marginData || 'error' in (marginData as any)) {
-              return { ...item, avg_margin_percentage: 0 };
-            }
+              if (
+                error ||
+                !marginData ||
+                typeof marginData !== 'object' ||
+                'error' in (marginData as Record<string, unknown>)
+              ) {
+                return { ...item, avg_margin_percentage: 0 };
+              }
 
-            const result = marginData as any;
-            return {
-              ...item,
-              avg_margin_percentage: result.margem_percentual || 0,
-            };
+              const result = marginData as Record<string, number>;
+              return {
+                ...item,
+                avg_margin_percentage: result.margem_percentual || 0,
+              };
           } catch (error) {
             return { ...item, avg_margin_percentage: 0 };
           }

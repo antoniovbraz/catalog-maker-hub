@@ -1,9 +1,15 @@
 import { Info } from '@/components/ui/icons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
+interface MarketplaceMetadata {
+  commission_range?: string;
+  installments?: string;
+  commission_cap?: number;
+}
+
 interface MarketplaceTooltipProps {
   marketplaceName: string;
-  metadata?: Record<string, any>;
+  metadata?: MarketplaceMetadata;
 }
 
 export const MarketplaceTooltip = ({ marketplaceName, metadata }: MarketplaceTooltipProps) => {

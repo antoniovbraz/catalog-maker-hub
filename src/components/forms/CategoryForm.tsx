@@ -28,7 +28,7 @@ export const CategoryForm = () => {
   const deleteMutation = useDeleteCategory();
 
   // Validação em tempo real
-  const validateField = (name: keyof CategoryFormData, value: any) => {
+  const validateField = (name: keyof CategoryFormData, value: string) => {
     const newErrors = { ...errors };
     
     switch (name) {
@@ -49,7 +49,7 @@ export const CategoryForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (name: keyof CategoryFormData, value: any) => {
+  const handleInputChange = (name: keyof CategoryFormData, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     setTouched(prev => ({ ...prev, [name]: true }));
     validateField(name, value);
@@ -206,11 +206,11 @@ export const CategoryForm = () => {
 
             {/* Botões de Ação */}
             <div className="flex gap-3 pt-4">
-              <Button 
-                type="submit" 
-                disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 h-11 bg-gradient-primary hover:bg-gradient-primary/90 shadow-hover"
-              >
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+                >
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? "💾 Atualizar Categoria" : "➕ Criar Categoria"}
               </Button>

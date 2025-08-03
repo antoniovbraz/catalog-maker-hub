@@ -1,7 +1,7 @@
 import { DashboardForm } from "@/components/forms/DashboardForm";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Heading, Text } from "@/components/ui/typography";
 
 const Dashboard = () => {

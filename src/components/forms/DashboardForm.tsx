@@ -121,11 +121,11 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
       `}
       {...attributes}
     >
-      {index === 0 && (
-        <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-scale-in">
-          🏆 Melhor
-        </Badge>
-      )}
+        {index === 0 && (
+          <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-in zoom-in-95">
+            🏆 Melhor
+          </Badge>
+        )}
       <div {...listeners} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 touch-none">
         <GripVertical className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors cursor-grab active:cursor-grabbing" />
       </div>
@@ -322,8 +322,8 @@ export const DashboardForm = () => {
             margemDesejada: defaultParams.margemDesejada,
           });
 
-          if (calculationResult && typeof calculationResult === 'object') {
-            const result = calculationResult as any;
+            if (calculationResult && typeof calculationResult === 'object') {
+              const result = calculationResult as Record<string, number>;
             
             // Salvar automaticamente os dados atualizados
             await savePricing.mutateAsync({
@@ -398,7 +398,7 @@ export const DashboardForm = () => {
     const calculateRealMargins = async () => {
       if (savedPricings.length === 0) return;
       
-      const newRealMargins: {[key: string]: {margem_unitaria_real: number, margem_percentual_real: number}} = {};
+        const newRealMargins: Record<string, {margem_unitaria_real: number; margem_percentual_real: number}> = {};
       
       for (const pricing of savedPricings) {
         try {
@@ -410,12 +410,13 @@ export const DashboardForm = () => {
             p_preco_praticado: pricing.preco_praticado
           });
 
-          if (!error && data && typeof data === 'object') {
-            newRealMargins[pricing.marketplace_id] = {
-              margem_unitaria_real: (data as any).margem_unitaria_real,
-              margem_percentual_real: (data as any).margem_percentual_real
-            };
-          }
+            if (!error && data && typeof data === 'object') {
+              const result = data as Record<string, number>;
+              newRealMargins[pricing.marketplace_id] = {
+                margem_unitaria_real: result.margem_unitaria_real,
+                margem_percentual_real: result.margem_percentual_real,
+              };
+            }
         } catch (error) {
           logger.error('Erro ao calcular margem real', error);
         }
