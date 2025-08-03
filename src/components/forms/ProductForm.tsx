@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Edit } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Edit, Plus, Package, Calculator, Tag, Save, X, AlertCircle } from "lucide-react";
 import { useProductsWithCategories, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { ProductWithCategory, ProductFormData } from "@/types/products";
 import { formatarMoeda } from "@/utils/pricing";
+import { DataTable, Column } from "@/components/common/DataTable";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export const ProductForm = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     description: "",
@@ -23,6 +28,8 @@ export const ProductForm = () => {
     tax_rate: 0
   });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Partial<ProductFormData>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof ProductFormData, boolean>>>({});
 
   const { data: categories = [] } = useCategories();
   const { data: products = [], isLoading } = useProductsWithCategories();
@@ -30,8 +37,74 @@ export const ProductForm = () => {
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
 
+  // Validação em tempo real
+  const validateField = (name: keyof ProductFormData, value: any) => {
+    const newErrors = { ...errors };
+    
+    switch (name) {
+      case 'name':
+        if (!value.trim()) {
+          newErrors.name = 'Nome é obrigatório';
+        } else if (value.length < 2) {
+          newErrors.name = 'Nome deve ter pelo menos 2 caracteres';
+        } else {
+          delete newErrors.name;
+        }
+        break;
+      case 'cost_unit':
+        if (typeof value === 'number' && value <= 0) {
+          newErrors.cost_unit = 'Custo deve ser maior que zero' as any;
+        } else {
+          delete newErrors.cost_unit;
+        }
+        break;
+      case 'tax_rate':
+        if (typeof value === 'number' && (value < 0 || value > 100)) {
+          newErrors.tax_rate = 'Taxa deve estar entre 0 e 100%' as any;
+        } else {
+          delete newErrors.tax_rate;
+        }
+        break;
+      default:
+        delete newErrors[name];
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Auto-save functionality (simulated)
+  useEffect(() => {
+    if (editingId && Object.keys(touched).length > 0) {
+      const timer = setTimeout(() => {
+        // Auto-save logic would go here
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [formData, editingId, touched]);
+
+  const handleInputChange = (name: keyof ProductFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setTouched(prev => ({ ...prev, [name]: true }));
+    validateField(name, value);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar todos os campos antes de enviar
+    const isValid = validateField('name', formData.name) && 
+                   validateField('cost_unit', formData.cost_unit) &&
+                   validateField('tax_rate', formData.tax_rate);
+    
+    if (!isValid) {
+      toast({
+        title: "Erro de validação",
+        description: "Corrija os erros no formulário antes de continuar",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // Converter "none" para undefined/null antes de enviar
     const dataToSubmit = {
@@ -45,12 +118,20 @@ export const ProductForm = () => {
       updateMutation.mutate({ id: editingId, data: dataToSubmit }, {
         onSuccess: () => {
           resetForm();
+          toast({
+            title: "Sucesso",
+            description: "Produto atualizado com sucesso!"
+          });
         }
       });
     } else {
       createMutation.mutate(dataToSubmit, {
         onSuccess: () => {
           resetForm();
+          toast({
+            title: "Sucesso", 
+            description: "Produto criado com sucesso!"
+          });
         }
       });
     }
@@ -67,6 +148,8 @@ export const ProductForm = () => {
       tax_rate: 0
     });
     setEditingId(null);
+    setErrors({});
+    setTouched({});
   };
 
   const handleEdit = (product: ProductWithCategory) => {
@@ -80,105 +163,257 @@ export const ProductForm = () => {
       tax_rate: product.tax_rate || 0
     });
     setEditingId(product.id);
+    setErrors({});
+    setTouched({});
   };
 
+  // Calcular custo total para exibição
+  const custoTotal = formData.cost_unit + formData.packaging_cost;
+
+  // Configurar colunas da tabela
+  const columns: Column<ProductWithCategory>[] = [
+    {
+      key: 'name',
+      header: 'Nome',
+      render: (value, item) => (
+        <div className="flex items-center gap-2">
+          <Package className="w-4 h-4 text-muted-foreground" />
+          <div>
+            <span className="font-medium">{value as string}</span>
+            {item.sku && (
+              <Badge variant="outline" className="ml-2 text-xs">
+                {item.sku}
+              </Badge>
+            )}
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'categories.name',
+      header: 'Categoria',
+      render: (value) => (
+        <div className="flex items-center gap-1">
+          <Tag className="w-3 h-3 text-muted-foreground" />
+          <span>{value as string || "Sem categoria"}</span>
+        </div>
+      )
+    },
+    {
+      key: 'cost_unit',
+      header: 'Custo Unit.',
+      render: (value) => (
+        <span className="font-mono text-sm">{formatarMoeda(value as number || 0)}</span>
+      )
+    },
+    {
+      key: 'packaging_cost',
+      header: 'Embalagem',
+      render: (value) => (
+        <span className="font-mono text-sm text-muted-foreground">
+          {formatarMoeda(value as number || 0)}
+        </span>
+      )
+    }
+  ];
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{editingId ? "Editar Produto" : "Novo Produto"}</CardTitle>
+    <div className="space-y-8">
+      {/* Form Section */}
+      <Card className="shadow-form border border-border/50">
+        <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <Package className="w-6 h-6" />
+            {editingId ? "✏️ Editar Produto" : "➕ Novo Produto"}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-6 p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Seção de Informações Básicas */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
+                📝 Informações Básicas
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Nome *
+                  </Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    placeholder="Ex: Smartphone Samsung Galaxy"
+                    className={cn(
+                      "mt-1",
+                      errors.name && touched.name ? "border-destructive focus-visible:ring-destructive" : ""
+                    )}
+                    required
+                  />
+                  {errors.name && touched.name && (
+                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.name}
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <Label htmlFor="sku" className="text-sm font-medium">SKU</Label>
+                  <Input
+                    id="sku"
+                    value={formData.sku}
+                    onChange={(e) => handleInputChange("sku", e.target.value)}
+                    placeholder="Ex: SM-G991B"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              
               <div>
-                <Label htmlFor="name">Nome *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  required
+                <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  placeholder="Descrição detalhada do produto..."
+                  className="mt-1 min-h-[80px]"
                 />
               </div>
               
               <div>
-                <Label htmlFor="sku">SKU</Label>
-                <Input
-                  id="sku"
-                  value={formData.sku}
-                  onChange={(e) => setFormData(prev => ({ ...prev, sku: e.target.value }))}
-                />
+                <Label htmlFor="category" className="text-sm font-medium">Categoria</Label>
+                <Select 
+                  value={formData.category_id} 
+                  onValueChange={(value) => handleInputChange("category_id", value)}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhuma categoria</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            
-            <div>
-              <Label htmlFor="description">Descrição</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="category">Categoria</Label>
-              <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione uma categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhuma categoria</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="cost_unit">Custo Unitário (R$) *</Label>
-                <Input
-                  id="cost_unit"
-                  type="number"
-                  step="0.01"
-                  value={formData.cost_unit}
-                  onChange={(e) => setFormData(prev => ({ ...prev, cost_unit: parseFloat(e.target.value) || 0 }))}
-                  required
-                />
-              </div>
+
+            <Separator />
+
+            {/* Seção de Custos */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
+                💰 Configuração de Custos
+              </h3>
               
-              <div>
-                <Label htmlFor="packaging_cost">Custo da Embalagem (R$)</Label>
-                <Input
-                  id="packaging_cost"
-                  type="number"
-                  step="0.01"
-                  value={formData.packaging_cost}
-                  onChange={(e) => setFormData(prev => ({ ...prev, packaging_cost: parseFloat(e.target.value) || 0 }))}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="cost_unit" className="text-sm font-medium">
+                    Custo Unitário (R$) *
+                  </Label>
+                  <Input
+                    id="cost_unit"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.cost_unit}
+                    onChange={(e) => handleInputChange("cost_unit", parseFloat(e.target.value) || 0)}
+                    placeholder="0,00"
+                    className={cn(
+                      "mt-1",
+                      errors.cost_unit && touched.cost_unit ? "border-destructive focus-visible:ring-destructive" : ""
+                    )}
+                    required
+                  />
+                  {errors.cost_unit && touched.cost_unit && (
+                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.cost_unit}
+                    </div>
+                  )}
+                </div>
+                
+                <div>
+                  <Label htmlFor="packaging_cost" className="text-sm font-medium">
+                    Custo da Embalagem (R$)
+                  </Label>
+                  <Input
+                    id="packaging_cost"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.packaging_cost}
+                    onChange={(e) => handleInputChange("packaging_cost", parseFloat(e.target.value) || 0)}
+                    placeholder="0,00"
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="tax_rate" className="text-sm font-medium">
+                    Alíquota de Imposto (%)
+                  </Label>
+                  <Input
+                    id="tax_rate"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    value={formData.tax_rate}
+                    onChange={(e) => handleInputChange("tax_rate", parseFloat(e.target.value) || 0)}
+                    placeholder="0,00"
+                    className={cn(
+                      "mt-1",
+                      errors.tax_rate && touched.tax_rate ? "border-destructive focus-visible:ring-destructive" : ""
+                    )}
+                  />
+                  {errors.tax_rate && touched.tax_rate && (
+                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.tax_rate}
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              <div>
-                <Label htmlFor="tax_rate">Alíquota de Imposto (%)</Label>
-                <Input
-                  id="tax_rate"
-                  type="number"
-                  step="0.01"
-                  value={formData.tax_rate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tax_rate: parseFloat(e.target.value) || 0 }))}
-                />
-              </div>
+
+              {/* Preview do custo total */}
+              {custoTotal > 0 && (
+                <div className="bg-muted/50 p-4 rounded-lg border border-border/50">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Custo Total:</span>
+                    <span className="text-lg font-bold text-primary">
+                      {formatarMoeda(custoTotal)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             
-            <div className="flex gap-2">
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {editingId ? "Atualizar" : "Criar"}
+            <Separator />
+
+            {/* Botões de Ação */}
+            <div className="flex gap-3 pt-4">
+              <Button 
+                type="submit" 
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="flex-1 h-11 bg-gradient-primary hover:bg-gradient-primary/90 shadow-hover"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {editingId ? "💾 Atualizar Produto" : "➕ Criar Produto"}
               </Button>
               {editingId && (
-                <Button type="button" variant="outline" onClick={resetForm}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={resetForm}
+                  className="h-11 min-w-[120px] shadow-form"
+                >
+                  <X className="w-4 h-4 mr-2" />
                   Cancelar
                 </Button>
               )}
@@ -187,57 +422,18 @@ export const ProductForm = () => {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Produtos Cadastrados</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p>Carregando...</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead>Custo Unit.</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.sku}</TableCell>
-                    <TableCell>{product.categories?.name || "Sem categoria"}</TableCell>
-                    <TableCell>{formatarMoeda(product.cost_unit || 0)}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(product)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deleteMutation.mutate(product.id)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+      {/* Lista de Produtos */}
+      <DataTable
+        data={products}
+        columns={columns}
+        onEdit={handleEdit}
+        onDelete={(product) => deleteMutation.mutate(product.id)}
+        loading={isLoading}
+        title="📦 Produtos Cadastrados"
+        searchPlaceholder="Buscar por nome, SKU ou categoria..."
+        emptyMessage="Nenhum produto cadastrado"
+        emptyDescription="Crie seu primeiro produto usando o formulário acima"
+      />
     </div>
   );
 };

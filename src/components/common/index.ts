@@ -7,4 +7,5 @@ export { MiniSparkline } from "./MiniSparkline";
 export { MiniProgressBar } from "./MiniProgressBar";
 export { EnhancedTooltip } from "./EnhancedTooltip";
 export { Breadcrumbs } from "./Breadcrumbs";
+export { SkeletonTable, SkeletonForm, SkeletonCard } from "./SkeletonLoaders";
 export type { Column, DataTableProps } from "./DataTable";
