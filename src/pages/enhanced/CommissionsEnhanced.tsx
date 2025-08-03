@@ -1,4 +1,4 @@
-import { Percent, Plus, Upload, Download, Calculator } from "lucide-react";
+import { Percent, Plus, Upload, Download, Calculator } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";

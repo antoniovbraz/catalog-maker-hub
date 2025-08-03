@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Check, Crown, Zap, Star, ArrowRight, Infinity } from 'lucide-react';
+import { Check, Crown, Zap, Star, ArrowRight, Infinity } from '@/components/ui/icons';
 import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '@/hooks/useSubscription';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/ui/empty-state';

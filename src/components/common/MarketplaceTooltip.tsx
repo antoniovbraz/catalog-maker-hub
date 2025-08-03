@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { Info } from '@/components/ui/icons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MarketplaceTooltipProps {

@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, ChevronRight } from "lucide-react";
+import { Trash2, Edit, ChevronRight } from '@/components/ui/icons';
 import { useMarketplacesHierarchical, useMarketplaceParents, useCreateMarketplace, useUpdateMarketplace, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";
 import { MarketplaceTooltip } from "@/components/common/MarketplaceTooltip";

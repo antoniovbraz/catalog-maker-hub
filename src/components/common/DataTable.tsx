@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Edit, Trash2, Search, Filter, MoreHorizontal, Plus } from "lucide-react";
+import { Edit, Trash2, Search, Filter, MoreHorizontal, Plus } from '@/components/ui/icons';
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { useState } from "react";

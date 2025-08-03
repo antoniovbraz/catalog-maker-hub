@@ -202,4 +202,16 @@ describe('DataTable Component', () => {
     expect(screen.getByText('Eletrônicos')).toBeInTheDocument();
     expect(screen.getByText('Casa')).toBeInTheDocument();
   });
+
+  it('deve corresponder ao snapshot', () => {
+    const { container } = render(
+      <DataTable
+        data={mockData}
+        columns={mockColumns}
+      />,
+      { wrapper: createWrapper() }
+    );
+
+    expect(container).toMatchSnapshot();
+  });
 });

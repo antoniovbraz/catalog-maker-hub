@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit } from '@/components/ui/icons';
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useSales, useCreateSale, useUpdateSale, useDeleteSale } from "@/hooks/useSales";
