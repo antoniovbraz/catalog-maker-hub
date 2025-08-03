@@ -1,4 +1,4 @@
-import { Search, Bell, User, LogOut, Settings, Zap } from "lucide-react";
+import { Search, Bell, User, LogOut, Settings, Zap, Command } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -6,9 +6,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 export function AppHeader() {
   const { user, profile, signOut } = useAuth();
+  const [searchValue, setSearchValue] = useState("");
 
   const getUserInitials = (name?: string) => {
     if (!name) return 'U';
@@ -33,19 +35,23 @@ export function AppHeader() {
           
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg">
-              <Zap className="w-5 h-5 text-primary" />
+            <div className="flex items-center justify-center w-8 h-8 bg-gradient-primary rounded-lg shadow-card">
+              <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="font-semibold text-lg bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hidden sm:inline">
-              Peepers Hub
+            <span className="font-bold text-lg bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hidden sm:inline">
+              Catalog Maker Hub
             </span>
           </div>
           
-          <div className="relative max-w-md flex-1">
+          {/* Global Search with improved styling */}
+          <div className="relative max-w-lg flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Command className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Buscar produtos, categorias..."
-              className="pl-10 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
+              placeholder="Buscar produtos, categorias, marketplaces... (Ctrl+K)"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="pl-10 pr-10 bg-muted/50 border-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:bg-background transition-all duration-200"
             />
           </div>
         </div>

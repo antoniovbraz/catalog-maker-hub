@@ -6,4 +6,5 @@ export { FormField } from "./FormField";
 export { MiniSparkline } from "./MiniSparkline";
 export { MiniProgressBar } from "./MiniProgressBar";
 export { EnhancedTooltip } from "./EnhancedTooltip";
+export { Breadcrumbs } from "./Breadcrumbs";
 export type { Column, DataTableProps } from "./DataTable";

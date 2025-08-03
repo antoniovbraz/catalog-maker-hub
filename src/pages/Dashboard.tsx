@@ -8,15 +8,20 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Dashboard - Comparação de Preços</CardTitle>
-            <CardDescription>
-              Compare preços e margens entre diferentes marketplaces para um produto
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            📊 Dashboard
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Compare preços e margens entre diferentes marketplaces para seus produtos
+          </p>
+        </div>
+
+        {/* Main Content */}
+        <Card className="shadow-card border-0 bg-gradient-subtle">
+          <CardContent className="p-6">
             <DashboardForm />
           </CardContent>
         </Card>

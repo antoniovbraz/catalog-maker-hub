@@ -173,16 +173,21 @@ export const PricingForm = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Form Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Calculadora de Preços</CardTitle>
+      <Card className="shadow-form border border-border/50">
+        <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
+          <CardTitle className="text-xl">📊 Calculadora de Preços</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="product">Produto *</Label>
+        <CardContent className="space-y-6 p-6">
+          {/* Seção de Seleção */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+              🎯 Seleção de Produto e Marketplace
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="product" className="text-sm font-medium">Produto *</Label>
               <Select 
                 value={formData.product_id} 
                 onValueChange={(value) => {
@@ -213,8 +218,8 @@ export const PricingForm = () => {
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor="marketplace">Marketplace *</Label>
+              <div>
+                <Label htmlFor="marketplace" className="text-sm font-medium">Marketplace *</Label>
               <Select 
                 value={formData.marketplace_id} 
                 onValueChange={(value) => {
@@ -244,11 +249,17 @@ export const PricingForm = () => {
                </SelectContent>
               </Select>
             </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="taxa_cartao">Taxa de Cartão (%)</Label>
+          {/* Seção de Configurações */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+              ⚙️ Configurações de Margem
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="taxa_cartao" className="text-sm font-medium">Taxa de Cartão (%)</Label>
               <Input
                 id="taxa_cartao"
                 type="number"
@@ -259,8 +270,8 @@ export const PricingForm = () => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="provisao_desconto">Provisão de Desconto (%)</Label>
+              <div>
+                <Label htmlFor="provisao_desconto" className="text-sm font-medium">Provisão de Desconto (%)</Label>
               <Input
                 id="provisao_desconto"
                 type="number"
@@ -271,8 +282,8 @@ export const PricingForm = () => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="margem_desejada">Margem Desejada (%)</Label>
+              <div>
+                <Label htmlFor="margem_desejada" className="text-sm font-medium">Margem Desejada (%)</Label>
               <Input
                 id="margem_desejada"
                 type="number"
@@ -282,10 +293,16 @@ export const PricingForm = () => {
                 placeholder="Ex: 25"
               />
             </div>
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="preco_praticado">Preço de Venda Praticado (R$) - Opcional</Label>
+          {/* Seção de Análise */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+              📈 Análise de Preço Praticado
+            </h3>
+            <div>
+              <Label htmlFor="preco_praticado" className="text-sm font-medium">Preço de Venda Praticado (R$) - Opcional</Label>
             <Input
               id="preco_praticado"
               type="number"
@@ -294,15 +311,17 @@ export const PricingForm = () => {
               onChange={(e) => handleInputChange("preco_praticado", e.target.value)}
               placeholder="Ex: 199.90"
             />
+            </div>
           </div>
           
-          <div className="flex gap-2">
+          {/* Botões de Ação */}
+          <div className="flex gap-3 pt-4 border-t border-border">
             <Button
               onClick={handleCalculate}
               disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
-              className="flex-1"
+              className="flex-1 h-11 bg-gradient-primary hover:bg-gradient-primary/90 shadow-hover"
             >
-              {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "Calcular"}
+              {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "🧮 Calcular Preço"}
             </Button>
             
             {pricingResult && (
@@ -310,8 +329,9 @@ export const PricingForm = () => {
                 onClick={handleSave}
                 disabled={savePricingMutation.isPending}
                 variant="secondary"
+                className="h-11 min-w-[120px] shadow-form"
               >
-                {savePricingMutation.isPending ? "Salvando..." : "Salvar"}
+                {savePricingMutation.isPending ? "Salvando..." : "💾 Salvar"}
               </Button>
             )}
           </div>
@@ -319,11 +339,11 @@ export const PricingForm = () => {
       </Card>
 
       {/* Results Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Resultado do Cálculo</CardTitle>
+      <Card className="shadow-form border border-border/50">
+        <CardHeader className="bg-gradient-card text-white rounded-t-lg">
+          <CardTitle className="text-xl">📊 Resultado do Cálculo</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {pricingResult ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-2 text-sm">
