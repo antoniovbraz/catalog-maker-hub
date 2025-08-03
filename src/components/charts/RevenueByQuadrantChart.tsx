@@ -2,6 +2,7 @@ import React from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { formatarMoeda } from "@/utils/pricing";
 import { ChartTooltipProps } from '@/types/charts';
+import { colors } from "@/styles/tokens";
 
 interface ProductStrategy {
   product_id: string;
@@ -18,10 +19,10 @@ interface RevenueByQuadrantChartProps {
 }
 
 const QUADRANT_CONFIG = {
-  alta_margem_alto_giro: { name: "⭐ Estrelas", color: "#22c55e" },
-  alta_margem_baixo_giro: { name: "💎 Joias", color: "#3b82f6" },
-  baixa_margem_alto_giro: { name: "🔄 Movimento", color: "#eab308" },
-  baixa_margem_baixo_giro: { name: "❓ Questionáveis", color: "#ef4444" },
+  alta_margem_alto_giro: { name: "⭐ Estrelas", color: colors.success.DEFAULT },
+  alta_margem_baixo_giro: { name: "💎 Joias", color: colors.primary.DEFAULT },
+  baixa_margem_alto_giro: { name: "🔄 Movimento", color: colors.warning.DEFAULT },
+  baixa_margem_baixo_giro: { name: "❓ Questionáveis", color: colors.destructive.DEFAULT },
 };
 
 export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ data }) => {

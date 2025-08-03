@@ -3,6 +3,7 @@ import { LineChart, Line, ResponsiveContainer } from "recharts"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { colors } from "@/styles/tokens"
 
 const sparklineVariants = cva("", {
   variants: {
@@ -24,7 +25,7 @@ interface SparklineProps
   stroke?: string
 }
 
-function Sparkline({ data, stroke = "hsl(var(--primary))", size, className, ...props }: SparklineProps) {
+function Sparkline({ data, stroke = colors.primary.DEFAULT, size, className, ...props }: SparklineProps) {
   const chartData = data.map((value, index) => ({ value, index }))
 
   return (

@@ -16,6 +16,7 @@ import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
 import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
 import { PRICING_CONFIG } from "@/lib/config";
 import { useLogger } from "@/utils/logger";
+import { colors } from "@/styles/tokens";
 import { 
   DndContext, 
   closestCenter, 
@@ -157,7 +158,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           </div>
           <Sparkline
             data={sparklineData}
-            stroke={result.margem_percentual >= 15 ? "hsl(var(--success))" : "hsl(var(--warning))"}
+            stroke={result.margem_percentual >= 15 ? colors.success.DEFAULT : colors.warning.DEFAULT}
             size="sm"
           />
         </CardTitle>
