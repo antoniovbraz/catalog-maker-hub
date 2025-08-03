@@ -19,7 +19,7 @@
 #### **3. Funcionalidades Pendentes 100% Completas**
 - ✅ `src/services/commissions.ts` - CRUD completo
 - ✅ `src/hooks/useCommissions.ts` - React Query integrado
-- ✅ `CommissionForm.tsx` - Formulário funcional completo
+- ✅ `CommissionFormEnhanced.tsx` - Formulário funcional completo
 - ✅ Validações de negócio implementadas
 
 #### **4. Arquitetura de Excelência**
