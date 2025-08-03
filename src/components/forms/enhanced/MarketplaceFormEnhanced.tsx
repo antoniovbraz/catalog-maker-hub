@@ -11,11 +11,13 @@ import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";
 
 interface MarketplaceFormEnhancedProps {
   editingMarketplace?: MarketplaceType | null;
+  creatingModalityForPlatform?: string | null;
   onCancelEdit?: () => void;
 }
 
 export function MarketplaceFormEnhanced({ 
   editingMarketplace, 
+  creatingModalityForPlatform,
   onCancelEdit 
 }: MarketplaceFormEnhancedProps) {
   const [formData, setFormData] = useState<MarketplaceFormData>({
@@ -34,6 +36,7 @@ export function MarketplaceFormEnhanced({
   const updateMutation = useUpdateMarketplace();
 
   const isEditing = !!editingMarketplace;
+  const isCreatingModality = !!creatingModalityForPlatform;
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   useEffect(() => {
@@ -49,18 +52,28 @@ export function MarketplaceFormEnhanced({
           : [],
       });
       setIsDirty(false);
+    } else if (creatingModalityForPlatform) {
+      setFormData({
+        name: "",
+        description: "",
+        url: "",
+        platform_id: creatingModalityForPlatform,
+        marketplace_type: "modality",
+        category_restrictions: [],
+      });
+      setIsDirty(false);
     } else {
       setFormData({
         name: "",
         description: "",
         url: "",
         platform_id: null,
-        marketplace_type: "modality",
+        marketplace_type: "platform",
         category_restrictions: [],
       });
       setIsDirty(false);
     }
-  }, [editingMarketplace]);
+  }, [editingMarketplace, creatingModalityForPlatform]);
 
   const handleInputChange = (field: keyof MarketplaceFormData, value: string | null | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -85,10 +98,11 @@ export function MarketplaceFormEnhanced({
             description: "",
             url: "",
             platform_id: null,
-            marketplace_type: "modality",
+            marketplace_type: isCreatingModality ? "modality" : "platform",
             category_restrictions: [],
           });
           setIsDirty(false);
+          onCancelEdit?.();
         }
       });
     }
@@ -100,7 +114,7 @@ export function MarketplaceFormEnhanced({
       description: "",
       url: "",
       platform_id: null,
-      marketplace_type: "modality",
+      marketplace_type: "platform",
       category_restrictions: [],
     });
     setIsDirty(false);
@@ -246,17 +260,37 @@ export function MarketplaceFormEnhanced({
     }
   ];
 
+  const getFormTitle = () => {
+    if (isEditing) {
+      return `Editar ${editingMarketplace?.marketplace_type === 'platform' ? 'Plataforma' : 'Modalidade'}`;
+    }
+    if (isCreatingModality) {
+      return 'Nova Modalidade';
+    }
+    return 'Nova Plataforma';
+  };
+
+  const getFormDescription = () => {
+    if (isEditing) {
+      return `Edite as informações da ${editingMarketplace?.marketplace_type === 'platform' ? 'plataforma' : 'modalidade'}`;
+    }
+    if (isCreatingModality) {
+      return 'Adicione uma nova modalidade para esta plataforma';
+    }
+    return 'Crie uma nova plataforma de marketplace';
+  };
+
   return (
     <SmartForm
-      title={isEditing ? "Editar Marketplace" : "Novo Marketplace"}
-      description={isEditing ? "Atualize as informações" : "Configure uma nova plataforma ou modalidade"}
+      title={getFormTitle()}
+      description={getFormDescription()}
       sections={sections}
       isEditing={isEditing}
       isDirty={isDirty}
       isSubmitting={isSubmitting}
       onSubmit={handleSubmit}
-      onCancel={isEditing ? handleCancel : undefined}
-      submitLabel={isEditing ? "Atualizar" : "Criar"}
+      onCancel={handleCancel}
+      submitLabel={isEditing ? "Salvar Alterações" : (isCreatingModality ? "Criar Modalidade" : "Criar Plataforma")}
     />
   );
 }

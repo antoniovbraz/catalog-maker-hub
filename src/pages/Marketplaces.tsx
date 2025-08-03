@@ -1,102 +1,62 @@
 import { Store, Plus, Upload, Download } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { DataVisualization } from "@/components/ui/data-visualization";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { MarketplaceFormEnhanced } from "@/components/forms/enhanced/MarketplaceFormEnhanced";
+import { MarketplaceHierarchyCard } from "@/components/marketplace/MarketplaceHierarchyCard";
 import { useMarketplacesHierarchical, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType } from "@/types/marketplaces";
 import { useState } from "react";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 
 const Marketplaces = () => {
   const { data: hierarchicalMarketplaces = [], isLoading } = useMarketplacesHierarchical();
   const deleteMutation = useDeleteMarketplace();
   const [editingMarketplace, setEditingMarketplace] = useState<MarketplaceType | null>(null);
+  const [creatingModalityForPlatform, setCreatingModalityForPlatform] = useState<string | null>(null);
 
-  // Flatten hierarchical data for table view
-  const flattenedMarketplaces = hierarchicalMarketplaces.flatMap(hierarchy => [
-    hierarchy.parent,
-    ...hierarchy.children
-  ]);
+  // Calculate stats from hierarchical data
+  const totalPlatforms = hierarchicalMarketplaces.length;
+  const totalModalities = hierarchicalMarketplaces.reduce((acc, h) => acc + h.children.length, 0);
+  const totalMarketplaces = totalPlatforms + totalModalities;
+  
+  const configuredPlatforms = hierarchicalMarketplaces.filter(h => h.parent.url && h.parent.description).length;
+  const configuredModalities = hierarchicalMarketplaces.reduce((acc, h) => 
+    acc + h.children.filter(m => m.url && m.description).length, 0
+  );
+  const configuredMarketplaces = configuredPlatforms + configuredModalities;
 
-  const totalMarketplaces = flattenedMarketplaces.length;
-  const configuredMarketplaces = flattenedMarketplaces.filter(m => m.url && m.description).length;
+  const handleEditPlatform = (platform: MarketplaceType) => {
+    setEditingMarketplace(platform);
+    setCreatingModalityForPlatform(null);
+  };
 
-  const columns = [
-    {
-      key: "name",
-      header: "Nome",
-      sortable: true,
-      render: (marketplace: MarketplaceType) => (
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{marketplace.name}</span>
-          <StatusBadge 
-            status={marketplace.marketplace_type === 'platform' ? 'configured' : 'warning'} 
-            label={marketplace.marketplace_type === 'platform' ? 'Plataforma' : 'Modalidade'} 
-            size="sm" 
-          />
-          {marketplace.marketplace_type === 'modality' && marketplace.platform_id && (
-            <span className="text-xs text-muted-foreground">↳</span>
-          )}
-        </div>
-      )
-    },
-    {
-      key: "description",
-      header: "Descrição",
-      render: (marketplace: MarketplaceType) => (
-        <span className="text-muted-foreground">
-          {marketplace.description || "Sem descrição"}
-        </span>
-      )
-    },
-    {
-      key: "url",
-      header: "URL",
-      render: (marketplace: MarketplaceType) => (
-        marketplace.url ? (
-          <a
-            href={marketplace.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            {marketplace.url}
-          </a>
-        ) : (
-          <span className="text-muted-foreground">Não configurada</span>
-        )
-      )
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (marketplace: MarketplaceType) => {
-        const isConfigured = marketplace.url && marketplace.description;
-        return (
-          <StatusBadge
-            status={isConfigured ? "configured" : "pending"}
-            label={isConfigured ? "Configurado" : "Pendente"}
-          />
-        );
-      }
-    }
-  ];
+  const handleEditModality = (modality: MarketplaceType) => {
+    setEditingMarketplace(modality);
+    setCreatingModalityForPlatform(null);
+  };
 
-  const actions = [
-    {
-      label: "Editar",
-      icon: <Store className="w-4 h-4" />,
-      onClick: (marketplace: MarketplaceType) => setEditingMarketplace(marketplace),
-      variant: "outline" as const
-    },
-    {
-      label: "Excluir",
-      icon: <Store className="w-4 h-4" />,
-      onClick: (marketplace: MarketplaceType) => deleteMutation.mutate(marketplace.id),
-      variant: "destructive" as const
-    }
-  ];
+  const handleAddModality = (platformId: string) => {
+    setEditingMarketplace(null);
+    setCreatingModalityForPlatform(platformId);
+  };
+
+  const handleCreateNewPlatform = () => {
+    setEditingMarketplace(null);
+    setCreatingModalityForPlatform(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMarketplace(null);
+    setCreatingModalityForPlatform(null);
+  };
+
+  const handleDeletePlatform = (platformId: string) => {
+    deleteMutation.mutate(platformId);
+  };
+
+  const handleDeleteModality = (modalityId: string) => {
+    deleteMutation.mutate(modalityId);
+  };
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
@@ -113,9 +73,9 @@ const Marketplaces = () => {
         <Download className="w-4 h-4 mr-2" />
         Exportar
       </Button>
-      <Button size="sm">
+      <Button size="sm" onClick={handleCreateNewPlatform}>
         <Plus className="w-4 h-4 mr-2" />
-        Novo Marketplace
+        Nova Plataforma
       </Button>
     </div>
   );
@@ -134,21 +94,55 @@ const Marketplaces = () => {
       <div className="xl:col-span-5 space-y-lg">
         <MarketplaceFormEnhanced
           editingMarketplace={editingMarketplace}
-          onCancelEdit={() => setEditingMarketplace(null)}
+          creatingModalityForPlatform={creatingModalityForPlatform}
+          onCancelEdit={handleCancelEdit}
         />
       </div>
 
-      {/* Data Visualization Column */}
+      {/* Hierarchy Visualization Column */}
       <div className="xl:col-span-7">
-        <DataVisualization
-          title="Marketplaces Cadastrados"
-          description="Visualize e gerencie todos os marketplaces e suas modalidades"
-          data={flattenedMarketplaces}
-          columns={columns}
-          actions={actions}
-          isLoading={isLoading}
-          searchable={true}
-        />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Plataformas e Modalidades</h3>
+              <div className="text-sm text-muted-foreground">
+                {totalPlatforms} plataformas, {totalModalities} modalidades
+              </div>
+            </div>
+            
+            {hierarchicalMarketplaces.length === 0 ? (
+              <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                <Store className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h4 className="text-lg font-medium mb-2">Nenhuma plataforma cadastrada</h4>
+                <p className="text-muted-foreground mb-4">
+                  Comece criando sua primeira plataforma de marketplace
+                </p>
+                <Button onClick={handleCreateNewPlatform}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Criar Primeira Plataforma
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {hierarchicalMarketplaces.map((hierarchy) => (
+                  <MarketplaceHierarchyCard
+                    key={hierarchy.parent.id}
+                    hierarchy={hierarchy}
+                    onEditPlatform={handleEditPlatform}
+                    onEditModality={handleEditModality}
+                    onAddModality={handleAddModality}
+                    onDeletePlatform={handleDeletePlatform}
+                    onDeleteModality={handleDeleteModality}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </ConfigurationPageLayout>
   );
