@@ -67,6 +67,24 @@ All colors MUST be HSL.
     --config-secondary: 220 13% 95%;
     --config-accent: 142 76% 36%;
     --config-warning: 38 92% 50%;
+
+    /* Typography */
+    --font-h1: 2.25rem;
+    --font-h2: 1.875rem;
+    --font-h3: 1.5rem;
+    --font-h4: 1.25rem;
+    --font-h5: 1.125rem;
+    --font-h6: 1rem;
+    --font-body: 1rem;
+    --font-caption: 0.875rem;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
   }
 
   .dark {

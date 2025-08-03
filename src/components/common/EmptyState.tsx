@@ -1,4 +1,5 @@
 import { PackageOpen } from "lucide-react";
+import { Heading, Text } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
@@ -17,22 +18,27 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <div className={cn(
-      "flex flex-col items-center justify-center py-12 px-4 text-center",
-      className
-    )}>
-      <div className="rounded-full bg-muted p-4 mb-4">
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center py-2xl px-md text-center",
+        className
+      )}
+    >
+      <div className="rounded-full bg-muted p-md mb-md">
         {icon || <PackageOpen className="h-8 w-8 text-muted-foreground" />}
       </div>
-      
-      <h3 className="text-lg font-semibold text-foreground mb-2">
+
+      <Heading variant="h3" className="text-foreground mb-sm">
         {message}
-      </h3>
-      
+      </Heading>
+
       {description && (
-        <p className="text-muted-foreground text-sm mb-6 max-w-sm">
+        <Text
+          variant="caption"
+          className="text-muted-foreground mb-lg max-w-sm"
+        >
           {description}
-        </p>
+        </Text>
       )}
       
       {action}
