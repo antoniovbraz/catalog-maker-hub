@@ -1,7 +1,7 @@
 import { Store, Plus, Upload, Download } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
-import { MarketplaceFormEnhanced } from "@/components/forms/enhanced/MarketplaceFormEnhanced";
+import { SimpleMarketplaceForm } from "@/components/forms/enhanced/SimpleMarketplaceForm";
 import { MarketplaceHierarchyCard } from "@/components/marketplace/MarketplaceHierarchyCard";
 import { useMarketplacesHierarchical, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType } from "@/types/marketplaces";
@@ -92,10 +92,10 @@ const Marketplaces = () => {
     >
       {/* Form Column */}
       <div className="xl:col-span-5 space-y-lg">
-        <MarketplaceFormEnhanced
+        <SimpleMarketplaceForm
           editingMarketplace={editingMarketplace}
           creatingModalityForPlatform={creatingModalityForPlatform}
-          onCancelEdit={handleCancelEdit}
+          onCancel={handleCancelEdit}
         />
       </div>
 
