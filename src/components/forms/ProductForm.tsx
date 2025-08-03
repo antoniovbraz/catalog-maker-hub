@@ -12,7 +12,7 @@ import { useProductsWithCategories, useCreateProduct, useUpdateProduct, useDelet
 import { useCategories } from "@/hooks/useCategories";
 import { ProductWithCategory, ProductFormData } from "@/types/products";
 import { formatarMoeda } from "@/utils/pricing";
-import { DataTable, Column } from "@/components/common/DataTable";
+import { DataVisualization } from "@/components/ui/data-visualization";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -171,15 +171,15 @@ export const ProductForm = () => {
   const custoTotal = formData.cost_unit + formData.packaging_cost;
 
   // Configurar colunas da tabela
-  const columns: Column<ProductWithCategory>[] = [
+  const columns = [
     {
       key: 'name',
       header: 'Nome',
-      render: (value, item) => (
+      render: (item: ProductWithCategory) => (
         <div className="flex items-center gap-2">
           <Package className="w-4 h-4 text-muted-foreground" />
           <div>
-            <span className="font-medium">{value as string}</span>
+            <span className="font-medium">{item.name}</span>
             {item.sku && (
               <Badge variant="outline" className="ml-2 text-xs">
                 {item.sku}
@@ -192,28 +192,42 @@ export const ProductForm = () => {
     {
       key: 'categories.name',
       header: 'Categoria',
-      render: (value) => (
+      render: (item: ProductWithCategory) => (
         <div className="flex items-center gap-1">
           <Tag className="w-3 h-3 text-muted-foreground" />
-          <span>{value as string || "Sem categoria"}</span>
+          <span>{item.categories?.name || "Sem categoria"}</span>
         </div>
       )
     },
     {
       key: 'cost_unit',
       header: 'Custo Unit.',
-      render: (value) => (
-        <span className="font-mono text-sm">{formatarMoeda(value as number || 0)}</span>
+      render: (item: ProductWithCategory) => (
+        <span className="font-mono text-sm">{formatarMoeda(item.cost_unit || 0)}</span>
       )
     },
     {
       key: 'packaging_cost',
       header: 'Embalagem',
-      render: (value) => (
+      render: (item: ProductWithCategory) => (
         <span className="font-mono text-sm text-muted-foreground">
-          {formatarMoeda(value as number || 0)}
+          {formatarMoeda(item.packaging_cost || 0)}
         </span>
       )
+    }
+  ];
+
+  const actions = [
+    {
+      label: 'Editar',
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (product: ProductWithCategory) => handleEdit(product)
+    },
+    {
+      label: 'Excluir',
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (product: ProductWithCategory) => deleteMutation.mutate(product.id),
+      variant: 'destructive' as const
     }
   ];
 
@@ -423,16 +437,20 @@ export const ProductForm = () => {
       </Card>
 
       {/* Lista de Produtos */}
-      <DataTable
+      <DataVisualization
+        title="📦 Produtos Cadastrados"
         data={products}
         columns={columns}
-        onEdit={handleEdit}
-        onDelete={(product) => deleteMutation.mutate(product.id)}
-        loading={isLoading}
-        title="📦 Produtos Cadastrados"
-        searchPlaceholder="Buscar por nome, SKU ou categoria..."
-        emptyMessage="Nenhum produto cadastrado"
-        emptyDescription="Crie seu primeiro produto usando o formulário acima"
+        actions={actions}
+        isLoading={isLoading}
+        emptyState={
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Nenhum produto cadastrado</p>
+            <p className="text-sm text-muted-foreground">
+              Crie seu primeiro produto usando o formulário acima
+            </p>
+          </div>
+        }
       />
     </div>
   );
