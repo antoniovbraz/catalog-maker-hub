@@ -95,7 +95,7 @@ export const PricingForm = () => {
 
       // Verificar se temos um resultado válido
       if (result && typeof result === 'object') {
-        const typedResult = result as PricingResult;
+        const typedResult = result as unknown as PricingResult;
         
         
         setPricingResult(typedResult);
@@ -123,7 +123,7 @@ export const PricingForm = () => {
             });
 
             if (margemResult && typeof margemResult === 'object') {
-              setMargemRealResult(margemResult as MargemRealResult);
+              setMargemRealResult(margemResult as unknown as MargemRealResult);
             }
           } catch (error) {
             logger.error('Erro ao calcular margem real', error);

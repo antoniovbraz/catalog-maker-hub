@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { ConfigurationHeader } from "./ConfigurationHeader";
+import { PageTransition } from "@/components/common/PageTransition";
 
 interface ConfigurationPageLayoutProps {
   title: string;
@@ -34,10 +35,12 @@ export function ConfigurationPageLayout({
         progressTotal={progressTotal}
       />
       
-      <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          {children}
-        </div>
+      <main className="container mx-auto px-4 sm:px-6 py-6">
+        <PageTransition>
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            {children}
+          </div>
+        </PageTransition>
       </main>
     </div>
   );

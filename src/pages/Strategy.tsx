@@ -1,21 +1,24 @@
 import { StrategyForm } from "@/components/forms/StrategyForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
+import { BarChart3 } from "@/components/ui/icons";
 
 const Strategy = () => {
+  const breadcrumbs = [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Estratégia" }
+  ];
+
   return (
-    <div className="p-lg">
-      <Card>
-        <CardHeader>
-          <CardTitle>Estratégia de Precificação</CardTitle>
-          <CardDescription>
-            Analise produtos por margem e giro de vendas usando matriz estratégica
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <StrategyForm />
-        </CardContent>
-      </Card>
-    </div>
+    <ConfigurationPageLayout
+      title="Estratégia de Precificação"
+      description="Analise produtos por margem e giro de vendas usando matriz estratégica"
+      icon={<BarChart3 className="w-6 h-6" />}
+      breadcrumbs={breadcrumbs}
+    >
+      <div className="xl:col-span-12">
+        <StrategyForm />
+      </div>
+    </ConfigurationPageLayout>
   );
 };
 

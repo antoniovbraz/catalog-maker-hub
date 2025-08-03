@@ -10,7 +10,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
 
   async getAll(): Promise<T[]> {
     const { data, error } = await supabase
-      .from(this.tableName)
+      .from(this.tableName as any)
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -20,7 +20,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
 
   async getById(id: string): Promise<T | null> {
     const { data, error } = await supabase
-      .from(this.tableName)
+      .from(this.tableName as any)
       .select('*')
       .eq('id', id)
       .single();
@@ -37,8 +37,8 @@ export abstract class BaseService<T = Record<string, unknown>> {
     const dataWithTenant = await this.addTenantId(data);
     
     const { data: result, error } = await supabase
-      .from(this.tableName)
-      .insert(dataWithTenant as T)
+      .from(this.tableName as any)
+      .insert(dataWithTenant as any)
       .select()
       .single();
 
@@ -76,8 +76,8 @@ export abstract class BaseService<T = Record<string, unknown>> {
 
   async update(id: string, data: Partial<T>): Promise<T> {
     const { data: result, error } = await supabase
-      .from(this.tableName)
-      .update(data as T)
+      .from(this.tableName as any)
+      .update(data as any)
       .eq('id', id)
       .select()
       .single();
@@ -88,7 +88,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase
-      .from(this.tableName)
+      .from(this.tableName as any)
       .delete()
       .eq('id', id);
 

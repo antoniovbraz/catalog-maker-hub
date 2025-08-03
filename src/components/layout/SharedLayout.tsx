@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
 import { AppBreadcrumbs } from "@/components/common/AppBreadcrumbs";
+import { PageTransition } from "@/components/common/PageTransition";
 
 interface SharedLayoutProps {
   children: ReactNode;
@@ -17,15 +18,12 @@ export function SharedLayout({ children }: SharedLayoutProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           <AppHeader />
           
-          {/* Breadcrumbs Section */}
-          <div className="border-b border-border bg-muted/30 px-6 py-3">
-            <AppBreadcrumbs />
-          </div>
-          
-          {/* Main Content with improved container */}
-          <main className="flex-1 overflow-auto">
-            <div className="container max-w-7xl mx-auto p-lg space-y-lg">
-              {children}
+          {/* Main Content with improved container and transitions */}
+          <main className="flex-1 overflow-auto bg-gradient-subtle">
+            <div className="container max-w-7xl mx-auto p-6 space-y-6">
+              <PageTransition>
+                {children}
+              </PageTransition>
             </div>
           </main>
         </div>

@@ -43,9 +43,10 @@ export const ProductForm = () => {
     
     switch (name) {
       case 'name':
-        if (!value.trim()) {
+        const nameValue = String(value);
+        if (!nameValue.trim()) {
           newErrors.name = 'Nome é obrigatório';
-        } else if (value.length < 2) {
+        } else if (nameValue.length < 2) {
           newErrors.name = 'Nome deve ter pelo menos 2 caracteres';
         } else {
           delete newErrors.name;

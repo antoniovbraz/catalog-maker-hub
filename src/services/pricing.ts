@@ -141,17 +141,17 @@ export class PricingService extends BaseService<SavedPricingType> {
           const updatedData = {
             product_id: pricing.product_id,
             marketplace_id: pricing.marketplace_id,
-            custo_total: newPricing.custo_total,
-            valor_fixo: newPricing.valor_fixo,
-            frete: newPricing.frete,
-            comissao: newPricing.comissao,
+            custo_total: Number(newPricing.custo_total),
+            valor_fixo: Number(newPricing.valor_fixo),
+            frete: Number(newPricing.frete),
+            comissao: Number(newPricing.comissao),
             taxa_cartao: pricing.taxa_cartao,
             provisao_desconto: pricing.provisao_desconto,
             margem_desejada: pricing.margem_desejada,
-            preco_sugerido: newPricing.preco_sugerido,
+            preco_sugerido: Number(newPricing.preco_sugerido),
             preco_praticado: pricing.preco_praticado,
-            margem_unitaria: newPricing.margem_unitaria,
-            margem_percentual: newPricing.margem_percentual
+            margem_unitaria: Number(newPricing.margem_unitaria),
+            margem_percentual: Number(newPricing.margem_percentual)
           };
 
           await this.upsert(updatedData);
