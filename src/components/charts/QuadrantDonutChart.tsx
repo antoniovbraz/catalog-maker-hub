@@ -1,6 +1,7 @@
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { ChartTooltipProps, ChartLegendProps } from '@/types/charts';
+import { colors } from "@/styles/tokens";
 
 interface QuadrantCounts {
   alta_margem_alto_giro: number;
@@ -14,33 +15,33 @@ interface QuadrantDonutChartProps {
 }
 
 const QUADRANT_DATA = [
-  { 
-    name: "Estrelas", 
-    key: "alta_margem_alto_giro", 
-    color: "#22c55e",
+  {
+    name: "Estrelas",
+    key: "alta_margem_alto_giro",
+    color: colors.success.DEFAULT,
     emoji: "⭐",
-    description: "Alta Margem + Alto Giro"
+    description: "Alta Margem + Alto Giro",
   },
-  { 
-    name: "Joias", 
-    key: "alta_margem_baixo_giro", 
-    color: "#3b82f6",
+  {
+    name: "Joias",
+    key: "alta_margem_baixo_giro",
+    color: colors.primary.DEFAULT,
     emoji: "💎",
-    description: "Alta Margem + Baixo Giro"
+    description: "Alta Margem + Baixo Giro",
   },
-  { 
-    name: "Movimento", 
-    key: "baixa_margem_alto_giro", 
-    color: "#eab308",
+  {
+    name: "Movimento",
+    key: "baixa_margem_alto_giro",
+    color: colors.warning.DEFAULT,
     emoji: "🔄",
-    description: "Baixa Margem + Alto Giro"
+    description: "Baixa Margem + Alto Giro",
   },
-  { 
-    name: "Questionáveis", 
-    key: "baixa_margem_baixo_giro", 
-    color: "#ef4444",
+  {
+    name: "Questionáveis",
+    key: "baixa_margem_baixo_giro",
+    color: colors.destructive.DEFAULT,
     emoji: "❓",
-    description: "Baixa Margem + Baixo Giro"
+    description: "Baixa Margem + Baixo Giro",
   },
 ];
 
@@ -78,8 +79,8 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
       <div className="flex flex-wrap justify-center gap-4 mt-4">
         {payload?.map((entry, index: number) => (
           <div key={index} className="flex items-center gap-2 text-sm">
-            <div 
-              className="w-3 h-3 rounded-full" 
+            <div
+              className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
             <span>{String(entry.payload?.emoji || '')} {entry.value}</span>

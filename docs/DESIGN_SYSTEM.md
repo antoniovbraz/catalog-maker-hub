@@ -4,9 +4,7 @@
 O design system centraliza estilos, componentes e padrões de interface para garantir consistência e escalabilidade em toda a aplicação.
 
 ## Tokens
-- **Cores**: definidos no `tailwind.config.ts` como tokens de marca e temas.
-- **Tipografia**: utiliza a família padrão do projeto com tamanhos em `rem`.
-- **Espaçamento**: valores de `spacing` do Tailwind servem como base para margens e paddings.
+- **Cores, tipografia e espaçamento**: centralizados em `src/styles/tokens.ts` e importados pelo `tailwind.config.ts` e pelos componentes que precisarem dessas variáveis.
 - **Radius**: tokens de borda preservam a identidade visual em elementos interativos.
 
 ## Componentes Base

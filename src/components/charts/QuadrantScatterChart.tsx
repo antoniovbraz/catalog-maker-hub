@@ -1,6 +1,7 @@
 import React from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { ChartTooltipProps } from '@/types/charts';
+import { colors } from "@/styles/tokens";
 
 interface ProductStrategy {
   product_id: string;
@@ -20,11 +21,16 @@ interface QuadrantScatterChartProps {
 
 const getQuadrantColor = (quadrant: ProductStrategy["quadrant"]) => {
   switch (quadrant) {
-    case "alta_margem_alto_giro": return "#22c55e"; // green
-    case "alta_margem_baixo_giro": return "#3b82f6"; // blue
-    case "baixa_margem_alto_giro": return "#eab308"; // yellow
-    case "baixa_margem_baixo_giro": return "#ef4444"; // red
-    default: return "#6b7280";
+    case "alta_margem_alto_giro":
+      return colors.success.DEFAULT;
+    case "alta_margem_baixo_giro":
+      return colors.primary.DEFAULT;
+    case "baixa_margem_alto_giro":
+      return colors.warning.DEFAULT;
+    case "baixa_margem_baixo_giro":
+      return colors.destructive.DEFAULT;
+    default:
+      return colors.muted.foreground;
   }
 };
 
@@ -107,7 +113,7 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
             y1="0%" 
             x2={`${giroLimitAlto}%`} 
             y2="100%" 
-            stroke="hsl(var(--muted-foreground))" 
+            stroke={colors.muted.foreground}
             strokeDasharray="5,5" 
             opacity={0.5}
           />
@@ -116,7 +122,7 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
             y1={`${100 - (margeLimitAlta / Math.max(...data.map(d => d.margin_percentage)) * 100)}%`} 
             x2="100%" 
             y2={`${100 - (margeLimitAlta / Math.max(...data.map(d => d.margin_percentage)) * 100)}%`} 
-            stroke="hsl(var(--muted-foreground))" 
+            stroke={colors.muted.foreground}
             strokeDasharray="5,5" 
             opacity={0.5}
           />
