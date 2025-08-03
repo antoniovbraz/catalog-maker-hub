@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { marketplacesService } from "@/services/marketplaces";
 import { MarketplaceFormData } from "@/types/marketplaces";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 export const MARKETPLACES_QUERY_KEY = "marketplaces";
 

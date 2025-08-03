@@ -13,7 +13,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { ProductWithCategory, ProductFormData } from "@/types/products";
 import { formatarMoeda } from "@/utils/pricing";
 import { DataVisualization } from "@/components/ui/data-visualization";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
 export const ProductForm = () => {

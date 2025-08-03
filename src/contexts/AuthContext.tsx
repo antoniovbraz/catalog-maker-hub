@@ -3,7 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthContextType, Profile } from '@/types/auth';
 import { authService } from '@/services/auth';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 import { useLogger } from '@/utils/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

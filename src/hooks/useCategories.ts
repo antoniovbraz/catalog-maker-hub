@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoriesService } from "@/services/categories";
 import { CategoryFormData } from "@/types/categories";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 export const CATEGORIES_QUERY_KEY = "categories";
 
