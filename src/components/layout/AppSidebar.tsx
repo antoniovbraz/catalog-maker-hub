@@ -99,22 +99,41 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
     const stored = localStorage.getItem(`sidebar-group-${title.toLowerCase()}`);
     return stored !== null ? JSON.parse(stored) : true;
   });
+  
+  const [userClosedManually, setUserClosedManually] = useState(false);
 
   const hasActiveItem = items.some(item => location.pathname === item.path);
 
+  // Auto-open only if user hasn't manually closed and there's an active item
   useEffect(() => {
-    if (hasActiveItem && !isOpen) {
+    if (hasActiveItem && !isOpen && !userClosedManually) {
       setIsOpen(true);
     }
-  }, [hasActiveItem, isOpen]);
+  }, [hasActiveItem, isOpen, userClosedManually]);
 
+  // Reset manual close flag when changing groups (no active items)
+  useEffect(() => {
+    if (!hasActiveItem) {
+      setUserClosedManually(false);
+    }
+  }, [hasActiveItem]);
+
+  // Save state to localStorage
   useEffect(() => {
     localStorage.setItem(`sidebar-group-${title.toLowerCase()}`, JSON.stringify(isOpen));
   }, [isOpen, title]);
 
+  // Handle manual toggle
+  const handleToggle = (newOpen: boolean) => {
+    setIsOpen(newOpen);
+    if (!newOpen && hasActiveItem) {
+      setUserClosedManually(true);
+    }
+  };
+
   return (
     <SidebarMenuItem>
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible open={isOpen} onOpenChange={handleToggle}>
         <CollapsibleTrigger asChild>
           <SidebarMenuButton className="w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200">
             <Icon className="w-5 h-5 shrink-0" />
