@@ -128,6 +128,7 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
                 )}
               </>
             )}
+            {collapsed && <span className="sr-only">{title}</span>}
           </SidebarMenuButton>
         </CollapsibleTrigger>
         {!collapsed && (

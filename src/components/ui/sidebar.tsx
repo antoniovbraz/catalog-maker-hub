@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,12 +65,13 @@ const SidebarProvider = React.forwardRef<
     },
     ref
   ) => {
-    const isMobile = useIsMobile()
+    const isDesktop = useMediaQuery("(min-width: 768px)")
+    const isMobile = !isDesktop
     const [openMobile, setOpenMobile] = React.useState(false)
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
+    const [_open, _setOpen] = React.useState(defaultOpen ?? isDesktop)
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
@@ -86,6 +87,14 @@ const SidebarProvider = React.forwardRef<
       },
       [setOpenProp, open]
     )
+
+    React.useEffect(() => {
+      if (!isDesktop) {
+        setOpen(false)
+      } else if (defaultOpen === undefined) {
+        setOpen(true)
+      }
+    }, [isDesktop, defaultOpen, setOpen])
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
@@ -204,7 +213,7 @@ const Sidebar = React.forwardRef<
             }
             side={side}
           >
-            <div className="flex h-full w-full flex-col">{children}</div>
+            <nav className="flex h-full w-full flex-col">{children}</nav>
           </SheetContent>
         </Sheet>
       )
@@ -244,12 +253,12 @@ const Sidebar = React.forwardRef<
           )}
           {...props}
         >
-          <div
+          <nav
             data-sidebar="sidebar"
             className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
           >
             {children}
-          </div>
+          </nav>
         </div>
       </div>
     )
