@@ -32,7 +32,62 @@ All colors MUST be HSL.
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 258 56% 52%;
-    --radius: 0.75rem;
+    --radius: 0rem; /* Corporate style: no rounding */
+
+    /* Sidebar System (adapted from corporate) */
+    --sidebar-background: 258 56% 52%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 220 13% 91%;
+    --sidebar-primary-foreground: 215 25% 27%;
+    --sidebar-accent: 258 56% 52%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 13% 85%;
+    --sidebar-ring: 258 56% 52%;
+
+    /* Gradients (adapted to light theme colors) */
+    --gradient-primary: linear-gradient(135deg, hsl(258 56% 52%), hsl(270 56% 60%));
+    --gradient-card: linear-gradient(135deg, hsl(248 25% 99%), hsl(220 13% 95%));
+    --gradient-subtle: linear-gradient(180deg, hsl(248 25% 99%) 0%, hsl(220 13% 95%) 100%);
+    --gradient-config: linear-gradient(135deg, hsl(258 56% 52%), hsl(270 56% 60%));
+
+    /* Enhanced Shadow System (adapted from corporate) */
+    --shadow-elegant: 0 10px 30px -10px hsl(258 56% 52% / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(258 56% 52% / 0.1);
+    --shadow-hover: 0 8px 30px -8px hsl(258 56% 52% / 0.15);
+    --shadow-form: 0 2px 10px -2px hsl(258 56% 52% / 0.08);
+    --shadow-floating: 0 20px 40px -12px hsl(258 56% 52% / 0.25);
+    --shadow-glow: 0 0 40px hsl(258 56% 52% / 0.3);
+
+    /* Animation Timings (from corporate) */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Configuration Colors (adapted) */
+    --config-primary: 258 56% 52%;
+    --config-secondary: 220 13% 95%;
+    --config-accent: 220 13% 91%;
+    --config-text: 215 25% 27%;
+    --config-background: 248 25% 99%;
+    --config-warning: 38 92% 50%;
+
+    /* Typography System (from corporate) */
+    --font-h1: 2.5rem;
+    --font-h2: 2rem;
+    --font-h3: 1.5rem;
+    --font-h4: 1.25rem;
+    --font-h5: 1.125rem;
+    --font-h6: 1rem;
+    --font-body: 0.875rem;
+    --font-caption: 0.75rem;
+
+    /* Spacing System (from corporate) */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
   }
 
   /* Corporate Theme - Serious and Professional */
@@ -115,31 +170,30 @@ All colors MUST be HSL.
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    --radius: 0rem; /* Corporate style: no rounding */
+
+    /* Sidebar System (adapted from corporate) */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -148,31 +202,45 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --radius: 0.75rem;
-    --gradient-primary: linear-gradient(135deg, hsl(258 56% 52%), hsl(270 56% 60%));
-    --gradient-card: linear-gradient(135deg, hsl(258 56% 52%), hsl(258 56% 45%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(258 56% 52% / 0.02));
-    --gradient-config: linear-gradient(135deg, hsl(258 56% 52%), hsl(270 56% 60%));
-    --shadow-elegant: 0 10px 30px -10px hsl(258 56% 52% / 0.2);
-    --shadow-card: 0 4px 20px hsl(258 56% 52% / 0.15);
-    --shadow-hover: 0 8px 25px -8px hsl(258 56% 52% / 0.25);
-    --shadow-form: 0 2px 10px hsl(258 56% 52% / 0.1);
-    --config-primary: 258 56% 52%;
+
+    /* Gradients (adapted to dark theme colors) */
+    --gradient-primary: linear-gradient(135deg, hsl(210 40% 98%), hsl(212.7 26.8% 83.9%));
+    --gradient-card: linear-gradient(135deg, hsl(222.2 84% 4.9%), hsl(217.2 32.6% 17.5%));
+    --gradient-subtle: linear-gradient(180deg, hsl(222.2 84% 4.9%) 0%, hsl(217.2 32.6% 17.5%) 100%);
+    --gradient-config: linear-gradient(135deg, hsl(210 40% 98%), hsl(212.7 26.8% 83.9%));
+
+    /* Enhanced Shadow System (adapted from corporate) */
+    --shadow-elegant: 0 10px 30px -10px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    --shadow-hover: 0 8px 30px -8px hsl(0 0% 0% / 0.35);
+    --shadow-form: 0 2px 10px -2px hsl(0 0% 0% / 0.25);
+    --shadow-floating: 0 20px 40px -12px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 40px hsl(210 40% 98% / 0.2);
+
+    /* Animation Timings (from corporate) */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Configuration Colors (adapted) */
+    --config-primary: 210 40% 98%;
     --config-secondary: 217.2 32.6% 17.5%;
-    --config-accent: 142 76% 36%;
+    --config-accent: 215 20.2% 65.1%;
+    --config-text: 210 40% 98%;
+    --config-background: 222.2 84% 4.9%;
     --config-warning: 38 92% 50%;
-    --font-h1: 2.25rem;
-    --font-h2: 1.875rem;
+
+    /* Typography System (from corporate) */
+    --font-h1: 2.5rem;
+    --font-h2: 2rem;
     --font-h3: 1.5rem;
     --font-h4: 1.25rem;
     --font-h5: 1.125rem;
     --font-h6: 1rem;
-    --font-body: 1rem;
-    --font-caption: 0.875rem;
+    --font-body: 0.875rem;
+    --font-caption: 0.75rem;
+
+    /* Spacing System (from corporate) */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
