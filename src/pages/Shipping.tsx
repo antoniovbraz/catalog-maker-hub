@@ -1,27 +1,24 @@
 import { ShippingRuleForm } from "@/components/forms/ShippingRuleForm";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Heading, Text } from "@/components/ui/typography";
+import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
+import { Truck } from "@/components/ui/icons";
 
 const Shipping = () => {
+  const breadcrumbs = [
+    { label: "Configurações", href: "/dashboard" },
+    { label: "Regras de Frete" }
+  ];
+
   return (
-    <div className="p-lg">
-      <Card>
-        <CardHeader>
-          <Heading
-            variant="h3"
-            className="font-semibold leading-none tracking-tight"
-          >
-            Regras de Frete
-          </Heading>
-          <Text className="text-sm text-muted-foreground">
-            Configure regras de frete por produto e marketplace
-          </Text>
-        </CardHeader>
-        <CardContent>
-          <ShippingRuleForm />
-        </CardContent>
-      </Card>
-    </div>
+    <ConfigurationPageLayout
+      title="Regras de Frete"
+      description="Configure regras de frete por produto e marketplace"
+      icon={<Truck className="w-6 h-6" />}
+      breadcrumbs={breadcrumbs}
+    >
+      <div className="xl:col-span-6">
+        <ShippingRuleForm />
+      </div>
+    </ConfigurationPageLayout>
   );
 };
 

@@ -1,27 +1,24 @@
 import { ProductForm } from "@/components/forms/ProductForm";
-import { Card, CardContent } from "@/components/ui/card";
-import { Heading, Text } from "@/components/ui/typography";
+import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
+import { Package } from "@/components/ui/icons";
 
 const Products = () => {
-  return (
-    <div className="space-y-lg">
-      {/* Page Header */}
-      <div className="space-y-sm">
-        <Heading variant="h1" className="tracking-tight">
-          📦 Produtos
-        </Heading>
-        <Text className="text-muted-foreground">
-          Cadastre e gerencie produtos com custos, impostos e categorias
-        </Text>
-      </div>
+  const breadcrumbs = [
+    { label: "Configurações", href: "/dashboard" },
+    { label: "Produtos" }
+  ];
 
-      {/* Main Content */}
-      <Card className="shadow-card border-0 bg-gradient-subtle">
-        <CardContent className="p-lg">
-          <ProductForm />
-        </CardContent>
-      </Card>
-    </div>
+  return (
+    <ConfigurationPageLayout
+      title="Gerenciar Produtos"
+      description="Cadastre e gerencie produtos com custos, impostos e categorias"
+      icon={<Package className="w-6 h-6" />}
+      breadcrumbs={breadcrumbs}
+    >
+      <div className="xl:col-span-6">
+        <ProductForm />
+      </div>
+    </ConfigurationPageLayout>
   );
 };
 
