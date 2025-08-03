@@ -24,7 +24,7 @@ export function ConfigurationHeader({
 }: ConfigurationHeaderProps) {
 
   return (
-    <header className="bg-card border-b border-border shadow-card">
+    <header className="bg-card border-b border-border">
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumbs */}
         {breadcrumbs.length > 0 && (

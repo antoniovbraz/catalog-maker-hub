@@ -1,12 +1,28 @@
 import { PricingForm } from "@/components/forms/PricingForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { Calculator } from "@/components/ui/icons";
+import { Calculator, Plus } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import { useFormVisibility } from "@/hooks/useFormVisibility";
 
 const Pricing = () => {
+  const { isFormVisible, showForm, hideForm } = useFormVisibility({
+    formStorageKey: 'pricing-form-visible',
+    listStorageKey: 'pricing-list-visible'
+  });
+
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
     { label: "Precificação" }
   ];
+
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      <Button size="sm" onClick={showForm}>
+        <Plus className="w-4 h-4 mr-2" />
+        Calcular Preço
+      </Button>
+    </div>
+  );
 
   return (
     <ConfigurationPageLayout
@@ -14,8 +30,13 @@ const Pricing = () => {
       description="Calcule preços sugeridos e margens de lucro para seus produtos"
       icon={<Calculator className="w-6 h-6" />}
       breadcrumbs={breadcrumbs}
+      actions={headerActions}
     >
-      <PricingForm />
+      {isFormVisible && (
+        <div className="xl:col-span-12">
+          <PricingForm />
+        </div>
+      )}
     </ConfigurationPageLayout>
   );
 };

@@ -1,4 +1,4 @@
-import { Percent, Plus, Upload, Download, Calculator } from '@/components/ui/icons';
+import { Percent, Plus, Calculator, Eye, EyeOff } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -9,11 +9,18 @@ import { useCommissionsWithDetails, useDeleteCommission } from "@/hooks/useCommi
 import { CommissionWithDetails } from "@/types/commissions";
 import { formatarPercentual } from "@/utils/pricing";
 import { useState } from "react";
+import { useFormVisibility } from "@/hooks/useFormVisibility";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 
 const Commissions = () => {
   const { data: commissions = [], isLoading } = useCommissionsWithDetails();
   const deleteMutation = useDeleteCommission();
   const [editingCommission, setEditingCommission] = useState<CommissionWithDetails | null>(null);
+  
+  const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
+    formStorageKey: 'commissions-form-visible',
+    listStorageKey: 'commissions-list-visible'
+  });
 
   const totalCommissions = commissions.length;
   const activeCommissions = commissions.filter(c => c.rate > 0).length;
@@ -97,7 +104,10 @@ const Commissions = () => {
     {
       label: "Editar",
       icon: <Calculator className="w-4 h-4" />,
-      onClick: (commission: CommissionWithDetails) => setEditingCommission(commission),
+      onClick: (commission: CommissionWithDetails) => {
+        setEditingCommission(commission);
+        showForm();
+      },
       variant: "outline" as const
     },
     {
@@ -115,15 +125,7 @@ const Commissions = () => {
 
   const headerActions = (
     <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm">
-        <Upload className="w-4 h-4 mr-2" />
-        Importar
-      </Button>
-      <Button variant="outline" size="sm">
-        <Download className="w-4 h-4 mr-2" />
-        Exportar
-      </Button>
-      <Button size="sm">
+      <Button size="sm" onClick={showForm}>
         <Plus className="w-4 h-4 mr-2" />
         Nova Comissão
       </Button>
@@ -142,39 +144,51 @@ const Commissions = () => {
         actions={headerActions}
     >
       {/* Form Column */}
-      <div className="xl:col-span-5 space-y-lg">
-        <CommissionFormEnhanced
-          editingCommission={editingCommission}
-          onCancelEdit={() => setEditingCommission(null)}
-        />
+      {isFormVisible && (
+        <div className="xl:col-span-5 space-y-lg">
+          <CommissionFormEnhanced
+            editingCommission={editingCommission}
+            onCancelEdit={() => {
+              setEditingCommission(null);
+              hideForm();
+            }}
+          />
 
-        {/* Quick Stats Card */}
-        <div className="bg-card rounded-lg p-lg border">
-          <h3 className="font-semibold mb-4">Estatísticas Rápidas</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">{totalCommissions}</div>
-              <div className="text-sm text-muted-foreground">Total</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-success">{activeCommissions}</div>
-              <div className="text-sm text-muted-foreground">Ativas</div>
+          {/* Quick Stats Card */}
+          <div className="bg-card rounded-lg p-lg border">
+            <h3 className="font-semibold mb-4">Estatísticas Rápidas</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{totalCommissions}</div>
+                <div className="text-sm text-muted-foreground">Total</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-success">{activeCommissions}</div>
+                <div className="text-sm text-muted-foreground">Ativas</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Data Visualization Column */}
-      <div className="xl:col-span-7">
-        <DataVisualization
+      <div className={isFormVisible ? "xl:col-span-7" : "xl:col-span-12"}>
+        <CollapsibleCard
           title="Comissões Configuradas"
-          description="Visualize todas as comissões por marketplace e categoria"
-          data={commissions}
-          columns={columns}
-          actions={actions}
-          isLoading={isLoading}
-          searchable={true}
-        />
+          icon={<Percent className="w-4 h-4" />}
+          isOpen={isListVisible}
+          onToggle={toggleList}
+        >
+          <DataVisualization
+            title=""
+            description="Visualize todas as comissões por marketplace e categoria"
+            data={commissions}
+            columns={columns}
+            actions={actions}
+            isLoading={isLoading}
+            searchable={true}
+          />
+        </CollapsibleCard>
       </div>
     </ConfigurationPageLayout>
   );
