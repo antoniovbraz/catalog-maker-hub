@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Check, Crown, Zap, Star, ArrowRight, Infinity } from 'lucide-react';
 import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '@/hooks/useSubscription';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { EmptyState } from '@/components/common/EmptyState';
+import { EmptyState } from '@/components/ui/empty-state';
 
 export default function Subscription() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -27,9 +27,9 @@ export default function Subscription() {
   if (!plans?.length) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <EmptyState 
+        <EmptyState
           icon={<Crown className="h-8 w-8" />}
-          message="Nenhum plano disponível"
+          title="Nenhum plano disponível"
           description="Os planos de assinatura ainda não foram configurados."
         />
       </div>

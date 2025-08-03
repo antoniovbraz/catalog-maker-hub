@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit, Trash2, Search, Filter, MoreHorizontal, Plus } from "lucide-react";
-import { EmptyState } from "./EmptyState";
+import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -120,8 +120,8 @@ export function DataTable<T extends { id: string }>({
             </div>
           </div>
         )}
-        <EmptyState 
-          message="Nenhum resultado encontrado" 
+        <EmptyState
+          title="Nenhum resultado encontrado"
           description={`Nenhum item corresponde à busca "${searchTerm}"`}
         />
       </div>
@@ -150,15 +150,18 @@ export function DataTable<T extends { id: string }>({
             </div>
           </div>
         )}
-        <EmptyState 
-          message={emptyMessage} 
+        <EmptyState
+          title={emptyMessage}
           description={emptyDescription}
-          action={onCreate && (
-            <Button onClick={onCreate} className="shadow-form">
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar primeiro registro
-            </Button>
-          )}
+          action={
+            onCreate
+              ? {
+                  label: "Adicionar primeiro registro",
+                  onClick: onCreate,
+                  icon: <Plus className="w-4 h-4 mr-2" />,
+                }
+              : undefined
+          }
         />
       </div>
     );
