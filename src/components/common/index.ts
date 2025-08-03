@@ -1,7 +1,6 @@
 export { LoadingSpinner } from "./LoadingSpinner"
 export { ConfirmDialog } from "./ConfirmDialog"
 export { FormField } from "./FormField"
-export { MiniProgressBar } from "./MiniProgressBar"
 export { EnhancedTooltip } from "./EnhancedTooltip"
 export { AppBreadcrumbs } from "./AppBreadcrumbs"
 export { SkeletonTable, SkeletonForm, SkeletonCard } from "./SkeletonLoaders"

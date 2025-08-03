@@ -9,8 +9,6 @@ interface ConfigurationPageLayoutProps {
   children: ReactNode;
   actions?: ReactNode;
   breadcrumbs?: Array<{ label: string; href?: string }>;
-  progressValue?: number;
-  progressTotal?: number;
 }
 
 export function ConfigurationPageLayout({
@@ -19,9 +17,7 @@ export function ConfigurationPageLayout({
   icon,
   children,
   actions,
-  breadcrumbs,
-  progressValue,
-  progressTotal
+  breadcrumbs
 }: ConfigurationPageLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -31,8 +27,6 @@ export function ConfigurationPageLayout({
         icon={icon}
         actions={actions}
         breadcrumbs={breadcrumbs}
-        progressValue={progressValue}
-        progressTotal={progressTotal}
       />
       
       <main className="container mx-auto px-4 sm:px-6 py-6">

@@ -17,13 +17,6 @@ const Marketplaces = () => {
   // Calculate stats from hierarchical data
   const totalPlatforms = hierarchicalMarketplaces.length;
   const totalModalities = hierarchicalMarketplaces.reduce((acc, h) => acc + h.children.length, 0);
-  const totalMarketplaces = totalPlatforms + totalModalities;
-  
-  const configuredPlatforms = hierarchicalMarketplaces.filter(h => h.parent.url && h.parent.description).length;
-  const configuredModalities = hierarchicalMarketplaces.reduce((acc, h) => 
-    acc + h.children.filter(m => m.url && m.description).length, 0
-  );
-  const configuredMarketplaces = configuredPlatforms + configuredModalities;
 
   const handleEditPlatform = (platform: MarketplaceType) => {
     setEditingMarketplace(platform);
@@ -87,8 +80,6 @@ const Marketplaces = () => {
       icon={<Store className="w-6 h-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
-      progressValue={configuredMarketplaces}
-      progressTotal={totalMarketplaces}
     >
       {/* Form Column */}
       <div className="xl:col-span-5 space-y-lg">

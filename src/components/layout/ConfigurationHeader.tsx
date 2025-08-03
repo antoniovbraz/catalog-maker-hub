@@ -1,8 +1,6 @@
 import { ReactNode } from "react";
 import { ChevronRight, Home } from '@/components/ui/icons';
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 
 interface Breadcrumb {
   label: string;
@@ -15,8 +13,6 @@ interface ConfigurationHeaderProps {
   icon?: ReactNode;
   actions?: ReactNode;
   breadcrumbs?: Breadcrumb[];
-  progressValue?: number;
-  progressTotal?: number;
 }
 
 export function ConfigurationHeader({
@@ -24,12 +20,8 @@ export function ConfigurationHeader({
   description,
   icon,
   actions,
-  breadcrumbs = [],
-  progressValue,
-  progressTotal
+  breadcrumbs = []
 }: ConfigurationHeaderProps) {
-  const hasProgress = progressValue !== undefined && progressTotal !== undefined;
-  const progressPercentage = hasProgress ? (progressValue / progressTotal) * 100 : 0;
 
   return (
     <header className="bg-card border-b border-border shadow-card">
@@ -70,28 +62,12 @@ export function ConfigurationHeader({
                 <h1 className="text-3xl font-bold tracking-tight text-foreground">
                   {title}
                 </h1>
-                {hasProgress && (
-                  <Badge variant="secondary" className="mt-1">
-                    {progressValue}/{progressTotal} configurados
-                  </Badge>
-                )}
               </div>
             </div>
             
             <p className="text-lg text-muted-foreground max-w-3xl">
               {description}
             </p>
-
-            {/* Progress Bar */}
-            {hasProgress && (
-              <div className="mt-4 max-w-md">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Progresso da configuração</span>
-                  <span className="font-medium">{Math.round(progressPercentage)}%</span>
-                </div>
-                <Progress value={progressPercentage} className="h-2" />
-              </div>
-            )}
           </div>
 
           {actions && (

@@ -10,7 +10,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Package, Target, GripVertical, RefreshCw } from '@/components/ui/icons';
 import { Sparkline } from "@/components/ui/sparkline";
-import { MiniProgressBar } from "@/components/common/MiniProgressBar";
 import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
 import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
@@ -165,13 +164,6 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
       </CardHeader>
       
       <CardContent className="space-y-3">
-        <MiniProgressBar 
-          value={result.margem_percentual} 
-          target={result.margem_desejada} 
-          label="Meta de Margem"
-          className="mb-3"
-        />
-        
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">

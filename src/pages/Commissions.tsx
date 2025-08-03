@@ -137,11 +137,9 @@ const Commissions = () => {
         "Configure as taxas de comissão por marketplace e categoria. " +
         "Essas taxas são fundamentais para o cálculo preciso dos seus preços de venda."
       }
-      icon={<Percent className="w-6 h-6" />}
-      breadcrumbs={breadcrumbs}
-      actions={headerActions}
-      progressValue={activeCommissions}
-      progressTotal={totalCommissions}
+        icon={<Percent className="w-6 h-6" />}
+        breadcrumbs={breadcrumbs}
+        actions={headerActions}
     >
       {/* Form Column */}
       <div className="xl:col-span-5 space-y-lg">
