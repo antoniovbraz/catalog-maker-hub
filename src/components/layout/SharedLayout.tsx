@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
-import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { AppBreadcrumbs } from "@/components/common/AppBreadcrumbs";
 
 interface SharedLayoutProps {
   children: ReactNode;
@@ -19,7 +19,7 @@ export function SharedLayout({ children }: SharedLayoutProps) {
           
           {/* Breadcrumbs Section */}
           <div className="border-b border-border bg-muted/30 px-6 py-3">
-            <Breadcrumbs />
+            <AppBreadcrumbs />
           </div>
           
           {/* Main Content with improved container */}
