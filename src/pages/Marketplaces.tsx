@@ -1,15 +1,18 @@
 import { MarketplaceForm } from "@/components/forms/MarketplaceForm";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Heading, Text } from "@/components/ui/typography";
 
 const Marketplaces = () => {
   return (
     <div className="space-y-lg">
       {/* Page Header */}
       <div className="space-y-sm">
-        <h1 className="text-3xl font-bold tracking-tight">🏪 Marketplaces</h1>
-        <p className="text-muted-foreground">
+        <Heading variant="h1" className="tracking-tight">
+          🏪 Marketplaces
+        </Heading>
+        <Text className="text-muted-foreground">
           Cadastre e gerencie os marketplaces onde seus produtos são vendidos
-        </p>
+        </Text>
       </div>
 
       {/* Main Content */}
