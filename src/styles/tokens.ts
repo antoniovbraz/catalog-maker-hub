@@ -50,6 +50,12 @@ export const colors = {
     border: 'hsl(var(--sidebar-border))',
     ring: 'hsl(var(--sidebar-ring))',
   },
+  /* Corporate Theme Colors */
+  gunmetal: '200 40% 13%',
+  'fern-green': '100 27% 43%',
+  'tea-green': '100 58% 83%',
+  'anti-flash-white': '0 0% 94%',
+  cinnabar: '12 77% 55%',
 } as const;
 
 export const typography = {

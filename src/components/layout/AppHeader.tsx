@@ -6,6 +6,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ThemeManager } from "@/components/ui/theme-manager";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 
@@ -88,8 +89,11 @@ export function AppHeader() {
           </Dialog>
         </div>
 
-        {/* Right section - Notifications and user */}
+        {/* Right section - Theme Manager, Notifications and user */}
         <div className="flex items-center gap-2 sm:gap-4">
+          {/* Theme Manager */}
+          <ThemeManager />
+          
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative" aria-label="Notificações" tabIndex={0}>
             <Bell className="w-5 h-5" />
