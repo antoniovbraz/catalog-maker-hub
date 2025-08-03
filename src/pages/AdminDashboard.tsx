@@ -78,29 +78,38 @@ export default function AdminDashboard() {
     staleTime: 5 * 60 * 1000, // 5 minutos de cache
     queryFn: async (): Promise<SubscriptionTableRow[]> => {
       try {
-        const { data, error } = await supabase
+        // Buscar assinaturas básicas primeiro
+        const { data: subscriptions, error: subError } = await supabase
           .from('subscriptions')
-          .select(`
-            id,
-            status,
-            current_period_end,
-            profiles!subscriptions_user_id_fkey(full_name, email),
-            subscription_plans!subscriptions_plan_id_fkey(display_name, price_monthly)
-          `)
+          .select('id, user_id, plan_id, status, current_period_end')
           .order('created_at', { ascending: false });
 
-        if (error) {
-          console.error('Subscriptions query error:', error);
-          throw new Error(`Erro ao buscar assinaturas: ${error.message}`);
+        if (subError) {
+          console.error('Subscriptions basic query error:', subError);
+          throw new Error(`Erro ao buscar assinaturas: ${subError.message}`);
         }
-        
-        // Transformar dados para o formato esperado
-        const transformedData = (data || []).map((sub: any) => ({
+
+        // Se não há assinaturas, retorna array vazio
+        if (!subscriptions || subscriptions.length === 0) {
+          return [];
+        }
+
+        // Buscar dados de usuários e planos separadamente
+        const userIds = [...new Set(subscriptions.map(sub => sub.user_id))];
+        const planIds = [...new Set(subscriptions.map(sub => sub.plan_id))];
+
+        const [{ data: users }, { data: plans }] = await Promise.all([
+          supabase.from('profiles').select('id, full_name, email').in('id', userIds),
+          supabase.from('subscription_plans').select('id, display_name, price_monthly').in('id', planIds)
+        ]);
+
+        // Mapear dados
+        const transformedData = subscriptions.map(sub => ({
           id: sub.id,
           status: sub.status,
           current_period_end: sub.current_period_end,
-          user: sub.profiles,
-          plan: sub.subscription_plans
+          user: users?.find(u => u.id === sub.user_id) || null,
+          plan: plans?.find(p => p.id === sub.plan_id) || null
         }));
         
         return transformedData as SubscriptionTableRow[];
@@ -117,27 +126,47 @@ export default function AdminDashboard() {
     staleTime: 2 * 60 * 1000, // 2 minutos de cache (mais frequente)
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
+        // Buscar assinaturas ativas com planos
+        const { data: activeSubscriptions, error } = await supabase
           .from('subscriptions')
-          .select(`
-            subscription_plans!subscriptions_plan_id_fkey(price_monthly)
-          `)
+          .select('plan_id')
           .eq('status', 'active');
         
         if (error) {
-          console.error('Revenue query error:', error);
-          throw new Error(`Erro ao calcular receita: ${error.message}`);
+          console.error('Revenue subscriptions query error:', error);
+          throw new Error(`Erro ao buscar assinaturas ativas: ${error.message}`);
+        }
+
+        if (!activeSubscriptions || activeSubscriptions.length === 0) {
+          return {
+            monthly: 0,
+            yearly: 0,
+            activeSubscriptions: 0
+          };
+        }
+
+        // Buscar preços dos planos
+        const planIds = [...new Set(activeSubscriptions.map(sub => sub.plan_id))];
+        const { data: plans, error: plansError } = await supabase
+          .from('subscription_plans')
+          .select('id, price_monthly')
+          .in('id', planIds);
+
+        if (plansError) {
+          console.error('Revenue plans query error:', plansError);
+          throw new Error(`Erro ao buscar planos: ${plansError.message}`);
         }
         
-        // Calcular receita total no frontend de forma otimizada
-        const monthlyRevenue = (data || []).reduce((total, sub: any) => {
-          return total + (sub.subscription_plans?.price_monthly || 0);
+        // Calcular receita total
+        const monthlyRevenue = activeSubscriptions.reduce((total, sub) => {
+          const plan = plans?.find(p => p.id === sub.plan_id);
+          return total + (plan?.price_monthly || 0);
         }, 0);
         
         return {
           monthly: monthlyRevenue,
           yearly: monthlyRevenue * 12,
-          activeSubscriptions: data?.length || 0
+          activeSubscriptions: activeSubscriptions.length
         };
       } catch (error) {
         console.error('Revenue calculation error:', error);
