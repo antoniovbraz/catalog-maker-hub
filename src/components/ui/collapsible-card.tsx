@@ -12,7 +12,6 @@ interface CollapsibleCardProps {
   onToggle: () => void;
   children: React.ReactNode;
   className?: string;
-  variant?: 'primary' | 'secondary' | 'default';
 }
 
 export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
@@ -21,51 +20,34 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
   isOpen,
   onToggle,
   children,
-  className,
-  variant = 'default'
+  className
 }) => {
-  const headerVariants = {
-    primary: "bg-gradient-primary text-white",
-    secondary: "bg-gradient-card text-white", 
-    default: "bg-muted/50 text-foreground"
-  };
-
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
-      <Card className={cn("shadow-form border border-border/50", className)}>
+      <Card className={cn("shadow-card border border-border/20", className)}>
         <CollapsibleTrigger asChild>
-          <CardHeader 
-            className={cn(
-              "cursor-pointer hover:opacity-90 transition-opacity rounded-t-lg",
-              headerVariants[variant]
-            )}
-          >
-            <CardTitle className="text-xl flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-3">
+            <CardTitle className="text-base flex items-center justify-between font-medium">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 {icon}
-                {title}
+                <span>{title}</span>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                className={cn(
-                  "h-8 w-8 p-0",
-                  variant === 'default' 
-                    ? "text-foreground hover:bg-muted" 
-                    : "text-white hover:bg-white/20"
-                )}
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
               >
                 {isOpen ? (
-                  <ChevronUp className="h-4 w-4" />
+                  <ChevronUp className="h-3 w-3" />
                 ) : (
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-3 w-3" />
                 )}
               </Button>
             </CardTitle>
           </CardHeader>
         </CollapsibleTrigger>
         <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
-          <CardContent className="p-lg">
+          <CardContent className="pt-0 pb-4 px-6">
             {children}
           </CardContent>
         </CollapsibleContent>

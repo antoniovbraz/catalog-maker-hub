@@ -182,20 +182,20 @@ export const PricingForm = () => {
   };
 
   return (
-    <div className="space-y-lg max-w-4xl mx-auto">
-      {/* Formulário Principal */}
-      <Card className="shadow-form border border-border/50">
-        <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
+    <div className="space-y-6">
+      {/* Formulário Principal - Layout Coeso */}
+      <Card className="shadow-card border border-border/50">
+        <CardHeader className="bg-gradient-primary text-white">
           <CardTitle className="text-xl flex items-center gap-2">
             <Calculator className="w-6 h-6" />
             Calculadora de Preços
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-lg p-lg">
-          {/* Seção de Seleção */}
-          <div className="space-y-md">
-            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
-              🎯 Seleção de Produto e Marketplace
+        <CardContent className="space-y-6 p-6">
+          {/* Seleção de Produto e Marketplace */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+              Seleção de Produto e Marketplace
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -296,10 +296,10 @@ export const PricingForm = () => {
             )}
           </div>
 
-          {/* Configurações Básicas */}
-          <div className="space-y-md">
+          {/* Configurações de Margem */}
+          <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
-              ⚙️ Configurações de Margem
+              Configurações de Margem
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -339,15 +339,41 @@ export const PricingForm = () => {
               </div>
             </div>
           </div>
+
+          {/* Análise de Preço Praticado */}
+          <CollapsibleCard
+            title="Análise de Preço Praticado"
+            icon={<TrendingUp className="w-4 h-4" />}
+            isOpen={analysisSection.isOpen}
+            onToggle={analysisSection.toggle}
+          >
+            <div>
+              <Label htmlFor="preco_praticado" className="text-sm font-medium">
+                Preço de Venda Praticado (R$) - Opcional
+              </Label>
+              <Input
+                id="preco_praticado"
+                type="number"
+                step="0.01"
+                value={formData.preco_praticado}
+                onChange={(e) => handleInputChange("preco_praticado", e.target.value)}
+                placeholder="Ex: 199.90"
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Compare sua margem real com a desejada
+              </p>
+            </div>
+          </CollapsibleCard>
           
           {/* Botões de Ação */}
           <div className="flex gap-3 pt-4 border-t border-border">
             <Button
               onClick={handleCalculate}
               disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
-              className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+              className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
             >
-              {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "🧮 Calcular Preço"}
+              {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "Calcular Preço"}
             </Button>
             
             {pricingResult && (
@@ -355,139 +381,109 @@ export const PricingForm = () => {
                 onClick={handleSave}
                 disabled={savePricingMutation.isPending}
                 variant="secondary"
-                className="h-11 min-w-[120px] shadow-form"
+                className="h-11 min-w-[120px]"
               >
-                {savePricingMutation.isPending ? "Salvando..." : "💾 Salvar"}
+                {savePricingMutation.isPending ? "Salvando..." : "Salvar"}
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Análise de Preço Praticado - Seção Colapsável */}
-      <CollapsibleCard
-        title="Análise de Preço Praticado"
-        icon={<TrendingUp className="w-5 h-5" />}
-        isOpen={analysisSection.isOpen}
-        onToggle={analysisSection.toggle}
-        variant="secondary"
-      >
-        <div>
-          <Label htmlFor="preco_praticado" className="text-sm font-medium">
-            Preço de Venda Praticado (R$) - Opcional
-          </Label>
-          <Input
-            id="preco_praticado"
-            type="number"
-            step="0.01"
-            value={formData.preco_praticado}
-            onChange={(e) => handleInputChange("preco_praticado", e.target.value)}
-            placeholder="Ex: 199.90"
-            className="mt-1"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Compare sua margem real com a desejada
-          </p>
-        </div>
-      </CollapsibleCard>
+      {/* Resultados */}
+      {pricingResult && (
+        <Card className="shadow-card border border-border/50">
+          <CardHeader className="bg-muted/30">
+            <CardTitle className="text-lg flex items-center gap-2 text-foreground">
+              <Calculator className="w-5 h-5" />
+              Resultado do Cálculo
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>Produto:</div>
+                <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
+                
+                <div>SKU:</div>
+                <div className="font-medium">{pricingResult.product_sku || 'N/A'}</div>
+                
+                <Separator className="col-span-2 my-2" />
+                
+                <div>Custo Total:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.custo_total || 0)}</div>
+                
+                <div>Valor Fixo:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.valor_fixo || 0)}</div>
+                
+                <div>Frete:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.frete || 0)}</div>
+                
+                <div>Comissão:</div>
+                <div className="font-medium">{formatarPercentual(pricingResult.comissao || 0)}</div>
+                
+                <Separator className="col-span-2 my-2" />
+                
+                <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
+                <div className="text-lg font-bold text-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
+                
+                <div className="font-semibold">Margem Unitária:</div>
+                <div className="font-semibold">{formatarMoeda(pricingResult.margem_unitaria || 0)}</div>
+                
+                <div className="font-semibold">Margem Percentual:</div>
+                <div className="font-semibold">{formatarPercentual(pricingResult.margem_percentual || 0)}</div>
+              </div>
 
-      {/* Resultados - Seção Colapsável */}
-      <CollapsibleCard
-        title="Resultado do Cálculo"
-        icon={<Calculator className="w-5 h-5" />}
-        isOpen={resultsSection.isOpen}
-        onToggle={resultsSection.toggle}
-        variant="default"
-      >
-        {pricingResult ? (
-          <div className="space-y-md">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>Produto:</div>
-              <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
-              
-              <div>SKU:</div>
-              <div className="font-medium">{pricingResult.product_sku || 'N/A'}</div>
-              
-              <Separator className="col-span-2 my-2" />
-              
-              <div>Custo Total:</div>
-              <div className="font-medium">{formatarMoeda(pricingResult.custo_total || 0)}</div>
-              
-              <div>Valor Fixo:</div>
-              <div className="font-medium">{formatarMoeda(pricingResult.valor_fixo || 0)}</div>
-              
-              <div>Frete:</div>
-              <div className="font-medium">{formatarMoeda(pricingResult.frete || 0)}</div>
-              
-              <div>Comissão:</div>
-              <div className="font-medium">{formatarPercentual(pricingResult.comissao || 0)}</div>
-              
-              <Separator className="col-span-2 my-2" />
-              
-              <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
-              <div className="text-lg font-bold text-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
-              
-              <div className="font-semibold">Margem Unitária:</div>
-              <div className="font-semibold">{formatarMoeda(pricingResult.margem_unitaria || 0)}</div>
-              
-              <div className="font-semibold">Margem Percentual:</div>
-              <div className="font-semibold">{formatarPercentual(pricingResult.margem_percentual || 0)}</div>
-            </div>
-
-            {/* Seção de Margem Real - só aparece se houver cálculo */}
-            {margemRealResult && (
-              <>
-                <Separator className="my-4" />
-                <div className="bg-muted/50 p-md rounded-lg">
-                  <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
-                    📊 Análise do Preço Praticado
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>Preço Praticado:</div>
-                    <div className="font-medium text-orange-600 dark:text-orange-400">
-                      {formatarMoeda(margemRealResult.preco_praticado || 0)}
-                    </div>
-                    
-                    <div>Margem Real Unitária:</div>
-                    <div className="font-medium">
-                      {formatarMoeda(margemRealResult.margem_unitaria_real || 0)}
-                    </div>
-                    
-                    <div>Margem Real Percentual:</div>
-                    <div className={`font-medium ${
-                      (margemRealResult.margem_percentual_real || 0) < 0 
-                        ? 'text-destructive' 
-                        : 'text-green-600 dark:text-green-400'
-                    }`}>
-                      {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
-                    </div>
-                    
-                    {/* Indicador de comparação */}
-                    <div className="col-span-2 mt-2 pt-2 border-t">
-                      <div className="text-xs text-muted-foreground">
-                        {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
-                          <span className="text-amber-600 dark:text-amber-400">
-                            ⚠️ Margem real é menor que a desejada
-                          </span>
-                        ) : (
-                          <span className="text-green-600 dark:text-green-400">
-                            ✅ Margem real está dentro do esperado
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p className="text-lg">🧮 Calcule um preço para ver os resultados</p>
-            <p className="text-sm">Preencha os campos acima e clique em "Calcular Preço"</p>
-          </div>
-        )}
-      </CollapsibleCard>
-    </div>
-  );
-};
+              {/* Seção de Margem Real - só aparece se houver cálculo */}
+              {margemRealResult && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="bg-muted/30 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
+                      Análise do Preço Praticado
+                    </h4>
+                     <div className="grid grid-cols-2 gap-2 text-sm">
+                       <div>Preço Praticado:</div>
+                       <div className="font-medium text-orange-600 dark:text-orange-400">
+                         {formatarMoeda(margemRealResult.preco_praticado || 0)}
+                       </div>
+                       
+                       <div>Margem Real Unitária:</div>
+                       <div className="font-medium">
+                         {formatarMoeda(margemRealResult.margem_unitaria_real || 0)}
+                       </div>
+                       
+                       <div>Margem Real Percentual:</div>
+                       <div className={`font-medium ${
+                         (margemRealResult.margem_percentual_real || 0) < 0 
+                           ? 'text-destructive' 
+                           : 'text-green-600 dark:text-green-400'
+                       }`}>
+                         {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
+                       </div>
+                       
+                       {/* Indicador de comparação */}
+                       <div className="col-span-2 mt-2 pt-2 border-t">
+                         <div className="text-xs text-muted-foreground">
+                           {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
+                             <span className="text-amber-600 dark:text-amber-400">
+                               ⚠️ Margem real é menor que a desejada
+                             </span>
+                           ) : (
+                             <span className="text-green-600 dark:text-green-400">
+                               ✅ Margem real está dentro do esperado
+                             </span>
+                           )}
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </>
+               )}
+             </div>
+           </CardContent>
+         </Card>
+       )}
+     </div>
+   );
+ };

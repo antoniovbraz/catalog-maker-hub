@@ -245,73 +245,73 @@ export const ProductForm = () => {
   });
 
   return (
-    <div className="space-y-lg max-w-4xl mx-auto">
-      {/* Form Section */}
-      <Card className="shadow-form border border-border/50">
-        <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
+    <div className="space-y-6">
+      {/* Formulário Principal - Layout Coeso */}
+      <Card className="shadow-card border border-border/50">
+        <CardHeader className="bg-gradient-primary text-white">
           <CardTitle className="text-xl flex items-center gap-2">
             <Package className="w-6 h-6" />
             {editingId ? "Editar Produto" : "Novo Produto"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-lg p-lg">
-          <form onSubmit={handleSubmit} className="space-y-lg">
+        <CardContent className="space-y-6 p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Informações Básicas */}
-            <div className="space-y-md">
-              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
-                📝 Informações Básicas
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+                Informações Básicas
               </h3>
               
-              <div>
-                <Label htmlFor="name" className="text-sm font-medium">
-                  Nome *
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="Ex: Smartphone Samsung Galaxy"
-                  className={cn(
-                    "mt-1",
-                    errors.name && touched.name ? "border-destructive focus-visible:ring-destructive" : ""
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Nome *
+                  </Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    placeholder="Ex: Smartphone Samsung Galaxy"
+                    className={cn(
+                      "mt-1",
+                      errors.name && touched.name ? "border-destructive focus-visible:ring-destructive" : ""
+                    )}
+                    required
+                  />
+                  {errors.name && touched.name && (
+                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.name}
+                    </div>
                   )}
-                  required
-                />
-                {errors.name && touched.name && (
-                  <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
-                    <AlertCircle className="w-3 h-3" />
-                    {errors.name}
-                  </div>
-                )}
-              </div>
-              
-              <div>
-                <Label htmlFor="category" className="text-sm font-medium">Categoria</Label>
-                <Select 
-                  value={formData.category_id} 
-                  onValueChange={(value) => handleInputChange("category_id", value)}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecione uma categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Nenhuma categoria</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="category" className="text-sm font-medium">Categoria</Label>
+                  <Select 
+                    value={formData.category_id} 
+                    onValueChange={(value) => handleInputChange("category_id", value)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhuma categoria</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
-            <Separator />
-
-            {/* Seção de Custos */}
-            <div className="space-y-md">
-              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
-                💰 Configuração de Custos
+            {/* Configuração de Custos */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+                Configuração de Custos
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -386,7 +386,7 @@ export const ProductForm = () => {
 
               {/* Preview do custo total */}
               {custoTotal > 0 && (
-                <div className="bg-muted/50 p-md rounded-lg border border-border/50">
+                <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Custo Total:</span>
                     <span className="text-lg font-bold text-primary">
@@ -396,15 +396,45 @@ export const ProductForm = () => {
                 </div>
               )}
             </div>
-            
-            <Separator />
+
+            {/* Campos Opcionais */}
+            <CollapsibleCard
+              title="Campos Opcionais"
+              icon={<Tag className="w-4 h-4" />}
+              isOpen={optionalFields.isOpen}
+              onToggle={optionalFields.toggle}
+            >
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="sku" className="text-sm font-medium">SKU</Label>
+                  <Input
+                    id="sku"
+                    value={formData.sku}
+                    onChange={(e) => handleInputChange("sku", e.target.value)}
+                    placeholder="Ex: SM-G991B"
+                    className="mt-1"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    placeholder="Descrição detalhada do produto..."
+                    className="mt-1 min-h-[80px]"
+                  />
+                </div>
+              </div>
+            </CollapsibleCard>
 
             {/* Botões de Ação */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 pt-4 border-t border-border">
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+                className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? "Atualizar Produto" : "Criar Produto"}
@@ -414,7 +444,7 @@ export const ProductForm = () => {
                   type="button" 
                   variant="outline" 
                   onClick={resetForm}
-                  className="h-11 min-w-[120px] shadow-form"
+                  className="h-11 min-w-[120px]"
                 >
                   <X className="w-4 h-4 mr-2" />
                   Cancelar
@@ -425,46 +455,12 @@ export const ProductForm = () => {
         </CardContent>
       </Card>
 
-      {/* Campos Opcionais - Seção Colapsável */}
-      <CollapsibleCard
-        title="Campos Opcionais"
-        icon={<Tag className="w-5 h-5" />}
-        isOpen={optionalFields.isOpen}
-        onToggle={optionalFields.toggle}
-        variant="secondary"
-      >
-        <div className="space-y-md">
-          <div>
-            <Label htmlFor="sku" className="text-sm font-medium">SKU</Label>
-            <Input
-              id="sku"
-              value={formData.sku}
-              onChange={(e) => handleInputChange("sku", e.target.value)}
-              placeholder="Ex: SM-G991B"
-              className="mt-1"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Descrição detalhada do produto..."
-              className="mt-1 min-h-[80px]"
-            />
-          </div>
-        </div>
-      </CollapsibleCard>
-
-      {/* Lista de Produtos - Seção Colapsável */}
+      {/* Lista de Produtos */}
       <CollapsibleCard
         title="Produtos Cadastrados"
-        icon={<Package className="w-5 h-5" />}
+        icon={<Package className="w-4 h-4" />}
         isOpen={productsList.isOpen}
         onToggle={productsList.toggle}
-        variant="default"
       >
         <DataVisualization
           title=""
