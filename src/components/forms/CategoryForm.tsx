@@ -9,7 +9,7 @@ import { FolderOpen, Save, X, AlertCircle, Edit, Trash2 } from '@/components/ui/
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType, CategoryFormData } from "@/types/categories";
 import { DataVisualization } from "@/components/ui/data-visualization";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
 export const CategoryForm = () => {

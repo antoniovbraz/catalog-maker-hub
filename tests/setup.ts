@@ -54,7 +54,7 @@ beforeAll(() => {
   }));
 
   // Mock do toast
-  vi.doMock('@/hooks/use-toast', () => ({
+  vi.doMock('@/components/ui/use-toast', () => ({
     toast: mockToast,
     useToast: () => ({ toast: mockToast }),
   }));

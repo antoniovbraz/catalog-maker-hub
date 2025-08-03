@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { salesService } from "@/services/sales";
 import { SaleFormData } from "@/types/sales";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 export const SALES_QUERY_KEY = "sales";
 
