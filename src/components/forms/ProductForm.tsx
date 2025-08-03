@@ -15,6 +15,8 @@ import { formatarMoeda } from "@/utils/pricing";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
 
 export const ProductForm = () => {
   const { toast } = useToast();
@@ -232,69 +234,55 @@ export const ProductForm = () => {
     }
   ];
 
+  const productsList = useCollapsibleSection({ 
+    storageKey: 'products-list', 
+    defaultOpen: false 
+  });
+
+  const optionalFields = useCollapsibleSection({ 
+    storageKey: 'products-optional-fields', 
+    defaultOpen: false 
+  });
+
   return (
-    <div className="space-y-xl">
+    <div className="space-y-lg max-w-4xl mx-auto">
       {/* Form Section */}
       <Card className="shadow-form border border-border/50">
         <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
           <CardTitle className="text-xl flex items-center gap-2">
             <Package className="w-6 h-6" />
-            {editingId ? "✏️ Editar Produto" : "➕ Novo Produto"}
+            {editingId ? "Editar Produto" : "Novo Produto"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-lg p-lg">
           <form onSubmit={handleSubmit} className="space-y-lg">
-            {/* Seção de Informações Básicas */}
+            {/* Informações Básicas */}
             <div className="space-y-md">
               <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
                 📝 Informações Básicas
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name" className="text-sm font-medium">
-                    Nome *
-                  </Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    placeholder="Ex: Smartphone Samsung Galaxy"
-                    className={cn(
-                      "mt-1",
-                      errors.name && touched.name ? "border-destructive focus-visible:ring-destructive" : ""
-                    )}
-                    required
-                  />
-                  {errors.name && touched.name && (
-                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
-                      <AlertCircle className="w-3 h-3" />
-                      {errors.name}
-                    </div>
-                  )}
-                </div>
-                
-                <div>
-                  <Label htmlFor="sku" className="text-sm font-medium">SKU</Label>
-                  <Input
-                    id="sku"
-                    value={formData.sku}
-                    onChange={(e) => handleInputChange("sku", e.target.value)}
-                    placeholder="Ex: SM-G991B"
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              
               <div>
-                <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
-                  placeholder="Descrição detalhada do produto..."
-                  className="mt-1 min-h-[80px]"
+                <Label htmlFor="name" className="text-sm font-medium">
+                  Nome *
+                </Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="Ex: Smartphone Samsung Galaxy"
+                  className={cn(
+                    "mt-1",
+                    errors.name && touched.name ? "border-destructive focus-visible:ring-destructive" : ""
+                  )}
+                  required
                 />
+                {errors.name && touched.name && (
+                  <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.name}
+                  </div>
+                )}
               </div>
               
               <div>
@@ -413,13 +401,13 @@ export const ProductForm = () => {
 
             {/* Botões de Ação */}
             <div className="flex gap-3 pt-4">
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
-                >
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+              >
                 <Save className="w-4 h-4 mr-2" />
-                {editingId ? "💾 Atualizar Produto" : "➕ Criar Produto"}
+                {editingId ? "Atualizar Produto" : "Criar Produto"}
               </Button>
               {editingId && (
                 <Button 
@@ -437,22 +425,63 @@ export const ProductForm = () => {
         </CardContent>
       </Card>
 
-      {/* Lista de Produtos */}
-      <DataVisualization
-        title="📦 Produtos Cadastrados"
-        data={products}
-        columns={columns}
-        actions={actions}
-        isLoading={isLoading}
-        emptyState={
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Nenhum produto cadastrado</p>
-            <p className="text-sm text-muted-foreground">
-              Crie seu primeiro produto usando o formulário acima
-            </p>
+      {/* Campos Opcionais - Seção Colapsável */}
+      <CollapsibleCard
+        title="Campos Opcionais"
+        icon={<Tag className="w-5 h-5" />}
+        isOpen={optionalFields.isOpen}
+        onToggle={optionalFields.toggle}
+        variant="secondary"
+      >
+        <div className="space-y-md">
+          <div>
+            <Label htmlFor="sku" className="text-sm font-medium">SKU</Label>
+            <Input
+              id="sku"
+              value={formData.sku}
+              onChange={(e) => handleInputChange("sku", e.target.value)}
+              placeholder="Ex: SM-G991B"
+              className="mt-1"
+            />
           </div>
-        }
-      />
+          
+          <div>
+            <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              placeholder="Descrição detalhada do produto..."
+              className="mt-1 min-h-[80px]"
+            />
+          </div>
+        </div>
+      </CollapsibleCard>
+
+      {/* Lista de Produtos - Seção Colapsável */}
+      <CollapsibleCard
+        title="Produtos Cadastrados"
+        icon={<Package className="w-5 h-5" />}
+        isOpen={productsList.isOpen}
+        onToggle={productsList.toggle}
+        variant="default"
+      >
+        <DataVisualization
+          title=""
+          data={products}
+          columns={columns}
+          actions={actions}
+          isLoading={isLoading}
+          emptyState={
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Nenhum produto cadastrado</p>
+              <p className="text-sm text-muted-foreground">
+                Crie seu primeiro produto usando o formulário acima
+              </p>
+            </div>
+          }
+        />
+      </CollapsibleCard>
     </div>
   );
 };

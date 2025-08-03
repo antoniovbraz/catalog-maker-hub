@@ -15,9 +15,7 @@ const Products = () => {
       icon={<Package className="w-6 h-6" />}
       breadcrumbs={breadcrumbs}
     >
-      <div className="xl:col-span-6">
-        <ProductForm />
-      </div>
+      <ProductForm />
     </ConfigurationPageLayout>
   );
 };

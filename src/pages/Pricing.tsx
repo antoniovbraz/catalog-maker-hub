@@ -15,9 +15,7 @@ const Pricing = () => {
       icon={<Calculator className="w-6 h-6" />}
       breadcrumbs={breadcrumbs}
     >
-      <div className="xl:col-span-6">
-        <PricingForm />
-      </div>
+      <PricingForm />
     </ConfigurationPageLayout>
   );
 };

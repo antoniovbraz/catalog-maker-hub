@@ -11,6 +11,8 @@ import { CategoryType, CategoryFormData } from "@/types/categories";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
 
 export const CategoryForm = () => {
   const { toast } = useToast();
@@ -147,19 +149,29 @@ export const CategoryForm = () => {
     }
   ];
 
+  const categoriesList = useCollapsibleSection({ 
+    storageKey: 'categories-list', 
+    defaultOpen: false 
+  });
+
+  const optionalFields = useCollapsibleSection({ 
+    storageKey: 'categories-optional-fields', 
+    defaultOpen: false 
+  });
+
   return (
-    <div className="space-y-xl">
+    <div className="space-y-lg max-w-4xl mx-auto">
       {/* Form Section */}
       <Card className="shadow-form border border-border/50">
         <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
           <CardTitle className="text-xl flex items-center gap-2">
             <FolderOpen className="w-6 h-6" />
-            {editingId ? "✏️ Editar Categoria" : "➕ Nova Categoria"}
+            {editingId ? "Editar Categoria" : "Nova Categoria"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-lg p-lg">
           <form onSubmit={handleSubmit} className="space-y-lg">
-            {/* Seção de Informações */}
+            {/* Informações Básicas */}
             <div className="space-y-md">
               <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
                 📂 Informações da Categoria
@@ -187,32 +199,19 @@ export const CategoryForm = () => {
                   </div>
                 )}
               </div>
-              
-              <div>
-                <Label htmlFor="description" className="text-sm font-medium">
-                  Descrição
-                </Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange("description", e.target.value)}
-                  placeholder="Descrição detalhada da categoria..."
-                  className="mt-1 min-h-[80px]"
-                />
-              </div>
             </div>
             
             <Separator />
 
             {/* Botões de Ação */}
             <div className="flex gap-3 pt-4">
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
-                >
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+              >
                 <Save className="w-4 h-4 mr-2" />
-                {editingId ? "💾 Atualizar Categoria" : "➕ Criar Categoria"}
+                {editingId ? "Atualizar Categoria" : "Criar Categoria"}
               </Button>
               {editingId && (
                 <Button 
@@ -230,22 +229,52 @@ export const CategoryForm = () => {
         </CardContent>
       </Card>
 
-      {/* Lista de Categorias */}
-      <DataVisualization
-        title="📂 Categorias Cadastradas"
-        data={categories}
-        columns={columns}
-        actions={actions}
-        isLoading={isLoading}
-        emptyState={
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
-            <p className="text-sm text-muted-foreground">
-              Crie sua primeira categoria usando o formulário acima
-            </p>
-          </div>
-        }
-      />
+      {/* Campo Opcional - Seção Colapsável */}
+      <CollapsibleCard
+        title="Campo Opcional"
+        icon={<FolderOpen className="w-5 h-5" />}
+        isOpen={optionalFields.isOpen}
+        onToggle={optionalFields.toggle}
+        variant="secondary"
+      >
+        <div>
+          <Label htmlFor="description" className="text-sm font-medium">
+            Descrição
+          </Label>
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="Descrição detalhada da categoria..."
+            className="mt-1 min-h-[80px]"
+          />
+        </div>
+      </CollapsibleCard>
+
+      {/* Lista de Categorias - Seção Colapsável */}
+      <CollapsibleCard
+        title="Categorias Cadastradas"
+        icon={<FolderOpen className="w-5 h-5" />}
+        isOpen={categoriesList.isOpen}
+        onToggle={categoriesList.toggle}
+        variant="default"
+      >
+        <DataVisualization
+          title=""
+          data={categories}
+          columns={columns}
+          actions={actions}
+          isLoading={isLoading}
+          emptyState={
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
+              <p className="text-sm text-muted-foreground">
+                Crie sua primeira categoria usando o formulário acima
+              </p>
+            </div>
+          }
+        />
+      </CollapsibleCard>
     </div>
   );
 };

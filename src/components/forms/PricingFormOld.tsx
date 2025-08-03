@@ -8,13 +8,14 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useMarketplacePlatforms, useMarketplaceModalities } from "@/hooks/useMarketplaces";
+import { useCategories } from "@/hooks/useCategories";
 import { useCalculatePrice, useCalculateMargemReal, useSavePricing } from "@/hooks/usePricing";
 import { PricingFormData } from "@/types/pricing";
 import { formatarMoeda, formatarPercentual } from "@/utils/pricing";
 import { useLogger } from "@/utils/logger";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
-import { Calculator, TrendingUp } from "@/components/ui/icons";
+import { Calculator, Settings, TrendingUp } from "@/components/ui/icons";
 
 interface PricingResult {
   custo_total: number;
@@ -70,20 +71,12 @@ export const PricingForm = () => {
   const calculateMargemRealMutation = useCalculateMargemReal();
   const savePricingMutation = useSavePricing();
 
-  const analysisSection = useCollapsibleSection({ 
-    storageKey: 'pricing-analysis-section', 
-    defaultOpen: false 
-  });
-
-  const resultsSection = useCollapsibleSection({ 
-    storageKey: 'pricing-results-section', 
-    defaultOpen: true 
-  });
-
   const handleInputChange = (field: keyof PricingFormData, value: string | number) => {
     if (field === 'product_id' || field === 'marketplace_id') {
+      // Manter como string para IDs
       setFormData(prev => ({ ...prev, [field]: value }));
     } else {
+      // Converter para número para campos numéricos
       const numericValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
       setFormData(prev => ({ ...prev, [field]: numericValue }));
     }
@@ -99,6 +92,7 @@ export const PricingForm = () => {
       return;
     }
 
+
     try {
       const result = await calculatePriceMutation.mutateAsync({
         productId: formData.product_id,
@@ -108,10 +102,16 @@ export const PricingForm = () => {
         margemDesejada: formData.margem_desejada
       });
 
+      
+
+      // Verificar se temos um resultado válido
       if (result && typeof result === 'object') {
         const typedResult = result as unknown as PricingResult;
+        
+        
         setPricingResult(typedResult);
         
+        // Atualizar form data com os valores calculados
         setFormData(prev => ({
           ...prev,
           custo_total: typedResult.custo_total || 0,
@@ -120,12 +120,10 @@ export const PricingForm = () => {
           comissao: typedResult.comissao || 0
         }));
         
-        // Auto-expandir resultados após calcular
-        if (!resultsSection.isOpen) {
-          resultsSection.toggle();
-        }
-        
+        // Se há preço praticado, calcular margem real também
         if (formData.preco_praticado > 0) {
+          
+          
           try {
             const margemResult = await calculateMargemRealMutation.mutateAsync({
               productId: formData.product_id,
@@ -142,7 +140,10 @@ export const PricingForm = () => {
             logger.error('Erro ao calcular margem real', error);
           }
         }
+        
+        
       } else {
+        
         toast({
           title: "Erro",
           description: "Resposta inválida do servidor",
@@ -158,6 +159,7 @@ export const PricingForm = () => {
       });
     }
   };
+
 
   const handleSave = async () => {
     if (!pricingResult) {
@@ -181,6 +183,21 @@ export const PricingForm = () => {
     }
   };
 
+  const advancedSettings = useCollapsibleSection({ 
+    storageKey: 'pricing-advanced-settings', 
+    defaultOpen: false 
+  });
+
+  const analysisSection = useCollapsibleSection({ 
+    storageKey: 'pricing-analysis-section', 
+    defaultOpen: false 
+  });
+
+  const resultsSection = useCollapsibleSection({ 
+    storageKey: 'pricing-results-section', 
+    defaultOpen: true 
+  });
+
   return (
     <div className="space-y-lg max-w-4xl mx-auto">
       {/* Formulário Principal */}
@@ -200,32 +217,35 @@ export const PricingForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="product" className="text-sm font-medium">Produto *</Label>
-                <Select 
-                  value={formData.product_id} 
-                  onValueChange={(value) => handleInputChange("product_id", value)}
-                >
-                  <SelectTrigger className="relative z-0">
-                    <SelectValue placeholder="Selecione um produto" />
-                  </SelectTrigger>
-                  <SelectContent className="z-[200] bg-popover border shadow-lg">
-                    {loadingProducts ? (
-                      <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
-                    ) : products.length === 0 ? (
-                      <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum produto encontrado</div>
-                    ) : (
-                      products.map((product) => (
-                        <SelectItem 
-                          key={product.id} 
-                          value={product.id}
-                          className="cursor-pointer hover:bg-accent"
-                        >
-                          {product.name} {product.sku ? `(${product.sku})` : ''}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select 
+                value={formData.product_id} 
+                onValueChange={(value) => {
+                  
+                  handleInputChange("product_id", value);
+                }}
+              >
+                <SelectTrigger className="relative z-0">
+                  <SelectValue placeholder="Selecione um produto" />
+                </SelectTrigger>
+               <SelectContent className="z-[200] bg-popover border shadow-lg">
+                 {loadingProducts ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
+                 ) : products.length === 0 ? (
+                   <div className="px-2 py-1.5 text-sm text-muted-foreground">Nenhum produto encontrado</div>
+                 ) : (
+                   products.map((product) => (
+                     <SelectItem 
+                       key={product.id} 
+                       value={product.id}
+                       className="cursor-pointer hover:bg-accent"
+                     >
+                       {product.name} {product.sku ? `(${product.sku})` : ''}
+                     </SelectItem>
+                   ))
+                 )}
+               </SelectContent>
+              </Select>
+            </div>
 
               <div>
                 <Label htmlFor="platform" className="text-sm font-medium">Plataforma *</Label>
@@ -233,6 +253,7 @@ export const PricingForm = () => {
                   value={selectedPlatform} 
                   onValueChange={(value) => {
                     setSelectedPlatform(value);
+                    // Limpar modalidade selecionada ao trocar plataforma
                     handleInputChange("marketplace_id", "");
                   }}
                 >
@@ -297,56 +318,51 @@ export const PricingForm = () => {
           </div>
 
           {/* Configurações Básicas */}
-          <div className="space-y-md">
-            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
-              ⚙️ Configurações de Margem
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="taxa_cartao" className="text-sm font-medium">Taxa de Cartão (%)</Label>
-                <Input
-                  id="taxa_cartao"
-                  type="number"
-                  step="0.01"
-                  value={formData.taxa_cartao}
-                  onChange={(e) => handleInputChange("taxa_cartao", e.target.value)}
-                  placeholder="Ex: 2.5"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="taxa_cartao" className="text-sm font-medium">Taxa de Cartão (%)</Label>
+              <Input
+                id="taxa_cartao"
+                type="number"
+                step="0.01"
+                value={formData.taxa_cartao}
+                onChange={(e) => handleInputChange("taxa_cartao", e.target.value)}
+                placeholder="Ex: 2.5"
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="provisao_desconto" className="text-sm font-medium">Provisão de Desconto (%)</Label>
-                <Input
-                  id="provisao_desconto"
-                  type="number"
-                  step="0.01"
-                  value={formData.provisao_desconto}
-                  onChange={(e) => handleInputChange("provisao_desconto", e.target.value)}
-                  placeholder="Ex: 10"
-                />
-              </div>
+            <div>
+              <Label htmlFor="provisao_desconto" className="text-sm font-medium">Provisão de Desconto (%)</Label>
+              <Input
+                id="provisao_desconto"
+                type="number"
+                step="0.01"
+                value={formData.provisao_desconto}
+                onChange={(e) => handleInputChange("provisao_desconto", e.target.value)}
+                placeholder="Ex: 10"
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="margem_desejada" className="text-sm font-medium">Margem Desejada (%)</Label>
-                <Input
-                  id="margem_desejada"
-                  type="number"
-                  step="0.01"
-                  value={formData.margem_desejada}
-                  onChange={(e) => handleInputChange("margem_desejada", e.target.value)}
-                  placeholder="Ex: 25"
-                />
-              </div>
+            <div>
+              <Label htmlFor="margem_desejada" className="text-sm font-medium">Margem Desejada (%)</Label>
+              <Input
+                id="margem_desejada"
+                type="number"
+                step="0.01"
+                value={formData.margem_desejada}
+                onChange={(e) => handleInputChange("margem_desejada", e.target.value)}
+                placeholder="Ex: 25"
+              />
             </div>
           </div>
           
           {/* Botões de Ação */}
           <div className="flex gap-3 pt-4 border-t border-border">
-            <Button
-              onClick={handleCalculate}
-              disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
-              className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
-            >
+              <Button
+                onClick={handleCalculate}
+                disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
+                className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+              >
               {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "🧮 Calcular Preço"}
             </Button>
             
@@ -364,130 +380,101 @@ export const PricingForm = () => {
         </CardContent>
       </Card>
 
-      {/* Análise de Preço Praticado - Seção Colapsável */}
-      <CollapsibleCard
-        title="Análise de Preço Praticado"
-        icon={<TrendingUp className="w-5 h-5" />}
-        isOpen={analysisSection.isOpen}
-        onToggle={analysisSection.toggle}
-        variant="secondary"
-      >
-        <div>
-          <Label htmlFor="preco_praticado" className="text-sm font-medium">
-            Preço de Venda Praticado (R$) - Opcional
-          </Label>
-          <Input
-            id="preco_praticado"
-            type="number"
-            step="0.01"
-            value={formData.preco_praticado}
-            onChange={(e) => handleInputChange("preco_praticado", e.target.value)}
-            placeholder="Ex: 199.90"
-            className="mt-1"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Compare sua margem real com a desejada
-          </p>
-        </div>
-      </CollapsibleCard>
+      {/* Results Section */}
+      <Card className="shadow-form border border-border/50">
+        <CardHeader className="bg-gradient-card text-white rounded-t-lg">
+          <CardTitle className="text-xl">📊 Resultado do Cálculo</CardTitle>
+        </CardHeader>
+        <CardContent className="p-lg">
+          {pricingResult ? (
+            <div className="space-y-md">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>Produto:</div>
+                <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
+                
+                <div>SKU:</div>
+                <div className="font-medium">{pricingResult.product_sku || 'N/A'}</div>
+                
+                <Separator className="col-span-2 my-2" />
+                
+                <div>Custo Total:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.custo_total || 0)}</div>
+                
+                <div>Valor Fixo:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.valor_fixo || 0)}</div>
+                
+                <div>Frete:</div>
+                <div className="font-medium">{formatarMoeda(pricingResult.frete || 0)}</div>
+                
+                <div>Comissão:</div>
+                <div className="font-medium">{formatarPercentual(pricingResult.comissao || 0)}</div>
+                
+                <Separator className="col-span-2 my-2" />
+                
+                <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
+                <div className="text-lg font-bold text-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
+                
+                <div className="font-semibold">Margem Unitária:</div>
+                <div className="font-semibold">{formatarMoeda(pricingResult.margem_unitaria || 0)}</div>
+                
+                <div className="font-semibold">Margem Percentual:</div>
+                <div className="font-semibold">{formatarPercentual(pricingResult.margem_percentual || 0)}</div>
+              </div>
 
-      {/* Resultados - Seção Colapsável */}
-      <CollapsibleCard
-        title="Resultado do Cálculo"
-        icon={<Calculator className="w-5 h-5" />}
-        isOpen={resultsSection.isOpen}
-        onToggle={resultsSection.toggle}
-        variant="default"
-      >
-        {pricingResult ? (
-          <div className="space-y-md">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>Produto:</div>
-              <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
-              
-              <div>SKU:</div>
-              <div className="font-medium">{pricingResult.product_sku || 'N/A'}</div>
-              
-              <Separator className="col-span-2 my-2" />
-              
-              <div>Custo Total:</div>
-              <div className="font-medium">{formatarMoeda(pricingResult.custo_total || 0)}</div>
-              
-              <div>Valor Fixo:</div>
-              <div className="font-medium">{formatarMoeda(pricingResult.valor_fixo || 0)}</div>
-              
-              <div>Frete:</div>
-              <div className="font-medium">{formatarMoeda(pricingResult.frete || 0)}</div>
-              
-              <div>Comissão:</div>
-              <div className="font-medium">{formatarPercentual(pricingResult.comissao || 0)}</div>
-              
-              <Separator className="col-span-2 my-2" />
-              
-              <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
-              <div className="text-lg font-bold text-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
-              
-              <div className="font-semibold">Margem Unitária:</div>
-              <div className="font-semibold">{formatarMoeda(pricingResult.margem_unitaria || 0)}</div>
-              
-              <div className="font-semibold">Margem Percentual:</div>
-              <div className="font-semibold">{formatarPercentual(pricingResult.margem_percentual || 0)}</div>
-            </div>
-
-            {/* Seção de Margem Real - só aparece se houver cálculo */}
-            {margemRealResult && (
-              <>
-                <Separator className="my-4" />
-                <div className="bg-muted/50 p-md rounded-lg">
-                  <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
-                    📊 Análise do Preço Praticado
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>Preço Praticado:</div>
-                    <div className="font-medium text-orange-600 dark:text-orange-400">
-                      {formatarMoeda(margemRealResult.preco_praticado || 0)}
-                    </div>
-                    
-                    <div>Margem Real Unitária:</div>
-                    <div className="font-medium">
-                      {formatarMoeda(margemRealResult.margem_unitaria_real || 0)}
-                    </div>
-                    
-                    <div>Margem Real Percentual:</div>
-                    <div className={`font-medium ${
-                      (margemRealResult.margem_percentual_real || 0) < 0 
-                        ? 'text-destructive' 
-                        : 'text-green-600 dark:text-green-400'
-                    }`}>
-                      {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
-                    </div>
-                    
-                    {/* Indicador de comparação */}
-                    <div className="col-span-2 mt-2 pt-2 border-t">
-                      <div className="text-xs text-muted-foreground">
-                        {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
-                          <span className="text-amber-600 dark:text-amber-400">
-                            ⚠️ Margem real é menor que a desejada
-                          </span>
-                        ) : (
-                          <span className="text-green-600 dark:text-green-400">
-                            ✅ Margem real está dentro do esperado
-                          </span>
-                        )}
+              {/* Seção de Margem Real - só aparece se houver cálculo */}
+              {margemRealResult && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="bg-muted/50 p-md rounded-lg">
+                    <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
+                      📊 Análise do Preço Praticado
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>Preço Praticado:</div>
+                      <div className="font-medium text-orange-600 dark:text-orange-400">
+                        {formatarMoeda(margemRealResult.preco_praticado || 0)}
+                      </div>
+                      
+                      <div>Margem Real Unitária:</div>
+                      <div className="font-medium">
+                        {formatarMoeda(margemRealResult.margem_unitaria_real || 0)}
+                      </div>
+                      
+                      <div>Margem Real Percentual:</div>
+                      <div className={`font-medium ${
+                        (margemRealResult.margem_percentual_real || 0) < 0 
+                          ? 'text-destructive' 
+                          : 'text-green-600 dark:text-green-400'
+                      }`}>
+                        {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
+                      </div>
+                      
+                      {/* Indicador de comparação */}
+                      <div className="col-span-2 mt-2 pt-2 border-t">
+                        <div className="text-xs text-muted-foreground">
+                          {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
+                            <span className="text-amber-600 dark:text-amber-400">
+                              ⚠️ Margem real é menor que a desejada
+                            </span>
+                          ) : (
+                            <span className="text-green-600 dark:text-green-400">
+                              ✅ Margem real está dentro do esperado
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p className="text-lg">🧮 Calcule um preço para ver os resultados</p>
-            <p className="text-sm">Preencha os campos acima e clique em "Calcular Preço"</p>
-          </div>
-        )}
-      </CollapsibleCard>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground py-8">
+              Preencha os campos e clique em "Calcular" para ver os resultados
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -15,9 +15,7 @@ const Categories = () => {
       icon={<FolderTree className="w-6 h-6" />}
       breadcrumbs={breadcrumbs}
     >
-      <div className="xl:col-span-6">
-        <CategoryForm />
-      </div>
+      <CategoryForm />
     </ConfigurationPageLayout>
   );
 };
