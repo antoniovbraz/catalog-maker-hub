@@ -53,8 +53,8 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
       const x = Number(data.x || 0);
       const revenue = Number(data.revenue || 0);
       
-      return (
-        <div className="bg-background border rounded-lg shadow-elegant p-3 text-sm animate-fade-in">
+        return (
+          <div className="bg-background border rounded-lg shadow-elegant p-3 text-sm animate-in fade-in">
           <p className="font-semibold text-primary">{name}</p>
           <p className="text-muted-foreground text-xs mb-2">{marketplace}</p>
           <div className="space-y-xs">

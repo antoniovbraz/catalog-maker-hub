@@ -85,15 +85,9 @@ describe('useProducts hooks', () => {
         wrapper: createWrapper(),
       });
 
-      result.current.mutate(productData);
-
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
-
-      expect(result.current.data).toEqual(newProduct);
+      await result.current.mutateAsync(productData);
       expect(productsService.create).toHaveBeenCalledWith(productData);
-      expect(testUtils.mockToast.success).toHaveBeenCalledWith(
+      expect(testUtils.mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Sucesso',
           description: 'Produto criado com sucesso!',
@@ -116,14 +110,8 @@ describe('useProducts hooks', () => {
         wrapper: createWrapper(),
       });
 
-      result.current.mutate(productData);
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(result.current.error).toEqual(mockError);
-      expect(testUtils.mockToast.error).toHaveBeenCalledWith(
+      await expect(result.current.mutateAsync(productData)).rejects.toThrow(mockError);
+      expect(testUtils.mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Erro',
           description: mockError.message,
@@ -144,13 +132,7 @@ describe('useProducts hooks', () => {
         wrapper: createWrapper(),
       });
 
-      result.current.mutate({ id: 'test-id', data: updateData });
-
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
-
-      expect(result.current.data).toEqual(updatedProduct);
+      await result.current.mutateAsync({ id: 'test-id', data: updateData });
       expect(productsService.update).toHaveBeenCalledWith('test-id', updateData);
     });
   });
@@ -163,14 +145,9 @@ describe('useProducts hooks', () => {
         wrapper: createWrapper(),
       });
 
-      result.current.mutate('test-id');
-
-      await waitFor(() => {
-        expect(result.current.isSuccess).toBe(true);
-      });
-
+      await result.current.mutateAsync('test-id');
       expect(productsService.delete).toHaveBeenCalledWith('test-id');
-      expect(testUtils.mockToast.success).toHaveBeenCalledWith(
+      expect(testUtils.mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Sucesso',
           description: 'Produto deletado com sucesso!',

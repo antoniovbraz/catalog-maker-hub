@@ -24,8 +24,13 @@ export class PricingError extends Error {
 /**
  * Manipula erros do Supabase e retorna mensagens amigáveis
  */
-export function handleSupabaseError(error: any): string {
-  if (error?.code === 'PGRST116') {
+  interface SupabaseError {
+    code?: string;
+    message?: string;
+  }
+
+  export function handleSupabaseError(error: SupabaseError): string {
+    if (error?.code === 'PGRST116') {
     return 'Registro não encontrado';
   }
   

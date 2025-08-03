@@ -36,27 +36,12 @@ interface SubscriptionTableRow {
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
-  
-  // Verificar se é super admin
-  if (profile?.role !== 'super_admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Crown className="h-16 w-16 text-muted-foreground mx-auto mb-md" />
-          <Heading variant="h2" className="text-destructive mb-sm">
-            Acesso Restrito
-          </Heading>
-          <Text className="text-muted-foreground">
-            Apenas super administradores podem acessar esta área.
-          </Text>
-        </div>
-      </div>
-    );
-  }
+  const isSuperAdmin = profile?.role === 'super_admin';
 
   // Queries para dados do admin
   const { data: allUsers, isLoading: usersLoading } = useQuery({
     queryKey: ['admin-users'],
+    enabled: isSuperAdmin,
     queryFn: async (): Promise<UserTableRow[]> => {
       const { data, error } = await supabase
         .from('profiles')
@@ -70,6 +55,7 @@ export default function AdminDashboard() {
 
   const { data: allSubscriptions, isLoading: subscriptionsLoading } = useQuery({
     queryKey: ['admin-subscriptions'],
+    enabled: isSuperAdmin,
     queryFn: async (): Promise<SubscriptionTableRow[]> => {
       const { data, error } = await supabase
         .from('subscriptions')
@@ -87,6 +73,7 @@ export default function AdminDashboard() {
 
   const { data: revenue, isLoading: revenueLoading } = useQuery({
     queryKey: ['admin-revenue'],
+    enabled: isSuperAdmin,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('subscriptions')
@@ -110,6 +97,22 @@ export default function AdminDashboard() {
       };
     }
   });
+
+  if (!isSuperAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Crown className="h-16 w-16 text-muted-foreground mx-auto mb-md" />
+          <Heading variant="h2" className="text-destructive mb-sm">
+            Acesso Restrito
+          </Heading>
+          <Text className="text-muted-foreground">
+            Apenas super administradores podem acessar esta área.
+          </Text>
+        </div>
+      </div>
+    );
+  }
 
   const stats = [
     {

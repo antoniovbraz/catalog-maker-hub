@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, SortAsc, SortDesc, Grid, List, MoreHorizontal } from "lucide-react";
+import { Search, SortAsc, SortDesc, Grid, List, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { StatusBadge } from "./status-badge";
 import { cn } from "@/lib/utils";
 
 interface DataColumn<T> {
@@ -32,7 +31,6 @@ interface DataVisualizationProps<T extends { id: string }> {
   columns: DataColumn<T>[];
   actions?: DataAction<T>[];
   searchable?: boolean;
-  filterable?: boolean;
   viewMode?: "table" | "grid";
   onViewModeChange?: (mode: "table" | "grid") => void;
   isLoading?: boolean;
@@ -48,7 +46,6 @@ export function DataVisualization<T extends { id: string }>({
   columns,
   actions = [],
   searchable = true,
-  filterable = false,
   viewMode = "table",
   onViewModeChange,
   isLoading = false,
@@ -99,7 +96,7 @@ export function DataVisualization<T extends { id: string }>({
     }
   };
 
-  const getValue = (item: T, key: string): any => {
+  const getValue = (item: T, key: string): unknown => {
     return key.split('.').reduce((obj, k) => obj?.[k], item);
   };
 

@@ -173,7 +173,7 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-sidebar-foreground bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 Peepers Hub
               </h2>
               <p className="text-xs text-sidebar-foreground/70">

@@ -66,7 +66,7 @@ export function ProgressIndicator({
             "space-y-md",
             !isVertical && "md:grid md:grid-cols-2 md:gap-4 md:space-y-0"
           )}>
-            {steps.map((step, index) => {
+              {steps.map((step) => {
               const isActive = currentStep === step.id;
               const isCompleted = step.completed;
               

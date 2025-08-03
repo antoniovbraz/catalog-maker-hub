@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Plus, Package, Calculator, Tag, Save, X, AlertCircle } from '@/components/ui/icons';
+import { Trash2, Edit, Package, Tag, Save, X, AlertCircle } from '@/components/ui/icons';
 import { useProductsWithCategories, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { ProductWithCategory, ProductFormData } from "@/types/products";
@@ -28,7 +28,7 @@ export const ProductForm = () => {
     tax_rate: 0
   });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Partial<ProductFormData>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof ProductFormData, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof ProductFormData, boolean>>>({});
 
   const { data: categories = [] } = useCategories();
@@ -38,7 +38,7 @@ export const ProductForm = () => {
   const deleteMutation = useDeleteProduct();
 
   // Validação em tempo real
-  const validateField = (name: keyof ProductFormData, value: any) => {
+  const validateField = (name: keyof ProductFormData, value: string | number) => {
     const newErrors = { ...errors };
     
     switch (name) {
@@ -52,15 +52,15 @@ export const ProductForm = () => {
         }
         break;
       case 'cost_unit':
-        if (typeof value === 'number' && value <= 0) {
-          newErrors.cost_unit = 'Custo deve ser maior que zero' as any;
+          if (typeof value === 'number' && value <= 0) {
+            newErrors.cost_unit = 'Custo deve ser maior que zero';
         } else {
           delete newErrors.cost_unit;
         }
         break;
       case 'tax_rate':
-        if (typeof value === 'number' && (value < 0 || value > 100)) {
-          newErrors.tax_rate = 'Taxa deve estar entre 0 e 100%' as any;
+          if (typeof value === 'number' && (value < 0 || value > 100)) {
+            newErrors.tax_rate = 'Taxa deve estar entre 0 e 100%';
         } else {
           delete newErrors.tax_rate;
         }
@@ -83,7 +83,7 @@ export const ProductForm = () => {
     }
   }, [formData, editingId, touched]);
 
-  const handleInputChange = (name: keyof ProductFormData, value: any) => {
+  const handleInputChange = (name: keyof ProductFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     setTouched(prev => ({ ...prev, [name]: true }));
     validateField(name, value);
@@ -412,11 +412,11 @@ export const ProductForm = () => {
 
             {/* Botões de Ação */}
             <div className="flex gap-3 pt-4">
-              <Button 
-                type="submit" 
-                disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 h-11 bg-gradient-primary hover:bg-gradient-primary/90 shadow-hover"
-              >
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+                >
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? "💾 Atualizar Produto" : "➕ Criar Produto"}
               </Button>

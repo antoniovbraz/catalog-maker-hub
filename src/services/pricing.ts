@@ -44,7 +44,13 @@ export class PricingService extends BaseService<SavedPricingType> {
     return data || [];
   }
 
-  async calcularPreco(productId: string, marketplaceId: string, taxaCartao: number, provisaoDesconto: number, margemDesejada: number): Promise<any> {
+    async calcularPreco(
+      productId: string,
+      marketplaceId: string,
+      taxaCartao: number,
+      provisaoDesconto: number,
+      margemDesejada: number,
+    ): Promise<Record<string, unknown>> {
     const { data, error } = await supabase.rpc('calcular_preco', {
       p_product_id: productId,
       p_marketplace_id: marketplaceId,
@@ -57,11 +63,17 @@ export class PricingService extends BaseService<SavedPricingType> {
     
     logger.debug('Resposta da RPC calcular_preco', 'PricingService', data);
     
-    // A função retorna um objeto JSON completo, não apenas um número
-    return data;
-  }
+      // A função retorna um objeto JSON completo, não apenas um número
+      return (data as Record<string, unknown>) || {};
+    }
 
-  async calcularMargemReal(productId: string, marketplaceId: string, taxaCartao: number, provisaoDesconto: number, precoPraticado: number): Promise<any> {
+    async calcularMargemReal(
+      productId: string,
+      marketplaceId: string,
+      taxaCartao: number,
+      provisaoDesconto: number,
+      precoPraticado: number,
+    ): Promise<Record<string, unknown>> {
     const { data, error } = await supabase.rpc('calcular_margem_real', {
       p_product_id: productId,
       p_marketplace_id: marketplaceId,
@@ -74,9 +86,9 @@ export class PricingService extends BaseService<SavedPricingType> {
     
     logger.debug('Resposta da RPC calcular_margem_real', 'PricingService', data);
     
-    // A função retorna um objeto JSON completo, não apenas um número
-    return data;
-  }
+      // A função retorna um objeto JSON completo, não apenas um número
+      return (data as Record<string, unknown>) || {};
+    }
 
   async upsert(data: Omit<SavedPricingType, 'id' | 'created_at' | 'updated_at'>): Promise<SavedPricingType> {
     const { data: result, error } = await supabase

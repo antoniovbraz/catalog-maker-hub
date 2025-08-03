@@ -316,11 +316,11 @@ export const PricingForm = () => {
           
           {/* Botões de Ação */}
           <div className="flex gap-3 pt-4 border-t border-border">
-            <Button
-              onClick={handleCalculate}
-              disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
-              className="flex-1 h-11 bg-gradient-primary hover:bg-gradient-primary/90 shadow-hover"
-            >
+              <Button
+                onClick={handleCalculate}
+                disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
+                className="flex-1 h-11 bg-gradient-primary hover:opacity-90 shadow-hover"
+              >
               {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "🧮 Calcular Preço"}
             </Button>
             
