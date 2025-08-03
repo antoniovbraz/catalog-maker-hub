@@ -46,20 +46,20 @@ export function SmartForm({
 
   return (
     <Card className={cn("shadow-card", className)}>
-      <CardHeader className="bg-gradient-card text-white">
+      <CardHeader className="bg-card">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-white flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               {title}
               {isEditing && <Badge variant="secondary">{editingLabel}</Badge>}
             </CardTitle>
             {description && (
-              <p className="text-white/80 mt-1">{description}</p>
+              <p className="text-muted-foreground mt-1">{description}</p>
             )}
           </div>
           
           {isDirty && (
-            <div className="flex items-center gap-2 text-white/80">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm">Alterações não salvas</span>
             </div>
@@ -109,7 +109,7 @@ export function SmartForm({
           
           {/* Form Actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-            {onCancel && isEditing && (
+            {onCancel && (
               <Button 
                 type="button" 
                 variant="outline" 

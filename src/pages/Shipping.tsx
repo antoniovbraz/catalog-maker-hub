@@ -3,9 +3,10 @@ import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLa
 import { Truck, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 
 const Shipping = () => {
-  const { isFormVisible, showForm, hideForm } = useFormVisibility({
+  const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
     formStorageKey: 'shipping-form-visible',
     listStorageKey: 'shipping-list-visible'
   });
@@ -37,6 +38,21 @@ const Shipping = () => {
           <ShippingRuleForm onCancel={hideForm} />
         </div>
       )}
+
+      {/* Lista externa colapsável */}
+      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
+        <CollapsibleCard
+          title="Regras de Frete Configuradas"
+          icon={<Truck className="w-4 h-4" />}
+          isOpen={isListVisible}
+          onToggle={toggleList}
+        >
+          <div className="p-4 text-center text-muted-foreground">
+            <p>Lista de regras de frete será exibida aqui</p>
+            <p className="text-sm mt-1">Adicione uma nova regra para começar</p>
+          </div>
+        </CollapsibleCard>
+      </div>
     </ConfigurationPageLayout>
   );
 };

@@ -228,7 +228,7 @@ export function CommissionFormEnhanced({
       isDirty={isDirty}
       isSubmitting={isSubmitting}
       onSubmit={handleSubmit}
-      onCancel={isEditing ? handleCancel : undefined}
+      onCancel={handleCancel}
       submitLabel={isEditing ? "Atualizar Comissão" : "Criar Comissão"}
     />
   );

@@ -14,7 +14,11 @@ import { cn } from "@/lib/utils";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
 
-export const CategoryForm = () => {
+interface CategoryFormProps {
+  onCancel?: () => void;
+}
+
+export const CategoryForm = ({ onCancel }: CategoryFormProps = {}) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<CategoryFormData>({
     name: "",
@@ -227,22 +231,23 @@ export const CategoryForm = () => {
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
+                className="flex-1 h-11"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? "Atualizar Categoria" : "Criar Categoria"}
               </Button>
-              {editingId && (
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={resetForm}
-                  className="h-11 min-w-[120px]"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancelar
-                </Button>
-              )}
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  resetForm();
+                  onCancel?.();
+                }}
+                className="h-11 min-w-[120px]"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Cancelar
+              </Button>
             </div>
           </form>
         </CardContent>
