@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FolderOpen, Save, X, AlertCircle } from '@/components/ui/icons';
+import { FolderOpen, Save, X, AlertCircle, Edit, Trash2 } from '@/components/ui/icons';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType, CategoryFormData } from "@/types/categories";
-import { DataTable, Column } from "@/components/common/DataTable";
+import { DataVisualization } from "@/components/ui/data-visualization";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -111,25 +111,39 @@ export const CategoryForm = () => {
   };
 
   // Configurar colunas da tabela
-  const columns: Column<CategoryType>[] = [
+  const columns = [
     {
       key: 'name',
       header: 'Nome',
-      render: (value) => (
+      render: (item: CategoryType) => (
         <div className="flex items-center gap-2">
           <FolderOpen className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium">{value as string}</span>
+          <span className="font-medium">{item.name}</span>
         </div>
       )
     },
     {
       key: 'description',
       header: 'Descrição',
-      render: (value) => (
+      render: (item: CategoryType) => (
         <span className="text-muted-foreground">
-          {value as string || "Sem descrição"}
+          {item.description || "Sem descrição"}
         </span>
       )
+    }
+  ];
+
+  const actions = [
+    {
+      label: 'Editar',
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (category: CategoryType) => handleEdit(category)
+    },
+    {
+      label: 'Excluir',
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (category: CategoryType) => deleteMutation.mutate(category.id),
+      variant: 'destructive' as const
     }
   ];
 
@@ -217,16 +231,20 @@ export const CategoryForm = () => {
       </Card>
 
       {/* Lista de Categorias */}
-      <DataTable
+      <DataVisualization
+        title="📂 Categorias Cadastradas"
         data={categories}
         columns={columns}
-        onEdit={handleEdit}
-        onDelete={(category) => deleteMutation.mutate(category.id)}
-        loading={isLoading}
-        title="📂 Categorias Cadastradas"
-        searchPlaceholder="Buscar categorias..."
-        emptyMessage="Nenhuma categoria cadastrada"
-        emptyDescription="Crie sua primeira categoria usando o formulário acima"
+        actions={actions}
+        isLoading={isLoading}
+        emptyState={
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
+            <p className="text-sm text-muted-foreground">
+              Crie sua primeira categoria usando o formulário acima
+            </p>
+          </div>
+        }
       />
     </div>
   );

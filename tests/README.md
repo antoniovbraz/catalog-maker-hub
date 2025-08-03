@@ -33,7 +33,7 @@ tests/
 ├── hooks/                   # Testes dos custom hooks
 │   └── useProducts.test.tsx # Testes dos hooks de produtos
 └── components/              # Testes de componentes
-    └── DataTable.test.tsx   # Testes do DataTable
+    └── DataVisualization.test.tsx   # Testes do DataVisualization
 ```
 
 ## 🎯 Cobertura de Testes
@@ -112,10 +112,10 @@ describe('useProducts', () => {
 
 ### 3. Testes de Componentes
 ```typescript
-// Exemplo: tests/components/DataTable.test.tsx
-describe('DataTable', () => {
+// Exemplo: tests/components/DataVisualization.test.tsx
+describe('DataVisualization', () => {
   it('deve renderizar dados corretamente', () => {
-    render(<DataTable data={mockData} columns={mockColumns} />);
+    render(<DataVisualization title="Teste" data={mockData} columns={mockColumns} />);
     
     expect(screen.getByText('Item 1')).toBeInTheDocument();
     expect(screen.getByText('Item 2')).toBeInTheDocument();

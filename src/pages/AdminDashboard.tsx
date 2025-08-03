@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DataTable, Column } from '@/components/common/DataTable';
+import { DataVisualization } from '@/components/ui/data-visualization';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Heading, Text } from '@/components/ui/typography';
 import { Crown, Users, TrendingUp, DollarSign, Activity, Settings, UserPlus, BarChart3 } from '@/components/ui/icons';
@@ -142,11 +142,11 @@ export default function AdminDashboard() {
     }
   ];
 
-  const userColumns: Column<UserTableRow>[] = [
+  const userColumns = [
     {
       key: 'full_name',
       header: 'Nome',
-      render: (_value, item) => (
+      render: (item: UserTableRow) => (
         <div>
           <div className="font-medium">{item.full_name || 'N/A'}</div>
           <div className="text-sm text-muted-foreground">{item.email}</div>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
     {
       key: 'role',
       header: 'Role',
-      render: (_value, item) => (
+      render: (item: UserTableRow) => (
         <Badge variant={item.role === 'super_admin' ? 'destructive' : 'secondary'}>
           {item.role}
         </Badge>
@@ -169,12 +169,12 @@ export default function AdminDashboard() {
     {
       key: 'created_at',
       header: 'Criado em',
-      render: (value) => new Date(String(value)).toLocaleDateString('pt-BR')
+      render: (item: UserTableRow) => new Date(String(item.created_at)).toLocaleDateString('pt-BR')
     },
     {
       key: 'is_active',
       header: 'Status',
-      render: (_value, item) => (
+      render: (item: UserTableRow) => (
         <Badge variant={item.is_active ? 'default' : 'secondary'}>
           {item.is_active ? 'Ativo' : 'Inativo'}
         </Badge>
@@ -182,11 +182,11 @@ export default function AdminDashboard() {
     }
   ];
 
-  const subscriptionColumns: Column<SubscriptionTableRow>[] = [
+  const subscriptionColumns = [
     {
       key: 'user.full_name',
       header: 'Usuário',
-      render: (_value, item) => (
+      render: (item: SubscriptionTableRow) => (
         <div>
           <div className="font-medium">{item.user?.full_name || 'N/A'}</div>
           <div className="text-sm text-muted-foreground">{item.user?.email}</div>
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
     {
       key: 'plan.display_name',
       header: 'Plano',
-      render: (_value, item) => (
+      render: (item: SubscriptionTableRow) => (
         <Badge variant="outline">
           {item.plan?.display_name}
         </Badge>
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
     {
       key: 'status',
       header: 'Status',
-      render: (_value, item) => (
+      render: (item: SubscriptionTableRow) => (
         <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
           {item.status}
         </Badge>
@@ -214,12 +214,12 @@ export default function AdminDashboard() {
     {
       key: 'plan.price_monthly',
       header: 'Valor Mensal',
-      render: (_value, item) => `R$ ${(item.plan?.price_monthly || 0).toFixed(2)}`
+      render: (item: SubscriptionTableRow) => `R$ ${(item.plan?.price_monthly || 0).toFixed(2)}`
     },
     {
       key: 'current_period_end',
       header: 'Período',
-      render: (_value, item) => {
+      render: (item: SubscriptionTableRow) => {
         if (!item.current_period_end) return 'N/A';
         return new Date(item.current_period_end).toLocaleDateString('pt-BR');
       }
@@ -303,43 +303,21 @@ export default function AdminDashboard() {
         </TabsList>
 
         <TabsContent value="users" className="space-y-lg">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                Gestão de Usuários
-              </CardTitle>
-              <CardDescription>
-                Gerencie todos os usuários da plataforma
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DataTable 
-                columns={userColumns}
-                data={allUsers || []}
-              />
-            </CardContent>
-          </Card>
+          <DataVisualization
+            title="Gestão de Usuários"
+            description="Gerencie todos os usuários da plataforma"
+            data={allUsers || []}
+            columns={userColumns}
+          />
         </TabsContent>
 
         <TabsContent value="subscriptions" className="space-y-lg">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="w-5 h-5" />
-                Gestão de Assinaturas
-              </CardTitle>
-              <CardDescription>
-                Monitore todas as assinaturas ativas na plataforma
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DataTable 
-                columns={subscriptionColumns}
-                data={allSubscriptions || []}
-              />
-            </CardContent>
-          </Card>
+          <DataVisualization
+            title="Gestão de Assinaturas"
+            description="Monitore todas as assinaturas ativas na plataforma"
+            data={allSubscriptions || []}
+            columns={subscriptionColumns}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-lg">
