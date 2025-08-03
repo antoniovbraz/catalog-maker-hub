@@ -67,10 +67,10 @@ export function SmartForm({
         </div>
       </CardHeader>
       
-      <CardContent className="p-6">
-        <form onSubmit={onSubmit} className="space-y-6">
+      <CardContent className="p-lg">
+        <form onSubmit={onSubmit} className="space-y-lg">
           {sections.map((section, index) => (
-            <div key={section.id} className="space-y-4">
+            <div key={section.id} className="space-y-md">
               {/* Section Header */}
               <div className="flex items-center gap-2 pb-2 border-b border-border">
                 {section.icon && (

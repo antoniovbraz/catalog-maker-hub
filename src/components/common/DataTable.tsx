@@ -68,7 +68,7 @@ export function DataTable<T extends { id: string }>({
   };
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-md">
         {(title || searchable || onCreate) && (
           <div className="flex items-center justify-between">
             {title && <h2 className="text-xl font-semibold">{title}</h2>}
@@ -95,7 +95,7 @@ export function DataTable<T extends { id: string }>({
 
   if (!filteredData.length && searchTerm) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-md">
         {(title || searchable || onCreate) && (
           <div className="flex items-center justify-between">
             {title && <h2 className="text-xl font-semibold">{title}</h2>}
@@ -130,7 +130,7 @@ export function DataTable<T extends { id: string }>({
 
   if (!data.length) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-md">
         {(title || searchable || onCreate) && (
           <div className="flex items-center justify-between">
             {title && <h2 className="text-xl font-semibold">{title}</h2>}
@@ -168,7 +168,7 @@ export function DataTable<T extends { id: string }>({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-md">
       {/* Header with title, search and actions */}
       {(title || searchable || onCreate) && (
         <div className="flex items-center justify-between">

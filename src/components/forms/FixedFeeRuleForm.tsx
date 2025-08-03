@@ -227,13 +227,13 @@ export const FixedFeeRuleForm = () => {
   const showRangeFields = formData.rule_type === "faixa" || formData.rule_type === "percentual";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       <Card>
         <CardHeader>
           <CardTitle>{editingId ? "Editar Taxa Fixa" : "Nova Taxa Fixa"}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="marketplace">Marketplace *</Label>
@@ -260,7 +260,7 @@ export const FixedFeeRuleForm = () => {
                         <Info className="w-4 h-4 text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent className="max-w-sm">
-                        <div className="space-y-2">
+                        <div className="space-y-sm">
                           {RULE_TYPES.map((type) => (
                             <div key={type.value}>
                               <p className="font-medium">{type.label}:</p>

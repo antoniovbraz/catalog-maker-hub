@@ -172,7 +172,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
         />
         
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="space-y-1">
+          <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Package className="h-3 w-3" />
               <span>Custo Total</span>
@@ -180,7 +180,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <DollarSign className="h-3 w-3" />
               <span>Preço Praticado</span>
@@ -188,7 +188,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <TrendingUp className="h-3 w-3" />
               <span>Margem R$</span>
@@ -196,7 +196,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             <div className="font-semibold text-success">R$ {result.margem_unitaria.toFixed(2)}</div>
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Target className="h-3 w-3" />
               <span>Comissão</span>
@@ -217,7 +217,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           </div>
         </div>
         
-        <div className="pt-2 border-t border-border/30 text-xs text-muted-foreground space-y-1">
+        <div className="pt-2 border-t border-border/30 text-xs text-muted-foreground space-y-xs">
           <div className="font-medium text-foreground mb-2">Detalhamento:</div>
           <div className="grid grid-cols-2 gap-x-2 gap-y-1">
             <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
@@ -490,7 +490,7 @@ export const DashboardForm = () => {
   const isLoading = loadingSavedPricings || isRecalculating;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       {/* Controls */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
@@ -639,7 +639,7 @@ export const DashboardForm = () => {
 
       {/* Results */}
       {selectedProductId && selectedMarketplaces.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-md">
           <h3 className="text-lg font-semibold">Comparação de Preços</h3>
           
           {isLoading ? (
@@ -650,7 +650,7 @@ export const DashboardForm = () => {
                     <div className="h-4 bg-muted rounded w-3/4"></div>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
+                    <div className="space-y-sm">
                       <div className="h-3 bg-muted rounded"></div>
                       <div className="h-3 bg-muted rounded w-5/6"></div>
                       <div className="h-3 bg-muted rounded w-4/6"></div>

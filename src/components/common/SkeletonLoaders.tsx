@@ -7,7 +7,7 @@ interface SkeletonTableProps {
 
 export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-md">
       {/* Header skeleton */}
       <div className="flex items-center justify-between">
         <Skeleton className="h-6 w-48" />
@@ -20,7 +20,7 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
       {/* Table skeleton */}
       <div className="rounded-lg border border-border/50 overflow-hidden">
         {/* Table header */}
-        <div className="bg-muted/50 p-4 border-b">
+        <div className="bg-muted/50 p-md border-b">
           <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr) auto` }}>
             {Array.from({ length: columns }).map((_, i) => (
               <Skeleton key={i} className="h-4 w-20" />
@@ -32,7 +32,7 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
         {/* Table rows */}
         <div className="space-y-0">
           {Array.from({ length: rows }).map((_, rowIndex) => (
-            <div key={rowIndex} className="p-4 border-b last:border-b-0">
+            <div key={rowIndex} className="p-md border-b last:border-b-0">
               <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr) auto` }}>
                 {Array.from({ length: columns }).map((_, colIndex) => (
                   <Skeleton key={colIndex} className="h-4 w-full" />
@@ -54,21 +54,21 @@ interface SkeletonFormProps {
 
 export function SkeletonForm({ sections = 2, fieldsPerSection = 3 }: SkeletonFormProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-xl">
       <div className="rounded-lg border border-border/50 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-primary p-6">
+        <div className="bg-gradient-primary p-lg">
           <Skeleton className="h-6 w-48 bg-white/20" />
         </div>
         
         {/* Form content */}
-        <div className="p-6 space-y-6">
+        <div className="p-lg space-y-lg">
           {Array.from({ length: sections }).map((_, sectionIndex) => (
-            <div key={sectionIndex} className="space-y-4">
+            <div key={sectionIndex} className="space-y-md">
               <Skeleton className="h-5 w-32" />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Array.from({ length: fieldsPerSection }).map((_, fieldIndex) => (
-                  <div key={fieldIndex} className="space-y-2">
+                  <div key={fieldIndex} className="space-y-sm">
                     <Skeleton className="h-4 w-20" />
                     <Skeleton className="h-10 w-full" />
                   </div>
@@ -94,9 +94,9 @@ interface SkeletonCardProps {
 
 export function SkeletonCard({ count = 1 }: SkeletonCardProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-md">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="rounded-lg border border-border/50 p-6 space-y-4">
+        <div key={index} className="rounded-lg border border-border/50 p-lg space-y-md">
           <div className="flex items-center justify-between">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-8 w-8 rounded" />

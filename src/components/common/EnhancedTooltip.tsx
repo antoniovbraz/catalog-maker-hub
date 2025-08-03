@@ -36,9 +36,9 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
         {children}
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-64">
-        <div className="space-y-2">
+        <div className="space-y-sm">
           <p className="font-medium text-sm">{title}</p>
-          <div className="space-y-1">
+          <div className="space-y-xs">
             {details.map((detail, index) => (
               <div key={index} className="flex justify-between text-xs">
                 <span className="text-muted-foreground">{detail.label}:</span>

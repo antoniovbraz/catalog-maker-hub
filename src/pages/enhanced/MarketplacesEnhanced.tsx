@@ -127,7 +127,7 @@ const MarketplacesEnhanced = () => {
       progressTotal={totalMarketplaces}
     >
       {/* Form Column */}
-      <div className="xl:col-span-5 space-y-6">
+      <div className="xl:col-span-5 space-y-lg">
         <MarketplaceFormEnhanced 
           editingMarketplace={editingMarketplace}
           onCancelEdit={() => setEditingMarketplace(null)}

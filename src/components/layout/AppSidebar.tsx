@@ -166,7 +166,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-0 bg-sidebar">
-      <SidebarHeader className="p-6">
+      <SidebarHeader className="p-lg">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
             <Zap className="w-5 h-5 text-primary" />
@@ -184,7 +184,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="space-y-4">
+      <SidebarContent className="space-y-md">
         {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">

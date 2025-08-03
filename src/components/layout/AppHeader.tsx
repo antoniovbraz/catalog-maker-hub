@@ -72,7 +72,7 @@ export function AppHeader() {
           {/* User Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-3 h-auto p-2">
+              <Button variant="ghost" className="flex items-center gap-3 h-auto p-sm">
                 <Avatar className="w-8 h-8">
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                     {getUserInitials(profile?.full_name)}
@@ -91,7 +91,7 @@ export function AppHeader() {
             
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
-                <div className="flex flex-col space-y-1">
+                <div className="flex flex-col space-y-xs">
                   <p className="text-sm font-medium leading-none">
                     {profile?.full_name || 'Usuário'}
                   </p>

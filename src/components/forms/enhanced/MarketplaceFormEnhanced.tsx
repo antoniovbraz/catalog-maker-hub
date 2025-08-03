@@ -102,7 +102,7 @@ export function MarketplaceFormEnhanced({
       icon: <Store className="w-4 h-4" />,
       required: true,
       children: (
-        <div className="space-y-4">
+        <div className="space-y-md">
           <div>
             <Label htmlFor="name">Nome do Marketplace *</Label>
             <Input

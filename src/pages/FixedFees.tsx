@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const FixedFees = () => {
   return (
-    <div className="p-6">
+    <div className="p-lg">
       <Card>
         <CardHeader>
           <CardTitle>Regras de valor fixo</CardTitle>

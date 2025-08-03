@@ -60,13 +60,13 @@ export const MarketplaceForm = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       <Card>
         <CardHeader>
           <CardTitle>{editingId ? "Editar Marketplace" : "Novo Marketplace"}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-md">
             <div>
               <Label htmlFor="name">Nome *</Label>
               <Input
@@ -141,9 +141,9 @@ export const MarketplaceForm = () => {
           {isLoading ? (
             <p>Carregando...</p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-md">
               {hierarchicalMarketplaces.map((hierarchy) => (
-                <div key={hierarchy.parent.id} className="border rounded-lg p-4">
+                <div key={hierarchy.parent.id} className="border rounded-lg p-md">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-lg">{hierarchy.parent.name}</h3>
@@ -179,7 +179,7 @@ export const MarketplaceForm = () => {
                   </p>
                   
                   {hierarchy.children.length > 0 && (
-                    <div className="ml-4 space-y-2">
+                    <div className="ml-4 space-y-sm">
                       {hierarchy.children.map((child) => (
                         <div key={child.id} className="flex items-center justify-between p-3 bg-muted rounded-md">
                           <div className="flex items-center gap-2">

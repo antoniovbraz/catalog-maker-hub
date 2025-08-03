@@ -218,7 +218,7 @@ export const ProductForm = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-xl">
       {/* Form Section */}
       <Card className="shadow-form border border-border/50">
         <CardHeader className="bg-gradient-primary text-white rounded-t-lg">
@@ -227,10 +227,10 @@ export const ProductForm = () => {
             {editingId ? "✏️ Editar Produto" : "➕ Novo Produto"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="space-y-lg p-lg">
+          <form onSubmit={handleSubmit} className="space-y-lg">
             {/* Seção de Informações Básicas */}
-            <div className="space-y-4">
+            <div className="space-y-md">
               <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
                 📝 Informações Básicas
               </h3>
@@ -306,7 +306,7 @@ export const ProductForm = () => {
             <Separator />
 
             {/* Seção de Custos */}
-            <div className="space-y-4">
+            <div className="space-y-md">
               <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2 flex items-center gap-2">
                 💰 Configuração de Custos
               </h3>
@@ -383,7 +383,7 @@ export const ProductForm = () => {
 
               {/* Preview do custo total */}
               {custoTotal > 0 && (
-                <div className="bg-muted/50 p-4 rounded-lg border border-border/50">
+                <div className="bg-muted/50 p-md rounded-lg border border-border/50">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Custo Total:</span>
                     <span className="text-lg font-bold text-primary">

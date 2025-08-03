@@ -33,7 +33,7 @@ export function ProgressIndicator({
 
   if (!showDetails) {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div className={cn("space-y-sm", className)}>
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium text-foreground">
             Progresso da Configuração
@@ -51,8 +51,8 @@ export function ProgressIndicator({
 
   return (
     <Card className={className}>
-      <CardContent className="p-6">
-        <div className="space-y-4">
+      <CardContent className="p-lg">
+        <div className="space-y-md">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Progresso da Configuração</h3>
             <span className="text-sm text-muted-foreground">
@@ -63,7 +63,7 @@ export function ProgressIndicator({
           <Progress value={progressPercentage} className="h-2" />
           
           <div className={cn(
-            "space-y-4",
+            "space-y-md",
             !isVertical && "md:grid md:grid-cols-2 md:gap-4 md:space-y-0"
           )}>
             {steps.map((step, index) => {

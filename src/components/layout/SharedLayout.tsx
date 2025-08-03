@@ -24,7 +24,7 @@ export function SharedLayout({ children }: SharedLayoutProps) {
           
           {/* Main Content with improved container */}
           <main className="flex-1 overflow-auto">
-            <div className="container max-w-7xl mx-auto p-6 space-y-6">
+            <div className="container max-w-7xl mx-auto p-lg space-y-lg">
               {children}
             </div>
           </main>

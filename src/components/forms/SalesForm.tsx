@@ -81,13 +81,13 @@ export const SalesForm = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-lg">
       <Card>
         <CardHeader>
           <CardTitle>{editingId ? "Editar Venda" : "Nova Venda"}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="product">Produto *</Label>
