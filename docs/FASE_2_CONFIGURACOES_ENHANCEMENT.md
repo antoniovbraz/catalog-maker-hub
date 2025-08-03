@@ -1,6 +1,6 @@
 # FASE 2 - ENHANCEMENT DAS PÁGINAS DE CONFIGURAÇÃO ✅ EM PROGRESSO
 
-## 📊 **PROGRESS: 40% COMPLETO**
+## 📊 **PROGRESS: 50% COMPLETO**
 
 ### ✅ **FASE 1 IMPLEMENTADA - FOUNDATION & LAYOUT SYSTEM**
 
@@ -18,9 +18,9 @@
 - ✅ Suporte a gradientes e sombras elegantes
 
 #### **3. Páginas Enhanced Implementadas**
-- ✅ `MarketplacesEnhanced` - Layout two-column com formulário inteligente
+- ✅ `Marketplaces` - Layout two-column com formulário inteligente
 - ✅ `CommissionFormEnhanced` - Seções organizadas com preview de impacto
-- ✅ `CommissionsEnhanced` - Visualização moderna com estatísticas
+- ✅ `Commissions` - Visualização moderna com estatísticas
 
 ### 🔄 **PRÓXIMOS PASSOS - FASE 2**
 
