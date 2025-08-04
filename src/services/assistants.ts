@@ -10,6 +10,67 @@ export class AssistantsService extends BaseService<Assistant> {
     super('assistants');
   }
 
+  // Método para fazer requisições HTTP com retry e timeout
+  private async makeRequest(method: string, endpoint: string, body?: any): Promise<any> {
+    const maxRetries = 3;
+    const timeout = 30000; // 30 segundos
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        this.logger.debug(`Tentativa ${attempt}/${maxRetries} - ${method} ${endpoint}`);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('Usuário não autenticado');
+        }
+
+        const response = await fetch(`https://ngkhzbzynkhgezkqykeb.supabase.co/functions/v1/${endpoint}`, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5na2h6Ynp5bmtoZ2V6a3F5a2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMDM3ODgsImV4cCI6MjA2OTU3OTc4OH0.EMk6edTPpwvcy_6VVDxARgoRsJrY9EiijbfR4dFDQAQ',
+          },
+          body: body ? JSON.stringify(body) : undefined,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const result = await response.json();
+        this.logger.debug(`Sucesso na tentativa ${attempt}`, result);
+        return result;
+        
+      } catch (error: any) {
+        this.logger.error(`Erro na tentativa ${attempt}/${maxRetries}`, error);
+        
+        if (attempt === maxRetries) {
+          // Se é a última tentativa, relançar o erro
+          if (error.name === 'AbortError') {
+            throw new Error('Timeout na requisição - tente novamente');
+          }
+          if (error.message.includes('SSL') || error.message.includes('handshake')) {
+            throw new Error('Erro de conectividade SSL - tente novamente em alguns minutos');
+          }
+          throw error;
+        }
+        
+        // Aguardar antes de tentar novamente (backoff exponencial)
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        this.logger.debug(`Aguardando ${delay}ms antes da próxima tentativa`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
   async createAssistant(data: AssistantFormData): Promise<Assistant> {
     try {
       this.logger.debug('Criando assistente', data);
@@ -47,17 +108,9 @@ export class AssistantsService extends BaseService<Assistant> {
     try {
       this.logger.debug('Atualizando assistente', { id, data });
 
-      // Chamar edge function para atualizar assistente
-      const { data: result, error } = await supabase.functions.invoke(`assistants/${id}`, {
-        method: 'PUT',
-        body: data,
-      });
-
-      if (error) {
-        this.logger.error('Erro ao atualizar assistente', error);
-        throw new Error(`Falha ao atualizar assistente: ${error.message}`);
-      }
-
+      // Usar fetch direto para PUT com retry e timeout
+      const result = await this.makeRequest('PUT', `assistants/${id}`, data);
+      
       this.logger.info('Assistente atualizado com sucesso', result);
       return result as Assistant;
     } catch (error) {
@@ -70,16 +123,9 @@ export class AssistantsService extends BaseService<Assistant> {
     try {
       this.logger.debug('Deletando assistente', { id });
 
-      // Chamar edge function para deletar assistente
-      const { error } = await supabase.functions.invoke(`assistants/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (error) {
-        this.logger.error('Erro ao deletar assistente', error);
-        throw new Error(`Falha ao deletar assistente: ${error.message}`);
-      }
-
+      // Usar fetch direto para DELETE com retry e timeout
+      await this.makeRequest('DELETE', `assistants/${id}`);
+      
       this.logger.info('Assistente deletado com sucesso');
     } catch (error) {
       this.logger.error('Erro na deleção do assistente', error);

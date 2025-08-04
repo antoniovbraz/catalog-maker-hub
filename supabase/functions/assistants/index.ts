@@ -24,38 +24,57 @@ serve(async (req) => {
     console.log('Method:', req.method);
     console.log('URL:', req.url);
     
+    // Validar configurações
     if (!OPENAI_API_KEY) {
       console.error('ERRO: OpenAI API key não está configurada');
-      throw new Error('OpenAI API key não está configurada');
+      return new Response(JSON.stringify({ error: 'OpenAI API key não está configurada' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       console.error('ERRO: Supabase env vars não configuradas');
-      throw new Error('Supabase não está configurado');
+      return new Response(JSON.stringify({ error: 'Supabase não está configurado' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const { method } = req;
     const url = new URL(req.url);
-    const assistantId = url.pathname.split('/').pop();
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+    
+    console.log('Path segments:', pathSegments);
 
-    console.log(`Processando ${method} para assistente ${assistantId}`);
-
-    switch (method) {
-      case 'POST':
-        return await createAssistant(req);
-      case 'PUT':
-        return await updateAssistant(req, assistantId!);
-      case 'DELETE':
-        return await deleteAssistant(assistantId!);
-      default:
-        return new Response(JSON.stringify({ error: 'Método não permitido' }), {
-          status: 405,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+    if (method === 'POST') {
+      console.log('Roteando para createAssistant');
+      return createAssistant(req);
+    } else if (method === 'PUT' && pathSegments.length >= 2) {
+      const assistantDbId = pathSegments[pathSegments.length - 1];
+      console.log('Roteando para updateAssistant, ID:', assistantDbId);
+      return updateAssistant(req, assistantDbId);
+    } else if (method === 'DELETE' && pathSegments.length >= 2) {
+      const assistantDbId = pathSegments[pathSegments.length - 1];
+      console.log('Roteando para deleteAssistant, ID:', assistantDbId);
+      return deleteAssistant(assistantDbId);
+    } else {
+      console.error('Rota não encontrada:', { method, pathSegments });
+      return new Response(JSON.stringify({ 
+        error: 'Método não suportado ou rota inválida',
+        method,
+        pathSegments 
+      }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-  } catch (error) {
-    console.error('Erro na função assistants:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error: any) {
+    console.error('Erro na edge function assistants:', error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      stack: error.stack 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -159,24 +178,32 @@ async function updateAssistant(req: Request, assistantDbId: string) {
 
   console.log('Assistente encontrado, OpenAI ID:', assistantData.assistant_id);
 
-  // Atualizar na OpenAI
-  const openaiResponse = await fetch(`https://api.openai.com/v1/assistants/${assistantData.assistant_id}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2',
-    },
-    body: JSON.stringify({
-      name,
-      model,
-      instructions,
-    }),
-  });
+  // Atualizar na OpenAI com timeout e retry
+  console.log('Chamando OpenAI API para atualizar assistente...');
+  let openaiResponse;
+  try {
+    openaiResponse = await fetch(`https://api.openai.com/v1/assistants/${assistantData.assistant_id}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2',
+      },
+      body: JSON.stringify({
+        name,
+        model,
+        instructions,
+      }),
+    });
+    console.log('OpenAI Response status:', openaiResponse.status);
+  } catch (error: any) {
+    console.error('Erro na comunicação com OpenAI:', error);
+    throw new Error(`Erro de conectividade com OpenAI: ${error.message}`);
+  }
 
   if (!openaiResponse.ok) {
     const error = await openaiResponse.text();
-    console.error('Erro da OpenAI na atualização:', error);
+    console.error('Erro OpenAI:', error);
     throw new Error(`Erro ao atualizar assistente na OpenAI: ${error}`);
   }
 
@@ -231,19 +258,26 @@ async function deleteAssistant(assistantDbId: string) {
 
   console.log('Assistente encontrado, OpenAI ID:', assistantData.assistant_id);
 
-  // Deletar da OpenAI
-  const openaiResponse = await fetch(`https://api.openai.com/v1/assistants/${assistantData.assistant_id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      'OpenAI-Beta': 'assistants=v2',
-    },
-  });
+  // Deletar da OpenAI com timeout e retry
+  console.log('Chamando OpenAI API para deletar assistente...');
+  try {
+    const openaiResponse = await fetch(`https://api.openai.com/v1/assistants/${assistantData.assistant_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'OpenAI-Beta': 'assistants=v2',
+      },
+    });
+    console.log('OpenAI Delete Response status:', openaiResponse.status);
 
-  if (!openaiResponse.ok) {
-    const error = await openaiResponse.text();
-    console.error('Erro da OpenAI na deleção:', error);
-    // Continuar mesmo com erro da OpenAI
+    if (!openaiResponse.ok) {
+      const error = await openaiResponse.text();
+      console.error('Erro ao deletar assistente da OpenAI:', error);
+      // Continuar mesmo se falhar na OpenAI
+    }
+  } catch (error: any) {
+    console.error('Erro na comunicação com OpenAI durante deleção:', error);
+    // Continuar mesmo se falhar na OpenAI
   }
 
   // Deletar do Supabase
