@@ -35,15 +35,15 @@ serve(async (req) => {
     // Buscar assistente para o marketplace
     const { data: assistant } = await supabase
       .from('assistants')
-      .select('openai_assistant_id, instructions')
+      .select('assistant_id, instructions')
       .eq('marketplace', marketplace)
       .single();
 
-    if (!assistant?.openai_assistant_id) {
+    if (!assistant?.assistant_id) {
       throw new Error(`Assistente não encontrado para marketplace: ${marketplace}`);
     }
 
-    console.log('Assistente encontrado:', assistant.openai_assistant_id);
+    console.log('Assistente encontrado:', assistant.assistant_id);
 
     let currentThreadId = thread_id;
 
@@ -109,7 +109,7 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
         'OpenAI-Beta': 'assistants=v2'
       },
       body: JSON.stringify({
-        assistant_id: assistant.openai_assistant_id
+        assistant_id: assistant.assistant_id
       })
     });
 
