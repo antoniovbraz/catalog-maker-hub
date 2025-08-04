@@ -20,6 +20,7 @@ import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import AdGenerator from "./pages/AdGenerator";
 
 const queryClient = new QueryClient();
 
@@ -132,6 +133,16 @@ const App = () => (
                 <ProtectedRoute>
                   <SharedLayout>
                     <Pricing />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ad-generator" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <AdGenerator />
                   </SharedLayout>
                 </ProtectedRoute>
               } 

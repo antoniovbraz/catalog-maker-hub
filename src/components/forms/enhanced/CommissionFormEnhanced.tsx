@@ -99,27 +99,31 @@ export function CommissionFormEnhanced({
     onCancelEdit?.();
   };
 
-  // Calculate impact preview
+  // Calculate impact preview with better visual feedback
   const getImpactPreview = (rate: number) => {
     if (rate === 0) return null;
     
-    const impactLevel = rate;
-    let color = "text-success";
-    let label = "Baixo impacto no preço";
+    let color = "text-green-600";
+    let label = "Baixo impacto";
+    let bgColor = "bg-green-50 border-green-200";
     
-    if (impactLevel > 10) {
-      color = "text-warning";
-      label = "Médio impacto no preço";
-    }
-    if (impactLevel > 20) {
-      color = "text-destructive";
-      label = "Alto impacto no preço";
+    if (rate > 8 && rate <= 15) {
+      color = "text-yellow-600";
+      label = "Impacto moderado";
+      bgColor = "bg-yellow-50 border-yellow-200";
+    } else if (rate > 15) {
+      color = "text-red-600";
+      label = "Alto impacto";
+      bgColor = "bg-red-50 border-red-200";
     }
     
     return (
-      <div className={`text-sm ${color} mt-2`}>
-        <Calculator className="w-4 h-4 inline mr-1" />
-        {label}
+      <div className={`text-sm ${color} mt-2 p-2 rounded-md border ${bgColor} flex items-center gap-2`}>
+        <Calculator className="w-4 h-4" />
+        <span>{label} no preço final</span>
+        <Badge variant="outline" className="text-xs ml-auto">
+          {rate.toFixed(1)}%
+        </Badge>
       </div>
     );
   };
@@ -195,7 +199,12 @@ export function CommissionFormEnhanced({
       required: true,
       children: (
         <div>
-          <Label htmlFor="rate">Taxa de Comissão (%) *</Label>
+          <Label htmlFor="rate" className="font-medium">
+            Taxa de Comissão (%) *
+            <span className="text-xs text-muted-foreground font-normal ml-2">
+              Valor em percentual
+            </span>
+          </Label>
           <div className="relative">
             <Input
               id="rate"
@@ -205,14 +214,19 @@ export function CommissionFormEnhanced({
               max="100"
               value={formData.rate}
               onChange={(e) => handleInputChange("rate", parseFloat(e.target.value) || 0)}
-              placeholder="Ex: 14 para 14%"
+              placeholder="Ex: 14"
+              className="pr-10"
               required
             />
-            <Percent className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">
+              %
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Digite o valor em percentual (ex: 14 para 14%)
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-xs text-muted-foreground">
+              💡 Digite apenas o número (exemplo: <strong>14</strong> para 14%)
+            </p>
+          </div>
           {getImpactPreview(formData.rate)}
         </div>
       )

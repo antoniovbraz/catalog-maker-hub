@@ -56,6 +56,7 @@ const operationsMenuItems = [
   { id: "products", title: "Produtos", icon: Package, path: "/products" },
   { id: "sales", title: "Vendas", icon: BarChart3, path: "/sales" },
   { id: "pricing", title: "Precificação", icon: Calculator, path: "/pricing" },
+  { id: "ad-generator", title: "Gerador de Anúncios", icon: Zap, path: "/ad-generator" },
 ];
 
 interface MenuItemProps {

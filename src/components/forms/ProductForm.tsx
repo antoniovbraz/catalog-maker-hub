@@ -109,12 +109,12 @@ export const ProductForm = () => {
       return;
     }
     
-    // Converter "none" para undefined/null antes de enviar
+    // Converter "none" para null antes de enviar
     const dataToSubmit = {
       ...formData,
-      category_id: formData.category_id === "none" ? undefined : formData.category_id,
-      sku: formData.sku || undefined,
-      description: formData.description || undefined
+      category_id: formData.category_id === "none" || formData.category_id === "" ? null : formData.category_id,
+      sku: formData.sku || null,
+      description: formData.description || null
     };
     
     if (editingId) {
