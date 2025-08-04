@@ -57,6 +57,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
       'commissions',
       'marketplace_fixed_fee_rules',
       'shipping_rules',
+      'product_images',
     ];
 
     if (tablesWithTenant.includes(this.tableName)) {
