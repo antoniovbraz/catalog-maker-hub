@@ -13,10 +13,15 @@ export function calcularMargemRealLocal(
   provisaoDesconto: number,
   taxRate: number = 0
 ): number {
+  if (precoVenda === 0) {
+    return 0;
+  }
+
   const totalCustos = custoTotal + valorFixo + frete;
-  const comissaoLimitada = Math.min(precoVenda * comissao / 100, 100.00);
-  const totalTaxas = comissaoLimitada + (precoVenda * (taxaCartao + provisaoDesconto + taxRate)) / 100;
-  
+  const comissaoLimitada = Math.min((precoVenda * comissao) / 100, 100.0);
+  const totalTaxas =
+    comissaoLimitada + (precoVenda * (taxaCartao + provisaoDesconto + taxRate)) / 100;
+
   return ((precoVenda - totalCustos - totalTaxas) / precoVenda) * 100;
 }
 
