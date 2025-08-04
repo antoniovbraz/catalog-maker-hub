@@ -20,8 +20,18 @@ serve(async (req) => {
   }
 
   try {
+    console.log('=== ASSISTANTS EDGE FUNCTION INICIADA ===');
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
+    
     if (!OPENAI_API_KEY) {
+      console.error('ERRO: OpenAI API key não está configurada');
       throw new Error('OpenAI API key não está configurada');
+    }
+
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('ERRO: Supabase env vars não configuradas');
+      throw new Error('Supabase não está configurado');
     }
 
     const { method } = req;
@@ -123,18 +133,31 @@ async function createAssistant(req: Request) {
 async function updateAssistant(req: Request, assistantDbId: string) {
   const { name, model, instructions } = await req.json();
 
-  console.log('Atualizando assistente:', assistantDbId);
+  console.log('=== INICIANDO ATUALIZAÇÃO ===');
+  console.log('Assistant DB ID:', assistantDbId);
+  console.log('Dados recebidos:', { name, model, instructions: instructions?.substring(0, 100) + '...' });
 
   // Buscar assistente no banco
+  console.log('Buscando assistente na tabela assistants...');
   const { data: assistantData, error: fetchError } = await supabase
     .from('assistants')
     .select('assistant_id')
     .eq('id', assistantDbId)
     .single();
 
-  if (fetchError || !assistantData) {
+  console.log('Resultado da busca:', { assistantData, fetchError });
+
+  if (fetchError) {
+    console.error('Erro ao buscar assistente:', fetchError);
+    throw new Error(`Erro ao buscar assistente: ${fetchError.message}`);
+  }
+
+  if (!assistantData) {
+    console.error('Assistente não encontrado no banco');
     throw new Error('Assistente não encontrado');
   }
+
+  console.log('Assistente encontrado, OpenAI ID:', assistantData.assistant_id);
 
   // Atualizar na OpenAI
   const openaiResponse = await fetch(`https://api.openai.com/v1/assistants/${assistantData.assistant_id}`, {
@@ -183,18 +206,30 @@ async function updateAssistant(req: Request, assistantDbId: string) {
 }
 
 async function deleteAssistant(assistantDbId: string) {
-  console.log('Deletando assistente:', assistantDbId);
+  console.log('=== INICIANDO DELEÇÃO ===');
+  console.log('Assistant DB ID:', assistantDbId);
 
   // Buscar assistente no banco
+  console.log('Buscando assistente na tabela assistants...');
   const { data: assistantData, error: fetchError } = await supabase
     .from('assistants')
     .select('assistant_id')
     .eq('id', assistantDbId)
     .single();
 
-  if (fetchError || !assistantData) {
+  console.log('Resultado da busca:', { assistantData, fetchError });
+
+  if (fetchError) {
+    console.error('Erro ao buscar assistente:', fetchError);
+    throw new Error(`Erro ao buscar assistente: ${fetchError.message}`);
+  }
+
+  if (!assistantData) {
+    console.error('Assistente não encontrado no banco');
     throw new Error('Assistente não encontrado');
   }
+
+  console.log('Assistente encontrado, OpenAI ID:', assistantData.assistant_id);
 
   // Deletar da OpenAI
   const openaiResponse = await fetch(`https://api.openai.com/v1/assistants/${assistantData.assistant_id}`, {
