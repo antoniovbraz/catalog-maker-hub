@@ -167,6 +167,89 @@ All colors MUST be HSL.
     --transition-slow: 500ms ease-out;
   }
 
+  /* Windows 7 Theme */
+  .windows7 {
+    --background: 210 40% 96%;
+    --foreground: 210 15% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 15% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 15% 20%;
+    --primary: 210 90% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 92%;
+    --secondary-foreground: 210 15% 20%;
+    --muted: 210 40% 92%;
+    --muted-foreground: 210 15% 40%;
+    --accent: 210 100% 80%;
+    --accent-foreground: 210 15% 20%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 210 30% 86%;
+    --input: 210 30% 86%;
+    --ring: 210 90% 50%;
+    --radius: 0.25rem; /* Windows 7 style: slight rounding */
+
+    /* Sidebar System */
+    --sidebar-background: 210 90% 40%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 210 100% 80%;
+    --sidebar-primary-foreground: 210 15% 20%;
+    --sidebar-accent: 210 90% 50%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 30% 70%;
+    --sidebar-ring: 210 90% 50%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 90% 50%), hsl(210 90% 65%));
+    --gradient-card: linear-gradient(135deg, hsl(248 25% 99%), hsl(220 13% 95%));
+    --gradient-subtle: linear-gradient(180deg, hsl(248 25% 99%) 0%, hsl(220 13% 95%) 100%);
+    --gradient-config: linear-gradient(135deg, hsl(210 90% 50%), hsl(210 90% 65%));
+
+    /* Enhanced Shadow System */
+    --shadow-elegant: 0 10px 30px -10px hsl(210 90% 50% / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(210 90% 50% / 0.1);
+    --shadow-hover: 0 8px 30px -8px hsl(210 90% 50% / 0.15);
+    --shadow-form: 0 2px 10px -2px hsl(210 90% 50% / 0.08);
+    --shadow-floating: 0 20px 40px -12px hsl(210 90% 50% / 0.25);
+    --shadow-glow: 0 0 40px hsl(210 90% 50% / 0.3);
+
+    /* Animation Timings */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Configuration Colors */
+    --config-primary: 210 90% 50%;
+    --config-secondary: 210 40% 92%;
+    --config-accent: 210 100% 80%;
+    --config-text: 210 15% 20%;
+    --config-background: 210 40% 96%;
+    --config-warning: 38 92% 50%;
+
+    /* Typography System */
+    --font-h1: 2.5rem;
+    --font-h2: 2rem;
+    --font-h3: 1.5rem;
+    --font-h4: 1.25rem;
+    --font-h5: 1.125rem;
+    --font-h6: 1rem;
+    --font-body: 0.875rem;
+    --font-caption: 0.75rem;
+
+    /* Spacing System */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+  }
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
