@@ -33,7 +33,7 @@ const Strategy = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="xl:col-span-12">
+        <div className="lg:col-span-12 xl:col-span-12">
           <StrategyForm onCancel={hideForm} />
         </div>
       )}

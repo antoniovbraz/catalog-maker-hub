@@ -33,7 +33,7 @@ const Sales = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="xl:col-span-8">
+        <div className="lg:col-span-8 xl:col-span-8">
           <SalesForm onCancel={hideForm} />
         </div>
       )}

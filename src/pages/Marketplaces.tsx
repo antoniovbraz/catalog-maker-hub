@@ -87,7 +87,7 @@ const Marketplaces = () => {
     >
       {/* Form Column */}
       {isFormVisible && (
-        <div className="xl:col-span-5 space-y-lg">
+        <div className="lg:col-span-5 xl:col-span-5 space-y-lg">
           <SimpleMarketplaceForm
             editingMarketplace={editingMarketplace}
             creatingModalityForPlatform={creatingModalityForPlatform}
@@ -97,7 +97,13 @@ const Marketplaces = () => {
       )}
 
       {/* Hierarchy Visualization Column */}
-      <div className={isFormVisible ? "xl:col-span-7" : "xl:col-span-12"}>
+      <div
+        className={
+          isFormVisible
+            ? "lg:col-span-7 xl:col-span-7"
+            : "lg:col-span-12 xl:col-span-12"
+        }
+      >
         <CollapsibleCard
           title="Plataformas e Modalidades"
           icon={<Store className="w-4 h-4" />}

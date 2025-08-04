@@ -145,7 +145,7 @@ const Commissions = () => {
     >
       {/* Form Column */}
       {isFormVisible && (
-        <div className="xl:col-span-5 space-y-lg">
+        <div className="lg:col-span-5 xl:col-span-5 space-y-lg">
           <CommissionFormEnhanced
             editingCommission={editingCommission}
             onCancelEdit={() => {
@@ -172,7 +172,13 @@ const Commissions = () => {
       )}
 
       {/* Data Visualization Column */}
-      <div className={isFormVisible ? "xl:col-span-7" : "xl:col-span-12"}>
+      <div
+        className={
+          isFormVisible
+            ? "lg:col-span-7 xl:col-span-7"
+            : "lg:col-span-12 xl:col-span-12"
+        }
+      >
         <CollapsibleCard
           title="Comissões Configuradas"
           icon={<Percent className="w-4 h-4" />}

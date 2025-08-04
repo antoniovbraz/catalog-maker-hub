@@ -89,13 +89,19 @@ const Categories = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="xl:col-span-6">
+        <div className="lg:col-span-6 xl:col-span-6">
           <CategoryForm onCancel={handleFormCancel} editingCategory={editingCategory} />
         </div>
       )}
 
       {/* Lista de categorias sempre visível */}
-      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
+      <div
+        className={
+          isFormVisible
+            ? "lg:col-span-6 xl:col-span-6"
+            : "lg:col-span-12 xl:col-span-12"
+        }
+      >
         <Card className="shadow-card border border-border/20">
           <CardHeader className="py-3">
             <CardTitle className="text-base flex items-center gap-2 font-medium text-muted-foreground">

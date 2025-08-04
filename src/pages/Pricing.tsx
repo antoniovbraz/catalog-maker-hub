@@ -33,7 +33,7 @@ const Pricing = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="xl:col-span-12">
+        <div className="lg:col-span-12 xl:col-span-12">
           <PricingForm />
         </div>
       )}
