@@ -31,7 +31,7 @@ export function ConfigurationPageLayout({
       
       <main className="container mx-auto px-4 sm:px-6 py-6">
         <PageTransition>
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-12 gap-6">
             {children}
           </div>
         </PageTransition>

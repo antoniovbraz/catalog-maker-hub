@@ -34,13 +34,19 @@ const Shipping = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="xl:col-span-6">
+        <div className="lg:col-span-6 xl:col-span-6">
           <ShippingRuleForm onCancel={hideForm} />
         </div>
       )}
 
       {/* Lista externa colapsável */}
-      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
+      <div
+        className={
+          isFormVisible
+            ? "lg:col-span-6 xl:col-span-6"
+            : "lg:col-span-12 xl:col-span-12"
+        }
+      >
         <CollapsibleCard
           title="Regras de Frete Configuradas"
           icon={<Truck className="w-4 h-4" />}

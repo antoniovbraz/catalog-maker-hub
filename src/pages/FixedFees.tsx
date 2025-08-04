@@ -113,12 +113,18 @@ const FixedFees = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="xl:col-span-6">
+        <div className="lg:col-span-6 xl:col-span-6">
           <FixedFeeRuleForm onCancel={hideForm} />
         </div>
       )}
 
-      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
+      <div
+        className={
+          isFormVisible
+            ? "lg:col-span-6 xl:col-span-6"
+            : "lg:col-span-12 xl:col-span-12"
+        }
+      >
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

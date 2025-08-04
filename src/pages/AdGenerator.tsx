@@ -161,7 +161,7 @@ export default function AdGenerator() {
       }
     >
       {/* Mode Toggle */}
-      <div className="xl:col-span-12 mb-6">
+      <div className="lg:col-span-12 xl:col-span-12 mb-6">
         <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
           <span className="font-medium">Modo de Geração:</span>
           <div className="flex gap-2">
@@ -191,7 +191,7 @@ export default function AdGenerator() {
 
       {mode === 'strategic' ? (
         // Modo Estratégico - Chat Interface
-        <div className="xl:col-span-12 space-y-6">
+        <div className="lg:col-span-12 xl:col-span-12 space-y-6">
           {selectedProductId && (
             <Card>
               <CardHeader>
@@ -251,7 +251,7 @@ export default function AdGenerator() {
         // Modo Rápido - Interface Original
         <>
           {/* Alert Informativo */}
-          <div className="xl:col-span-12 mb-6">
+          <div className="lg:col-span-12 xl:col-span-12 mb-6">
             <Alert>
               <Info className="w-4 h-4" />
               <AlertDescription>
@@ -261,7 +261,7 @@ export default function AdGenerator() {
           </div>
 
           {/* Coluna de Configuração (8 colunas) */}
-          <div className="xl:col-span-8 space-y-6">
+          <div className="lg:col-span-8 xl:col-span-8 space-y-6">
         {/* Card 1: Seleção de Produto */}
         <Card>
           <CardHeader>
@@ -464,7 +464,7 @@ export default function AdGenerator() {
       </div>
 
       {/* Coluna de Resultado (4 colunas) - Sticky */}
-      <div className="xl:col-span-4">
+      <div className="lg:col-span-4 xl:col-span-4">
         <div className="sticky top-6">
           {generatedResult ? (
             <Card>
