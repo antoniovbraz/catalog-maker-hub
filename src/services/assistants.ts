@@ -11,7 +11,7 @@ export class AssistantsService extends BaseService<Assistant> {
   }
 
   // Método para fazer requisições HTTP com retry e timeout
-  private async makeRequest(method: string, endpoint: string, body?: any): Promise<any> {
+  private async makeRequest(method: string, endpoint: string, body?: unknown): Promise<unknown> {
     const maxRetries = 3;
     const timeout = 30000; // 30 segundos
     
@@ -48,19 +48,21 @@ export class AssistantsService extends BaseService<Assistant> {
         const result = await response.json();
         this.logger.debug(`Sucesso na tentativa ${attempt}`, result);
         return result;
-        
-      } catch (error: any) {
+
+      } catch (error: unknown) {
         this.logger.error(`Erro na tentativa ${attempt}/${maxRetries}`, error);
         
         if (attempt === maxRetries) {
           // Se é a última tentativa, relançar o erro
-          if (error.name === 'AbortError') {
-            throw new Error('Timeout na requisição - tente novamente');
-          }
-          if (error.message.includes('SSL') || error.message.includes('handshake')) {
-            throw new Error('Erro de conectividade SSL - tente novamente em alguns minutos');
-          }
-          throw error;
+            if (error instanceof Error) {
+              if (error.name === 'AbortError') {
+                throw new Error('Timeout na requisição - tente novamente');
+              }
+              if (error.message.includes('SSL') || error.message.includes('handshake')) {
+                throw new Error('Erro de conectividade SSL - tente novamente em alguns minutos');
+              }
+            }
+            throw error;
         }
         
         // Aguardar antes de tentar novamente (backoff exponencial)
@@ -109,7 +111,7 @@ export class AssistantsService extends BaseService<Assistant> {
       this.logger.debug('Atualizando assistente', { id, data });
 
       // Usar fetch direto para PUT com retry e timeout
-      const result = await this.makeRequest('PUT', `assistants/${id}`, data);
+        const result = await this.makeRequest('PUT', `assistants/${id}`, data);
       
       this.logger.info('Assistente atualizado com sucesso', result);
       return result as Assistant;
@@ -138,7 +140,7 @@ export class AssistantsService extends BaseService<Assistant> {
       this.logger.debug('Buscando assistente por marketplace', { marketplace });
 
       const { data, error } = await supabase
-        .from(this.tableName as any)
+        .from(this.tableName)
         .select('*')
         .eq('marketplace', marketplace)
         .single();
