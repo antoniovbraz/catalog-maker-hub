@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,14 +23,11 @@ serve(async (req) => {
 
   try {
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { assistant_id, product_info, marketplace, image_urls, custom_prompt, description_only }: GenerateAdRequest = await req.json();
 
     console.log('Iniciando geração de anúncio', { assistant_id, marketplace, description_only });
@@ -168,7 +164,14 @@ serve(async (req) => {
     }
 
     const messages = await messagesResponse.json();
-    const assistantMessage = messages.data.find((msg: any) => msg.role === 'assistant');
+    interface ThreadMessage {
+      role: string;
+      content: Array<{ text?: { value: string } }>;
+    }
+
+    const assistantMessage = messages.data.find(
+      (msg: ThreadMessage) => msg.role === 'assistant'
+    ) as ThreadMessage | undefined;
 
     if (!assistantMessage || !assistantMessage.content[0]) {
       throw new Error('Nenhuma resposta do assistente encontrada');

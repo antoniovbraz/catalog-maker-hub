@@ -145,9 +145,17 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
     });
 
     const messagesData = await messagesResponse.json();
-    
+
     // Pegar a resposta mais recente do assistente
-    const assistantMessage = messagesData.data.find((msg: any) => msg.role === 'assistant');
+    interface ThreadMessage {
+      role: string;
+      content: Array<{ text?: { value: string } }>; // structure from OpenAI thread response
+    }
+
+    const assistantMessage = messagesData.data.find(
+      (msg: ThreadMessage) => msg.role === 'assistant'
+    ) as ThreadMessage | undefined;
+
     const responseText = assistantMessage?.content[0]?.text?.value || 'Erro ao obter resposta';
 
     console.log('Resposta do assistente obtida');

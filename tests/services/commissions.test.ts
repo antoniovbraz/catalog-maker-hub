@@ -52,7 +52,7 @@ describe('CommissionsService', () => {
         select: mockSelect
       }));
 
-      (supabase.from as any).mockImplementation(mockFrom);
+      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
 
       const result = await commissionsService.findApplicableCommission({
         marketplaceId: 'marketplace-1',
@@ -96,7 +96,7 @@ describe('CommissionsService', () => {
         select: mockSelect
       }));
 
-      (supabase.from as any).mockImplementation(mockFrom);
+      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
 
       const result = await commissionsService.findApplicableCommission({
         marketplaceId: 'marketplace-1',
@@ -122,7 +122,7 @@ describe('CommissionsService', () => {
         select: mockSelect
       }));
 
-      (supabase.from as any).mockImplementation(mockFrom);
+      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
 
       const result = await commissionsService.findApplicableCommission({
         marketplaceId: 'marketplace-1',
@@ -145,7 +145,7 @@ describe('CommissionsService', () => {
         select: mockSelect
       }));
 
-      (supabase.from as any).mockImplementation(mockFrom);
+      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
 
       const result = await commissionsService.validateUniqueRule(
         'marketplace-1',
@@ -166,7 +166,7 @@ describe('CommissionsService', () => {
         select: mockSelect
       }));
 
-      (supabase.from as any).mockImplementation(mockFrom);
+      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
 
       const result = await commissionsService.validateUniqueRule(
         'marketplace-1',
@@ -187,7 +187,7 @@ describe('CommissionsService', () => {
         select: mockSelect
       }));
 
-      (supabase.from as any).mockImplementation(mockFrom);
+      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
 
       const result = await commissionsService.validateUniqueRule(
         'marketplace-1',

@@ -62,7 +62,7 @@ export class MarketplacesService extends BaseService<MarketplaceType> {
   }
 
   async getModalitiesByPlatform(platformId: string, categoryId?: string): Promise<MarketplaceType[]> {
-    let query = supabase
+    const query = supabase
       .from('marketplaces')
       .select('*')
       .eq('platform_id', platformId)

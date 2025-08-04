@@ -48,7 +48,7 @@ export class AdsService extends BaseService<ProductImage> {
       const filePath = `${tenantId}/${productId}/${fileName}`;
 
       // Upload do arquivo para o Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('product-images')
         .upload(filePath, file);
 

@@ -87,11 +87,12 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('ERRO GERAL na edge function:', error);
-    return new Response(JSON.stringify({ 
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({
       error: 'Erro interno do servidor',
-      details: error.message 
+      details: message
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -165,9 +166,10 @@ async function handleCreateAssistant(req: Request) {
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro em handleCreateAssistant:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -253,9 +255,10 @@ async function handleUpdateAssistant(req: Request, assistantDbId: string) {
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro em handleUpdateAssistant:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -300,7 +303,7 @@ async function handleDeleteAssistant(assistantDbId: string) {
         },
       });
       console.log('OpenAI Delete Response status:', openaiResponse.status);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao deletar da OpenAI (continuando):', error);
     }
 
@@ -320,9 +323,10 @@ async function handleDeleteAssistant(assistantDbId: string) {
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro em handleDeleteAssistant:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

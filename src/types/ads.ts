@@ -20,12 +20,12 @@ export interface AdGenerationRequest {
   custom_prompt?: string;
 }
 
-export interface AdGenerationResult {
-  title: string;
-  description: string;
-  keywords: string[];
-  marketplace_specific_data?: Record<string, any>;
-}
+  export interface AdGenerationResult {
+    title: string;
+    description: string;
+    keywords: string[];
+    marketplace_specific_data?: Record<string, unknown>;
+  }
 
 export const productImageSchema = z.object({
   product_id: z.string().uuid("Product ID deve ser um UUID válido"),
