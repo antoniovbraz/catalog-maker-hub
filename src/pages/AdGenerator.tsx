@@ -27,7 +27,6 @@ import { useGenerateListing } from "@/hooks/useAdGeneration";
 import { MarketplaceDestination } from "@/types/ads";
 import { ProductImage } from "@/types/ads";
 import { cn } from "@/lib/utils";
-import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useToast } from "@/components/ui/use-toast";
 
 const MARKETPLACE_OPTIONS = [
@@ -153,8 +152,8 @@ export default function AdGenerator() {
         </Button>
       }
     >
-      <div className="space-y-6">
-        {/* Alert Informativo */}
+      {/* Alert Informativo */}
+      <div className="xl:col-span-12 mb-6">
         <Alert>
           <Info className="w-4 h-4" />
           <AlertDescription>
@@ -162,259 +161,315 @@ export default function AdGenerator() {
             A integração com IA será implementada na próxima fase.
           </AlertDescription>
         </Alert>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Configuração */}
-          <div className="space-y-6">
-            {/* Seleção de Produto */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="w-5 h-5" />
-                  Selecionar Produto
-                </CardTitle>
-                <CardDescription>
-                  Escolha o produto para o qual deseja criar o anúncio
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="product-select">Produto</Label>
-                    <Select value={selectedProductId} onValueChange={setSelectedProductId}>
-                      <SelectTrigger id="product-select" className="mt-1">
-                        <SelectValue placeholder="Selecione um produto..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {products.map((product) => (
-                          <SelectItem key={product.id} value={product.id}>
-                            <div className="flex items-center gap-2">
-                              <Package className="w-4 h-4 text-muted-foreground" />
-                              <span>{product.name}</span>
-                              {product.sku && (
-                                <Badge variant="outline" className="text-xs">
-                                  {product.sku}
-                                </Badge>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+      {/* Coluna de Configuração (8 colunas) */}
+      <div className="xl:col-span-8 space-y-6">
+        {/* Card 1: Seleção de Produto */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              Selecionar Produto
+            </CardTitle>
+            <CardDescription>
+              Escolha o produto para o qual deseja criar o anúncio
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="product-select">Produto</Label>
+                <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+                  <SelectTrigger id="product-select" className="mt-1">
+                    <SelectValue placeholder="Selecione um produto..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={product.id}>
+                        <div className="flex items-center gap-2">
+                          <Package className="w-4 h-4 text-muted-foreground" />
+                          <span>{product.name}</span>
+                          {product.sku && (
+                            <Badge variant="outline" className="text-xs">
+                              {product.sku}
+                            </Badge>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {selectedProduct && (
-                    <div className="p-3 bg-muted/30 rounded-md">
-                      <h4 className="font-medium mb-1">{selectedProduct.name}</h4>
-                      {selectedProduct.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {selectedProduct.description}
-                        </p>
-                      )}
-                    </div>
+              {selectedProduct && (
+                <div className="p-3 bg-muted/30 rounded-md">
+                  <h4 className="font-medium mb-1">{selectedProduct.name}</h4>
+                  {selectedProduct.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {selectedProduct.description}
+                    </p>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Marketplace */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5" />
-                  Marketplace de Destino
-                </CardTitle>
-                <CardDescription>
-                  Cada marketplace tem características específicas de anúncio
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {MARKETPLACE_OPTIONS.map((option) => (
-                    <Button
-                      key={option.value}
-                      variant={selectedMarketplace === option.value ? "default" : "outline"}
-                      className="h-auto p-4 flex flex-col items-center gap-2"
-                      onClick={() => setSelectedMarketplace(option.value)}
-                    >
-                      <span className="text-2xl">{option.icon}</span>
-                      <span className="text-sm font-medium">{option.label}</span>
-                    </Button>
+        {/* Card 2: Upload de Imagens */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Camera className="w-5 h-5" />
+              Imagens do Produto
+              <Badge variant="outline">
+                {images.length} imagem(ns)
+              </Badge>
+            </CardTitle>
+            <CardDescription>
+              Adicione fotos do produto, embalagem e especificações
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Área de Upload */}
+              <div
+                className={cn(
+                  "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
+                  dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25",
+                  !selectedProductId && "opacity-50 pointer-events-none"
+                )}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Arraste imagens aqui ou clique para selecionar
+                </p>
+                <Input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload(e.target.files)}
+                  className="hidden"
+                  id="image-upload"
+                  disabled={!selectedProductId}
+                />
+                <Label
+                  htmlFor="image-upload"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-background border rounded-md cursor-pointer hover:bg-muted"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  Selecionar Imagens
+                </Label>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Máximo 5MB por imagem. Formatos: JPG, PNG, WebP
+                </p>
+              </div>
+
+              {/* Grid de Imagens - Responsivo sem scroll interno */}
+              {images.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {images.map((image: ProductImage) => (
+                    <div key={image.id} className="relative group">
+                      <img
+                        src={image.image_url}
+                        alt="Produto"
+                        className="w-full h-24 object-cover rounded-md border"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => window.open(image.image_url, '_blank')}
+                        >
+                          <Eye className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => deleteMutation.mutate(image.id)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <Badge 
+                        variant="secondary" 
+                        className="absolute top-1 left-1 text-xs"
+                      >
+                        {image.image_type}
+                      </Badge>
+                    </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Prompt Personalizado */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  Instruções Personalizadas (Opcional)
-                </CardTitle>
-                <CardDescription>
-                  Adicione instruções específicas para a IA
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder="Ex: Enfatize a durabilidade do produto, mencione garantia de 1 ano..."
-                  rows={3}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Upload de Imagens */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Camera className="w-5 h-5" />
-                  Imagens do Produto
-                  <Badge variant="outline">
-                    {images.length} imagem(ns)
-                  </Badge>
-                </CardTitle>
-                <CardDescription>
-                  Adicione fotos do produto, embalagem e especificações
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Área de Upload */}
-                  <div
-                    className={cn(
-                      "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
-                      dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-                      !selectedProductId && "opacity-50 pointer-events-none"
-                    )}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
+        {/* Card 3: Marketplace e Instruções */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Marketplace */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5" />
+                Marketplace
+              </CardTitle>
+              <CardDescription>
+                Cada plataforma tem características específicas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-3">
+                {MARKETPLACE_OPTIONS.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={selectedMarketplace === option.value ? "default" : "outline"}
+                    className="h-auto p-3 flex items-center justify-start gap-3"
+                    onClick={() => setSelectedMarketplace(option.value)}
                   >
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Arraste imagens aqui ou clique para selecionar
-                    </p>
-                    <Input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => handleFileUpload(e.target.files)}
-                      className="hidden"
-                      id="image-upload"
-                      disabled={!selectedProductId}
-                    />
-                    <Label
-                      htmlFor="image-upload"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-background border rounded-md cursor-pointer hover:bg-muted"
-                    >
-                      <ImageIcon className="w-4 h-4" />
-                      Selecionar Imagens
-                    </Label>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Máximo 5MB por imagem. Formatos: JPG, PNG, WebP
-                    </p>
-                  </div>
+                    <span className="text-xl">{option.icon}</span>
+                    <span className="text-sm font-medium">{option.label}</span>
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-                  {/* Lista de Imagens */}
-                  {images.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
-                      {images.map((image: ProductImage) => (
-                        <div key={image.id} className="relative group">
-                          <img
-                            src={image.image_url}
-                            alt="Produto"
-                            className="w-full h-24 object-cover rounded-md border"
-                          />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => window.open(image.image_url, '_blank')}
-                            >
-                              <Eye className="w-3 h-3" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteMutation.mutate(image.id)}
-                              disabled={deleteMutation.isPending}
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </div>
-                          <Badge 
-                            variant="secondary" 
-                            className="absolute top-1 left-1 text-xs"
-                          >
-                            {image.image_type}
-                          </Badge>
-                        </div>
+          {/* Instruções Personalizadas */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                Instruções (Opcional)
+              </CardTitle>
+              <CardDescription>
+                Adicione instruções específicas para a IA
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                placeholder="Ex: Enfatize a durabilidade do produto, mencione garantia de 1 ano..."
+                rows={4}
+                className="resize-none"
+              />
+              <div className="mt-2 text-xs text-muted-foreground text-right">
+                {customPrompt.length}/500 caracteres
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Coluna de Resultado (4 colunas) - Sticky */}
+      <div className="xl:col-span-4">
+        <div className="sticky top-6">
+          {generatedResult ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wand2 className="w-5 h-5" />
+                  Anúncio Gerado
+                </CardTitle>
+                <CardDescription>
+                  Resultado da geração automatizada
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Título */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-medium">Título</Label>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => navigator.clipboard.writeText(generatedResult.title)}
+                    >
+                      📋
+                    </Button>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-md text-sm">
+                    {generatedResult.title}
+                  </div>
+                </div>
+                
+                {/* Descrição */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-sm font-medium">Descrição</Label>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => navigator.clipboard.writeText(generatedResult.description)}
+                    >
+                      📋
+                    </Button>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-md text-sm whitespace-pre-wrap max-h-32 overflow-y-auto">
+                    {generatedResult.description}
+                  </div>
+                </div>
+                
+                {/* Palavras-chave */}
+                {generatedResult.keywords && (
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Palavras-chave</Label>
+                    <div className="flex flex-wrap gap-1">
+                      {generatedResult.keywords.map((keyword: string, index: number) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {keyword}
+                        </Badge>
                       ))}
                     </div>
-                  )}
+                  </div>
+                )}
+
+                <Separator />
+                
+                {/* Botões de Ação */}
+                <div className="flex flex-col gap-2">
+                  <Button size="sm" className="w-full">
+                    <Eye className="w-3 h-3 mr-2" />
+                    Visualizar Preview
+                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button size="sm" variant="outline">
+                      📋 Copiar Tudo
+                    </Button>
+                    <Button size="sm" variant="outline">
+                      💾 Salvar
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Resultado Gerado */}
-            {generatedResult && (
-              <CollapsibleCard
-                title="Anúncio Gerado"
-                icon={<Wand2 className="w-4 h-4" />}
-                isOpen={true}
-                onToggle={() => {}}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium">Título</Label>
-                    <div className="mt-1 p-3 bg-muted/30 rounded-md">
-                      {generatedResult.title}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-sm font-medium">Descrição</Label>
-                    <div className="mt-1 p-3 bg-muted/30 rounded-md whitespace-pre-wrap">
-                      {generatedResult.description}
-                    </div>
-                  </div>
-                  
-                  {generatedResult.keywords && (
-                    <div>
-                      <Label className="text-sm font-medium">Palavras-chave</Label>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {generatedResult.keywords.map((keyword: string, index: number) => (
-                          <Badge key={index} variant="outline">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <Separator />
-                  
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
-                      <Eye className="w-3 h-3 mr-1" />
-                      Visualizar
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      📋 Copiar
-                    </Button>
-                    <Button size="sm">
-                      🚀 Publicar
-                    </Button>
-                  </div>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wand2 className="w-5 h-5" />
+                  Resultado
+                </CardTitle>
+                <CardDescription>
+                  O anúncio gerado aparecerá aqui
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-muted-foreground">
+                  <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                  <p className="text-sm">
+                    Configure os campos ao lado e clique em<br />
+                    "Gerar Anúncio" para ver o resultado
+                  </p>
                 </div>
-              </CollapsibleCard>
-            )}
-          </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </ConfigurationPageLayout>
