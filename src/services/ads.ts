@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import { ProductImage, AdGenerationRequest, AdGenerationResult } from "@/types/ads";
 import { logger } from "@/utils/logger";
+import { assistantsService } from "./assistants";
 
 export class AdsService extends BaseService<ProductImage> {
   constructor() {
@@ -114,7 +115,6 @@ export class AdsService extends BaseService<ProductImage> {
 
   /**
    * Gera título e descrição para anúncio usando IA
-   * TODO: Implementar integração com OpenAI na próxima fase
    */
   async generateListing(request: AdGenerationRequest): Promise<AdGenerationResult> {
     try {
@@ -124,28 +124,66 @@ export class AdsService extends BaseService<ProductImage> {
         imageCount: request.image_urls.length
       });
 
-      // TODO: Implementar chamada para OpenAI GPT
-      // Esta função será expandida na próxima fase para:
-      // 1. Buscar dados do produto no banco
-      // 2. Analisar imagens enviadas
-      // 3. Gerar prompts específicos por marketplace
-      // 4. Chamar API da OpenAI
-      // 5. Processar e formatar resposta
+      // Buscar assistente configurado para o marketplace
+      const assistant = await assistantsService.getAssistantByMarketplace(request.marketplace);
+      if (!assistant) {
+        throw new Error(`Nenhum assistente configurado para o marketplace ${request.marketplace}`);
+      }
 
-      // Por enquanto, retorna um resultado mock
-      const mockResult: AdGenerationResult = {
-        title: `[MOCK] Título para ${request.marketplace}`,
-        description: `[MOCK] Descrição gerada automaticamente para o marketplace ${request.marketplace}`,
-        keywords: ['mock', 'placeholder', request.marketplace],
+      // Buscar dados do produto
+      const { data: product, error: productError } = await supabase
+        .from('products')
+        .select('*, categories(name)')
+        .eq('id', request.product_id)
+        .single();
+
+      if (productError || !product) {
+        throw new Error('Produto não encontrado');
+      }
+
+      // Preparar prompt com dados do produto e marketplace
+      const productInfo = `
+Produto: ${product.name}
+Categoria: ${product.categories?.name || 'Não especificada'}
+Descrição: ${product.description || 'Não informada'}
+SKU: ${product.sku || 'Não informado'}
+Preço: R$ ${product.cost_unit}
+
+Marketplace: ${request.marketplace}
+Número de imagens: ${request.image_urls.length}
+Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
+      `.trim();
+
+      // Chamar edge function para gerar anúncio
+      const { data: result, error } = await supabase.functions.invoke('generate-ad', {
+        body: {
+          assistant_id: assistant.assistant_id,
+          product_info: productInfo,
+          marketplace: request.marketplace,
+          image_urls: request.image_urls,
+          custom_prompt: request.custom_prompt
+        }
+      });
+
+      if (error) {
+        logger.error('Erro na chamada da edge function', 'AdsService', error);
+        throw new Error(`Erro na geração: ${error.message}`);
+      }
+
+      const adResult: AdGenerationResult = {
+        title: result.title || '',
+        description: result.description || '',
+        keywords: result.keywords || [],
         marketplace_specific_data: {
           generated_at: new Date().toISOString(),
           marketplace: request.marketplace,
-          image_count: request.image_urls.length
+          image_count: request.image_urls.length,
+          assistant_used: assistant.name
         }
       };
 
-      logger.info('Geração de anúncio concluída (mock)', 'AdsService', mockResult);
-      return mockResult;
+      logger.info('Geração de anúncio concluída', 'AdsService', adResult);
+      return adResult;
     } catch (error) {
       logger.error('Erro na geração de anúncio', 'AdsService', error);
       throw error;
@@ -154,7 +192,6 @@ export class AdsService extends BaseService<ProductImage> {
 
   /**
    * Gera apenas descrição detalhada do produto
-   * TODO: Implementar integração com OpenAI na próxima fase
    */
   async generateDescription(
     productId: string, 
@@ -168,14 +205,52 @@ export class AdsService extends BaseService<ProductImage> {
         imageCount: imageUrls.length
       });
 
-      // TODO: Implementar lógica de geração de descrição
-      // Esta função será expandida para analisar imagens e gerar
-      // descrições detalhadas específicas para cada marketplace
+      // Buscar assistente configurado para o marketplace
+      const assistant = await assistantsService.getAssistantByMarketplace(marketplace);
+      if (!assistant) {
+        throw new Error(`Nenhum assistente configurado para o marketplace ${marketplace}`);
+      }
 
-      const mockDescription = `[MOCK] Descrição detalhada gerada para o marketplace ${marketplace} com base em ${imageUrls.length} imagem(ns).`;
-      
-      logger.info('Geração de descrição concluída (mock)', 'AdsService');
-      return mockDescription;
+      // Buscar dados do produto
+      const { data: product, error: productError } = await supabase
+        .from('products')
+        .select('*, categories(name)')
+        .eq('id', productId)
+        .single();
+
+      if (productError || !product) {
+        throw new Error('Produto não encontrado');
+      }
+
+      // Preparar prompt específico para descrição
+      const productInfo = `
+Produto: ${product.name}
+Categoria: ${product.categories?.name || 'Não especificada'}
+Descrição atual: ${product.description || 'Não informada'}
+SKU: ${product.sku || 'Não informado'}
+
+Gere apenas uma descrição detalhada e atrativa para este produto no ${marketplace}.
+      `.trim();
+
+      // Chamar edge function para gerar descrição
+      const { data: result, error } = await supabase.functions.invoke('generate-ad', {
+        body: {
+          assistant_id: assistant.assistant_id,
+          product_info: productInfo,
+          marketplace,
+          image_urls: imageUrls,
+          description_only: true
+        }
+      });
+
+      if (error) {
+        logger.error('Erro na chamada da edge function', 'AdsService', error);
+        throw new Error(`Erro na geração: ${error.message}`);
+      }
+
+      const description = result.description || '';
+      logger.info('Geração de descrição concluída', 'AdsService');
+      return description;
     } catch (error) {
       logger.error('Erro na geração de descrição', 'AdsService', error);
       throw error;
