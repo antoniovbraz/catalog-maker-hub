@@ -27,6 +27,12 @@ const themes = [
     name: "Clássico Escuro",
     description: "Tema original escuro", 
     preview: "bg-gradient-to-r from-slate-800 to-slate-600"
+  },
+  {
+    id: "windows7",
+    name: "Windows 7",
+    description: "Tema clássico do Windows 7",
+    preview: "bg-gradient-to-r from-[#1A6ED8] to-[#6CC0F3]",
   }
 ] as const
 
