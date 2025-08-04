@@ -15,7 +15,8 @@ import {
   Zap,
   Activity,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Bot
 } from '@/components/ui/icons';
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -306,6 +307,23 @@ export function AppSidebar() {
                       <Shield className="w-5 h-5 shrink-0" />
                       {!collapsed && <span className="font-medium">Dashboard Admin</span>}
                       {collapsed && <div className="sr-only">Dashboard Admin</div>}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
+                      location.pathname === '/admin/assistentes-ia'
+                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    <Link to="/admin/assistentes-ia">
+                      <Bot className="w-5 h-5 shrink-0" />
+                      {!collapsed && <span className="font-medium">Assistentes IA</span>}
+                      {collapsed && <div className="sr-only">Assistentes IA</div>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

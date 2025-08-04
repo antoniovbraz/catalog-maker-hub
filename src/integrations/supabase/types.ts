@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      assistants: {
+        Row: {
+          assistant_id: string
+          created_at: string
+          id: string
+          instructions: string
+          marketplace: string
+          model: string
+          name: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          assistant_id: string
+          created_at?: string
+          id?: string
+          instructions: string
+          marketplace: string
+          model?: string
+          name: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          assistant_id?: string
+          created_at?: string
+          id?: string
+          instructions?: string
+          marketplace?: string
+          model?: string
+          name?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string

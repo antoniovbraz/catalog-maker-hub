@@ -19,6 +19,7 @@ import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
 import AdminDashboard from "./pages/AdminDashboard";
+import AssistantsManagement from "./pages/admin/AssistantsManagement";
 import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
 
@@ -161,16 +162,26 @@ const App = () => (
             />
             
             {/* Admin Routes */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requiredRole="super_admin">
-                  <SharedLayout>
-                    <AdminDashboard />
-                  </SharedLayout>
-                </ProtectedRoute>
-              } 
-            />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute requiredRole="super_admin">
+                <SharedLayout>
+                  <AdminDashboard />
+                </SharedLayout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/assistentes-ia" 
+            element={
+              <ProtectedRoute requiredRole="super_admin">
+                <SharedLayout>
+                  <AssistantsManagement />
+                </SharedLayout>
+              </ProtectedRoute>
+            } 
+          />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

@@ -8,7 +8,7 @@ import { Search, SortAsc, SortDesc, Grid, List, MoreHorizontal } from "lucide-re
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-interface DataColumn<T> {
+export interface DataColumn<T> {
   key: keyof T | string;
   header: string;
   render?: (item: T) => ReactNode;
@@ -16,11 +16,11 @@ interface DataColumn<T> {
   className?: string;
 }
 
-interface DataAction<T> {
+export interface DataAction<T> {
   label: string;
   icon?: ReactNode;
   onClick: (item: T) => void;
-  variant?: "default" | "destructive" | "outline";
+  variant?: "default" | "destructive" | "outline" | "secondary";
   disabled?: (item: T) => boolean;
 }
 
