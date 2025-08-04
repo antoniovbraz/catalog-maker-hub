@@ -35,3 +35,6 @@ verify_jwt = true
 
 [functions.generate-ad]
 verify_jwt = true
+
+[functions.generate-ad-chat]
+verify_jwt = true

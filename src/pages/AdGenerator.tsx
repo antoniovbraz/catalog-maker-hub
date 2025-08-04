@@ -24,6 +24,7 @@ import {
 import { useProducts } from "@/hooks/useProducts";
 import { useProductImages, useUploadProductImage, useDeleteProductImage } from "@/hooks/useProductImages";
 import { useGenerateListing } from "@/hooks/useAdGeneration";
+import { AdChatInterface } from "@/components/forms/AdChatInterface";
 import { MarketplaceDestination } from "@/types/ads";
 import { ProductImage } from "@/types/ads";
 import { cn } from "@/lib/utils";
@@ -42,6 +43,7 @@ export default function AdGenerator() {
   const [customPrompt, setCustomPrompt] = useState("");
   const [generatedResult, setGeneratedResult] = useState<any>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [mode, setMode] = useState<'quick' | 'strategic'>('quick');
 
   const { data: products = [] } = useProducts();
   const { data: images = [], refetch: refetchImages } = useProductImages(selectedProductId);
@@ -142,29 +144,120 @@ export default function AdGenerator() {
         { href: "/ad-generator", label: "Gerador de Anúncios" }
       ]}
       actions={
-        <Button 
-          onClick={handleGenerate}
-          disabled={!canGenerate || generateMutation.isPending}
-          className="bg-gradient-primary hover:opacity-90"
-        >
-          <Wand2 className="w-4 h-4 mr-2" />
-          {generateMutation.isPending ? "Gerando..." : "Gerar Anúncio"}
-        </Button>
+        mode === 'quick' ? (
+          <Button 
+            onClick={handleGenerate}
+            disabled={!canGenerate || generateMutation.isPending}
+            className="bg-gradient-primary hover:opacity-90"
+          >
+            <Wand2 className="w-4 h-4 mr-2" />
+            {generateMutation.isPending ? "Gerando..." : "Gerar Anúncio"}
+          </Button>
+        ) : null
       }
     >
-      {/* Alert Informativo */}
+      {/* Mode Toggle */}
       <div className="xl:col-span-12 mb-6">
-        <Alert>
-          <Info className="w-4 h-4" />
-          <AlertDescription>
-            Esta funcionalidade está em desenvolvimento. Atualmente gera resultados de demonstração. 
-            A integração com IA será implementada na próxima fase.
-          </AlertDescription>
-        </Alert>
+        <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+          <span className="font-medium">Modo de Geração:</span>
+          <div className="flex gap-2">
+            <Button
+              variant={mode === 'quick' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMode('quick')}
+            >
+              Rápido
+            </Button>
+            <Button
+              variant={mode === 'strategic' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setMode('strategic')}
+            >
+              Estratégico
+            </Button>
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {mode === 'quick' 
+              ? 'Geração direta com base nos dados do produto' 
+              : 'Conversa estratégica para otimizar o anúncio'
+            }
+          </span>
+        </div>
       </div>
 
-      {/* Coluna de Configuração (8 colunas) */}
-      <div className="xl:col-span-8 space-y-6">
+      {mode === 'strategic' ? (
+        // Modo Estratégico - Chat Interface
+        <div className="xl:col-span-12 space-y-6">
+          {selectedProductId && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Configuração do Chat</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                  <div>
+                    <Label htmlFor="chat-product">Produto</Label>
+                    <Select value={selectedProductId} onValueChange={setSelectedProductId}>
+                      <SelectTrigger id="chat-product" className="mt-1">
+                        <SelectValue placeholder="Selecione um produto..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products.map((product) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="chat-marketplace">Marketplace</Label>
+                    <Select value={selectedMarketplace} onValueChange={(value) => setSelectedMarketplace(value as MarketplaceDestination)}>
+                      <SelectTrigger id="chat-marketplace" className="mt-1">
+                        <SelectValue placeholder="Selecione marketplace..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MARKETPLACE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card>
+            <CardContent className="p-0">
+              <AdChatInterface
+                productData={selectedProduct}
+                marketplace={selectedMarketplace || 'mercado_livre'}
+                onResultGenerated={(result) => {
+                  console.log('Resultado gerado:', result);
+                  setGeneratedResult({ description: result });
+                }}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        // Modo Rápido - Interface Original
+        <>
+          {/* Alert Informativo */}
+          <div className="xl:col-span-12 mb-6">
+            <Alert>
+              <Info className="w-4 h-4" />
+              <AlertDescription>
+                Modo rápido: Geração direta baseada nos dados do produto e imagens.
+              </AlertDescription>
+            </Alert>
+          </div>
+
+          {/* Coluna de Configuração (8 colunas) */}
+          <div className="xl:col-span-8 space-y-6">
         {/* Card 1: Seleção de Produto */}
         <Card>
           <CardHeader>
@@ -469,9 +562,11 @@ export default function AdGenerator() {
                 </div>
               </CardContent>
             </Card>
-          )}
-        </div>
-      </div>
+           )}
+         </div>
+       </div>
+        </>
+      )}
     </ConfigurationPageLayout>
   );
 }

@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "start": "deno run --allow-net --allow-env --allow-read --allow-write index.ts"
+  },
+  "imports": {
+    "xhr": "https://deno.land/x/xhr@0.1.0/mod.ts"
+  }
+}
