@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useCollapsibleSection } from './useCollapsibleSection';
 
 interface UseFormVisibilityProps {

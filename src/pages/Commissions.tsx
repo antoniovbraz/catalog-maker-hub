@@ -1,4 +1,4 @@
-import { Percent, Plus, Calculator, Eye, EyeOff } from '@/components/ui/icons';
+import { Percent, Plus, Calculator } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";

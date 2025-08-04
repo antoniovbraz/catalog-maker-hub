@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Send, Bot, User, RotateCcw } from 'lucide-react';
-import { useAdChat, type ChatMessage } from '@/hooks/useAdChat';
+import { Send, Bot, User, RotateCcw } from '@/components/ui/icons';
+import { useAdChat } from '@/hooks/useAdChat';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 interface AdChatInterfaceProps {
-  productData: any;
+  productData: unknown;
   marketplace: string;
-  onResultGenerated?: (result: any) => void;
+  onResultGenerated?: (result: unknown) => void;
 }
 
 export function AdChatInterface({ 

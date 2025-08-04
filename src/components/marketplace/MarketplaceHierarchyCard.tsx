@@ -1,4 +1,4 @@
-import { Plus, Store, Settings, Trash2 } from 'lucide-react';
+import { Plus, Store, Settings, Trash2 } from '@/components/ui/icons';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

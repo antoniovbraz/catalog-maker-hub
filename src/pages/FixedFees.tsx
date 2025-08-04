@@ -1,16 +1,14 @@
 import { FixedFeeRuleForm } from "@/components/forms/FixedFeeRuleForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { Coins, Plus, Edit, Trash2, Info } from "@/components/ui/icons";
+import { Coins, Plus, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
-import { useState } from "react";
 
 const FixedFees = () => {
   const { isFormVisible, showForm, hideForm } = useFormVisibility({
