@@ -42,6 +42,30 @@ describe('ProductsService', () => {
     });
   });
 
+  describe('getAllWithCategories', () => {
+    it('deve retornar produtos com categorias', async () => {
+      const mockProducts = [
+        {
+          ...testUtils.createMockProduct({ id: '1', name: 'Produto 1', category_id: 'cat1' }),
+          categories: testUtils.createMockCategory({ id: 'cat1', name: 'Categoria 1' }),
+        },
+      ];
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
+      };
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+
+      const result = await productsService.getAllWithCategories();
+
+      expect(testUtils.mockSupabaseClient.from).toHaveBeenCalledWith('products');
+      expect(mockQuery.select).toHaveBeenCalledWith(expect.stringContaining('categories:category_id'));
+      expect(mockQuery.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(result).toEqual(mockProducts);
+    });
+  });
+
   describe('getById', () => {
     it('deve retornar produto por ID', async () => {
       const mockProduct = testUtils.createMockProduct({ id: 'test-id' });
@@ -161,6 +185,28 @@ describe('ProductsService', () => {
       const result = await productsService.getByCategory('test-category');
 
       expect(mockQuery.eq).toHaveBeenCalledWith('category_id', 'test-category');
+      expect(result).toEqual(mockProducts);
+    });
+  });
+
+  describe('searchByName', () => {
+    it('deve buscar produtos por nome usando ilike', async () => {
+      const searchTerm = 'Prod';
+      const mockProducts = [testUtils.createMockProduct({ name: 'Produto 1' })];
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        ilike: vi.fn().mockReturnThis(),
+        order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
+      };
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+
+      const result = await productsService.searchByName(searchTerm);
+
+      expect(testUtils.mockSupabaseClient.from).toHaveBeenCalledWith('products');
+      expect(mockQuery.select).toHaveBeenCalledWith('*');
+      expect(mockQuery.ilike).toHaveBeenCalledWith('name', `%${searchTerm}%`);
+      expect(mockQuery.order).toHaveBeenCalledWith('name');
       expect(result).toEqual(mockProducts);
     });
   });
