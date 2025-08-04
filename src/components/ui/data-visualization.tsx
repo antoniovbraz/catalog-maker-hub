@@ -58,6 +58,10 @@ export function DataVisualization<T extends { id: string }>({
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
 
+  const getValue = (item: T, key: string): unknown => {
+    return key.split('.').reduce((obj, k) => obj?.[k], item);
+  };
+
   // Filter data based on search term
   const filteredData = data.filter(item => {
     if (!searchTerm) return true;
@@ -94,10 +98,6 @@ export function DataVisualization<T extends { id: string }>({
       setSortColumn(column);
       setSortDirection("asc");
     }
-  };
-
-  const getValue = (item: T, key: string): unknown => {
-    return key.split('.').reduce((obj, k) => obj?.[k], item);
   };
 
   const renderTableView = () => (
