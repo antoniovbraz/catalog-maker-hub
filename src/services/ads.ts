@@ -33,10 +33,18 @@ export class AdsService extends BaseService<ProductImage> {
     sortOrder: number = 0
   ): Promise<ProductImage> {
     try {
-      // Gerar nome único para o arquivo
+      // Buscar tenant_id do usuário
+      const { authService } = await import('./auth');
+      const tenantId = await authService.getCurrentTenantId();
+      
+      if (!tenantId) {
+        throw new Error('Tenant ID não encontrado');
+      }
+
+      // Gerar nome único para o arquivo com estrutura tenant_id/product_id/arquivo
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `${productId}/${fileName}`;
+      const filePath = `${tenantId}/${productId}/${fileName}`;
 
       // Upload do arquivo para o Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -53,7 +61,7 @@ export class AdsService extends BaseService<ProductImage> {
         .from('product-images')
         .getPublicUrl(filePath);
 
-      // Salvar referência no banco
+      // Salvar referência no banco (tenant_id será adicionado automaticamente pelo BaseService)
       const imageData = {
         product_id: productId,
         image_url: publicUrl,
@@ -79,7 +87,7 @@ export class AdsService extends BaseService<ProductImage> {
         throw new Error('Imagem não encontrada');
       }
 
-      // Extrair caminho do arquivo da URL
+      // Extrair caminho do arquivo da URL (agora no formato tenant_id/product_id/arquivo)
       const url = new URL(image.image_url);
       const filePath = url.pathname.split('/product-images/')[1];
 
