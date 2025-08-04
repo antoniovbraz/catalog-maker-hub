@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
-import { AppBreadcrumbs } from "@/components/common/AppBreadcrumbs";
 import { PageTransition } from "@/components/common/PageTransition";
 
 interface SharedLayoutProps {

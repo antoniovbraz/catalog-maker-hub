@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Check } from "@/components/ui/icons";
+import { Plus, Check } from "@/components/ui/icons";
 import { useMarketplacePlatforms, useCreateMarketplace, useUpdateMarketplace } from "@/hooks/useMarketplaces";
 import { useCategories } from "@/hooks/useCategories";
 import { MarketplaceType, MarketplaceFormData } from "@/types/marketplaces";

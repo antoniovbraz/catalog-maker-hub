@@ -1,14 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { assistantsService } from '@/services/assistants';
-import type { Assistant, AssistantFormData } from '@/types/assistants';
+import type { AssistantFormData } from '@/types/assistants';
 import { useToast } from '@/components/ui/use-toast';
 import { useLogger } from '@/utils/logger';
 
 const ASSISTANTS_QUERY_KEY = ['assistants'] as const;
 
 export function useAssistants() {
-  const logger = useLogger('useAssistants');
-
   return useQuery({
     queryKey: ASSISTANTS_QUERY_KEY,
     queryFn: () => assistantsService.getAll(),
@@ -96,8 +94,6 @@ export function useDeleteAssistant() {
 }
 
 export function useAssistantByMarketplace(marketplace: string) {
-  const logger = useLogger('useAssistantByMarketplace');
-
   return useQuery({
     queryKey: ['assistants', 'marketplace', marketplace],
     queryFn: () => assistantsService.getAssistantByMarketplace(marketplace),

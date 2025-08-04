@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DataVisualization } from '@/components/ui/data-visualization';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { Heading, Text } from '@/components/ui/typography';
 import { Crown, Users, TrendingUp, DollarSign, Activity, Settings, UserPlus, BarChart3 } from '@/components/ui/icons';
 import { useQuery } from '@tanstack/react-query';
@@ -34,15 +33,6 @@ interface SubscriptionTableRow {
   current_period_end?: string | null;
 }
 
-interface AdminDashboardData {
-  users: UserTableRow[];
-  subscriptions: SubscriptionTableRow[];
-  revenue: {
-    monthly: number;
-    yearly: number;
-    activeSubscriptions: number;
-  };
-}
 
 export default function AdminDashboard() {
   const { profile } = useAuth();

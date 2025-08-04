@@ -25,8 +25,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useProductImages, useUploadProductImage, useDeleteProductImage } from "@/hooks/useProductImages";
 import { useGenerateListing } from "@/hooks/useAdGeneration";
 import { AdChatInterface } from "@/components/forms/AdChatInterface";
-import { MarketplaceDestination } from "@/types/ads";
-import { ProductImage } from "@/types/ads";
+import { MarketplaceDestination, ProductImage } from "@/types/ads";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -41,7 +40,12 @@ export default function AdGenerator() {
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedMarketplace, setSelectedMarketplace] = useState<MarketplaceDestination | "">("");
   const [customPrompt, setCustomPrompt] = useState("");
-  const [generatedResult, setGeneratedResult] = useState<any>(null);
+  interface GeneratedResult {
+    title?: string;
+    description: string;
+    keywords?: string[];
+  }
+  const [generatedResult, setGeneratedResult] = useState<GeneratedResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [mode, setMode] = useState<'quick' | 'strategic'>('quick');
 

@@ -11,20 +11,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Info } from '@/components/ui/icons';
 import { handleSupabaseError } from "@/utils/errors";
 
-interface FixedFeeRule {
-  id: string;
-  marketplace_id: string;
-  rule_type: string;
-  range_min: number | null;
-  range_max: number | null;
-  value: number;
-  created_at: string;
-  updated_at: string;
-  marketplaces?: {
-    name: string;
-  };
-}
-
 interface Marketplace {
   id: string;
   name: string;
@@ -166,17 +152,6 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
     } else {
       createMutation.mutate(formData);
     }
-  };
-
-  const handleEdit = (rule: FixedFeeRule) => {
-    setFormData({
-      marketplace_id: rule.marketplace_id,
-      rule_type: rule.rule_type,
-      range_min: rule.range_min?.toString() || "",
-      range_max: rule.range_max?.toString() || "",
-      value: rule.value.toString()
-    });
-    setEditingId(rule.id);
   };
 
   const handleCancelEdit = () => {

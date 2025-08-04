@@ -4,7 +4,7 @@ import { FolderTree, Plus, Edit, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
-import { useCategories, useUpdateCategory, useDeleteCategory } from "@/hooks/useCategories";
+import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType } from "@/types/categories";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { useState } from "react";
@@ -17,7 +17,6 @@ const Categories = () => {
   });
 
   const { data: categories = [], isLoading } = useCategories();
-  const updateMutation = useUpdateCategory();
   const deleteMutation = useDeleteCategory();
 
   const handleEdit = (category: CategoryType) => {

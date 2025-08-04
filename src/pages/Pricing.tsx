@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 
 const Pricing = () => {
-  const { isFormVisible, showForm, hideForm } = useFormVisibility({
+  const { isFormVisible, showForm } = useFormVisibility({
     formStorageKey: 'pricing-form-visible',
     listStorageKey: 'pricing-list-visible'
   });

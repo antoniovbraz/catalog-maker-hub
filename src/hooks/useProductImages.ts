@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adsService } from "@/services/ads";
-import { ProductImageFormData } from "@/types/ads";
 import { useToast } from "@/components/ui/use-toast";
 import { logger } from "@/utils/logger";
 

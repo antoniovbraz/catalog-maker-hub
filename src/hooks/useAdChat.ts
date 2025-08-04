@@ -14,7 +14,7 @@ export interface ChatMessage {
 interface ChatRequest {
   thread_id?: string;
   message: string;
-  product_info?: any;
+  product_info?: unknown;
   marketplace: string;
   is_initial_message?: boolean;
 }
@@ -81,7 +81,7 @@ export function useAdChat() {
     },
   });
 
-  const sendMessage = (message: string, productInfo?: any, marketplace: string = 'mercado_livre') => {
+  const sendMessage = (message: string, productInfo?: unknown, marketplace: string = 'mercado_livre') => {
     const isInitial = messages.length === 0;
     
     chatMutation.mutate({
