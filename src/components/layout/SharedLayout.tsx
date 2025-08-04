@@ -19,7 +19,7 @@ export function SharedLayout({ children }: SharedLayoutProps) {
           
           {/* Main Content with improved container and transitions */}
           <main className="flex-1 overflow-auto bg-gradient-subtle">
-            <div className="container max-w-7xl mx-auto p-6 space-y-6">
+            <div className="container max-w-7xl mx-auto px-4 py-6 sm:px-6 space-y-6">
               <PageTransition>
                 {children}
               </PageTransition>
