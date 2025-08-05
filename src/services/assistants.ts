@@ -135,23 +135,35 @@ export class AssistantsService extends BaseService<Assistant> {
     }
   }
 
-  async getAssistantByMarketplace(marketplace: string, mode: 'quick' | 'strategic' = 'quick'): Promise<Assistant | null> {
+  async getAssistantByMarketplace(
+    marketplace: string,
+    mode: 'quick' | 'strategic' = 'quick',
+    productId?: string
+  ): Promise<Assistant | null> {
     try {
-      this.logger.debug('Buscando assistente por marketplace e modo', { marketplace, mode });
+      this.logger.debug('Buscando assistente por marketplace e modo', { marketplace, mode, productId });
 
-      const { data, error } = await supabase
+      const query = supabase
         .from('assistants')
         .select('*')
         .eq('marketplace', marketplace)
-        .eq('mode', mode)
-        .maybeSingle();
+        .eq('mode', mode);
+
+      if (mode === 'strategic') {
+        if (!productId) {
+          throw new Error('productId é obrigatório no modo estratégico');
+        }
+        query.eq('product_id', productId);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error) {
         throw error;
       }
 
       if (!data) {
-        this.logger.debug('Nenhum assistente encontrado para o marketplace e modo', { marketplace, mode });
+        this.logger.debug('Nenhum assistente encontrado para o marketplace e modo', { marketplace, mode, productId });
         return null;
       }
 

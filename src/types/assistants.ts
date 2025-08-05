@@ -3,6 +3,7 @@ export interface Assistant {
   name: string;
   marketplace: 'mercado_livre' | 'shopee' | 'instagram';
   mode: 'quick' | 'strategic';
+  product_id?: string;
   model: string;
   instructions: string;
   assistant_id: string; // OpenAI Assistant ID
