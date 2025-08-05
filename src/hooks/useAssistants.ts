@@ -93,10 +93,10 @@ export function useDeleteAssistant() {
   });
 }
 
-export function useAssistantByMarketplace(marketplace: string) {
+export function useAssistantByMarketplace(marketplace: string, mode: 'quick' | 'strategic' = 'quick') {
   return useQuery({
-    queryKey: ['assistants', 'marketplace', marketplace],
-    queryFn: () => assistantsService.getAssistantByMarketplace(marketplace),
+    queryKey: ['assistants', 'marketplace', marketplace, 'mode', mode],
+    queryFn: () => assistantsService.getAssistantByMarketplace(marketplace, mode),
     enabled: !!marketplace,
     staleTime: 5 * 60 * 1000, // 5 minutos
   });

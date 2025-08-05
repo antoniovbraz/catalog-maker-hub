@@ -30,13 +30,16 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useCreateAssistant, useUpdateAssistant } from "@/hooks/useAssistants";
 import type { Assistant, AssistantFormData } from "@/types/assistants";
-import { AVAILABLE_MODELS, MARKETPLACE_OPTIONS } from "@/types/assistants";
+import { AVAILABLE_MODELS, MARKETPLACE_OPTIONS, MODE_OPTIONS } from "@/types/assistants";
 import { useEffect, useState } from "react";
 
 const assistantSchema = z.object({
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   marketplace: z.enum(['mercado_livre', 'shopee', 'instagram'], {
     required_error: "Marketplace é obrigatório",
+  }),
+  mode: z.enum(['quick', 'strategic'], {
+    required_error: "Modo é obrigatório",
   }),
   model: z.string().min(1, "Modelo é obrigatório"),
   instructions: z.string().min(50, "Instruções devem ter pelo menos 50 caracteres"),
@@ -62,6 +65,7 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
     defaultValues: {
       name: "",
       marketplace: "mercado_livre",
+      mode: "quick",
       model: "gpt-4o",
       instructions: "",
     },
@@ -74,6 +78,7 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
         form.reset({
           name: assistant.name,
           marketplace: assistant.marketplace,
+          mode: assistant.mode,
           model: assistant.model,
           instructions: assistant.instructions,
         });
@@ -82,6 +87,7 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
         form.reset({
           name: "",
           marketplace: "mercado_livre",
+          mode: "quick",
           model: "gpt-4o",
           instructions: "",
         });
@@ -156,33 +162,63 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="marketplace"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Marketplace</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o marketplace" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {MARKETPLACE_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Marketplace para o qual este assistente será usado.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="marketplace"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marketplace</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o marketplace" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {MARKETPLACE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Marketplace para o qual este assistente será usado.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="mode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Modo</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o modo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {MODE_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Modo de geração do assistente.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}

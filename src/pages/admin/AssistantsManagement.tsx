@@ -8,7 +8,7 @@ import { AssistantForm } from "@/components/forms/AssistantForm";
 import { useAssistants, useDeleteAssistant } from "@/hooks/useAssistants";
 import type { Assistant } from "@/types/assistants";
 import type { DataColumn, DataAction } from "@/components/ui/data-visualization";
-import { MARKETPLACE_OPTIONS } from "@/types/assistants";
+import { MARKETPLACE_OPTIONS, MODE_OPTIONS } from "@/types/assistants";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -33,6 +33,15 @@ export default function AssistantsManagement() {
       render: (assistant) => {
         const marketplace = MARKETPLACE_OPTIONS.find(m => m.value === assistant.marketplace);
         return marketplace?.label || assistant.marketplace;
+      },
+    },
+    {
+      key: "mode",
+      header: "Modo",
+      sortable: true,
+      render: (assistant) => {
+        const mode = MODE_OPTIONS.find(m => m.value === assistant.mode);
+        return mode?.label || assistant.mode;
       },
     },
     {

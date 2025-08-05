@@ -4,7 +4,7 @@ import type { Assistant, AssistantFormData } from "@/types/assistants";
 import { useLogger } from "@/utils/logger";
 
 export class AssistantsService extends BaseService<Assistant> {
-  private logger = useLogger('AssistantsService');
+  protected logger = useLogger('AssistantsService');
 
   constructor() {
     super('assistants');
@@ -135,29 +135,31 @@ export class AssistantsService extends BaseService<Assistant> {
     }
   }
 
-  async getAssistantByMarketplace(marketplace: string): Promise<Assistant | null> {
+  async getAssistantByMarketplace(marketplace: string, mode: 'quick' | 'strategic' = 'quick'): Promise<Assistant | null> {
     try {
-      this.logger.debug('Buscando assistente por marketplace', { marketplace });
+      this.logger.debug('Buscando assistente por marketplace e modo', { marketplace, mode });
 
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from('assistants')
         .select('*')
         .eq('marketplace', marketplace)
-        .single();
+        .eq('mode', mode)
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          this.logger.debug('Nenhum assistente encontrado para o marketplace', { marketplace });
-          return null;
-        }
         throw error;
       }
 
+      if (!data) {
+        this.logger.debug('Nenhum assistente encontrado para o marketplace e modo', { marketplace, mode });
+        return null;
+      }
+
       this.logger.debug('Assistente encontrado', data);
-      return data as unknown as Assistant;
+      return data as Assistant;
     } catch (error) {
-      this.logger.error('Erro ao buscar assistente por marketplace', error);
-      throw new Error(`Buscar assistente por marketplace falhou: ${error.message}`);
+      this.logger.error('Erro ao buscar assistente por marketplace e modo', error);
+      throw new Error(`Buscar assistente por marketplace e modo falhou: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   }
 }

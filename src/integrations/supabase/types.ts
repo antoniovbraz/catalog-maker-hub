@@ -21,6 +21,7 @@ export type Database = {
           id: string
           instructions: string
           marketplace: string
+          mode: string
           model: string
           name: string
           tenant_id: string
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           instructions: string
           marketplace: string
+          mode?: string
           model?: string
           name: string
           tenant_id: string
@@ -43,6 +45,7 @@ export type Database = {
           id?: string
           instructions?: string
           marketplace?: string
+          mode?: string
           model?: string
           name?: string
           tenant_id?: string
