@@ -2,6 +2,22 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { marketplacesService } from '@/services/marketplaces';
 import { testUtils } from '../setup';
 
+// Helper para criar mock completo da query do Supabase
+const createQueryMock = (overrides: Record<string, any> = {}) => ({
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  ilike: vi.fn().mockReturnThis(),
+  is: vi.fn().mockReturnThis(),
+  ...overrides,
+});
+
 // Mock do Supabase é feito no setup.ts
 describe('MarketplacesService', () => {
   beforeEach(() => {
@@ -41,10 +57,10 @@ describe('MarketplacesService', () => {
 
       const mockData = [platform1, modality1, modality2, platform2, orphan];
 
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockData, error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await marketplacesService.getHierarchical();
@@ -86,11 +102,11 @@ describe('MarketplacesService', () => {
 
       const mockData = [modality1, modality2, modality3];
 
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockData, error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await marketplacesService.getModalitiesByPlatform('p1', 'cat1');
@@ -104,10 +120,10 @@ describe('MarketplacesService', () => {
 
   describe('validateName', () => {
     it('deve retornar true quando nome é único', async () => {
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [], error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await marketplacesService.validateName('Nome Único');
@@ -117,10 +133,10 @@ describe('MarketplacesService', () => {
     });
 
     it('deve retornar false quando nome já existe', async () => {
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [{ id: 'existing-id' }], error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await marketplacesService.validateName('Nome Existente');
@@ -129,13 +145,13 @@ describe('MarketplacesService', () => {
     });
 
     it('deve excluir ID específico na validação', async () => {
-      const mockQueryAfterEq = {
+      const mockQueryAfterEq = createQueryMock({
         neq: vi.fn().mockResolvedValue({ data: [], error: null })
-      };
-      const mockQuery = {
+      });
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue(mockQueryAfterEq)
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await marketplacesService.validateName('Nome', 'test-id');

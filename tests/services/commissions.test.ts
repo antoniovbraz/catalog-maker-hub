@@ -1,32 +1,26 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { commissionsService } from '@/services/commissions';
-import { supabase } from '@/integrations/supabase/client';
+import { testUtils } from '../setup';
 
-// Mock do Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(),
-          order: vi.fn(() => ({ data: [], error: null }))
-        })),
-        is: vi.fn(() => ({
-          single: vi.fn()
-        })),
-        neq: vi.fn(() => ({ data: [], error: null })),
-        order: vi.fn(() => ({ data: [], error: null }))
-      })),
-      insert: vi.fn(() => ({ data: [], error: null })),
-      update: vi.fn(() => ({ data: [], error: null })),
-      delete: vi.fn(() => ({ data: [], error: null }))
-    }))
-  }
-}));
+// Helper para criar mock completo da query do Supabase
+const createQueryMock = (overrides: Record<string, any> = {}) => ({
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  ilike: vi.fn().mockReturnThis(),
+  is: vi.fn().mockReturnThis(),
+  ...overrides,
+});
 
 describe('CommissionsService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    testUtils.resetAllMocks();
   });
 
   describe('findApplicableCommission', () => {
@@ -39,28 +33,19 @@ describe('CommissionsService', () => {
         created_at: '2024-01-01',
         updated_at: '2024-01-01'
       };
-
-      const mockSelect = vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            single: vi.fn().mockResolvedValue({ data: mockSpecificCommission, error: null })
-          }))
-        }))
-      }));
-
-      const mockFrom = vi.fn(() => ({
-        select: mockSelect
-      }));
-
-      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
+      const mockQuery = createQueryMock({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockSpecificCommission, error: null })
+      });
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await commissionsService.findApplicableCommission({
         marketplaceId: 'marketplace-1',
         categoryId: 'category-1'
       });
-
       expect(result).toEqual(mockSpecificCommission);
-      expect(mockFrom).toHaveBeenCalledWith('commissions');
+      expect(testUtils.mockSupabaseClient.from).toHaveBeenCalledWith('commissions');
     });
 
     it('should fallback to default commission when category-specific not found', async () => {
@@ -73,30 +58,20 @@ describe('CommissionsService', () => {
         updated_at: '2024-01-01'
       };
 
-      let callCount = 0;
-      const mockSelect = vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            single: vi.fn().mockImplementation(() => {
-              callCount++;
-              if (callCount === 1) {
-                // Primeira chamada (categoria específica) retorna erro
-                return Promise.resolve({ data: null, error: { message: 'Not found' } });
-              }
-              return Promise.resolve({ data: null, error: { message: 'Not found' } });
-            })
-          })),
-          is: vi.fn(() => ({
-            single: vi.fn().mockResolvedValue({ data: mockDefaultCommission, error: null })
-          }))
-        }))
-      }));
-
-      const mockFrom = vi.fn(() => ({
-        select: mockSelect
-      }));
-
-      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
+      const firstQuery = createQueryMock({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } })
+      });
+      const secondQuery = createQueryMock({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: mockDefaultCommission, error: null })
+      });
+      testUtils.mockSupabaseClient.from
+        .mockReturnValueOnce(firstQuery)
+        .mockReturnValueOnce(secondQuery);
 
       const result = await commissionsService.findApplicableCommission({
         marketplaceId: 'marketplace-1',
@@ -107,22 +82,20 @@ describe('CommissionsService', () => {
     });
 
     it('should return null when no commission found', async () => {
-      const mockSelect = vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => ({
-            single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } })
-          })),
-          is: vi.fn(() => ({
-            single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } })
-          }))
-        }))
-      }));
-
-      const mockFrom = vi.fn(() => ({
-        select: mockSelect
-      }));
-
-      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
+      const firstQuery = createQueryMock({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } })
+      });
+      const secondQuery = createQueryMock({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } })
+      });
+      testUtils.mockSupabaseClient.from
+        .mockReturnValueOnce(firstQuery)
+        .mockReturnValueOnce(secondQuery);
 
       const result = await commissionsService.findApplicableCommission({
         marketplaceId: 'marketplace-1',
@@ -135,17 +108,12 @@ describe('CommissionsService', () => {
 
   describe('validateUniqueRule', () => {
     it('should return true when no duplicate exists', async () => {
-      const mockSelect = vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => ({ data: [], error: null }))
-        }))
-      }));
-
-      const mockFrom = vi.fn(() => ({
-        select: mockSelect
-      }));
-
-      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
+      const mockQuery = createQueryMock();
+      mockQuery.select.mockReturnThis();
+      mockQuery.eq
+        .mockReturnValueOnce(mockQuery)
+        .mockResolvedValueOnce({ data: [], error: null });
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await commissionsService.validateUniqueRule(
         'marketplace-1',
@@ -156,17 +124,12 @@ describe('CommissionsService', () => {
     });
 
     it('should return false when duplicate exists', async () => {
-      const mockSelect = vi.fn(() => ({
-        eq: vi.fn(() => ({
-          eq: vi.fn(() => ({ data: [{ id: 'existing-id' }], error: null }))
-        }))
-      }));
-
-      const mockFrom = vi.fn(() => ({
-        select: mockSelect
-      }));
-
-      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
+      const mockQuery = createQueryMock();
+      mockQuery.select.mockReturnThis();
+      mockQuery.eq
+        .mockReturnValueOnce(mockQuery)
+        .mockResolvedValueOnce({ data: [{ id: 'existing-id' }], error: null });
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await commissionsService.validateUniqueRule(
         'marketplace-1',
@@ -177,17 +140,11 @@ describe('CommissionsService', () => {
     });
 
     it('should handle null category correctly', async () => {
-      const mockSelect = vi.fn(() => ({
-        eq: vi.fn(() => ({
-          is: vi.fn(() => ({ data: [], error: null }))
-        }))
-      }));
-
-      const mockFrom = vi.fn(() => ({
-        select: mockSelect
-      }));
-
-      (supabase.from as unknown as vi.Mock).mockImplementation(mockFrom);
+      const mockQuery = createQueryMock();
+      mockQuery.select.mockReturnThis();
+      mockQuery.eq.mockReturnThis();
+      mockQuery.is.mockResolvedValue({ data: [], error: null });
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await commissionsService.validateUniqueRule(
         'marketplace-1',
