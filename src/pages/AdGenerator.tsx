@@ -90,7 +90,7 @@ export default function AdGenerator() {
       description="Gere anúncios otimizados usando inteligência artificial"
       breadcrumbs={breadcrumbs}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:col-span-12">
         {/* Configuração */}
         <div className="lg:col-span-1 space-y-6">
           {/* Seleção de Modo */}
