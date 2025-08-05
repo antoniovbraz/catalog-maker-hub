@@ -1,0 +1,793 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Snapshots das páginas principais > deve renderizar AdGenerator corretamente 1`] = `
+<div>
+  <div
+    class="min-h-screen bg-gradient-subtle"
+  >
+    <header
+      class="bg-card border-b border-border"
+    >
+      <div
+        class="container mx-auto px-4 py-6"
+      >
+        <nav
+          class="flex items-center space-x-1 text-sm text-muted-foreground mb-4"
+        >
+          <a
+            class="hover:text-foreground transition-colors"
+            href="/dashboard"
+          >
+            <svg
+              class="lucide lucide-house h-4 w-4"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"
+              />
+              <path
+                d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+              />
+            </svg>
+          </a>
+          <div
+            class="flex items-center space-x-1"
+          >
+            <svg
+              class="lucide lucide-chevron-right h-4 w-4"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m9 18 6-6-6-6"
+              />
+            </svg>
+            <a
+              class="hover:text-foreground transition-colors"
+              href="/"
+            >
+              Dashboard
+            </a>
+          </div>
+          <div
+            class="flex items-center space-x-1"
+          >
+            <svg
+              class="lucide lucide-chevron-right h-4 w-4"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m9 18 6-6-6-6"
+              />
+            </svg>
+            <a
+              class="hover:text-foreground transition-colors"
+              href="/ad-generator"
+            >
+              Gerador de IA
+            </a>
+          </div>
+        </nav>
+        <div
+          class="flex items-start justify-between"
+        >
+          <div
+            class="flex-1"
+          >
+            <div
+              class="flex items-center gap-3 mb-2"
+            >
+              <div>
+                <h1
+                  class="text-3xl font-bold tracking-tight text-foreground"
+                >
+                  Gerador de Anúncios IA
+                </h1>
+              </div>
+            </div>
+            <p
+              class="text-lg text-muted-foreground max-w-3xl"
+            >
+              Gere anúncios otimizados usando inteligência artificial
+            </p>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main
+      class="container mx-auto px-4 sm:px-6 py-6"
+    >
+      <div
+        class="transition-all duration-500 ease-out opacity-0 translate-y-4"
+      >
+        <div
+          class="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-12 gap-6"
+        >
+          <div
+            class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:col-span-12"
+          >
+            <div
+              class="lg:col-span-1 space-y-6"
+            >
+              <div
+                class="rounded-lg border bg-card text-card-foreground shadow-sm"
+              >
+                <div
+                  class="flex flex-col space-y-1.5 p-lg pb-3"
+                >
+                  <h3
+                    class="tracking-tight text-lg font-semibold"
+                  >
+                    Modo de Geração
+                  </h3>
+                  <p
+                    class="text-sm text-muted-foreground"
+                  >
+                    Escolha entre geração rápida ou estratégica
+                  </p>
+                </div>
+                <div
+                  class="p-lg pt-0 space-y-3"
+                >
+                  <div
+                    class="grid grid-cols-2 gap-3"
+                  >
+                    <button
+                      class="justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-auto p-3 flex flex-col items-center gap-2"
+                    >
+                      <svg
+                        class="lucide lucide-wand-sparkles h-4 w-4"
+                        fill="none"
+                        height="24"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"
+                        />
+                        <path
+                          d="m14 7 3 3"
+                        />
+                        <path
+                          d="M5 6v4"
+                        />
+                        <path
+                          d="M19 14v4"
+                        />
+                        <path
+                          d="M10 2v2"
+                        />
+                        <path
+                          d="M7 8H3"
+                        />
+                        <path
+                          d="M21 16h-4"
+                        />
+                        <path
+                          d="M11 3H9"
+                        />
+                      </svg>
+                      <span
+                        class="text-sm font-medium"
+                      >
+                        Rápido
+                      </span>
+                    </button>
+                    <button
+                      class="justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-auto p-3 flex flex-col items-center gap-2"
+                    >
+                      <svg
+                        class="lucide lucide-sparkles h-4 w-4"
+                        fill="none"
+                        height="24"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"
+                        />
+                        <path
+                          d="M20 3v4"
+                        />
+                        <path
+                          d="M22 5h-4"
+                        />
+                        <path
+                          d="M4 17v2"
+                        />
+                        <path
+                          d="M5 18H3"
+                        />
+                      </svg>
+                      <span
+                        class="text-sm font-medium"
+                      >
+                        Estratégico
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="rounded-lg border bg-card text-card-foreground shadow-sm"
+              >
+                <div
+                  class="flex flex-col space-y-1.5 p-lg pb-3"
+                >
+                  <h3
+                    class="tracking-tight text-lg font-semibold"
+                  >
+                    Configuração
+                  </h3>
+                  <p
+                    class="text-sm text-muted-foreground"
+                  >
+                    Selecione o produto e marketplace para gerar o anúncio
+                  </p>
+                </div>
+                <div
+                  class="p-lg pt-0 space-y-4"
+                >
+                  <div
+                    class="space-y-2"
+                  >
+                    <label
+                      class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium"
+                      for="product"
+                    >
+                      Produto
+                    </label>
+                    <button
+                      aria-autocomplete="none"
+                      aria-controls="radix-:r0:"
+                      aria-expanded="false"
+                      class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+                      data-placeholder=""
+                      data-state="closed"
+                      dir="ltr"
+                      id="product"
+                      role="combobox"
+                      type="button"
+                    >
+                      <span
+                        style="pointer-events: none;"
+                      >
+                        Selecione um produto
+                      </span>
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-chevron-down h-4 w-4 opacity-50"
+                        fill="none"
+                        height="24"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m6 9 6 6 6-6"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    class="space-y-2"
+                  >
+                    <label
+                      class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium"
+                      for="marketplace"
+                    >
+                      Marketplace
+                    </label>
+                    <button
+                      aria-autocomplete="none"
+                      aria-controls="radix-:r1:"
+                      aria-expanded="false"
+                      class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+                      data-placeholder=""
+                      data-state="closed"
+                      dir="ltr"
+                      id="marketplace"
+                      role="combobox"
+                      type="button"
+                    >
+                      <span
+                        style="pointer-events: none;"
+                      >
+                        Selecione o marketplace
+                      </span>
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-chevron-down h-4 w-4 opacity-50"
+                        fill="none"
+                        height="24"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m6 9 6 6 6-6"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="rounded-lg border bg-card text-card-foreground shadow-sm"
+              >
+                <div
+                  class="flex flex-col space-y-1.5 p-lg pb-3"
+                >
+                  <h3
+                    class="tracking-tight text-lg font-semibold"
+                  >
+                    Geração Rápida
+                  </h3>
+                  <p
+                    class="text-sm text-muted-foreground"
+                  >
+                    Gere um anúncio instantaneamente
+                  </p>
+                </div>
+                <div
+                  class="p-lg pt-0 space-y-4"
+                >
+                  <div
+                    class="space-y-2"
+                  >
+                    <label
+                      class="peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm font-medium"
+                      for="prompt"
+                    >
+                      Prompt Personalizado (Opcional)
+                    </label>
+                    <textarea
+                      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px] resize-none"
+                      id="prompt"
+                      placeholder="Ex: Destaque a durabilidade e qualidade premium..."
+                    />
+                  </div>
+                  <button
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                    disabled=""
+                  >
+                    <svg
+                      class="lucide lucide-wand-sparkles h-4 w-4 mr-2"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"
+                      />
+                      <path
+                        d="m14 7 3 3"
+                      />
+                      <path
+                        d="M5 6v4"
+                      />
+                      <path
+                        d="M19 14v4"
+                      />
+                      <path
+                        d="M10 2v2"
+                      />
+                      <path
+                        d="M7 8H3"
+                      />
+                      <path
+                        d="M21 16h-4"
+                      />
+                      <path
+                        d="M11 3H9"
+                      />
+                    </svg>
+                    Gerar Anúncio
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="lg:col-span-2"
+            >
+              <div
+                class="rounded-lg border bg-card text-card-foreground shadow-sm"
+              >
+                <div
+                  class="flex flex-col space-y-1.5 p-lg pb-3"
+                >
+                  <h3
+                    class="tracking-tight text-lg font-semibold"
+                  >
+                    Resultado
+                  </h3>
+                  <p
+                    class="text-sm text-muted-foreground"
+                  >
+                    O anúncio gerado aparecerá aqui
+                  </p>
+                </div>
+                <div
+                  class="p-lg pt-0"
+                >
+                  <div
+                    class="text-center py-12 text-muted-foreground"
+                  >
+                    <svg
+                      class="lucide lucide-shopping-cart h-12 w-12 mx-auto mb-4 opacity-50"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx="8"
+                        cy="21"
+                        r="1"
+                      />
+                      <circle
+                        cx="19"
+                        cy="21"
+                        r="1"
+                      />
+                      <path
+                        d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+                      />
+                    </svg>
+                    <p>
+                      Nenhum anúncio gerado ainda
+                    </p>
+                    <p
+                      class="text-sm mt-1"
+                    >
+                      Use a geração rápida para criar um anúncio instantaneamente
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+`;
+
+exports[`Snapshots das páginas principais > deve renderizar AdminDashboard corretamente 1`] = `
+<div>
+  <div
+    class="min-h-screen flex items-center justify-center"
+  >
+    <div
+      class="text-center"
+    >
+      <svg
+        class="lucide lucide-crown h-16 w-16 text-muted-foreground mx-auto mb-md"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"
+        />
+        <path
+          d="M5 21h14"
+        />
+      </svg>
+      <h2
+        class="font-bold text-destructive mb-sm"
+      >
+        Acesso Restrito
+      </h2>
+      <p
+        class="text-muted-foreground"
+      >
+        Apenas super administradores podem acessar esta área.
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Snapshots das páginas principais > deve renderizar Dashboard corretamente 1`] = `
+<div>
+  <div
+    class="space-y-lg"
+  >
+    <div
+      class="space-y-sm"
+    >
+      <h1
+        class="font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
+      >
+        📊 Dashboard
+      </h1>
+      <p
+        class="text-h5"
+      >
+        Compare preços e margens entre diferentes marketplaces para seus produtos
+      </p>
+    </div>
+    <div
+      class="rounded-lg text-card-foreground shadow-sm shadow-card border-0 bg-gradient-subtle"
+    >
+      <div
+        class="p-lg pt-0 p-lg"
+      >
+        <div
+          class="space-y-lg"
+        >
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <div
+              class="rounded-lg border bg-card text-card-foreground shadow-sm"
+            >
+              <div
+                class="flex flex-col space-y-1.5 p-lg"
+              >
+                <h3
+                  class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                >
+                  <svg
+                    class="lucide lucide-package h-5 w-5"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"
+                    />
+                    <path
+                      d="M12 22V12"
+                    />
+                    <path
+                      d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"
+                    />
+                    <path
+                      d="m7.5 4.27 9 5.15"
+                    />
+                  </svg>
+                  Seleção de Produto
+                </h3>
+                <p
+                  class="text-sm text-muted-foreground"
+                >
+                  Selecione um produto para comparar suas precificações salvas
+                </p>
+              </div>
+              <div
+                class="p-lg pt-0"
+              >
+                <div>
+                  <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    for="product"
+                  >
+                    Produto *
+                  </label>
+                  <button
+                    aria-autocomplete="none"
+                    aria-controls="radix-:r6:"
+                    aria-expanded="false"
+                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+                    data-placeholder=""
+                    data-state="closed"
+                    dir="ltr"
+                    role="combobox"
+                    type="button"
+                  >
+                    <span
+                      style="pointer-events: none;"
+                    >
+                      Selecione um produto
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-chevron-down h-4 w-4 opacity-50"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="m6 9 6 6 6-6"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="rounded-lg border bg-card text-card-foreground shadow-sm"
+            >
+              <div
+                class="flex flex-col space-y-1.5 p-lg"
+              >
+                <h3
+                  class="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                >
+                  <svg
+                    class="lucide lucide-target h-5 w-5"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="6"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="2"
+                    />
+                  </svg>
+                  Marketplaces
+                  <div
+                    class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  >
+                    0
+                    /6
+                  </div>
+                </h3>
+                <p
+                  class="text-sm text-muted-foreground"
+                >
+                  Selecione até 6 marketplaces para comparar - os dados serão atualizados automaticamente
+                </p>
+              </div>
+              <div
+                class="p-lg pt-0"
+              >
+                <div
+                  class="space-y-3 max-h-40 overflow-y-auto"
+                >
+                  <div>
+                    Carregando marketplaces...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="rounded-lg border bg-card text-card-foreground shadow-sm"
+          >
+            <div
+              class="p-lg text-center py-8"
+            >
+              <p
+                class="text-muted-foreground mb-2"
+              >
+                Selecione um produto e marketplaces para ver as precificações salvas
+              </p>
+              <p
+                class="text-sm text-muted-foreground"
+              >
+                Use a aba "Precificação" para calcular e salvar precificações primeiro.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Snapshots das páginas principais > deve renderizar Subscription corretamente 1`] = `
+<div>
+  <div
+    class="min-h-screen flex items-center justify-center"
+  >
+    <div
+      class="flex items-center justify-center gap-2"
+      data-testid="loading-spinner"
+    >
+      <svg
+        class="lucide lucide-loader-circle animate-spin text-muted-foreground h-8 w-8"
+        fill="none"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M21 12a9 9 0 1 1-6.219-8.56"
+        />
+      </svg>
+      <span
+        class="text-sm text-muted-foreground"
+      >
+        Carregando planos...
+      </span>
+    </div>
+  </div>
+</div>
+`;
