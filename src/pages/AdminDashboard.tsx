@@ -204,29 +204,29 @@ export default function AdminDashboard() {
       title: "Total de Usuários",
       value: allUsers?.length || 0,
       icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      color: "text-primary",
+      bgColor: "bg-primary/10"
     },
     {
-      title: "Assinaturas Ativas", 
+      title: "Assinaturas Ativas",
       value: revenue?.activeSubscriptions || 0,
       icon: Crown,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      color: "text-secondary",
+      bgColor: "bg-secondary/10"
     },
     {
       title: "Receita Mensal",
       value: `R$ ${(revenue?.monthly || 0).toFixed(2)}`,
       icon: DollarSign,
-      color: "text-green-600",
-      bgColor: "bg-green-50"
+      color: "text-success",
+      bgColor: "bg-success/10"
     },
     {
       title: "Receita Anual (Proj.)",
       value: `R$ ${(revenue?.yearly || 0).toFixed(2)}`,
       icon: TrendingUp,
-      color: "text-orange-600", 
-      bgColor: "bg-orange-50"
+      color: "text-warning",
+      bgColor: "bg-warning/10"
     }
   ];
 
@@ -396,7 +396,7 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => (
-          <Card key={index} className="border-0 shadow-md">
+          <Card key={index} className="border-0 shadow-card">
             <CardContent className="p-lg">
               <div className="flex items-center justify-between">
                 <div>
