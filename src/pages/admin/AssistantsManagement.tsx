@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { Plus, Bot, Edit, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { AssistantForm } from "@/components/forms/AssistantForm";
+import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { useAssistants, useDeleteAssistant } from "@/hooks/useAssistants";
 import type { Assistant } from "@/types/assistants";
 import type { DataColumn, DataAction } from "@/components/ui/data-visualization";
@@ -14,8 +21,10 @@ import { ptBR } from "date-fns/locale";
 
 export default function AssistantsManagement() {
   const [showForm, setShowForm] = useState(false);
-  const [editingAssistant, setEditingAssistant] = useState<Assistant | null>(null);
-  const [deletingAssistant, setDeletingAssistant] = useState<Assistant | null>(null);
+  const [editingAssistant, setEditingAssistant] =
+    useState<Assistant | null>(null);
+  const [deletingAssistant, setDeletingAssistant] =
+    useState<Assistant | null>(null);
 
   const { data: assistants = [], isLoading } = useAssistants();
   const deleteMutation = useDeleteAssistant();
@@ -31,7 +40,9 @@ export default function AssistantsManagement() {
       header: "Marketplace",
       sortable: true,
       render: (assistant) => {
-        const marketplace = MARKETPLACE_OPTIONS.find(m => m.value === assistant.marketplace);
+        const marketplace = MARKETPLACE_OPTIONS.find(
+          (m) => m.value === assistant.marketplace,
+        );
         return marketplace?.label || assistant.marketplace;
       },
     },
@@ -40,7 +51,7 @@ export default function AssistantsManagement() {
       header: "Modo",
       sortable: true,
       render: (assistant) => {
-        const mode = MODE_OPTIONS.find(m => m.value === assistant.mode);
+        const mode = MODE_OPTIONS.find((m) => m.value === assistant.mode);
         return mode?.label || assistant.mode;
       },
     },
@@ -53,15 +64,17 @@ export default function AssistantsManagement() {
       key: "created_at",
       header: "Criado em",
       sortable: true,
-      render: (assistant) => 
-        format(new Date(assistant.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }),
+      render: (assistant) =>
+        format(new Date(assistant.created_at), "dd/MM/yyyy 'às' HH:mm", {
+          locale: ptBR,
+        }),
     },
   ];
 
   const actions: DataAction<Assistant>[] = [
     {
       label: "Editar",
-      icon: <Edit className="h-4 w-4" />,
+      icon: <Edit className="size-4" />,
       onClick: (assistant) => {
         setEditingAssistant(assistant);
         setShowForm(true);
@@ -70,7 +83,7 @@ export default function AssistantsManagement() {
     },
     {
       label: "Excluir",
-      icon: <Trash2 className="h-4 w-4" />,
+      icon: <Trash2 className="size-4" />,
       onClick: (assistant) => setDeletingAssistant(assistant),
       variant: "destructive",
     },
@@ -92,51 +105,60 @@ export default function AssistantsManagement() {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Assistentes IA</h1>
-          <p className="text-muted-foreground mt-2">
-            Gerencie os assistentes IA para cada marketplace
-          </p>
-        </div>
-        <Button onClick={handleCreateNew} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Assistente
-        </Button>
-      </div>
+  const breadcrumbs = [
+    { label: "Admin", href: "/admin" },
+    { label: "Assistentes IA" },
+  ];
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bot className="h-5 w-5" />
-            Assistentes Configurados
-          </CardTitle>
-          <CardDescription>
-            Lista de todos os assistentes IA configurados para os marketplaces.
-            Cada marketplace pode ter apenas um assistente ativo por vez.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataVisualization
-            title="Assistentes IA"
-            data={assistants}
-            columns={columns}
-            actions={actions}
-            searchable
-            isLoading={isLoading}
-            emptyState={
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Nenhum assistente configurado ainda</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Crie seu primeiro assistente IA para começar a gerar anúncios automaticamente
-                </p>
-              </div>
-            }
-          />
-        </CardContent>
-      </Card>
+  const headerActions = (
+    <Button size="sm" onClick={handleCreateNew} className="gap-sm">
+      <Plus className="size-4" />
+      Novo Assistente
+    </Button>
+  );
+
+  return (
+    <>
+      <ConfigurationPageLayout
+        title="Assistentes IA"
+        description="Gerencie os assistentes IA para cada marketplace"
+        icon={<Bot className="size-6" />}
+        breadcrumbs={breadcrumbs}
+        actions={headerActions}
+      >
+        <div className="lg:col-span-12">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-sm">
+                <Bot className="size-5" />
+                Assistentes Configurados
+              </CardTitle>
+              <CardDescription>
+                Lista de todos os assistentes IA configurados para os marketplaces.
+                Cada marketplace pode ter apenas um assistente ativo por vez.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DataVisualization
+                title="Assistentes IA"
+                data={assistants}
+                columns={columns}
+                actions={actions}
+                searchable
+                isLoading={isLoading}
+                emptyState={
+                  <div className="py-xl text-center">
+                    <p className="text-muted-foreground">Nenhum assistente configurado ainda</p>
+                    <p className="mt-xs text-sm text-muted-foreground">
+                      Crie seu primeiro assistente IA para começar a gerar anúncios automaticamente
+                    </p>
+                  </div>
+                }
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </ConfigurationPageLayout>
 
       {/* Modal de criação/edição */}
       <AssistantForm
@@ -157,6 +179,7 @@ export default function AssistantsManagement() {
         loading={deleteMutation.isPending}
         variant="destructive"
       />
-    </div>
+    </>
   );
 }
+
