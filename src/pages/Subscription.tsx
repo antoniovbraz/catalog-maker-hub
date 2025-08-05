@@ -55,11 +55,16 @@ export default function Subscription() {
 
   const getPlanColor = (planName: string) => {
     switch (planName) {
-      case 'free': return 'bg-muted text-muted-foreground';
-      case 'basic': return 'bg-blue-500 text-white';
-      case 'pro': return 'bg-purple-500 text-white';
-      case 'enterprise': return 'bg-gradient-to-r from-purple-600 to-blue-600 text-white';
-      default: return 'bg-muted text-muted-foreground';
+      case 'free':
+        return 'bg-muted text-muted-foreground';
+      case 'basic':
+        return 'bg-secondary text-secondary-foreground';
+      case 'pro':
+        return 'bg-primary text-primary-foreground';
+      case 'enterprise':
+        return 'bg-gradient-primary text-primary-foreground';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -157,8 +162,8 @@ export default function Subscription() {
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              billingCycle === 'monthly' 
-                ? 'bg-background text-foreground shadow-sm' 
+              billingCycle === 'monthly'
+                ? 'bg-background text-foreground shadow-hover'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -167,8 +172,8 @@ export default function Subscription() {
           <button
             onClick={() => setBillingCycle('yearly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              billingCycle === 'yearly' 
-                ? 'bg-background text-foreground shadow-sm' 
+              billingCycle === 'yearly'
+                ? 'bg-background text-foreground shadow-hover'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -188,7 +193,7 @@ export default function Subscription() {
           return (
             <Card 
               key={plan.id}
-              className={`relative ${isRecommended ? 'border-primary shadow-lg scale-105' : ''} ${
+              className={`relative ${isRecommended ? 'border-primary shadow-card scale-105' : ''} ${
                 isCurrent ? 'ring-2 ring-primary/50' : ''
               }`}
             >
@@ -199,7 +204,7 @@ export default function Subscription() {
               )}
               
               {isCurrent && (
-                <Badge className="absolute -top-3 right-4 bg-green-600">
+                <Badge className="absolute -top-3 right-4 bg-success">
                   Atual
                 </Badge>
               )}
@@ -246,7 +251,7 @@ export default function Subscription() {
                       
                       return (
                         <li key={feature} className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-green-600" />
+                          <Check className="h-4 w-4 text-success" />
                           {featureLabels[feature] || feature}
                         </li>
                       );
