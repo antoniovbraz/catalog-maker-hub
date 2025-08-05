@@ -50,6 +50,10 @@ export const colors = {
     border: 'hsl(var(--sidebar-border))',
     ring: 'hsl(var(--sidebar-ring))',
   },
+  /* Marketplace brand colors */
+  'mercado-livre': 'hsl(var(--mercado-livre))',
+  shopee: 'hsl(var(--shopee))',
+  instagram: 'hsl(var(--instagram))',
   /* Corporate Theme Colors */
   gunmetal: '200 40% 13%',
   'fern-green': '100 27% 43%',
