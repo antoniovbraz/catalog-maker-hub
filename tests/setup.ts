@@ -25,6 +25,11 @@ const mockFromReturn = {
 const mockSupabaseClient = {
   from: vi.fn(() => mockFromReturn),
   rpc: vi.fn(),
+  channel: vi.fn(() => ({
+    on: vi.fn().mockReturnThis(),
+    subscribe: vi.fn().mockResolvedValue({}),
+  })),
+  removeChannel: vi.fn(),
   auth: {
     getUser: vi.fn(),
     signIn: vi.fn(),

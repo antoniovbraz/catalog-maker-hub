@@ -24,6 +24,7 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 - `npm run lint` – executa a verificação de lint
 - `npm test` – executa a suite de testes
 - `npm run test:coverage` – executa os testes com relatório de cobertura
+- `npm run test:e2e` – executa testes end-to-end de overflow horizontal
 - `npm run preview` – visualiza o build de produção localmente
 
 ## Diretrizes de Contribuição
