@@ -1,6 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { testUtils } from '../setup';
 import { productsService } from '@/services/products';
+import { authService } from '@/services/auth';
+
+// Helper para criar mock completo da query do Supabase
+const createQueryMock = (overrides: Record<string, any> = {}) => ({
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  ilike: vi.fn().mockReturnThis(),
+  is: vi.fn().mockReturnThis(),
+  ...overrides,
+});
 
 // Mock do Supabase é feito no setup.ts
 describe('ProductsService', () => {
@@ -16,10 +33,10 @@ describe('ProductsService', () => {
       ];
 
       // Mock da resposta do Supabase
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.getAll();
@@ -32,10 +49,10 @@ describe('ProductsService', () => {
 
     it('deve lançar erro quando Supabase retorna erro', async () => {
       const mockError = { message: 'Database error' };
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: null, error: mockError }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       await expect(productsService.getAll()).rejects.toThrow('Buscar products falhou: Database error');
@@ -51,10 +68,10 @@ describe('ProductsService', () => {
         },
       ];
 
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.getAllWithCategories();
@@ -70,11 +87,11 @@ describe('ProductsService', () => {
     it('deve retornar produto por ID', async () => {
       const mockProduct = testUtils.createMockProduct({ id: 'test-id' });
       
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockProduct, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.getById('test-id');
@@ -87,14 +104,14 @@ describe('ProductsService', () => {
     });
 
     it('deve retornar null quando produto não encontrado', async () => {
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({ 
-          data: null, 
-          error: { code: 'PGRST116', message: 'Not found' } 
+        single: vi.fn().mockResolvedValue({
+          data: null,
+          error: { code: 'PGRST116', message: 'Not found' }
         }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.getById('non-existent-id');
@@ -114,17 +131,18 @@ describe('ProductsService', () => {
       
       const mockCreatedProduct = testUtils.createMockProduct(productData);
       
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQuery = createQueryMock({
         insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockCreatedProduct, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.create(productData);
 
       expect(testUtils.mockSupabaseClient.from).toHaveBeenCalledWith('products');
-      expect(mockQuery.insert).toHaveBeenCalledWith(productData);
+      expect(mockQuery.insert).toHaveBeenCalledWith({ ...productData, tenant_id: 'tenant-1' });
       expect(mockQuery.select).toHaveBeenCalled();
       expect(mockQuery.single).toHaveBeenCalled();
       expect(result).toEqual(mockCreatedProduct);
@@ -136,18 +154,19 @@ describe('ProductsService', () => {
       const updateData = { name: 'Produto Atualizado', cost_unit: 150 };
       const mockUpdatedProduct = testUtils.createMockProduct(updateData);
       
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQuery = createQueryMock({
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockUpdatedProduct, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.update('test-id', updateData);
 
       expect(testUtils.mockSupabaseClient.from).toHaveBeenCalledWith('products');
-      expect(mockQuery.update).toHaveBeenCalledWith(updateData);
+      expect(mockQuery.update).toHaveBeenCalledWith(expect.objectContaining(updateData));
       expect(mockQuery.eq).toHaveBeenCalledWith('id', 'test-id');
       expect(result).toEqual(mockUpdatedProduct);
     });
@@ -155,10 +174,11 @@ describe('ProductsService', () => {
 
   describe('delete', () => {
     it('deve deletar produto com sucesso', async () => {
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQuery = createQueryMock({
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       await expect(productsService.delete('test-id')).resolves.toBeUndefined();
@@ -175,11 +195,12 @@ describe('ProductsService', () => {
         testUtils.createMockProduct({ category_id: 'test-category' }),
       ];
       
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.getByCategory('test-category');
@@ -194,11 +215,12 @@ describe('ProductsService', () => {
       const searchTerm = 'Prod';
       const mockProducts = [testUtils.createMockProduct({ name: 'Produto 1' })];
 
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         ilike: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.searchByName(searchTerm);
@@ -213,10 +235,11 @@ describe('ProductsService', () => {
 
   describe('validateSKU', () => {
     it('deve retornar true quando SKU é único', async () => {
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await productsService.validateSKU('UNIQUE-SKU');
@@ -226,14 +249,15 @@ describe('ProductsService', () => {
     });
 
     it('deve retornar false quando SKU já existe', async () => {
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQueryExisting = createQueryMock({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ 
-          data: [{ id: 'existing-id' }], 
-          error: null 
+        eq: vi.fn().mockResolvedValue({
+          data: [{ id: 'existing-id' }],
+          error: null
         }),
-      };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+      });
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQueryExisting);
 
       const result = await productsService.validateSKU('EXISTING-SKU');
 
@@ -241,16 +265,17 @@ describe('ProductsService', () => {
     });
 
     it('deve excluir ID específico na validação', async () => {
-      const mockQuery = {
+      vi.spyOn(authService, 'getCurrentTenantId').mockResolvedValue('tenant-1');
+      const mockQueryExclude = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         neq: vi.fn().mockResolvedValue({ data: [], error: null }),
-      };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+      });
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQueryExclude);
 
       const result = await productsService.validateSKU('SKU-TEST', 'exclude-id');
 
-      expect(mockQuery.neq).toHaveBeenCalledWith('id', 'exclude-id');
+      expect(mockQueryExclude.neq).toHaveBeenCalledWith('id', 'exclude-id');
       expect(result).toBe(true);
     });
   });

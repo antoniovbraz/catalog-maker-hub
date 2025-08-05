@@ -2,6 +2,22 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { categoriesService } from '@/services/categories';
 import { testUtils } from '../setup';
 
+// Helper para criar mock completo da query do Supabase
+const createQueryMock = (overrides: Record<string, any> = {}) => ({
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  ilike: vi.fn().mockReturnThis(),
+  is: vi.fn().mockReturnThis(),
+  ...overrides,
+});
+
 // Mock do Supabase é feito no setup.ts
 describe('CategoriesService', () => {
   beforeEach(() => {
@@ -21,10 +37,10 @@ describe('CategoriesService', () => {
         }
       ];
 
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockCategories, error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await categoriesService.getWithProductCount();
@@ -43,10 +59,10 @@ describe('CategoriesService', () => {
 
   describe('validateName', () => {
     it('deve retornar true quando nome é único', async () => {
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [], error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await categoriesService.validateName('Nome Único');
@@ -56,10 +72,10 @@ describe('CategoriesService', () => {
     });
 
     it('deve retornar false quando nome já existe', async () => {
-      const mockQuery = {
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [{ id: 'existing-id' }], error: null })
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await categoriesService.validateName('Nome Existente');
@@ -68,13 +84,13 @@ describe('CategoriesService', () => {
     });
 
     it('deve excluir ID específico na validação', async () => {
-      const mockQueryAfterEq = {
+      const mockQueryAfterEq = createQueryMock({
         neq: vi.fn().mockResolvedValue({ data: [], error: null })
-      };
-      const mockQuery = {
+      });
+      const mockQuery = createQueryMock({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue(mockQueryAfterEq)
-      };
+      });
       testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
 
       const result = await categoriesService.validateName('Nome', 'test-id');
