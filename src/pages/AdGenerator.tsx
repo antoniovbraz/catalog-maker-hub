@@ -2,12 +2,10 @@ import { useState } from "react";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Wand2, 
@@ -20,13 +18,12 @@ import { useProducts } from "@/hooks/useProducts";
 import { useGenerateListing } from "@/hooks/useAdGeneration";
 import { AdChatInterface } from "@/components/forms/AdChatInterface";
 import { MarketplaceDestination } from "@/types/ads";
-import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
 const MARKETPLACE_OPTIONS = [
-  { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-yellow-500' },
-  { value: 'shopee', label: 'Shopee', icon: '🛍️', color: 'bg-orange-500' },
-  { value: 'instagram', label: 'Instagram', icon: '📸', color: 'bg-pink-500' },
+  { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-mercado-livre' },
+  { value: 'shopee', label: 'Shopee', icon: '🛍️', color: 'bg-shopee' },
+  { value: 'instagram', label: 'Instagram', icon: '📸', color: 'bg-instagram' },
 ] as const;
 
 export default function AdGenerator() {
