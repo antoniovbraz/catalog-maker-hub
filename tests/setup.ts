@@ -8,18 +8,22 @@ afterEach(() => {
 });
 
 // Mock do Supabase Client
+const mockFromReturn = {
+  select: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  neq: vi.fn().mockReturnThis(),
+  order: vi.fn().mockReturnThis(),
+  single: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  ilike: vi.fn().mockReturnThis(),
+  is: vi.fn().mockReturnThis(),
+};
+
 const mockSupabaseClient = {
-  from: vi.fn(() => ({
-    select: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    neq: vi.fn().mockReturnThis(),
-    order: vi.fn().mockReturnThis(),
-    single: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockReturnThis(),
-  })),
+  from: vi.fn(() => mockFromReturn),
   rpc: vi.fn(),
   auth: {
     getUser: vi.fn(),
@@ -135,5 +139,6 @@ export const testUtils = {
     mockSupabaseClient.rpc.mockClear();
     mockToast.mockClear();
     Object.values(mockQueryClient).forEach(fn => fn.mockClear());
+    Object.values(mockFromReturn).forEach(fn => fn.mockClear());
   },
 };
