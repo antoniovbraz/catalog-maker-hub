@@ -93,7 +93,7 @@ export default function Auth() {
           </p>
         </div>
 
-        <Card className="border-0 shadow-2xl bg-card/50 backdrop-blur-sm">
+        <Card className="border-0 shadow-form bg-card/50 backdrop-blur-sm">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-2xl">Bem-vindo!</CardTitle>
             <CardDescription>
