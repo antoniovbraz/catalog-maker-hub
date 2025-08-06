@@ -39,6 +39,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Heading, Text } from "@/components/ui/typography";
 
 const mainMenuItems = [
   { id: "dashboard", title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -195,12 +196,12 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex-1">
-                <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <Heading variant="h2">
                 Peepers Hub
-              </h2>
-              <p className="text-xs text-sidebar-foreground/70">
+              </Heading>
+              <Text variant="caption">
                 Price Pilot
-              </p>
+              </Text>
             </div>
           )}
         </div>
