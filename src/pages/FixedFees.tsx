@@ -148,30 +148,32 @@ const FixedFees = () => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Table>
-                {tableHeader}
-                <TableBody>
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <Skeleton className="h-4 w-24" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-4 w-20" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-4 w-32" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="h-4 w-20" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton className="size-8 rounded" />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  {tableHeader}
+                  <TableBody>
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          <Skeleton className="h-4 w-24" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-20" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-32" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-20" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="size-8 rounded" />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             ) : fixedFeeRules.length === 0 ? (
               <EmptyState
                 icon={<Coins className="size-8" />}
@@ -179,47 +181,49 @@ const FixedFees = () => {
                 description="Adicione uma nova taxa para começar"
               />
             ) : (
-              <Table>
-                {tableHeader}
-                <TableBody>
-                  {fixedFeeRules.map((rule) => (
-                    <TableRow key={rule.id}>
-                      <TableCell className="font-medium">
-                        {rule.marketplaces?.name}
-                      </TableCell>
-                      <TableCell>
-                        {RULE_TYPES.find((t) => t.value === rule.rule_type)?.label}
-                      </TableCell>
-                      <TableCell>
-                        {(rule.rule_type === "faixa" || rule.rule_type === "percentual") &&
-                        rule.range_min !== null &&
-                        rule.range_max !== null
-                          ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
-                          : rule.rule_type === "constante"
-                          ? "Todas as faixas"
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {rule.rule_type === "percentual"
-                          ? `${rule.value.toFixed(2)}%`
-                          : `R$ ${rule.value.toFixed(2)}`}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate(rule.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  {tableHeader}
+                  <TableBody>
+                    {fixedFeeRules.map((rule) => (
+                      <TableRow key={rule.id}>
+                        <TableCell className="font-medium break-words">
+                          {rule.marketplaces?.name}
+                        </TableCell>
+                        <TableCell className="break-words">
+                          {RULE_TYPES.find((t) => t.value === rule.rule_type)?.label}
+                        </TableCell>
+                        <TableCell className="break-words">
+                          {(rule.rule_type === "faixa" || rule.rule_type === "percentual") &&
+                          rule.range_min !== null &&
+                          rule.range_max !== null
+                            ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
+                            : rule.rule_type === "constante"
+                            ? "Todas as faixas"
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {rule.rule_type === "percentual"
+                            ? `${rule.value.toFixed(2)}%`
+                            : `R$ ${rule.value.toFixed(2)}`}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteMutation.mutate(rule.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
