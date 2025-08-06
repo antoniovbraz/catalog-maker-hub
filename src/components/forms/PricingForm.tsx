@@ -184,7 +184,7 @@ export const PricingForm = () => {
   return (
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
-      <Card className="border border-border/50 shadow-card">
+      <Card className="border-border/50">
         <CardHeader className="bg-card">
           <CardTitle className="flex items-center gap-2 text-xl">
             <Calculator className="size-6" />
@@ -207,7 +207,7 @@ export const PricingForm = () => {
                   <SelectTrigger className="relative z-0">
                     <SelectValue placeholder="Selecione um produto" />
                   </SelectTrigger>
-                  <SelectContent className="z-[200] border bg-popover shadow-lg">
+                  <SelectContent className="z-[200]">
                     {loadingProducts ? (
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                     ) : products.length === 0 ? (
@@ -239,7 +239,7 @@ export const PricingForm = () => {
                   <SelectTrigger className="relative z-0">
                     <SelectValue placeholder="Selecione uma plataforma" />
                   </SelectTrigger>
-                  <SelectContent className="z-[200] border bg-popover shadow-lg">
+                  <SelectContent className="z-[200]">
                     {loadingPlatforms ? (
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                     ) : platforms.length === 0 ? (
@@ -270,7 +270,7 @@ export const PricingForm = () => {
                   <SelectTrigger className="relative z-0">
                     <SelectValue placeholder="Selecione uma modalidade" />
                   </SelectTrigger>
-                  <SelectContent className="z-[200] border bg-popover shadow-lg">
+                  <SelectContent className="z-[200]">
                     {loadingModalities ? (
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                     ) : modalities.length === 0 ? (
@@ -392,7 +392,7 @@ export const PricingForm = () => {
 
       {/* Resultados */}
       {pricingResult && (
-        <Card className="border border-border/50 shadow-card">
+        <Card className="border-border/50">
           <CardHeader className="bg-muted/30">
             <CardTitle className="flex items-center gap-2 text-lg text-foreground">
               <Calculator className="size-5" />

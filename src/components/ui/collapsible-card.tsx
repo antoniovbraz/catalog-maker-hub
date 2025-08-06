@@ -24,7 +24,7 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
 }) => {
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
-      <Card className={cn("shadow-card border border-border/20", className)}>
+      <Card className={cn("border-border/20", className)}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer py-3 transition-colors hover:bg-muted/30">
             <CardTitle className="flex items-center justify-between text-base font-medium">

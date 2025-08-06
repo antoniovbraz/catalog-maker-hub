@@ -2,7 +2,7 @@ import * as React from "react"
 
 import { BaseCard, BaseCardProps } from "@/components/ui/base-card"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2 } from "@/components/ui/icons"
+import { Edit, Trash2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 

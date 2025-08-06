@@ -4,8 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Edit } from '@/components/ui/icons';
+import { CardListItem } from "@/components/ui";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useSales, useCreateSale, useUpdateSale, useDeleteSale } from "@/hooks/useSales";
@@ -185,60 +184,27 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
           {isLoading ? (
             <p>Carregando...</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Produto</TableHead>
-                  <TableHead>Marketplace</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Qtd</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sales.map((sale) => (
-                  <TableRow key={sale.id}>
-                    <TableCell className="font-medium break-words">
-                      {sale.products?.name}
-                    </TableCell>
-                      <TableCell className="break-words">
-                        {sale.marketplaces?.name}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {formatarMoeda(sale.price_charged)}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">{sale.quantity}</TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {formatarMoeda(sale.price_charged * sale.quantity)}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {format(new Date(sale.sold_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(sale)}
-                          >
-                            <Edit className="size-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate(sale.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {sales.map((sale) => (
+                <CardListItem
+                  key={sale.id}
+                  title={sale.products?.name}
+                  subtitle={sale.marketplaces?.name}
+                  status={formatarMoeda(sale.price_charged * sale.quantity)}
+                  onEdit={() => handleEdit(sale)}
+                  onDelete={() => deleteMutation.mutate(sale.id)}
+                >
+                  <div className="flex items-center justify-between text-sm">
+                    <span>
+                      {sale.quantity} x {formatarMoeda(sale.price_charged)}
+                    </span>
+                    <span>
+                      {format(new Date(sale.sold_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                    </span>
+                  </div>
+                </CardListItem>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

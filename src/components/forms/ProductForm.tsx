@@ -249,7 +249,7 @@ export const ProductForm = () => {
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
       <BaseCard
-        className="border border-border/50 shadow-card"
+        className="border-border/50"
         title={
           <CardTitle className="flex items-center gap-2 text-xl">
             <Package className="size-6" />

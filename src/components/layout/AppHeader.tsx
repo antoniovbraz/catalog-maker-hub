@@ -37,7 +37,7 @@ export function AppHeader() {
 
           {/* Logo */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-primary shadow-card">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-primary">
               <Zap className="size-5 text-white" />
             </div>
             <span className="hidden bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-base font-bold text-transparent sm:inline sm:text-lg md:text-xl">
