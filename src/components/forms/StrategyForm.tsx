@@ -218,7 +218,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
+            <Target className="size-5" />
             Parâmetros da Estratégia
           </CardTitle>
           <CardDescription>
@@ -226,7 +226,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
             <div>
               <Label htmlFor="margem_limit">Limite Margem Alta (%)</Label>
               <Input
@@ -281,12 +281,12 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+                <BarChart3 className="size-5" />
                 Resumo por Quadrante
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
                 <EnhancedTooltip
                   title="Produtos Estrela"
                   details={[
@@ -294,9 +294,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Excelente", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-help">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <Star className="h-4 w-4 text-green-600" />
+                  <div className="cursor-help rounded-lg border border-green-200 bg-green-50 p-3 text-center transition-colors hover:bg-green-100">
+                    <div className="mb-1 flex items-center justify-center gap-2">
+                      <Star className="size-4 text-green-600" />
                       <div className="text-2xl font-bold text-green-600">
                         {strategyAnalysis.quadrantCounts.alta_margem_alto_giro}
                       </div>
@@ -312,7 +312,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Boa margem, baixo volume", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors cursor-help">
+                  <div className="cursor-help rounded-lg border border-blue-200 bg-blue-50 p-3 text-center transition-colors hover:bg-blue-100">
                     <div className="text-2xl font-bold text-blue-600">
                       {strategyAnalysis.quadrantCounts.alta_margem_baixo_giro}
                     </div>
@@ -327,7 +327,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Alto volume, baixa margem", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 transition-colors cursor-help">
+                  <div className="cursor-help rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-center transition-colors hover:bg-yellow-100">
                     <div className="text-2xl font-bold text-yellow-600">
                       {strategyAnalysis.quadrantCounts.baixa_margem_alto_giro}
                     </div>
@@ -342,9 +342,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Crítica", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 transition-colors cursor-help">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <div className="cursor-help rounded-lg border border-red-200 bg-red-50 p-3 text-center transition-colors hover:bg-red-100">
+                    <div className="mb-1 flex items-center justify-center gap-2">
+                      <AlertTriangle className="size-4 text-red-600" />
                       <div className="text-2xl font-bold text-red-600">
                         {strategyAnalysis.quadrantCounts.baixa_margem_baixo_giro}
                       </div>
@@ -355,10 +355,10 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </div>
               
               {/* Subtle Charts with Enhanced Animations */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <div className="transition-all duration-300 hover:scale-[1.02]">
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <PieChart className="h-4 w-4 text-primary" />
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-medium">
+                    <PieChart className="size-4 text-primary" />
                     Distribuição dos Quadrantes
                   </h4>
                   <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
@@ -366,8 +366,8 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                   </div>
                 </div>
                 <div className="transition-all duration-300 hover:scale-[1.02]">
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-primary" />
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-medium">
+                    <BarChart3 className="size-4 text-primary" />
                     Receita por Quadrante
                   </h4>
                   <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
@@ -382,7 +382,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
           <Card className="transition-all duration-300 hover:shadow-elegant">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ScatterChart className="h-5 w-5 text-primary" />
+                <ScatterChart className="size-5 text-primary" />
                 Posicionamento Estratégico
               </CardTitle>
               <CardDescription>
@@ -407,9 +407,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 h-96">
+              <div className="grid h-96 grid-cols-2 gap-4">
                 {/* Top Left: Alta Margem + Baixo Giro */}
-                <Card className="bg-blue-50 border-blue-200">
+                <Card className="border-blue-200 bg-blue-50">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">💎 Joias</CardTitle>
@@ -422,13 +422,13 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-xs max-h-32 overflow-y-auto">
+                    <div className="max-h-32 space-y-xs overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "alta_margem_baixo_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
-                          <div className="font-medium truncate">{product.product_name}</div>
+                        <div key={i} className="rounded border bg-white p-xs text-xs">
+                          <div className="truncate font-medium">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
                       ))}
@@ -437,7 +437,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </Card>
 
                 {/* Top Right: Alta Margem + Alto Giro */}
-                <Card className="bg-green-50 border-green-200">
+                <Card className="border-green-200 bg-green-50">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">⭐ Estrelas</CardTitle>
@@ -450,13 +450,13 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-xs max-h-32 overflow-y-auto">
+                    <div className="max-h-32 space-y-xs overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "alta_margem_alto_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
-                          <div className="font-medium truncate">{product.product_name}</div>
+                        <div key={i} className="rounded border bg-white p-xs text-xs">
+                          <div className="truncate font-medium">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
                       ))}
@@ -465,7 +465,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </Card>
 
                 {/* Bottom Left: Baixa Margem + Baixo Giro */}
-                <Card className="bg-red-50 border-red-200">
+                <Card className="border-red-200 bg-red-50">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">❓ Questionáveis</CardTitle>
@@ -478,13 +478,13 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-xs max-h-32 overflow-y-auto">
+                    <div className="max-h-32 space-y-xs overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "baixa_margem_baixo_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
-                          <div className="font-medium truncate">{product.product_name}</div>
+                        <div key={i} className="rounded border bg-white p-xs text-xs">
+                          <div className="truncate font-medium">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
                       ))}
@@ -493,7 +493,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </Card>
 
                 {/* Bottom Right: Baixa Margem + Alto Giro */}
-                <Card className="bg-yellow-50 border-yellow-200">
+                <Card className="border-yellow-200 bg-yellow-50">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">🔄 Movimento</CardTitle>
@@ -506,13 +506,13 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <div className="space-y-xs max-h-32 overflow-y-auto">
+                    <div className="max-h-32 space-y-xs overflow-y-auto">
                       {strategyAnalysis.products
                         .filter(p => p.quadrant === "baixa_margem_alto_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
-                          <div className="font-medium truncate">{product.product_name}</div>
+                        <div key={i} className="rounded border bg-white p-xs text-xs">
+                          <div className="truncate font-medium">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
                       ))}
@@ -522,11 +522,11 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </div>
 
               {/* Axis Labels */}
-              <div className="mt-4 relative">
-                <div className="absolute -left-6 top-1/2 transform -translate-y-1/2 -rotate-90 text-xs text-muted-foreground">
+              <div className="relative mt-4">
+                <div className="absolute -left-6 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-muted-foreground">
                   Margem →
                 </div>
-                <div className="text-center text-xs text-muted-foreground mt-2">
+                <div className="mt-2 text-center text-xs text-muted-foreground">
                   ← Giro →
                 </div>
               </div>
@@ -537,7 +537,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Package className="h-5 w-5" />
+                <Package className="size-5" />
                 Lista Detalhada de Produtos
               </CardTitle>
             </CardHeader>
@@ -549,30 +549,30 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
 
                   return (
                     <div key={quadrant}>
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="mb-2 flex items-center gap-2">
                         <h4 className="font-semibold">{getQuadrantTitle(quadrant)}</h4>
                         <Badge variant="outline">{products.length} produtos</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">
+                      <p className="mb-3 text-sm text-muted-foreground">
                         {getQuadrantStrategy(quadrant)}
                       </p>
                       <div className="grid gap-2">
                         {products.map((product, i) => (
-                          <div key={i} className={`p-3 rounded-lg border ${getQuadrantColor(quadrant)}`}>
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-2 text-sm">
+                          <div key={i} className={`rounded-lg border p-3 ${getQuadrantColor(quadrant)}`}>
+                            <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-5">
                               <div>
                                 <div className="font-medium">{product.product_name}</div>
                                 <div className="text-xs opacity-70">{product.marketplace_name}</div>
                               </div>
                               <div>
                                 <div className="flex items-center gap-1">
-                                  <TrendingUp className="h-3 w-3" />
+                                  <TrendingUp className="size-3" />
                                   <span>Margem: {product.margin_percentage.toFixed(1)}%</span>
                                 </div>
                               </div>
                               <div>
                                 <div className="flex items-center gap-1">
-                                  <BarChart3 className="h-3 w-3" />
+                                  <BarChart3 className="size-3" />
                                   <span>Giro: {product.giro_percentage.toFixed(1)}%</span>
                                 </div>
                               </div>
@@ -598,7 +598,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
 
       {!isCalculated && (
         <Card>
-          <CardContent className="text-center py-8">
+          <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">
               Configure os parâmetros e clique em "Analisar Estratégia" para ver a classificação dos produtos
             </p>

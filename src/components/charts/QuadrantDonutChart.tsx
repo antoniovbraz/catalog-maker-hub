@@ -61,12 +61,12 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
       const data = payload[0];
       const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : 0;
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
+        <div className="rounded-lg border bg-background p-3 text-sm shadow-lg">
           <div className="flex items-center gap-2">
             <span>{String(data.payload.emoji || '')}</span>
             <span className="font-medium">{data.name}</span>
           </div>
-          <p className="text-muted-foreground text-xs">{String(data.payload.description || '')}</p>
+          <p className="text-xs text-muted-foreground">{String(data.payload.description || '')}</p>
           <p>{data.value} produtos ({percentage}%)</p>
         </div>
       );
@@ -76,11 +76,11 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
 
   const CustomLegend = ({ payload }: ChartLegendProps) => {
     return (
-      <div className="flex flex-wrap justify-center gap-4 mt-4">
+      <div className="mt-4 flex flex-wrap justify-center gap-4">
         {payload?.map((entry, index: number) => (
           <div key={index} className="flex items-center gap-2 text-sm">
             <div
-              className="w-3 h-3 rounded-full"
+              className="size-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
             <span>{String(entry.payload?.emoji || '')} {entry.value}</span>
@@ -95,7 +95,7 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
 
   if (total === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-muted-foreground">
+      <div className="flex h-64 items-center justify-center text-muted-foreground">
         Nenhum dado para exibir
       </div>
     );

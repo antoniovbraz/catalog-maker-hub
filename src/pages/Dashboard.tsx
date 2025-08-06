@@ -14,17 +14,17 @@ const Dashboard = () => {
         <div className="space-y-sm">
           <Heading
             variant="h1"
-            className="tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
+            className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text tracking-tight text-transparent"
           >
             📊 Dashboard
           </Heading>
-          <Text className="text-muted-foreground text-h5">
+          <Text className="text-h5 text-muted-foreground">
             Compare preços e margens entre diferentes marketplaces para seus produtos
           </Text>
         </div>
 
         {/* Main Content */}
-        <Card className="shadow-card border-0 bg-gradient-subtle">
+        <Card className="border-0 bg-gradient-subtle shadow-card">
           <CardContent className="p-lg">
             <DashboardForm />
           </CardContent>

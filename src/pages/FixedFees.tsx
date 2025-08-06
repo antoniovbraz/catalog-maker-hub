@@ -100,7 +100,7 @@ const FixedFees = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="size-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Taxa
       </Button>
     </div>
@@ -166,7 +166,7 @@ const FixedFees = () => {
                         <Skeleton className="h-4 w-20" />
                       </TableCell>
                       <TableCell>
-                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="size-8 rounded" />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -174,7 +174,7 @@ const FixedFees = () => {
               </Table>
             ) : fixedFeeRules.length === 0 ? (
               <EmptyState
-                icon={<Coins className="h-8 w-8" />}
+                icon={<Coins className="size-8" />}
                 title="Nenhuma taxa fixa configurada"
                 description="Adicione uma nova taxa para começar"
               />

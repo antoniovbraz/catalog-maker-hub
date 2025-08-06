@@ -25,26 +25,26 @@ export function ConfigurationHeader({
 }: ConfigurationHeaderProps) {
 
   return (
-    <header className="bg-card border-b border-border">
+    <header className="border-b border-border bg-card">
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumbs */}
         {breadcrumbs.length > 0 && (
-          <nav className="flex items-center space-x-1 text-sm text-muted-foreground mb-4">
-            <Link to="/dashboard" className="hover:text-foreground transition-colors">
-              <Home className="h-4 w-4" />
+          <nav className="mb-4 flex items-center space-x-1 text-sm text-muted-foreground">
+            <Link to="/dashboard" className="transition-colors hover:text-foreground">
+              <Home className="size-4" />
             </Link>
             {breadcrumbs.map((crumb, index) => (
               <div key={index} className="flex items-center space-x-1">
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="size-4" />
                 {crumb.href ? (
                   <Link 
                     to={crumb.href} 
-                    className="hover:text-foreground transition-colors"
+                    className="transition-colors hover:text-foreground"
                   >
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span className="text-foreground font-medium">{crumb.label}</span>
+                  <span className="font-medium text-foreground">{crumb.label}</span>
                 )}
               </div>
             ))}
@@ -53,9 +53,9 @@ export function ConfigurationHeader({
 
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="mb-2 flex items-center gap-3">
               {icon && (
-                <div className="p-sm bg-primary/10 rounded-lg text-primary">
+                <div className="rounded-lg bg-primary/10 p-sm text-primary">
                   {icon}
                 </div>
               )}

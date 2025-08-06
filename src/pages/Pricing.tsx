@@ -18,7 +18,7 @@ const Pricing = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="size-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Calcular Preço
       </Button>
     </div>

@@ -125,10 +125,10 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
   });
 
   return (
-    <Card className="shadow-card border border-border/50">
+    <Card className="border border-border/50 shadow-card">
       <CardHeader className="bg-card">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <FolderOpen className="w-6 h-6" />
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <FolderOpen className="size-6" />
           {editingId ? "Editar Categoria" : "Nova Categoria"}
         </CardTitle>
       </CardHeader>
@@ -136,7 +136,7 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Informações Básicas */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+            <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
               Informações da Categoria
             </h3>
             
@@ -156,8 +156,8 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
                 required
               />
               {errors.name && touched.name && (
-                <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
-                  <AlertCircle className="w-3 h-3" />
+                <div className="mt-1 flex items-center gap-1 text-sm text-destructive">
+                  <AlertCircle className="size-3" />
                   {errors.name}
                 </div>
               )}
@@ -167,7 +167,7 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
           {/* Campo Opcional */}
           <CollapsibleCard
             title="Campo Opcional"
-            icon={<FolderOpen className="w-4 h-4" />}
+            icon={<FolderOpen className="size-4" />}
             isOpen={optionalFields.isOpen}
             onToggle={optionalFields.toggle}
           >
@@ -186,13 +186,13 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
           </CollapsibleCard>
 
           {/* Botões de Ação */}
-          <div className="flex gap-3 pt-4 border-t border-border">
+          <div className="flex gap-3 border-t border-border pt-4">
             <Button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
-              className="flex-1 h-11"
+              className="h-11 flex-1"
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="mr-2 size-4" />
               {editingId ? "Atualizar Categoria" : "Criar Categoria"}
             </Button>
             <Button 
@@ -204,7 +204,7 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
               }}
               className="h-11 min-w-[120px]"
             >
-              <X className="w-4 h-4 mr-2" />
+              <X className="mr-2 size-4" />
               Cancelar
             </Button>
           </div>

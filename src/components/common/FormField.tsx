@@ -37,7 +37,7 @@ export function FormField({
 
   return (
     <div className={cn("space-y-sm", className)}>
-      <Label htmlFor={name} className={required ? "after:content-['*'] after:text-destructive after:ml-1" : ""}>
+      <Label htmlFor={name} className={required ? "after:ml-1 after:text-destructive after:content-['*']" : ""}>
         {label}
       </Label>
       

@@ -37,7 +37,7 @@ export const MarketplaceTooltip = ({ marketplaceName, metadata }: MarketplaceToo
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+          <Info className="size-4 cursor-help text-muted-foreground" />
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
           <p>{content}</p>

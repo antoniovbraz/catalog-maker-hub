@@ -120,8 +120,8 @@ export function DataVisualization<T extends { id: string }>({
                 {column.header}
                 {column.sortable && sortColumn === String(column.key) && (
                   sortDirection === "asc" ? 
-                    <SortAsc className="w-4 h-4" /> : 
-                    <SortDesc className="w-4 h-4" />
+                    <SortAsc className="size-4" /> : 
+                    <SortDesc className="size-4" />
                 )}
               </div>
             </TableHead>
@@ -131,7 +131,7 @@ export function DataVisualization<T extends { id: string }>({
       </TableHeader>
       <TableBody>
         {paginatedData.map((item) => (
-          <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+          <TableRow key={item.id} className="transition-colors hover:bg-muted/50">
             {columns.map((column) => (
               <TableCell key={String(column.key)} className={column.className}>
                 {column.render ? 
@@ -158,7 +158,7 @@ export function DataVisualization<T extends { id: string }>({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="sm" variant="ghost">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
@@ -215,7 +215,7 @@ export function DataVisualization<T extends { id: string }>({
                     ))}
                     {actions.length > 0 && (
                       <TableCell>
-                        <Skeleton className="h-8 w-8 rounded" />
+                        <Skeleton className="size-8 rounded" />
                       </TableCell>
                     )}
                   </TableRow>
@@ -247,12 +247,12 @@ export function DataVisualization<T extends { id: string }>({
           <div className="flex items-center gap-2">
             {searchable && (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 w-64"
+                  className="w-64 pl-9"
                 />
               </div>
             )}
@@ -265,7 +265,7 @@ export function DataVisualization<T extends { id: string }>({
                   onClick={() => onViewModeChange("table")}
                   className="rounded-r-none"
                 >
-                  <List className="w-4 h-4" />
+                  <List className="size-4" />
                 </Button>
                 <Button
                   size="sm"
@@ -273,7 +273,7 @@ export function DataVisualization<T extends { id: string }>({
                   onClick={() => onViewModeChange("grid")}
                   className="rounded-l-none border-l"
                 >
-                  <Grid className="w-4 h-4" />
+                  <Grid className="size-4" />
                 </Button>
               </div>
             )}
@@ -284,7 +284,7 @@ export function DataVisualization<T extends { id: string }>({
       <CardContent>
         {paginatedData.length === 0 ? (
           emptyState || (
-            <div className="text-center py-8">
+            <div className="py-8 text-center">
               <Text variant="muted">Nenhum item encontrado</Text>
             </div>
           )

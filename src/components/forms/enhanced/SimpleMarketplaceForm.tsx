@@ -180,7 +180,7 @@ export function SimpleMarketplaceForm({
   const platformName = platforms.find(p => p.id === creatingModalityForPlatform)?.name;
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader className="pb-md">
         <div className="flex items-center justify-between">
           <div>
@@ -195,7 +195,7 @@ export function SimpleMarketplaceForm({
             <CardDescription className="mt-xs">
               {getDescription()}
               {isCreatingModality && platformName && (
-                <span className="block mt-xs text-primary font-medium">
+                <span className="mt-xs block font-medium text-primary">
                   Para a plataforma: {platformName}
                 </span>
               )}
@@ -236,15 +236,15 @@ export function SimpleMarketplaceForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowOptional(!showOptional)}
-                className="text-sm text-muted-foreground hover:text-primary p-0 h-auto"
+                className="h-auto p-0 text-sm text-muted-foreground hover:text-primary"
               >
-                <Plus className={cn("w-3 h-3 mr-1 transition-transform", showOptional && "rotate-45")} />
+                <Plus className={cn("mr-1 size-3 transition-transform", showOptional && "rotate-45")} />
                 Opções avançadas
               </Button>
             </div>
 
             {showOptional && (
-              <div className="space-y-md p-md bg-muted/30 rounded-md border border-dashed">
+              <div className="space-y-md rounded-md border border-dashed bg-muted/30 p-md">
                 <div>
                   <Label htmlFor="description" className="text-sm">Descrição</Label>
                   <Textarea
@@ -284,7 +284,7 @@ export function SimpleMarketplaceForm({
                           onClick={toggleAllCategories}
                           className="h-8"
                         >
-                          {allCategoriesSelected && <Check className="w-3 h-3 mr-1" />}
+                          {allCategoriesSelected && <Check className="mr-1 size-3" />}
                           Todas as categorias
                         </Button>
                         {!allCategoriesSelected && (
@@ -295,7 +295,7 @@ export function SimpleMarketplaceForm({
                       </div>
                       
                       {!allCategoriesSelected && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-xs max-h-32 overflow-y-auto">
+                        <div className="grid max-h-32 grid-cols-2 gap-xs overflow-y-auto sm:grid-cols-3">
                           {categories.map((category) => {
                             const isSelected = selectedCategories.includes(category.id);
                             return (
@@ -307,7 +307,7 @@ export function SimpleMarketplaceForm({
                                 onClick={() => toggleCategory(category.id)}
                                 className="h-8 justify-start text-xs"
                               >
-                                {isSelected && <Check className="w-3 h-3 mr-1" />}
+                                {isSelected && <Check className="mr-1 size-3" />}
                                 {category.name}
                               </Button>
                             );
@@ -315,7 +315,7 @@ export function SimpleMarketplaceForm({
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-xs">
+                    <p className="mt-xs text-xs text-muted-foreground">
                       Por padrão, todas as categorias podem usar esta modalidade
                     </p>
                   </div>
@@ -325,7 +325,7 @@ export function SimpleMarketplaceForm({
           </div>
 
           {/* Botões de ação */}
-          <div className="flex justify-end gap-sm pt-md border-t">
+          <div className="flex justify-end gap-sm border-t pt-md">
             <Button 
               type="button" 
               variant="outline" 
@@ -341,7 +341,7 @@ export function SimpleMarketplaceForm({
             >
               {isSubmitting ? (
                 <div className="flex items-center gap-sm">
-                  <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                  <div className="size-3 animate-spin rounded-full border border-current border-t-transparent" />
                   {isEditing ? 'Salvando...' : 'Criando...'}
                 </div>
               ) : (
