@@ -1,4 +1,4 @@
-import { Store, Plus, Eye, EyeOff } from '@/components/ui/icons';
+import { Store, Plus, Eye, EyeOff, ChevronDown, ChevronUp } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
 import { SimpleMarketplaceForm } from "@/components/forms/enhanced/SimpleMarketplaceForm";
@@ -7,7 +7,7 @@ import { useMarketplacesHierarchical, useDeleteMarketplace } from "@/hooks/useMa
 import { MarketplaceType } from "@/types/marketplaces";
 import { useState } from "react";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
-import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { BaseCard } from "@/components/ui";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -105,11 +105,21 @@ const Marketplaces = () => {
             : "lg:col-span-12 xl:col-span-12"
         }
       >
-        <CollapsibleCard
+        <BaseCard
           title="Plataformas e Modalidades"
           icon={<Store className="size-4" />}
-          isOpen={isListVisible}
-          onToggle={toggleList}
+          status={
+            isListVisible ? (
+              <ChevronUp className="size-4" />
+            ) : (
+              <ChevronDown className="size-4" />
+            )
+          }
+          collapsible
+          open={isListVisible}
+          onOpenChange={() => toggleList()}
+          className="shadow-card border border-border/20"
+          contentPadding="px-6 pb-4 pt-0"
         >
           {isLoading ? (
             <div className="space-y-4 py-12">
@@ -160,7 +170,7 @@ const Marketplaces = () => {
               )}
             </div>
           )}
-        </CollapsibleCard>
+        </BaseCard>
       </div>
     </ConfigurationPageLayout>
   );
