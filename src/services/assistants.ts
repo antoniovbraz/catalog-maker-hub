@@ -143,11 +143,11 @@ export class AssistantsService extends BaseService<Assistant> {
     try {
       this.logger.debug('Buscando assistente por marketplace e modo', { marketplace, mode, productId });
 
-      const query = supabase
+      const query = (supabase
         .from('assistants')
         .select('*')
         .eq('marketplace', marketplace)
-        .eq('mode', mode);
+        .eq('mode', mode)) as any;
 
       if (mode === 'strategic') {
         if (!productId) {
@@ -156,7 +156,7 @@ export class AssistantsService extends BaseService<Assistant> {
         query.eq('product_id', productId);
       }
 
-      const { data, error } = await query.maybeSingle();
+      const { data, error } = await (query as any).maybeSingle();
 
       if (error) {
         throw error;
