@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const sizes = [
+  { name: 'xs', width: 360, height: 800 },
   { name: 'sm', width: 640, height: 800 },
   { name: 'md', width: 768, height: 800 },
   { name: 'lg', width: 1024, height: 800 },
