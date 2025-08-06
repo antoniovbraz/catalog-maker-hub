@@ -126,17 +126,17 @@ export default function Subscription() {
           </CardHeader>
           
           <CardContent className="space-y-md">
-            <h4 className="font-semibold mb-3">Uso do Período Atual</h4>
+            <Heading variant="h4" className="mb-3">Uso do Período Atual</Heading>
             
             {/* Products Usage */}
             <div className="space-y-sm">
-              <div className="flex justify-between text-sm">
-                <span>Produtos</span>
-                <span>
+              <div className="flex justify-between">
+                <Text variant="caption">Produtos</Text>
+                <Text variant="caption">
                   {getCurrentUsage('products')} / {
                     currentSubscription.plan?.limits?.products === -1 ? '∞' : currentSubscription.plan?.limits?.products
                   }
-                </span>
+                </Text>
               </div>
               {currentSubscription.plan?.limits?.products !== -1 && (
                 <Progress value={getUsagePercentage('products', currentSubscription.plan?.limits?.products || 0)} />
@@ -145,13 +145,13 @@ export default function Subscription() {
 
             {/* API Calls Usage */}
             <div className="space-y-sm">
-              <div className="flex justify-between text-sm">
-                <span>Chamadas API</span>
-                <span>
+              <div className="flex justify-between">
+                <Text variant="caption">Chamadas API</Text>
+                <Text variant="caption">
                   {getCurrentUsage('api_calls_month')} / {
                     currentSubscription.plan?.limits?.api_calls_month === -1 ? '∞' : currentSubscription.plan?.limits?.api_calls_month
                   }
-                </span>
+                </Text>
               </div>
               {currentSubscription.plan?.limits?.api_calls_month !== -1 && (
                 <Progress value={getUsagePercentage('api_calls_month', currentSubscription.plan?.limits?.api_calls_month || 0)} />
@@ -236,11 +236,11 @@ export default function Subscription() {
               <CardContent className="space-y-md">
                 {/* Features */}
                 <div className="space-y-sm">
-                  <h4 className="font-semibold text-sm">Recursos inclusos:</h4>
-                  <ul className="space-y-xs text-sm">
+                  <Heading variant="h4" className="text-sm">Recursos inclusos:</Heading>
+                  <ul className="space-y-xs">
                     {Object.entries(plan.features || {}).map(([feature, enabled]) => {
                       if (!enabled) return null;
-                      
+
                       const featureLabels: Record<string, string> = {
                         price_pilot: 'Price Pilot',
                         basic_analytics: 'Analytics Básico',
@@ -253,11 +253,11 @@ export default function Subscription() {
                         multi_user: 'Multi-usuários',
                         custom_integrations: 'Integrações Personalizadas'
                       };
-                      
+
                       return (
                         <li key={feature} className="flex items-center gap-2">
                           <Check className="h-4 w-4 text-success" />
-                          {featureLabels[feature] || feature}
+                          <Text variant="caption">{featureLabels[feature] || feature}</Text>
                         </li>
                       );
                     })}
@@ -268,8 +268,8 @@ export default function Subscription() {
 
                 {/* Limits */}
                 <div className="space-y-sm">
-                  <h4 className="font-semibold text-sm">Limites:</h4>
-                  <ul className="space-y-xs text-sm text-muted-foreground">
+                  <Heading variant="h4" className="text-sm">Limites:</Heading>
+                  <ul className="space-y-xs text-muted-foreground">
                     {Object.entries(plan.limits || {}).map(([limit, value]) => {
                       const limitLabels: Record<string, string> = {
                         products: 'Produtos',
@@ -277,13 +277,13 @@ export default function Subscription() {
                         api_calls_month: 'Chamadas API/mês',
                         users: 'Usuários'
                       };
-                      
+
                       return (
                         <li key={limit} className="flex justify-between">
-                          <span>{limitLabels[limit] || limit}:</span>
-                          <span className="font-medium">
+                          <Text variant="caption">{limitLabels[limit] || limit}:</Text>
+                          <Text variant="caption" className="font-medium">
                             {value === -1 ? <Infinity className="h-4 w-4 inline" /> : value.toLocaleString()}
-                          </span>
+                          </Text>
                         </li>
                       );
                     })}
