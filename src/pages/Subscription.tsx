@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Check, Crown, Zap, Star, ArrowRight, Infinity } from '@/components/ui/icons';
 import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '@/hooks/useSubscription';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Heading, Text } from "@/components/ui/typography";
 
@@ -19,8 +19,17 @@ export default function Subscription() {
 
   if (plansLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <LoadingSpinner size="lg" text="Carregando planos..." />
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="mb-12 text-center">
+          <Skeleton className="mx-auto mb-4 size-16 rounded-full" />
+          <Skeleton className="mx-auto mb-4 h-8 w-48" />
+          <Skeleton className="mx-auto h-4 w-2/3" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-[400px] w-full" />
+          ))}
+        </div>
       </div>
     );
   }
