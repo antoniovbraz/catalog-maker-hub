@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DataVisualization } from '@/components/ui/data-visualization';
 import { Heading, Text } from '@/components/ui/typography';
+import { CardGrid } from '@/components/ui/card-grid';
 import { Crown, Users, TrendingUp, DollarSign, Activity, Settings, UserPlus, BarChart3 } from '@/components/ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -333,7 +334,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats skeleton */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <CardGrid className="mb-8">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="rounded-lg border bg-card p-6">
               <div className="flex items-center justify-between">
@@ -345,7 +346,7 @@ export default function AdminDashboard() {
               </div>
             </div>
           ))}
-        </div>
+        </CardGrid>
 
         {/* Content skeleton */}
         <div className="space-y-4">
@@ -394,7 +395,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <CardGrid className="mb-8">
         {stats.map((stat, index) => (
           <Card key={index} className="border-0 shadow-card">
             <CardContent className="p-lg">
@@ -414,7 +415,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </CardGrid>
 
       {/* Main Content */}
       <Tabs defaultValue="users" className="space-y-lg">
@@ -452,7 +453,7 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-lg">
-          <div className="grid gap-6">
+          <CardGrid>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -473,7 +474,7 @@ export default function AdminDashboard() {
                 </Text>
               </CardContent>
             </Card>
-          </div>
+          </CardGrid>
         </TabsContent>
       </Tabs>
     </div>

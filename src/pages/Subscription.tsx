@@ -9,6 +9,7 @@ import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Heading, Text } from "@/components/ui/typography";
+import { CardGrid } from '@/components/ui/card-grid';
 
 export default function Subscription() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -25,11 +26,11 @@ export default function Subscription() {
           <Skeleton className="mx-auto mb-4 h-8 w-48" />
           <Skeleton className="mx-auto h-4 w-2/3" />
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <CardGrid>
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-[400px] w-full" />
           ))}
-        </div>
+        </CardGrid>
       </div>
     );
   }
@@ -198,7 +199,7 @@ export default function Subscription() {
       </div>
 
       {/* Plans Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <CardGrid>
         {plans.map((plan) => {
           const price = billingCycle === 'yearly' ? plan.price_yearly : plan.price_monthly;
           const isCurrent = isCurrentPlan(plan.id);
@@ -311,7 +312,7 @@ export default function Subscription() {
             </Card>
           );
         })}
-      </div>
+      </CardGrid>
 
       {/* FAQ or Additional Info */}
       <div className="mt-16 text-center">
