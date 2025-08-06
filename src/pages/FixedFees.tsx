@@ -145,6 +145,11 @@ const FixedFees = () => {
               icon={<Coins className="size-8" />}
               title="Nenhuma taxa fixa configurada"
               description="Adicione uma nova taxa para começar"
+              action={{
+                label: "Nova Taxa",
+                onClick: showForm,
+                icon: <Plus className="mr-2 size-4" />,
+              }}
             />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

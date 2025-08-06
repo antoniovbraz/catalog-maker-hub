@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { CardListItem } from "@/components/ui";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const Commissions = () => {
   const { data: commissions = [], isLoading } = useCommissionsWithDetails();
@@ -99,9 +100,16 @@ const Commissions = () => {
               ))}
             </div>
           ) : commissions.length === 0 ? (
-            <div className="py-8 text-center text-muted-foreground">
-              Nenhuma comissão configurada
-            </div>
+            <EmptyState
+              icon={<Percent className="size-8" />}
+              title="Nenhuma comissão configurada"
+              description="Adicione uma nova comissão para começar"
+              action={{
+                label: "Nova Comissão",
+                onClick: showForm,
+                icon: <Plus className="mr-2 size-4" />,
+              }}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {commissions.map((commission) => {

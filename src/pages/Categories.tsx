@@ -7,8 +7,8 @@ import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType } from "@/types/categories";
 import { useState } from "react";
-import { Text } from "@/components/ui/typography";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const Categories = () => {
   const [editingCategory, setEditingCategory] = useState<CategoryType | null>(null);
@@ -83,12 +83,16 @@ const Categories = () => {
               ))}
             </div>
           ) : categories.length === 0 ? (
-            <div className="py-8 text-center">
-              <Text className="text-muted-foreground">Nenhuma categoria cadastrada</Text>
-              <Text variant="caption" className="text-muted-foreground">
-                Crie sua primeira categoria usando o formulário ao lado
-              </Text>
-            </div>
+            <EmptyState
+              icon={<FolderTree className="size-8" />}
+              title="Nenhuma categoria cadastrada"
+              description="Crie sua primeira categoria para começar"
+              action={{
+                label: "Nova Categoria",
+                onClick: showForm,
+                icon: <Plus className="mr-2 size-4" />,
+              }}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {categories.map((category) => (
