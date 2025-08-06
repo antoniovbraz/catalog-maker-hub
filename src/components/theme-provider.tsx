@@ -4,17 +4,20 @@ import { useEffect } from "react";
 import type { TokenOverrides } from "@/styles/tokens";
 import { supabase } from "@/integrations/supabase/client";
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({
+  children,
+  defaultTheme,
+  enableSystem,
+  ...props
+}: ThemeProviderProps) {
   return (
-    <NextThemesProvider 
-      {...props}
+    <NextThemesProvider
       themes={["light", "dark", "corporate", "windows7"]}
-      defaultTheme="corporate"
-      enableSystem={false}
+      defaultTheme={defaultTheme ?? "corporate"}
+      enableSystem={enableSystem ?? false}
+      {...props}
     >
-      <ThemeWatcher>
-        {children}
-      </ThemeWatcher>
+      <ThemeWatcher>{children}</ThemeWatcher>
     </NextThemesProvider>
   );
 }
