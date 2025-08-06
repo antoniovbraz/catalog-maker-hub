@@ -51,7 +51,7 @@ describe('Componente DataVisualization', () => {
   });
 
   it('deve renderizar estado de loading', () => {
-    render(
+    const { container } = render(
       <DataVisualization
         title="Carregando"
         data={[]}
@@ -59,8 +59,7 @@ describe('Componente DataVisualization', () => {
         isLoading={true}
       />, { wrapper: createWrapper() }
     );
-
-    expect(screen.getByText('Carregando...')).toBeInTheDocument();
+    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
   });
 
   it('deve renderizar estado vazio', () => {

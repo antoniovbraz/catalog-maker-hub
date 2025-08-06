@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Text } from "@/components/ui/typography";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Search, SortAsc, SortDesc, Grid, List, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -101,9 +103,10 @@ export function DataVisualization<T extends { id: string }>({
   };
 
   const renderTableView = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
           {columns.map((column) => (
             <TableHead 
               key={String(column.key)} 
@@ -177,17 +180,48 @@ export function DataVisualization<T extends { id: string }>({
             )}
           </TableRow>
         ))}
-      </TableBody>
-    </Table>
+        </TableBody>
+      </Table>
+    </div>
   );
 
   if (isLoading) {
     return (
       <Card className={className}>
         <CardContent className="p-lg">
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="text-muted-foreground mt-2">Carregando...</p>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableHead key={String(column.key)}>
+                      <Skeleton className="h-4 w-20" />
+                    </TableHead>
+                  ))}
+                  {actions.length > 0 && (
+                    <TableHead>
+                      <Skeleton className="h-4 w-16" />
+                    </TableHead>
+                  )}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: itemsPerPage }).map((_, i) => (
+                  <TableRow key={i}>
+                    {columns.map((column) => (
+                      <TableCell key={String(column.key)} className={column.className}>
+                        <Skeleton className="h-4 w-full" />
+                      </TableCell>
+                    ))}
+                    {actions.length > 0 && (
+                      <TableCell>
+                        <Skeleton className="h-8 w-8 rounded" />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </CardContent>
       </Card>
@@ -204,7 +238,9 @@ export function DataVisualization<T extends { id: string }>({
               <Badge variant="secondary">{data.length}</Badge>
             </CardTitle>
             {description && (
-              <p className="text-sm text-muted-foreground mt-1">{description}</p>
+              <Text variant="muted" className="mt-1">
+                {description}
+              </Text>
             )}
           </div>
           
@@ -249,7 +285,7 @@ export function DataVisualization<T extends { id: string }>({
         {paginatedData.length === 0 ? (
           emptyState || (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Nenhum item encontrado</p>
+              <Text variant="muted">Nenhum item encontrado</Text>
             </div>
           )
         ) : (
@@ -259,11 +295,11 @@ export function DataVisualization<T extends { id: string }>({
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
+                <Text variant="muted" className="text-sm">
                   Mostrando {(currentPage - 1) * itemsPerPage + 1} a{" "}
                   {Math.min(currentPage * itemsPerPage, sortedData.length)} de{" "}
                   {sortedData.length} resultados
-                </p>
+                </Text>
                 
                 <div className="flex items-center gap-2">
                   <Button
