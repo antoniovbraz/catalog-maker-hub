@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Heading, Text } from "@/components/ui/typography";
+import { EmptyState } from "@/components/ui/empty-state";
 import { 
   Wand2, 
   Sparkles,
@@ -187,15 +189,25 @@ export default function AdGenerator() {
               {/* Produto Selecionado Info */}
               {selectedProduct && (
                 <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <h4 className="text-sm font-semibold mb-2">Produto Selecionado</h4>
+                  <Heading variant="h4" className="text-sm font-semibold mb-2">
+                    Produto Selecionado
+                  </Heading>
                   <div className="space-y-1 text-sm text-muted-foreground">
-                    <p><strong>Nome:</strong> {selectedProduct.name}</p>
+                    <Text>
+                      <strong>Nome:</strong> {selectedProduct.name}
+                    </Text>
                     {selectedProduct.sku && (
-                      <p><strong>SKU:</strong> {selectedProduct.sku}</p>
+                      <Text>
+                        <strong>SKU:</strong> {selectedProduct.sku}
+                      </Text>
                     )}
-                    <p><strong>Custo:</strong> R$ {selectedProduct.cost_unit.toFixed(2)}</p>
+                    <Text>
+                      <strong>Custo:</strong> R$ {selectedProduct.cost_unit.toFixed(2)}
+                    </Text>
                     {selectedProduct.description && (
-                      <p><strong>Descrição:</strong> {selectedProduct.description.slice(0, 100)}...</p>
+                      <Text>
+                        <strong>Descrição:</strong> {selectedProduct.description.slice(0, 100)}...
+                      </Text>
                     )}
                   </div>
                 </div>
@@ -292,7 +304,9 @@ export default function AdGenerator() {
                 {generatedResult ? (
                   <div className="space-y-4">
                     <div className="p-4 bg-muted rounded-lg">
-                      <h4 className="text-sm font-semibold mb-2">Anúncio Gerado</h4>
+                      <Heading variant="h4" className="text-sm font-semibold mb-2">
+                        Anúncio Gerado
+                      </Heading>
                       <div className="whitespace-pre-wrap text-sm">
                         {generatedResult.description}
                       </div>
@@ -316,16 +330,24 @@ export default function AdGenerator() {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Nenhum anúncio gerado ainda</p>
-                    <p className="text-sm mt-1">
-                      {mode === 'quick' 
-                        ? 'Use a geração rápida para criar um anúncio instantaneamente'
-                        : 'Configure produto e marketplace para iniciar a geração estratégica'
-                      }
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={<ShoppingCart className="h-8 w-8" />}
+                    title="Nenhum anúncio gerado ainda"
+                    description={
+                      mode === "quick"
+                        ? "Use a geração rápida para criar um anúncio instantaneamente"
+                        : "Configure produto e marketplace para iniciar a geração estratégica"
+                    }
+                    action={
+                      mode === "quick" && !!isQuickFormValid
+                        ? {
+                            label: "Gerar Anúncio",
+                            onClick: handleQuickGenerate,
+                            icon: <Wand2 className="w-4 h-4 mr-2" />,
+                          }
+                        : undefined
+                    }
+                  />
                 )}
               </CardContent>
             </Card>
