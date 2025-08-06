@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { ChevronRight, Home } from '@/components/ui/icons';
 import { Link } from "react-router-dom";
+import { Heading, Text } from "@/components/ui/typography";
 
 interface Breadcrumb {
   label: string;
@@ -59,15 +60,14 @@ export function ConfigurationHeader({
                 </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                <Heading variant="h1" className="tracking-tight">
                   {title}
-                </h1>
+                </Heading>
               </div>
             </div>
-            
-            <p className="text-lg text-muted-foreground max-w-3xl">
+            <Text variant="muted" className="max-w-3xl">
               {description}
-            </p>
+            </Text>
           </div>
 
           {actions && (

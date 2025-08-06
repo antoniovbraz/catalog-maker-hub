@@ -370,15 +370,15 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <Heading variant="h1" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-6 h-6 text-primary" />
             </div>
             Dashboard Admin
-          </h1>
-          <p className="text-muted-foreground mt-1">
+          </Heading>
+          <Text variant="muted" className="mt-1">
             Visão geral da plataforma Peepers Hub
-          </p>
+          </Text>
         </div>
         
         <div className="flex gap-2">
@@ -400,12 +400,12 @@ export default function AdminDashboard() {
             <CardContent className="p-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">
+                  <Text variant="caption" className="font-medium text-muted-foreground mb-1">
                     {stat.title}
-                  </p>
-                  <p className="text-2xl font-bold">
+                  </Text>
+                  <Text className="font-bold text-h3">
                     {stat.value}
-                  </p>
+                  </Text>
                 </div>
                 <div className={`w-12 h-12 rounded-full ${stat.bgColor} flex items-center justify-center`}>
                   <stat.icon className={`w-6 h-6 ${stat.color}`} />
@@ -465,12 +465,12 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent className="text-center py-12">
                 <Activity className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
+                <Heading variant="h3" className="mb-2">
                   Funcionalidade em Desenvolvimento
-                </h3>
-                <p className="text-muted-foreground">
+                </Heading>
+                <Text variant="muted">
                   Gráficos de uso, conversão e retenção serão implementados na próxima versão.
-                </p>
+                </Text>
               </CardContent>
             </Card>
           </div>

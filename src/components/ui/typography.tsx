@@ -43,6 +43,7 @@ const textVariants = cva("", {
     variant: {
       body: "text-body",
       caption: "text-caption",
+      muted: "text-body text-muted-foreground",
     },
   },
   defaultVariants: {
