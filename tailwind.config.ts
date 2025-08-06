@@ -21,23 +21,24 @@ export default {
 		},
                 extend: {
                         colors: tokens.colors,
-			backgroundImage: {
-				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-card': 'var(--gradient-card)',
-				'gradient-config': 'var(--gradient-config)',
-				'gradient-subtle': 'var(--gradient-subtle)'
-			},
-			boxShadow: {
-				'elegant': 'var(--shadow-elegant)',
-				'card': 'var(--shadow-card)',
-				'hover': 'var(--shadow-hover)',
-				'form': 'var(--shadow-form)'
-			},
-			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
-			},
+                        backgroundImage: {
+                                'gradient-primary': 'var(--gradient-primary)',
+                                'gradient-card': 'var(--gradient-card)',
+                                'gradient-config': 'var(--gradient-config)',
+                                'gradient-subtle': 'var(--gradient-subtle)'
+                        },
+                        boxShadow: {
+                                'elegant': 'var(--shadow-elegant)',
+                                'card': 'var(--card-shadow)',
+                                'hover': 'var(--shadow-hover)',
+                                'form': 'var(--shadow-form)'
+                        },
+                        borderRadius: {
+                                lg: 'var(--radius)',
+                                md: 'calc(var(--radius) - 2px)',
+                                sm: 'calc(var(--radius) - 4px)',
+                                card: 'var(--card-radius)'
+                        },
 			keyframes: {
 				'accordion-down': {
 					from: {
@@ -61,7 +62,8 @@ export default {
                                 'accordion-up': 'accordion-up 0.2s ease-out'
                         },
                         fontFamily: {
-                                playfair: ['"Playfair Display"', 'serif'],
+                                heading: [tokens.fonts.heading],
+                                body: [tokens.fonts.body],
                         },
                         fontSize: tokens.typography,
                         spacing: tokens.spacing,
