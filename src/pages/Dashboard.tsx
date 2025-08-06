@@ -1,7 +1,7 @@
 import { DashboardForm } from "@/components/forms/DashboardForm";
 import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { Card, CardContent } from "@/components/ui/card";
+import { BaseCard } from "@/components/ui";
 import { Heading, Text } from "@/components/ui/typography";
 
 const Dashboard = () => {
@@ -24,11 +24,12 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <Card className="border-0 bg-gradient-subtle shadow-card">
-          <CardContent className="p-lg">
-            <DashboardForm />
-          </CardContent>
-        </Card>
+        <BaseCard
+          className="border-0 bg-gradient-subtle shadow-card"
+          contentPadding="p-lg"
+        >
+          <DashboardForm />
+        </BaseCard>
       </div>
       
       {showOnboarding && (

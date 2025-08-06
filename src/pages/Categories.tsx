@@ -2,7 +2,7 @@ import { CategoryForm } from "@/components/forms/CategoryForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { FolderTree, Plus, Edit, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BaseCard } from "@/components/ui";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType } from "@/types/categories";
@@ -103,31 +103,32 @@ const Categories = () => {
             : "lg:col-span-12 xl:col-span-12"
         }
       >
-        <Card className="border border-border/20 shadow-card">
-          <CardHeader className="py-3">
-            <CardTitle className="flex items-center gap-2 text-base font-medium text-muted-foreground">
+        <BaseCard
+          className="border border-border/20 shadow-card"
+          title={
+            <div className="flex items-center gap-2 text-base font-medium text-muted-foreground">
               <FolderTree className="size-4" />
               <span>Categorias Cadastradas</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-6 pb-4 pt-0">
-            <DataVisualization
-              title=""
-              data={categories}
-              columns={columns}
-              actions={actions}
-              isLoading={isLoading}
-              emptyState={
-                <div className="py-8 text-center">
-                  <Text className="text-muted-foreground">Nenhuma categoria cadastrada</Text>
-                  <Text variant="caption" className="text-muted-foreground">
-                    Crie sua primeira categoria usando o formulário ao lado
-                  </Text>
-                </div>
-              }
-            />
-          </CardContent>
-        </Card>
+            </div>
+          }
+          contentPadding="px-6 pb-4 pt-0"
+        >
+          <DataVisualization
+            title=""
+            data={categories}
+            columns={columns}
+            actions={actions}
+            isLoading={isLoading}
+            emptyState={
+              <div className="py-8 text-center">
+                <Text className="text-muted-foreground">Nenhuma categoria cadastrada</Text>
+                <Text variant="caption" className="text-muted-foreground">
+                  Crie sua primeira categoria usando o formulário ao lado
+                </Text>
+              </div>
+            }
+          />
+        </BaseCard>
       </div>
     </ConfigurationPageLayout>
   );
