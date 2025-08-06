@@ -5,11 +5,11 @@ export const colors = {
   background: 'hsl(var(--background))',
   foreground: 'hsl(var(--foreground))',
   primary: {
-    DEFAULT: 'hsl(var(--primary))',
+    DEFAULT: 'hsl(var(--color-primary))',
     foreground: 'hsl(var(--primary-foreground))',
   },
   secondary: {
-    DEFAULT: 'hsl(var(--secondary))',
+    DEFAULT: 'hsl(var(--color-secondary))',
     foreground: 'hsl(var(--secondary-foreground))',
   },
   destructive: {
@@ -69,7 +69,7 @@ export const typography = {
   h4: 'var(--font-h4)',
   h5: 'var(--font-h5)',
   h6: 'var(--font-h6)',
-  body: 'var(--font-body)',
+  body: 'var(--font-size-body)',
   caption: 'var(--font-caption)',
 } as const;
 
@@ -82,6 +82,19 @@ export const spacing = {
   '2xl': 'var(--spacing-2xl)',
 } as const;
 
+export const fonts = {
+  heading: 'var(--font-heading)',
+  body: 'var(--font-body)',
+} as const;
+
+export const radii = {
+  card: 'var(--card-radius)',
+} as const;
+
+export const shadows = {
+  card: 'var(--card-shadow)',
+} as const;
+
 /**
  * Consolidated design tokens used across the application.
  * These tokens map to CSS variables declared in `index.css`.
@@ -90,6 +103,9 @@ export const tokens = {
   colors,
   typography,
   spacing,
+  fonts,
+  radii,
+  shadows,
 } as const;
 
 export type Tokens = typeof tokens;
@@ -103,5 +119,8 @@ export type TokenOverrides = {
   colors?: Record<string, string>;
   typography?: Record<string, string>;
   spacing?: Record<string, string>;
+  fonts?: Record<string, string>;
+  radii?: Record<string, string>;
+  shadows?: Record<string, string>;
 };
 

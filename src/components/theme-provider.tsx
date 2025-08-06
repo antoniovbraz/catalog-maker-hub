@@ -59,11 +59,24 @@ function applyTokenOverrides(overrides: TokenOverrides) {
   });
 
   Object.entries(overrides.typography ?? {}).forEach(([key, value]) => {
-    root.style.setProperty(`--font-${key}`, value);
+    const variable = key === 'body' ? '--font-size-body' : `--font-${key}`;
+    root.style.setProperty(variable, value);
   });
 
   Object.entries(overrides.spacing ?? {}).forEach(([key, value]) => {
     root.style.setProperty(`--spacing-${key}`, value);
+  });
+
+  Object.entries(overrides.fonts ?? {}).forEach(([key, value]) => {
+    root.style.setProperty(`--font-${key}`, value);
+  });
+
+  Object.entries(overrides.radii ?? {}).forEach(([key, value]) => {
+    root.style.setProperty(`--${key}`, value);
+  });
+
+  Object.entries(overrides.shadows ?? {}).forEach(([key, value]) => {
+    root.style.setProperty(`--${key}`, value);
   });
 }
 

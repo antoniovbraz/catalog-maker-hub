@@ -3,11 +3,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-const headingVariants = cva("font-bold", {
+const headingVariants = cva("font-bold font-heading", {
   variants: {
     variant: {
-      h1: "text-h1 font-playfair",
-      h2: "text-h2 font-playfair",
+      h1: "text-h1",
+      h2: "text-h2",
       h3: "text-h3",
       h4: "text-h4",
       h5: "text-h5",
@@ -38,7 +38,7 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
 );
 Heading.displayName = "Heading";
 
-const textVariants = cva("", {
+const textVariants = cva("font-body", {
   variants: {
     variant: {
       body: "text-body",
