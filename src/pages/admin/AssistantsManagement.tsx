@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DataVisualization } from "@/components/ui/data-visualization";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { AssistantForm } from "@/components/forms/AssistantForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
@@ -147,12 +148,16 @@ export default function AssistantsManagement() {
                 searchable
                 isLoading={isLoading}
                 emptyState={
-                  <div className="py-xl text-center">
-                    <p className="text-muted-foreground">Nenhum assistente configurado ainda</p>
-                    <p className="mt-xs text-sm text-muted-foreground">
-                      Crie seu primeiro assistente IA para começar a gerar anúncios automaticamente
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={<Bot className="h-8 w-8" />}
+                    title="Nenhum assistente configurado ainda"
+                    description="Crie seu primeiro assistente IA para começar a gerar anúncios automaticamente"
+                    action={{
+                      label: "Criar Assistente",
+                      onClick: handleCreateNew,
+                      icon: <Plus className="w-4 h-4 mr-2" />,
+                    }}
+                  />
                 }
               />
             </CardContent>
