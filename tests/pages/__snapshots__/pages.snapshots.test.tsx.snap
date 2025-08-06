@@ -102,14 +102,14 @@ exports[`Snapshots das páginas principais > deve renderizar AdGenerator correta
             >
               <div>
                 <h1
-                  class="text-3xl font-bold tracking-tight text-foreground"
+                  class="font-bold text-h1 tracking-tight"
                 >
                   Gerador de Anúncios IA
                 </h1>
               </div>
             </div>
             <p
-              class="text-lg text-muted-foreground max-w-3xl"
+              class="text-muted-foreground max-w-3xl"
             >
               Gere anúncios otimizados usando inteligência artificial
             </p>

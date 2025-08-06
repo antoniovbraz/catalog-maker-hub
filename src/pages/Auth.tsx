@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff, Zap } from '@/components/ui/icons';
+import { Heading, Text } from "@/components/ui/typography";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -85,12 +86,16 @@ export default function Auth() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
             <Zap className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Peepers Hub
-          </h1>
-          <p className="text-muted-foreground mt-2">
+            <Heading
+              variant="h1"
+              className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text"
+              style={{ color: 'transparent' }}
+            >
+              Peepers Hub
+            </Heading>
+          <Text variant="muted" className="mt-2">
             Ferramentas inteligentes para marketplaces
-          </p>
+          </Text>
         </div>
 
         <Card className="border-0 shadow-form bg-card/50 backdrop-blur-sm">
@@ -121,9 +126,9 @@ export default function Auth() {
                       className={loginForm.formState.errors.email ? 'border-destructive' : ''}
                     />
                     {loginForm.formState.errors.email && (
-                      <p className="text-sm text-destructive">
+                      <Text variant="caption" className="text-destructive">
                         {loginForm.formState.errors.email.message}
-                      </p>
+                      </Text>
                     )}
                   </div>
 
@@ -152,9 +157,9 @@ export default function Auth() {
                       </Button>
                     </div>
                     {loginForm.formState.errors.password && (
-                      <p className="text-sm text-destructive">
+                      <Text variant="caption" className="text-destructive">
                         {loginForm.formState.errors.password.message}
-                      </p>
+                      </Text>
                     )}
                   </div>
 
@@ -177,9 +182,9 @@ export default function Auth() {
                       className={signUpForm.formState.errors.fullName ? 'border-destructive' : ''}
                     />
                     {signUpForm.formState.errors.fullName && (
-                      <p className="text-sm text-destructive">
+                      <Text variant="caption" className="text-destructive">
                         {signUpForm.formState.errors.fullName.message}
-                      </p>
+                      </Text>
                     )}
                   </div>
 
@@ -203,9 +208,9 @@ export default function Auth() {
                       className={signUpForm.formState.errors.email ? 'border-destructive' : ''}
                     />
                     {signUpForm.formState.errors.email && (
-                      <p className="text-sm text-destructive">
+                      <Text variant="caption" className="text-destructive">
                         {signUpForm.formState.errors.email.message}
-                      </p>
+                      </Text>
                     )}
                   </div>
 
@@ -234,9 +239,9 @@ export default function Auth() {
                       </Button>
                     </div>
                     {signUpForm.formState.errors.password && (
-                      <p className="text-sm text-destructive">
+                      <Text variant="caption" className="text-destructive">
                         {signUpForm.formState.errors.password.message}
-                      </p>
+                      </Text>
                     )}
                   </div>
 
@@ -250,9 +255,9 @@ export default function Auth() {
                       className={signUpForm.formState.errors.confirmPassword ? 'border-destructive' : ''}
                     />
                     {signUpForm.formState.errors.confirmPassword && (
-                      <p className="text-sm text-destructive">
+                      <Text variant="caption" className="text-destructive">
                         {signUpForm.formState.errors.confirmPassword.message}
-                      </p>
+                      </Text>
                     )}
                   </div>
 
@@ -265,9 +270,9 @@ export default function Auth() {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-6 text-sm text-muted-foreground">
-          <p>© 2024 Peepers Hub. Todos os direitos reservados.</p>
-        </div>
+        <Text variant="caption" className="text-center mt-6 text-muted-foreground">
+          © 2024 Peepers Hub. Todos os direitos reservados.
+        </Text>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { Check, Crown, Zap, Star, ArrowRight, Infinity } from '@/components/ui/i
 import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '@/hooks/useSubscription';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Heading, Text } from "@/components/ui/typography";
 
 export default function Subscription() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -89,12 +90,16 @@ export default function Subscription() {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
           <Crown className="w-8 h-8 text-primary" />
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-4">
+        <Heading
+          variant="h1"
+          className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text mb-4"
+          style={{ color: 'transparent' }}
+        >
           Escolha seu Plano
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        </Heading>
+        <Text variant="muted" className="max-w-2xl mx-auto">
           Desbloqueie todo o potencial do Peepers Hub com ferramentas avançadas para seu marketplace
-        </p>
+        </Text>
       </div>
 
       {/* Current Subscription Status */}
@@ -301,10 +306,12 @@ export default function Subscription() {
 
       {/* FAQ or Additional Info */}
       <div className="mt-16 text-center">
-        <h3 className="text-2xl font-bold mb-4">Precisa de ajuda para escolher?</h3>
-        <p className="text-muted-foreground mb-6">
+        <Heading variant="h3" className="mb-4">
+          Precisa de ajuda para escolher?
+        </Heading>
+        <Text variant="muted" className="mb-6">
           Nossa equipe está pronta para ajudar você a encontrar o plano ideal para seu negócio.
-        </p>
+        </Text>
         <Button variant="outline" size="lg">
           Falar com Vendas
         </Button>
