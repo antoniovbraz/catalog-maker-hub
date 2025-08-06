@@ -9,7 +9,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
-import { Text } from "@/components/ui/typography";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FixedFees = () => {
   const { isFormVisible, showForm, hideForm } = useFormVisibility({
@@ -35,18 +36,18 @@ const FixedFees = () => {
   }
 
   const RULE_TYPES = [
-    { 
-      value: "constante", 
+    {
+      value: "constante",
       label: "Constante",
       description: "Valor fixo aplicado independente do preço do produto"
     },
-    { 
-      value: "faixa", 
+    {
+      value: "faixa",
       label: "Faixa",
       description: "Valor aplicado quando o preço estiver dentro de uma faixa específica"
     },
-    { 
-      value: "percentual", 
+    {
+      value: "percentual",
       label: "Percentual",
       description: "Percentual aplicado sobre o valor do produto dentro de uma faixa específica"
     }
@@ -62,7 +63,7 @@ const FixedFees = () => {
           marketplaces (name)
         `)
         .order("created_at", { ascending: false });
-      
+
       if (error) throw error;
       return data as FixedFeeRule[];
     }
@@ -74,7 +75,7 @@ const FixedFees = () => {
         .from("marketplace_fixed_fee_rules")
         .delete()
         .eq("id", id);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {
@@ -83,10 +84,10 @@ const FixedFees = () => {
     },
     onError: (error) => {
       const friendlyMessage = handleSupabaseError(error);
-      toast({ 
-        title: "Erro ao excluir taxa fixa", 
-        description: friendlyMessage, 
-        variant: "destructive" 
+      toast({
+        title: "Erro ao excluir taxa fixa",
+        description: friendlyMessage,
+        variant: "destructive"
       });
     }
   });
@@ -103,6 +104,18 @@ const FixedFees = () => {
         Nova Taxa
       </Button>
     </div>
+  );
+
+  const tableHeader = (
+    <TableHeader>
+      <TableRow>
+        <TableHead>Marketplace</TableHead>
+        <TableHead>Tipo</TableHead>
+        <TableHead>Faixa</TableHead>
+        <TableHead>Valor</TableHead>
+        <TableHead>Ações</TableHead>
+      </TableRow>
+    </TableHeader>
   );
 
   return (
@@ -135,41 +148,61 @@ const FixedFees = () => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p>Carregando...</p>
+              <Table>
+                {tableHeader}
+                <TableBody>
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-8 w-8 rounded" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             ) : fixedFeeRules.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">
-                <p>Nenhuma taxa fixa configurada</p>
-                <p className="text-sm mt-1">Adicione uma nova taxa para começar</p>
-              </div>
+              <EmptyState
+                icon={<Coins className="h-8 w-8" />}
+                title="Nenhuma taxa fixa configurada"
+                description="Adicione uma nova taxa para começar"
+              />
             ) : (
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Marketplace</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Faixa</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
+                {tableHeader}
                 <TableBody>
                   {fixedFeeRules.map((rule) => (
                     <TableRow key={rule.id}>
-                      <TableCell className="font-medium">{rule.marketplaces?.name}</TableCell>
-                      <TableCell>
-                        {RULE_TYPES.find(t => t.value === rule.rule_type)?.label}
+                      <TableCell className="font-medium">
+                        {rule.marketplaces?.name}
                       </TableCell>
                       <TableCell>
-                         {(rule.rule_type === "faixa" || rule.rule_type === "percentual") && rule.range_min !== null && rule.range_max !== null
-                           ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
-                           : rule.rule_type === "constante" ? "Todas as faixas" : "-"
-                         }
-                       </TableCell>
-                       <TableCell>
-                         {rule.rule_type === "percentual"
+                        {RULE_TYPES.find((t) => t.value === rule.rule_type)?.label}
+                      </TableCell>
+                      <TableCell>
+                        {(rule.rule_type === "faixa" || rule.rule_type === "percentual") &&
+                        rule.range_min !== null &&
+                        rule.range_max !== null
+                          ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
+                          : rule.rule_type === "constante"
+                          ? "Todas as faixas"
+                          : "-"}
+                      </TableCell>
+                      <TableCell>
+                        {rule.rule_type === "percentual"
                           ? `${rule.value.toFixed(2)}%`
-                          : `R$ ${rule.value.toFixed(2)}`
-                        }
+                          : `R$ ${rule.value.toFixed(2)}`}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -196,3 +229,4 @@ const FixedFees = () => {
 };
 
 export default FixedFees;
+
