@@ -16,31 +16,40 @@ interface EmptyStateProps {
   title: string;
   description?: string;
   action?: EmptyStateAction;
+  children?: React.ReactNode;
 }
 
-export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  children,
+}: EmptyStateProps) {
   return (
-    <Card className="flex flex-col items-center justify-center px-md py-2xl text-center">
-      <div className="mb-md rounded-full bg-muted p-md">
+    <Card className="flex flex-col items-center justify-center space-y-md px-md py-2xl text-center">
+      <div className="rounded-full bg-muted p-md">
         {icon || <PackageOpen className="size-8 text-muted-foreground" />}
       </div>
 
-      <Heading variant="h3" className="mb-sm text-foreground">
+      <Heading variant="h3" className="text-foreground">
         {title}
       </Heading>
 
       {description && (
-        <Text variant="caption" className="mb-lg max-w-sm text-muted-foreground">
+        <Text variant="caption" className="max-w-sm text-muted-foreground">
           {description}
         </Text>
       )}
 
       {action && (
-        <Button onClick={action.onClick} className={cn("mt-md", action.className)}>
+        <Button onClick={action.onClick} className={cn(action.className)}>
           {action.icon}
           {action.label}
         </Button>
       )}
+
+      {children}
     </Card>
   );
 }
