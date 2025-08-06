@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { CardListItem } from "@/components/ui";
 
 const Shipping = () => {
   const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
     formStorageKey: 'shipping-form-visible',
     listStorageKey: 'shipping-list-visible'
   });
+
+  const shippingRules: any[] = [];
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
@@ -54,16 +57,24 @@ const Shipping = () => {
           isOpen={isListVisible}
           onToggle={toggleList}
         >
-          <EmptyState
-            icon={<Truck className="size-8" />}
-            title="Nenhuma regra de frete configurada"
-            description="Adicione uma nova regra para começar"
-            action={{
-              label: "Nova Regra",
-              onClick: showForm,
-              icon: <Plus className="mr-2 size-4" />,
-            }}
-          />
+          {shippingRules.length === 0 ? (
+            <EmptyState
+              icon={<Truck className="size-8" />}
+              title="Nenhuma regra de frete configurada"
+              description="Adicione uma nova regra para começar"
+              action={{
+                label: "Nova Regra",
+                onClick: showForm,
+                icon: <Plus className="mr-2 size-4" />,
+              }}
+            />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {shippingRules.map((rule: any) => (
+                <CardListItem key={rule.id} title={rule.title} subtitle={rule.subtitle} />
+              ))}
+            </div>
+          )}
         </CollapsibleCard>
       </div>
     </ConfigurationPageLayout>

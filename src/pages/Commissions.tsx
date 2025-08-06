@@ -1,9 +1,7 @@
-import { Percent, Plus, Calculator } from '@/components/ui/icons';
+import { Percent, Plus } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { CommissionFormEnhanced } from "@/components/forms/enhanced/CommissionFormEnhanced";
 import { useCommissionsWithDetails, useDeleteCommission } from "@/hooks/useCommissions";
 import { CommissionWithDetails } from "@/types/commissions";
@@ -11,6 +9,7 @@ import { formatarPercentual } from "@/utils/pricing";
 import { useState } from "react";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { CardListItem } from "@/components/ui";
 
 const Commissions = () => {
   const { data: commissions = [], isLoading } = useCommissionsWithDetails();
@@ -25,98 +24,6 @@ const Commissions = () => {
   const totalCommissions = commissions.length;
   const activeCommissions = commissions.filter(c => c.rate > 0).length;
 
-  const columns = [
-    {
-      key: "marketplace",
-      header: "Marketplace",
-      sortable: true,
-      render: (commission: CommissionWithDetails) => (
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{commission.marketplaces?.name}</span>
-        </div>
-      )
-    },
-    {
-      key: "category",
-      header: "Categoria",
-      render: (commission: CommissionWithDetails) => (
-        <div className="flex items-center gap-2">
-          <span>{commission.categories?.name || 'Padrão'}</span>
-          {!commission.categories && (
-            <Badge variant="outline" className="text-xs">Geral</Badge>
-          )}
-        </div>
-      )
-    },
-    {
-      key: "rate",
-      header: "Taxa de Comissão",
-      sortable: true,
-      render: (commission: CommissionWithDetails) => (
-        <div className="flex items-center gap-2">
-          <Percent className="size-4 text-muted-foreground" />
-          <span className="font-mono font-medium">
-            {formatarPercentual(commission.rate * 100)}
-          </span>
-        </div>
-      )
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (commission: CommissionWithDetails) => {
-        const isActive = commission.rate > 0;
-        return (
-          <StatusBadge
-            status={isActive ? "active" : "inactive"}
-            label={isActive ? "Ativa" : "Inativa"}
-          />
-        );
-      }
-    },
-    {
-      key: "impact",
-      header: "Impacto no Preço",
-      render: (commission: CommissionWithDetails) => {
-        const impactLevel = commission.rate * 100;
-        let color = "bg-success/20 text-success";
-        let label = "Baixo";
-
-        if (impactLevel > 10) {
-          color = "bg-warning/20 text-warning";
-          label = "Médio";
-        }
-        if (impactLevel > 20) {
-          color = "bg-destructive/20 text-destructive";
-          label = "Alto";
-        }
-
-        return (
-          <Badge className={color}>
-            {label}
-          </Badge>
-        );
-      }
-    }
-  ];
-
-  const actions = [
-    {
-      label: "Editar",
-      icon: <Calculator className="size-4" />,
-      onClick: (commission: CommissionWithDetails) => {
-        setEditingCommission(commission);
-        showForm();
-      },
-      variant: "outline" as const
-    },
-    {
-      label: "Excluir",
-      icon: <Percent className="size-4" />,
-      onClick: (commission: CommissionWithDetails) => deleteMutation.mutate(commission.id),
-      variant: "destructive" as const
-    }
-  ];
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
@@ -139,9 +46,9 @@ const Commissions = () => {
         "Configure as taxas de comissão por marketplace e categoria. " +
         "Essas taxas são fundamentais para o cálculo preciso dos seus preços de venda."
       }
-        icon={<Percent className="size-6" />}
-        breadcrumbs={breadcrumbs}
-        actions={headerActions}
+      icon={<Percent className="size-6" />}
+      breadcrumbs={breadcrumbs}
+      actions={headerActions}
     >
       {/* Form Column */}
       {isFormVisible && (
@@ -171,7 +78,7 @@ const Commissions = () => {
         </div>
       )}
 
-      {/* Data Visualization Column */}
+      {/* Commissions List Column */}
       <div
         className={
           isFormVisible
@@ -185,15 +92,63 @@ const Commissions = () => {
           isOpen={isListVisible}
           onToggle={toggleList}
         >
-          <DataVisualization
-            title=""
-            description="Visualize todas as comissões por marketplace e categoria"
-            data={commissions}
-            columns={columns}
-            actions={actions}
-            isLoading={isLoading}
-            searchable={true}
-          />
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-24 w-full animate-pulse rounded-md bg-muted" />
+              ))}
+            </div>
+          ) : commissions.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              Nenhuma comissão configurada
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {commissions.map((commission) => {
+                const impactLevel = commission.rate * 100;
+                let impactColor = "text-success";
+                let impactLabel = "Baixo";
+
+                if (impactLevel > 10) {
+                  impactColor = "text-warning";
+                  impactLabel = "Médio";
+                }
+                if (impactLevel > 20) {
+                  impactColor = "text-destructive";
+                  impactLabel = "Alto";
+                }
+
+                return (
+                  <CardListItem
+                    key={commission.id}
+                    title={commission.marketplaces?.name}
+                    subtitle={commission.categories?.name || 'Padrão'}
+                    status={
+                      <StatusBadge
+                        status={commission.rate > 0 ? "active" : "inactive"}
+                        label={commission.rate > 0 ? "Ativa" : "Inativa"}
+                      />
+                    }
+                    onEdit={() => {
+                      setEditingCommission(commission);
+                      showForm();
+                    }}
+                    onDelete={() => deleteMutation.mutate(commission.id)}
+                  >
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <Percent className="size-4 text-muted-foreground" />
+                        <span className="font-mono font-medium">
+                          {formatarPercentual(commission.rate * 100)}
+                        </span>
+                      </div>
+                      <span className={impactColor}>{impactLabel}</span>
+                    </div>
+                  </CardListItem>
+                );
+              })}
+            </div>
+          )}
         </CollapsibleCard>
       </div>
     </ConfigurationPageLayout>
