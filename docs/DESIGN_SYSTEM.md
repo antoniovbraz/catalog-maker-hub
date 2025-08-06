@@ -95,6 +95,64 @@ Utilize ferramentas internas para validar visualmente as variações:
 - `npm run storybook` abre o Storybook para conferir componentes e layouts em diferentes breakpoints.
 - Publicar o Storybook pode servir como documentação viva do design system.
 
+## Cards
+Os cards organizam informações em painéis reutilizáveis.
+
+### Importação
+```tsx
+import { BaseCard, CardGrid } from '@/components/ui';
+```
+
+### Slots e props
+- `icon`: ícone à esquerda do título.
+- `title`: título do card.
+- `status`: elemento à direita do cabeçalho para indicar estado.
+- `actions`: ações adicionais no cabeçalho.
+- `collapsible`: permite recolher ou expandir o conteúdo.
+- `highlight`: quando usado dentro de `CardGrid`, faz o card ocupar toda a largura.
+
+### Exemplo: marketplace
+```tsx
+import { BaseCard, CardGrid } from '@/components/ui';
+import { Store, Plus, ChevronDown } from '@/components/ui/icons';
+import { Button } from '@/components/ui/button';
+
+export function MarketplaceSection() {
+  return (
+    <CardGrid>
+      <BaseCard
+        title="Plataformas e Modalidades"
+        icon={<Store className="size-4" />}
+        status={<ChevronDown className="size-4" />}
+        actions={
+          <Button size="sm">
+            <Plus className="mr-2 size-4" /> Nova Plataforma
+          </Button>
+        }
+        collapsible
+      >
+        {/* conteúdo */}
+      </BaseCard>
+    </CardGrid>
+  );
+}
+```
+
+### Exemplo: cards simples
+```tsx
+import { BaseCard, CardGrid } from '@/components/ui';
+
+export function SimpleCards() {
+  return (
+    <CardGrid>
+      <BaseCard title="Estoque">...</BaseCard>
+      <BaseCard title="Vendas">...</BaseCard>
+      <BaseCard highlight title="Alerta">...</BaseCard>
+    </CardGrid>
+  );
+}
+```
+
 ## Exemplos
 ### Botão
 ```tsx
