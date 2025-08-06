@@ -89,9 +89,9 @@ export default function AdGenerator() {
       description="Gere anúncios otimizados usando inteligência artificial"
       breadcrumbs={breadcrumbs}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:col-span-12">
+      <div className="grid grid-cols-1 gap-6 lg:col-span-12 lg:grid-cols-3">
         {/* Configuração */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="space-y-6 lg:col-span-1">
           {/* Seleção de Modo */}
           <Card>
             <CardHeader className="pb-3">
@@ -105,17 +105,17 @@ export default function AdGenerator() {
                 <Button
                   variant={mode === 'quick' ? 'default' : 'outline'}
                   onClick={() => setMode('quick')}
-                  className="h-auto p-3 flex flex-col items-center gap-2"
+                  className="flex h-auto flex-col items-center gap-2 p-3"
                 >
-                  <Wand2 className="h-4 w-4" />
+                  <Wand2 className="size-4" />
                   <span className="text-sm font-medium">Rápido</span>
                 </Button>
                 <Button
                   variant={mode === 'strategic' ? 'default' : 'outline'}
                   onClick={() => setMode('strategic')}
-                  className="h-auto p-3 flex flex-col items-center gap-2"
+                  className="flex h-auto flex-col items-center gap-2 p-3"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="size-4" />
                   <span className="text-sm font-medium">Estratégico</span>
                 </Button>
               </div>
@@ -151,7 +151,7 @@ export default function AdGenerator() {
                       products.map((product) => (
                         <SelectItem key={product.id} value={product.id}>
                           <div className="flex items-center gap-2">
-                            <Package className="h-4 w-4 text-muted-foreground" />
+                            <Package className="size-4 text-muted-foreground" />
                             <span>{product.name}</span>
                             {product.sku && (
                               <Badge variant="secondary" className="text-xs">
@@ -188,8 +188,8 @@ export default function AdGenerator() {
 
               {/* Produto Selecionado Info */}
               {selectedProduct && (
-                <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <Heading variant="h4" className="text-sm font-semibold mb-2">
+                <div className="mt-4 rounded-lg bg-muted p-3">
+                  <Heading variant="h4" className="mb-2 text-sm font-semibold">
                     Produto Selecionado
                   </Heading>
                   <div className="space-y-1 text-sm text-muted-foreground">
@@ -243,12 +243,12 @@ export default function AdGenerator() {
                 >
                   {generateMutation.isPending ? (
                     <>
-                      <Wand2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Wand2 className="mr-2 size-4 animate-spin" />
                       Gerando...
                     </>
                   ) : (
                     <>
-                      <Wand2 className="h-4 w-4 mr-2" />
+                      <Wand2 className="mr-2 size-4" />
                       Gerar Anúncio
                     </>
                   )}
@@ -260,7 +260,7 @@ export default function AdGenerator() {
           {/* Informação de Configuração para Modo Estratégico */}
           {mode === 'strategic' && !isStrategicFormValid && (
             <Alert>
-              <Info className="h-4 w-4" />
+              <Info className="size-4" />
               <AlertDescription>
                 Configure o produto e marketplace acima para iniciar a geração estratégica.
               </AlertDescription>
@@ -273,8 +273,8 @@ export default function AdGenerator() {
           {mode === 'strategic' && isStrategicFormValid ? (
             <Card className="h-[600px]">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <Sparkles className="size-5" />
                   Geração Estratégica
                 </CardTitle>
                 <CardDescription>
@@ -303,8 +303,8 @@ export default function AdGenerator() {
               <CardContent>
                 {generatedResult ? (
                   <div className="space-y-4">
-                    <div className="p-4 bg-muted rounded-lg">
-                      <Heading variant="h4" className="text-sm font-semibold mb-2">
+                    <div className="rounded-lg bg-muted p-4">
+                      <Heading variant="h4" className="mb-2 text-sm font-semibold">
                         Anúncio Gerado
                       </Heading>
                       <div className="whitespace-pre-wrap text-sm">
@@ -331,7 +331,7 @@ export default function AdGenerator() {
                   </div>
                 ) : (
                   <EmptyState
-                    icon={<ShoppingCart className="h-8 w-8" />}
+                    icon={<ShoppingCart className="size-8" />}
                     title="Nenhum anúncio gerado ainda"
                     description={
                       mode === "quick"
@@ -343,7 +343,7 @@ export default function AdGenerator() {
                         ? {
                             label: "Gerar Anúncio",
                             onClick: handleQuickGenerate,
-                            icon: <Wand2 className="w-4 h-4 mr-2" />,
+                            icon: <Wand2 className="mr-2 size-4" />,
                           }
                         : undefined
                     }

@@ -60,7 +60,7 @@ export function AdChatInterface({
       // Formatação de tabelas simples
       if (line.includes('|')) {
         return (
-          <div key={index} className="font-mono text-sm bg-muted/50 p-2 rounded my-1">
+          <div key={index} className="my-1 rounded bg-muted/50 p-2 font-mono text-sm">
             {line}
           </div>
         );
@@ -69,7 +69,7 @@ export function AdChatInterface({
       // Títulos e seções
       if (line.startsWith('##') || line.startsWith('**')) {
         return (
-          <div key={index} className="font-semibold text-primary mt-3 mb-1">
+          <div key={index} className="mb-1 mt-3 font-semibold text-primary">
             {line.replace(/[#*]/g, '')}
           </div>
         );
@@ -80,11 +80,11 @@ export function AdChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-[600px] max-w-4xl mx-auto">
+    <div className="mx-auto flex h-[600px] max-w-4xl flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between border-b p-4">
         <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-primary" />
+          <Bot className="size-5 text-primary" />
           <h3 className="font-semibold">Estrategista de Anúncios - {marketplace}</h3>
         </div>
         <Button 
@@ -93,18 +93,18 @@ export function AdChatInterface({
           onClick={resetChat}
           disabled={isLoading}
         >
-          <RotateCcw className="h-4 w-4 mr-2" />
+          <RotateCcw className="mr-2 size-4" />
           Reiniciar
         </Button>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <div className="text-center py-8">
-            <Bot className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h4 className="font-medium text-lg mb-2">Modo Estratégico</h4>
-            <p className="text-muted-foreground mb-4">
+          <div className="py-8 text-center">
+            <Bot className="mx-auto mb-4 size-12 text-muted-foreground" />
+            <h4 className="mb-2 text-lg font-medium">Modo Estratégico</h4>
+            <p className="mb-4 text-muted-foreground">
               O assistente irá fazer um diagnóstico completo e criar anúncios otimizados através de uma conversa estratégica.
             </p>
             <Button onClick={startChat} disabled={isLoading}>
@@ -119,28 +119,28 @@ export function AdChatInterface({
             className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.role === 'assistant' && (
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <Bot className="h-4 w-4 text-primary-foreground" />
+              <div className="shrink-0">
+                <div className="flex size-8 items-center justify-center rounded-full bg-primary">
+                  <Bot className="size-4 text-primary-foreground" />
                 </div>
               </div>
             )}
             
             <Card className={`max-w-[80%] ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : ''}`}>
               <CardContent className="p-3">
-                <div className="text-sm whitespace-pre-wrap">
+                <div className="whitespace-pre-wrap text-sm">
                   {formatMessage(msg.content)}
                 </div>
-                <div className="text-xs opacity-70 mt-2">
+                <div className="mt-2 text-xs opacity-70">
                   {msg.timestamp.toLocaleTimeString()}
                 </div>
               </CardContent>
             </Card>
 
             {msg.role === 'user' && (
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  <User className="h-4 w-4" />
+              <div className="shrink-0">
+                <div className="flex size-8 items-center justify-center rounded-full bg-muted">
+                  <User className="size-4" />
                 </div>
               </div>
             )}
@@ -149,9 +149,9 @@ export function AdChatInterface({
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <Bot className="h-4 w-4 text-primary-foreground" />
+            <div className="shrink-0">
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary">
+                <Bot className="size-4 text-primary-foreground" />
               </div>
             </div>
             <Card>
@@ -177,7 +177,7 @@ export function AdChatInterface({
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Digite sua resposta..."
-              className="flex-1 min-h-[60px] resize-none"
+              className="min-h-[60px] flex-1 resize-none"
               disabled={isLoading}
             />
             <Button 
@@ -186,7 +186,7 @@ export function AdChatInterface({
               size="sm"
               className="self-end"
             >
-              <Send className="h-4 w-4" />
+              <Send className="size-4" />
             </Button>
           </div>
         </div>

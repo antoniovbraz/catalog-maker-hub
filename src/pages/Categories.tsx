@@ -75,7 +75,7 @@ const Categories = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="size-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Categoria
       </Button>
     </div>
@@ -103,14 +103,14 @@ const Categories = () => {
             : "lg:col-span-12 xl:col-span-12"
         }
       >
-        <Card className="shadow-card border border-border/20">
+        <Card className="border border-border/20 shadow-card">
           <CardHeader className="py-3">
-            <CardTitle className="text-base flex items-center gap-2 font-medium text-muted-foreground">
+            <CardTitle className="flex items-center gap-2 text-base font-medium text-muted-foreground">
               <FolderTree className="size-4" />
               <span>Categorias Cadastradas</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 pb-4 px-6">
+          <CardContent className="px-6 pb-4 pt-0">
             <DataVisualization
               title=""
               data={categories}
@@ -118,7 +118,7 @@ const Categories = () => {
               actions={actions}
               isLoading={isLoading}
               emptyState={
-                <div className="text-center py-8">
+                <div className="py-8 text-center">
                   <Text className="text-muted-foreground">Nenhuma categoria cadastrada</Text>
                   <Text variant="caption" className="text-muted-foreground">
                     Crie sua primeira categoria usando o formulário ao lado

@@ -72,7 +72,7 @@ const Marketplaces = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={handleCreateNewPlatform}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Plataforma
       </Button>
     </div>
@@ -82,13 +82,13 @@ const Marketplaces = () => {
     <ConfigurationPageLayout
       title="Gerenciar Marketplaces"
       description="Configure os marketplaces onde seus produtos são vendidos. Organize por modalidades para melhor controle de comissões e regras específicas."
-      icon={<Store className="w-6 h-6" />}
+      icon={<Store className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
       {/* Form Column */}
       {isFormVisible && (
-        <div className="lg:col-span-5 xl:col-span-5 space-y-lg">
+        <div className="space-y-lg lg:col-span-5 xl:col-span-5">
           <SimpleMarketplaceForm
             editingMarketplace={editingMarketplace}
             creatingModalityForPlatform={creatingModalityForPlatform}
@@ -107,7 +107,7 @@ const Marketplaces = () => {
       >
         <CollapsibleCard
           title="Plataformas e Modalidades"
-          icon={<Store className="w-4 h-4" />}
+          icon={<Store className="size-4" />}
           isOpen={isListVisible}
           onToggle={toggleList}
         >
@@ -119,7 +119,7 @@ const Marketplaces = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4 flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
                   {totalPlatforms} plataformas, {totalModalities} modalidades
                 </div>
@@ -128,19 +128,19 @@ const Marketplaces = () => {
                   size="sm"
                   onClick={toggleList}
                 >
-                  {isListVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {isListVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </Button>
               </div>
 
               {hierarchicalMarketplaces.length === 0 ? (
                 <EmptyState
-                  icon={<Store className="h-8 w-8" />}
+                  icon={<Store className="size-8" />}
                   title="Nenhuma plataforma cadastrada"
                   description="Comece criando sua primeira plataforma de marketplace"
                   action={{
                     label: "Criar Primeira Plataforma",
                     onClick: handleCreateNewPlatform,
-                    icon: <Plus className="w-4 h-4 mr-2" />,
+                    icon: <Plus className="mr-2 size-4" />,
                   }}
                 />
               ) : (

@@ -174,7 +174,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-md">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <Label htmlFor="marketplace">Marketplace *</Label>
               <Select value={formData.marketplace_id} onValueChange={(value) => setFormData(prev => ({ ...prev, marketplace_id: value }))}>
@@ -197,7 +197,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Info className="w-4 h-4 text-muted-foreground" />
+                      <Info className="size-4 text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm">
                       <div className="space-y-sm">
@@ -228,7 +228,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
           </div>
           
           {showRangeFields && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="range_min">Valor Mínimo (R$) *</Label>
                 <Input

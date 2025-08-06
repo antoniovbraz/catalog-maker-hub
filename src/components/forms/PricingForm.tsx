@@ -184,20 +184,20 @@ export const PricingForm = () => {
   return (
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
-      <Card className="shadow-card border border-border/50">
+      <Card className="border border-border/50 shadow-card">
         <CardHeader className="bg-card">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <Calculator className="w-6 h-6" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Calculator className="size-6" />
             Calculadora de Preços
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 p-6">
           {/* Seleção de Produto e Marketplace */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+            <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
               Seleção de Produto e Marketplace
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="product" className="text-sm font-medium">Produto *</Label>
                 <Select 
@@ -207,7 +207,7 @@ export const PricingForm = () => {
                   <SelectTrigger className="relative z-0">
                     <SelectValue placeholder="Selecione um produto" />
                   </SelectTrigger>
-                  <SelectContent className="z-[200] bg-popover border shadow-lg">
+                  <SelectContent className="z-[200] border bg-popover shadow-lg">
                     {loadingProducts ? (
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                     ) : products.length === 0 ? (
@@ -239,7 +239,7 @@ export const PricingForm = () => {
                   <SelectTrigger className="relative z-0">
                     <SelectValue placeholder="Selecione uma plataforma" />
                   </SelectTrigger>
-                  <SelectContent className="z-[200] bg-popover border shadow-lg">
+                  <SelectContent className="z-[200] border bg-popover shadow-lg">
                     {loadingPlatforms ? (
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                     ) : platforms.length === 0 ? (
@@ -270,7 +270,7 @@ export const PricingForm = () => {
                   <SelectTrigger className="relative z-0">
                     <SelectValue placeholder="Selecione uma modalidade" />
                   </SelectTrigger>
-                  <SelectContent className="z-[200] bg-popover border shadow-lg">
+                  <SelectContent className="z-[200] border bg-popover shadow-lg">
                     {loadingModalities ? (
                       <div className="px-2 py-1.5 text-sm text-muted-foreground">Carregando...</div>
                     ) : modalities.length === 0 ? (
@@ -298,10 +298,10 @@ export const PricingForm = () => {
 
           {/* Configurações de Margem */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+            <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
               Configurações de Margem
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
                 <Label htmlFor="taxa_cartao" className="text-sm font-medium">Taxa de Cartão (%)</Label>
                 <Input
@@ -343,7 +343,7 @@ export const PricingForm = () => {
           {/* Análise de Preço Praticado */}
           <CollapsibleCard
             title="Análise de Preço Praticado"
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon={<TrendingUp className="size-4" />}
             isOpen={analysisSection.isOpen}
             onToggle={analysisSection.toggle}
           >
@@ -360,18 +360,18 @@ export const PricingForm = () => {
                 placeholder="Ex: 199.90"
                 className="mt-1"
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Compare sua margem real com a desejada
               </p>
             </div>
           </CollapsibleCard>
           
           {/* Botões de Ação */}
-          <div className="flex gap-3 pt-4 border-t border-border">
+          <div className="flex gap-3 border-t border-border pt-4">
             <Button
               onClick={handleCalculate}
               disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
-              className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
+              className="h-11 flex-1 bg-gradient-primary hover:opacity-90"
             >
               {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "Calcular Preço"}
             </Button>
@@ -392,10 +392,10 @@ export const PricingForm = () => {
 
       {/* Resultados */}
       {pricingResult && (
-        <Card className="shadow-card border border-border/50">
+        <Card className="border border-border/50 shadow-card">
           <CardHeader className="bg-muted/30">
-            <CardTitle className="text-lg flex items-center gap-2 text-foreground">
-              <Calculator className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-lg text-foreground">
+              <Calculator className="size-5" />
               Resultado do Cálculo
             </CardTitle>
           </CardHeader>
@@ -438,8 +438,8 @@ export const PricingForm = () => {
               {margemRealResult && (
                 <>
                   <Separator className="my-4" />
-                  <div className="bg-muted/30 p-4 rounded-lg">
-                    <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
+                  <div className="rounded-lg bg-muted/30 p-4">
+                    <h4 className="mb-3 font-semibold text-orange-600 dark:text-orange-400">
                       Análise do Preço Praticado
                     </h4>
                      <div className="grid grid-cols-2 gap-2 text-sm">
@@ -463,7 +463,7 @@ export const PricingForm = () => {
                        </div>
                        
                        {/* Indicador de comparação */}
-                       <div className="col-span-2 mt-2 pt-2 border-t">
+                       <div className="col-span-2 mt-2 border-t pt-2">
                          <div className="text-xs text-muted-foreground">
                            {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
                              <span className="text-amber-600 dark:text-amber-400">

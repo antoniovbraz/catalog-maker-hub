@@ -149,13 +149,13 @@ export default function AssistantsManagement() {
                 isLoading={isLoading}
                 emptyState={
                   <EmptyState
-                    icon={<Bot className="h-8 w-8" />}
+                    icon={<Bot className="size-8" />}
                     title="Nenhum assistente configurado ainda"
                     description="Crie seu primeiro assistente IA para começar a gerar anúncios automaticamente"
                     action={{
                       label: "Criar Assistente",
                       onClick: handleCreateNew,
-                      icon: <Plus className="w-4 h-4 mr-2" />,
+                      icon: <Plus className="mr-2 size-4" />,
                     }}
                   />
                 }

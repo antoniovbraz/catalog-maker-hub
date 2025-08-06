@@ -54,7 +54,7 @@ const Commissions = () => {
       sortable: true,
       render: (commission: CommissionWithDetails) => (
         <div className="flex items-center gap-2">
-          <Percent className="w-4 h-4 text-muted-foreground" />
+          <Percent className="size-4 text-muted-foreground" />
           <span className="font-mono font-medium">
             {formatarPercentual(commission.rate * 100)}
           </span>
@@ -103,7 +103,7 @@ const Commissions = () => {
   const actions = [
     {
       label: "Editar",
-      icon: <Calculator className="w-4 h-4" />,
+      icon: <Calculator className="size-4" />,
       onClick: (commission: CommissionWithDetails) => {
         setEditingCommission(commission);
         showForm();
@@ -112,7 +112,7 @@ const Commissions = () => {
     },
     {
       label: "Excluir",
-      icon: <Percent className="w-4 h-4" />,
+      icon: <Percent className="size-4" />,
       onClick: (commission: CommissionWithDetails) => deleteMutation.mutate(commission.id),
       variant: "destructive" as const
     }
@@ -126,7 +126,7 @@ const Commissions = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Comissão
       </Button>
     </div>
@@ -139,13 +139,13 @@ const Commissions = () => {
         "Configure as taxas de comissão por marketplace e categoria. " +
         "Essas taxas são fundamentais para o cálculo preciso dos seus preços de venda."
       }
-        icon={<Percent className="w-6 h-6" />}
+        icon={<Percent className="size-6" />}
         breadcrumbs={breadcrumbs}
         actions={headerActions}
     >
       {/* Form Column */}
       {isFormVisible && (
-        <div className="lg:col-span-5 xl:col-span-5 space-y-lg">
+        <div className="space-y-lg lg:col-span-5 xl:col-span-5">
           <CommissionFormEnhanced
             editingCommission={editingCommission}
             onCancelEdit={() => {
@@ -155,8 +155,8 @@ const Commissions = () => {
           />
 
           {/* Quick Stats Card */}
-          <div className="bg-card rounded-lg p-lg border">
-            <h3 className="font-semibold mb-4">Estatísticas Rápidas</h3>
+          <div className="rounded-lg border bg-card p-lg">
+            <h3 className="mb-4 font-semibold">Estatísticas Rápidas</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">{totalCommissions}</div>
@@ -181,7 +181,7 @@ const Commissions = () => {
       >
         <CollapsibleCard
           title="Comissões Configuradas"
-          icon={<Percent className="w-4 h-4" />}
+          icon={<Percent className="size-4" />}
           isOpen={isListVisible}
           onToggle={toggleList}
         >

@@ -169,10 +169,10 @@ export default function AdminDashboard() {
   if (usersError || subscriptionsError || revenueError) {
     const errorMessage = usersError?.message || subscriptionsError?.message || revenueError?.message || 'Erro desconhecido';
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Crown className="h-16 w-16 text-destructive mx-auto mb-md" />
-          <Heading variant="h2" className="text-destructive mb-sm">
+          <Crown className="mx-auto mb-md size-16 text-destructive" />
+          <Heading variant="h2" className="mb-sm text-destructive">
             Erro ao Carregar Dados
           </Heading>
           <Text className="text-muted-foreground">
@@ -185,10 +185,10 @@ export default function AdminDashboard() {
 
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Crown className="h-16 w-16 text-muted-foreground mx-auto mb-md" />
-          <Heading variant="h2" className="text-destructive mb-sm">
+          <Crown className="mx-auto mb-md size-16 text-muted-foreground" />
+          <Heading variant="h2" className="mb-sm text-destructive">
             Acesso Restrito
           </Heading>
           <Text className="text-muted-foreground">
@@ -319,29 +319,29 @@ export default function AdminDashboard() {
   
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
         {/* Header skeleton */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
-            <div className="h-8 w-64 bg-muted rounded animate-pulse" />
-            <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-64 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-48 animate-pulse rounded bg-muted" />
           </div>
           <div className="flex gap-2">
-            <div className="h-9 w-32 bg-muted rounded animate-pulse" />
-            <div className="h-9 w-36 bg-muted rounded animate-pulse" />
+            <div className="h-9 w-32 animate-pulse rounded bg-muted" />
+            <div className="h-9 w-36 animate-pulse rounded bg-muted" />
           </div>
         </div>
 
         {/* Stats skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-card rounded-lg border p-6">
+            <div key={i} className="rounded-lg border bg-card p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-                  <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                  <div className="h-8 w-16 animate-pulse rounded bg-muted" />
                 </div>
-                <div className="h-12 w-12 bg-muted rounded-full animate-pulse" />
+                <div className="size-12 animate-pulse rounded-full bg-muted" />
               </div>
             </div>
           ))}
@@ -349,13 +349,13 @@ export default function AdminDashboard() {
 
         {/* Content skeleton */}
         <div className="space-y-4">
-          <div className="h-10 w-96 bg-muted rounded animate-pulse" />
-          <div className="bg-card rounded-lg border p-6">
+          <div className="h-10 w-96 animate-pulse rounded bg-muted" />
+          <div className="rounded-lg border bg-card p-6">
             <div className="space-y-4">
-              <div className="h-6 w-48 bg-muted rounded animate-pulse" />
+              <div className="h-6 w-48 animate-pulse rounded bg-muted" />
               <div className="space-y-2">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-12 bg-muted rounded animate-pulse" />
+                  <div key={i} className="h-12 animate-pulse rounded bg-muted" />
                 ))}
               </div>
             </div>
@@ -366,13 +366,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <Heading variant="h1" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-primary" />
+            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+              <BarChart3 className="size-6 text-primary" />
             </div>
             Dashboard Admin
           </Heading>
@@ -383,32 +383,32 @@ export default function AdminDashboard() {
         
         <div className="flex gap-2">
           <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4 mr-2" />
+            <Settings className="mr-2 size-4" />
             Configurações
           </Button>
           <Button size="sm">
-            <UserPlus className="w-4 h-4 mr-2" />
+            <UserPlus className="mr-2 size-4" />
             Convidar Usuário
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <Card key={index} className="border-0 shadow-card">
             <CardContent className="p-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <Text variant="caption" className="font-medium text-muted-foreground mb-1">
+                  <Text variant="caption" className="mb-1 font-medium text-muted-foreground">
                     {stat.title}
                   </Text>
-                  <Text className="font-bold text-h3">
+                  <Text className="text-h3 font-bold">
                     {stat.value}
                   </Text>
                 </div>
-                <div className={`w-12 h-12 rounded-full ${stat.bgColor} flex items-center justify-center`}>
-                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                <div className={`size-12 rounded-full ${stat.bgColor} flex items-center justify-center`}>
+                  <stat.icon className={`size-6 ${stat.color}`} />
                 </div>
               </div>
             </CardContent>
@@ -420,15 +420,15 @@ export default function AdminDashboard() {
       <Tabs defaultValue="users" className="space-y-lg">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
+            <Users className="size-4" />
             Usuários
           </TabsTrigger>
           <TabsTrigger value="subscriptions" className="flex items-center gap-2">
-            <Crown className="w-4 h-4" />
+            <Crown className="size-4" />
             Assinaturas
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <Activity className="w-4 h-4" />
+            <Activity className="size-4" />
             Analytics
           </TabsTrigger>
         </TabsList>
@@ -456,15 +456,15 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
+                  <Activity className="size-5" />
                   Analytics em Desenvolvimento
                 </CardTitle>
                 <CardDescription>
                   Métricas avançadas estarão disponíveis em breve
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center py-12">
-                <Activity className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <CardContent className="py-12 text-center">
+                <Activity className="mx-auto mb-4 size-16 text-muted-foreground" />
                 <Heading variant="h3" className="mb-2">
                   Funcionalidade em Desenvolvimento
                 </Heading>

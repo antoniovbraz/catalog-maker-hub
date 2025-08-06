@@ -37,7 +37,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-64">
         <div className="space-y-sm">
-          <p className="font-medium text-sm">{title}</p>
+          <p className="text-sm font-medium">{title}</p>
           <div className="space-y-xs">
             {details.map((detail, index) => (
               <div key={index} className="flex justify-between text-xs">

@@ -20,7 +20,7 @@ const Shipping = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Regra
       </Button>
     </div>
@@ -30,7 +30,7 @@ const Shipping = () => {
     <ConfigurationPageLayout
       title="Regras de Frete"
       description="Configure regras de frete por produto e marketplace"
-      icon={<Truck className="w-6 h-6" />}
+      icon={<Truck className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
@@ -50,18 +50,18 @@ const Shipping = () => {
       >
         <CollapsibleCard
           title="Regras de Frete Configuradas"
-          icon={<Truck className="w-4 h-4" />}
+          icon={<Truck className="size-4" />}
           isOpen={isListVisible}
           onToggle={toggleList}
         >
           <EmptyState
-            icon={<Truck className="h-8 w-8" />}
+            icon={<Truck className="size-8" />}
             title="Nenhuma regra de frete configurada"
             description="Adicione uma nova regra para começar"
             action={{
               label: "Nova Regra",
               onClick: showForm,
-              icon: <Plus className="w-4 h-4 mr-2" />,
+              icon: <Plus className="mr-2 size-4" />,
             }}
           />
         </CollapsibleCard>
