@@ -1,14 +1,14 @@
 import { CategoryForm } from "@/components/forms/CategoryForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { FolderTree, Plus, Edit, Trash2 } from "@/components/ui/icons";
+import { FolderTree, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { BaseCard } from "@/components/ui";
+import { BaseCard, CardListItem } from "@/components/ui";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType } from "@/types/categories";
-import { DataVisualization } from "@/components/ui/data-visualization";
 import { useState } from "react";
 import { Text } from "@/components/ui/typography";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Categories = () => {
   const [editingCategory, setEditingCategory] = useState<CategoryType | null>(null);
@@ -29,43 +29,6 @@ const Categories = () => {
     setEditingCategory(null);
     hideForm();
   };
-
-  // Configurar colunas da tabela
-  const columns = [
-    {
-      key: 'name',
-      header: 'Nome',
-      render: (item: CategoryType) => (
-        <div className="flex items-center gap-2">
-          <FolderTree className="size-4 text-muted-foreground" />
-          <span className="font-medium">{item.name}</span>
-        </div>
-      )
-    },
-    {
-      key: 'description',
-      header: 'Descrição',
-      render: (item: CategoryType) => (
-        <span className="text-muted-foreground">
-          {item.description || "Sem descrição"}
-        </span>
-      )
-    }
-  ];
-
-  const actions = [
-    {
-      label: 'Editar',
-      icon: <Edit className="size-4" />,
-      onClick: (category: CategoryType) => handleEdit(category)
-    },
-    {
-      label: 'Excluir',
-      icon: <Trash2 className="size-4" />,
-      onClick: (category: CategoryType) => deleteMutation.mutate(category.id),
-      variant: 'destructive' as const
-    }
-  ];
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
@@ -113,21 +76,32 @@ const Categories = () => {
           }
           contentPadding="px-6 pb-4 pt-0"
         >
-          <DataVisualization
-            title=""
-            data={categories}
-            columns={columns}
-            actions={actions}
-            isLoading={isLoading}
-            emptyState={
-              <div className="py-8 text-center">
-                <Text className="text-muted-foreground">Nenhuma categoria cadastrada</Text>
-                <Text variant="caption" className="text-muted-foreground">
-                  Crie sua primeira categoria usando o formulário ao lado
-                </Text>
-              </div>
-            }
-          />
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 w-full" />
+              ))}
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="py-8 text-center">
+              <Text className="text-muted-foreground">Nenhuma categoria cadastrada</Text>
+              <Text variant="caption" className="text-muted-foreground">
+                Crie sua primeira categoria usando o formulário ao lado
+              </Text>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {categories.map((category) => (
+                <CardListItem
+                  key={category.id}
+                  title={category.name}
+                  subtitle={category.description || "Sem descrição"}
+                  onEdit={() => handleEdit(category)}
+                  onDelete={() => deleteMutation.mutate(category.id)}
+                />
+              ))}
+            </div>
+          )}
         </BaseCard>
       </div>
     </ConfigurationPageLayout>

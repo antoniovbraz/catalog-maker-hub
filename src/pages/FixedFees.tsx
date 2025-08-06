@@ -1,10 +1,9 @@
 import { FixedFeeRuleForm } from "@/components/forms/FixedFeeRuleForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { Coins, Plus, Trash2 } from "@/components/ui/icons";
+import { Coins, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { BaseCard, CardListItem } from "@/components/ui";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -106,18 +105,6 @@ const FixedFees = () => {
     </div>
   );
 
-  const tableHeader = (
-    <TableHeader>
-      <TableRow>
-        <TableHead>Marketplace</TableHead>
-        <TableHead>Tipo</TableHead>
-        <TableHead>Faixa</TableHead>
-        <TableHead>Valor</TableHead>
-        <TableHead>Ações</TableHead>
-      </TableRow>
-    </TableHeader>
-  );
-
   return (
     <ConfigurationPageLayout
       title="Regras de valor fixo"
@@ -139,94 +126,59 @@ const FixedFees = () => {
             : "lg:col-span-12 xl:col-span-12"
         }
       >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <BaseCard
+          title={
+            <div className="flex items-center gap-2">
               <Coins className="size-5" />
-              Taxas Fixas Configuradas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  {tableHeader}
-                  <TableBody>
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <TableRow key={i}>
-                        <TableCell>
-                          <Skeleton className="h-4 w-24" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-20" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-32" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-4 w-20" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="size-8 rounded" />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : fixedFeeRules.length === 0 ? (
-              <EmptyState
-                icon={<Coins className="size-8" />}
-                title="Nenhuma taxa fixa configurada"
-                description="Adicione uma nova taxa para começar"
-              />
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  {tableHeader}
-                  <TableBody>
-                    {fixedFeeRules.map((rule) => (
-                      <TableRow key={rule.id}>
-                        <TableCell className="font-medium break-words">
-                          {rule.marketplaces?.name}
-                        </TableCell>
-                        <TableCell className="break-words">
-                          {RULE_TYPES.find((t) => t.value === rule.rule_type)?.label}
-                        </TableCell>
-                        <TableCell className="break-words">
-                          {(rule.rule_type === "faixa" || rule.rule_type === "percentual") &&
-                          rule.range_min !== null &&
-                          rule.range_max !== null
-                            ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
-                            : rule.rule_type === "constante"
-                            ? "Todas as faixas"
-                            : "-"}
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap">
-                          {rule.rule_type === "percentual"
-                            ? `${rule.value.toFixed(2)}%`
-                            : `R$ ${rule.value.toFixed(2)}`}
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap">
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteMutation.mutate(rule.id)}
-                              disabled={deleteMutation.isPending}
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              <span>Taxas Fixas Configuradas</span>
+            </div>
+          }
+        >
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 w-full" />
+              ))}
+            </div>
+          ) : fixedFeeRules.length === 0 ? (
+            <EmptyState
+              icon={<Coins className="size-8" />}
+              title="Nenhuma taxa fixa configurada"
+              description="Adicione uma nova taxa para começar"
+            />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {fixedFeeRules.map((rule) => {
+                const rangeText =
+                  (rule.rule_type === "faixa" || rule.rule_type === "percentual") &&
+                  rule.range_min !== null &&
+                  rule.range_max !== null
+                    ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
+                    : rule.rule_type === "constante"
+                    ? "Todas as faixas"
+                    : undefined
+
+                return (
+                  <CardListItem
+                    key={rule.id}
+                    title={rule.marketplaces?.name}
+                    subtitle={RULE_TYPES.find((t) => t.value === rule.rule_type)?.label}
+                    status={
+                      rule.rule_type === "percentual"
+                        ? `${rule.value.toFixed(2)}%`
+                        : `R$ ${rule.value.toFixed(2)}`
+                    }
+                    onDelete={() => deleteMutation.mutate(rule.id)}
+                  >
+                    {rangeText && (
+                      <span className="text-sm text-muted-foreground">{rangeText}</span>
+                    )}
+                  </CardListItem>
+                )
+              })}
+            </div>
+          )}
+        </BaseCard>
       </div>
     </ConfigurationPageLayout>
   );
