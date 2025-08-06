@@ -45,7 +45,7 @@ export function SmartForm({
   const hasRequiredSections = sections.some(section => section.required);
 
   return (
-    <Card className={cn("shadow-card", className)}>
+    <Card className={cn(className)}>
       <CardHeader className="bg-card">
         <div className="flex items-center justify-between">
           <div>

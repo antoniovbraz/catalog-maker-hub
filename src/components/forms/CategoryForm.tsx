@@ -125,7 +125,7 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
   });
 
   return (
-    <Card className="border border-border/50 shadow-card">
+    <Card className="border-border/50">
       <CardHeader className="bg-card">
         <CardTitle className="flex items-center gap-2 text-xl">
           <FolderOpen className="size-6" />
