@@ -82,3 +82,26 @@ export const spacing = {
   '2xl': 'var(--spacing-2xl)',
 } as const;
 
+/**
+ * Consolidated design tokens used across the application.
+ * These tokens map to CSS variables declared in `index.css`.
+ */
+export const tokens = {
+  colors,
+  typography,
+  spacing,
+} as const;
+
+export type Tokens = typeof tokens;
+
+/**
+ * Structure used to override design tokens at runtime.
+ * Each property accepts raw CSS values which will be assigned to
+ * the corresponding CSS variables (e.g. `colors.primary` -> `--primary`).
+ */
+export type TokenOverrides = {
+  colors?: Record<string, string>;
+  typography?: Record<string, string>;
+  spacing?: Record<string, string>;
+};
+

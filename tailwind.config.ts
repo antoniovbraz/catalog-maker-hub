@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
-import { colors, typography, spacing } from "./src/styles/tokens";
+import { tokens } from "./src/styles/tokens";
 
 export default {
 	darkMode: ["class"],
@@ -20,7 +20,7 @@ export default {
 			}
 		},
                 extend: {
-                        colors,
+                        colors: tokens.colors,
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-card': 'var(--gradient-card)',
@@ -63,8 +63,8 @@ export default {
                         fontFamily: {
                                 playfair: ['"Playfair Display"', 'serif'],
                         },
-                        fontSize: typography,
-                        spacing,
+                        fontSize: tokens.typography,
+                        spacing: tokens.spacing,
                 }
         },
         plugins: [tailwindcssAnimate],
