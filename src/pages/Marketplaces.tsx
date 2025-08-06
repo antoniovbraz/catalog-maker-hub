@@ -6,9 +6,10 @@ import { MarketplaceHierarchyCard } from "@/components/marketplace/MarketplaceHi
 import { useMarketplacesHierarchical, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType } from "@/types/marketplaces";
 import { useState } from "react";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Marketplaces = () => {
   const { data: hierarchicalMarketplaces = [], isLoading } = useMarketplacesHierarchical();
@@ -111,8 +112,10 @@ const Marketplaces = () => {
           onToggle={toggleList}
         >
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <LoadingSpinner size="lg" />
+            <div className="space-y-4 py-12">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-24 w-full" />
+              ))}
             </div>
           ) : (
             <div className="space-y-4">
@@ -120,27 +123,26 @@ const Marketplaces = () => {
                 <div className="text-sm text-muted-foreground">
                   {totalPlatforms} plataformas, {totalModalities} modalidades
                 </div>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={toggleList}
                 >
                   {isListVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
               </div>
-              
+
               {hierarchicalMarketplaces.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-                  <Store className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h4 className="text-lg font-medium mb-2">Nenhuma plataforma cadastrada</h4>
-                  <p className="text-muted-foreground mb-4">
-                    Comece criando sua primeira plataforma de marketplace
-                  </p>
-                  <Button onClick={handleCreateNewPlatform}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Criar Primeira Plataforma
-                  </Button>
-                </div>
+                <EmptyState
+                  icon={<Store className="h-8 w-8" />}
+                  title="Nenhuma plataforma cadastrada"
+                  description="Comece criando sua primeira plataforma de marketplace"
+                  action={{
+                    label: "Criar Primeira Plataforma",
+                    onClick: handleCreateNewPlatform,
+                    icon: <Plus className="w-4 h-4 mr-2" />,
+                  }}
+                />
               ) : (
                 <div className="space-y-4">
                   {hierarchicalMarketplaces.map((hierarchy) => (
