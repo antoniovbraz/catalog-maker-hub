@@ -18,7 +18,7 @@ const Strategy = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="size-4 mr-2" />
         Analisar
       </Button>
     </div>
@@ -28,7 +28,7 @@ const Strategy = () => {
     <ConfigurationPageLayout
       title="Estratégia de Precificação"
       description="Analise produtos por margem e giro de vendas usando matriz estratégica"
-      icon={<BarChart3 className="w-6 h-6" />}
+      icon={<BarChart3 className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >

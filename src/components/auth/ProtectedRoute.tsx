@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useLogger } from '@/utils/logger';
+import { Heading, Text } from '@/components/ui/typography';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -27,7 +28,7 @@ export function ProtectedRoute({
       logger.debug('Auth check', { user: !!user, profile: !!profile, needsRedirect, pathname: location.pathname });
       setShouldRedirect(needsRedirect);
     }
-  }, [loading, user, profile, location.pathname]);
+  }, [loading, user, profile, location.pathname, logger]);
 
   if (loading) {
     return (
@@ -62,12 +63,12 @@ export function ProtectedRoute({
       return (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-destructive mb-2">
+            <Heading variant="h3" className="text-destructive mb-2">
               Acesso Negado
-            </h1>
-            <p className="text-muted-foreground">
+            </Heading>
+            <Text className="text-muted-foreground">
               Você não tem permissão para acessar esta página.
-            </p>
+            </Text>
           </div>
         </div>
       );

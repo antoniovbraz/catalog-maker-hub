@@ -153,7 +153,7 @@ export class AssistantsService extends BaseService<Assistant> {
         if (!productId) {
           throw new Error('productId é obrigatório no modo estratégico');
         }
-        query.eq('product_id', productId);
+        (query as any).eq('product_id', productId);
       }
 
       const { data, error } = await (query as any).maybeSingle();

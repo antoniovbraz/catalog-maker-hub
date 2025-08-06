@@ -18,7 +18,7 @@ const Pricing = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="size-4 mr-2" />
         Calcular Preço
       </Button>
     </div>
@@ -28,7 +28,7 @@ const Pricing = () => {
     <ConfigurationPageLayout
       title="Precificação"
       description="Calcule preços sugeridos e margens de lucro para seus produtos"
-      icon={<Calculator className="w-6 h-6" />}
+      icon={<Calculator className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >

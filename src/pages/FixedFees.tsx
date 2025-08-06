@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
+import { Text } from "@/components/ui/typography";
 
 const FixedFees = () => {
   const { isFormVisible, showForm, hideForm } = useFormVisibility({
@@ -98,7 +99,7 @@ const FixedFees = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="size-4 mr-2" />
         Nova Taxa
       </Button>
     </div>
@@ -108,7 +109,7 @@ const FixedFees = () => {
     <ConfigurationPageLayout
       title="Regras de valor fixo"
       description="Configure regras de valor fixo por marketplace com diferentes tipos"
-      icon={<Coins className="w-6 h-6" />}
+      icon={<Coins className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
@@ -128,7 +129,7 @@ const FixedFees = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Coins className="w-5 h-5" />
+              <Coins className="size-5" />
               Taxas Fixas Configuradas
             </CardTitle>
           </CardHeader>
@@ -178,7 +179,7 @@ const FixedFees = () => {
                             onClick={() => deleteMutation.mutate(rule.id)}
                             disabled={deleteMutation.isPending}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="size-4" />
                           </Button>
                         </div>
                       </TableCell>
