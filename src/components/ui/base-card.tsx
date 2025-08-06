@@ -29,8 +29,8 @@ const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>(
       status,
       actions,
       children,
-      contentPadding = "p-4",
-      contentSpacing = "space-y-4",
+      contentPadding = "p-md",
+      contentSpacing = "space-y-md",
       collapsible = false,
       open,
       defaultOpen,
@@ -43,7 +43,7 @@ const BaseCard = React.forwardRef<HTMLDivElement, BaseCardProps>(
     const contentClasses = cn(contentPadding, contentSpacing)
 
     const header = (
-      <CardHeader className="flex flex-row items-center justify-between p-4">
+      <CardHeader className="flex flex-row items-center justify-between p-md">
         {collapsible ? (
           <>
             <CollapsibleTrigger asChild>
