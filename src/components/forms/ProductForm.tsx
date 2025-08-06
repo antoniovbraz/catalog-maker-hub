@@ -266,18 +266,17 @@ export const ProductForm = () => {
                 Informações Básicas
               </h3>
               
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+                <Label htmlFor="name" className="text-sm font-medium">
+                  Nome *
+                </Label>
                 <div>
-                  <Label htmlFor="name" className="text-sm font-medium">
-                    Nome *
-                  </Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     placeholder="Ex: Smartphone Samsung Galaxy"
                     className={cn(
-                      "mt-1",
                       errors.name && touched.name ? "border-destructive focus-visible:ring-destructive" : ""
                     )}
                     required
@@ -289,26 +288,26 @@ export const ProductForm = () => {
                     </div>
                   )}
                 </div>
-                
-                <div>
-                  <Label htmlFor="category" className="text-sm font-medium">Categoria</Label>
-                  <Select 
-                    value={formData.category_id} 
-                    onValueChange={(value) => handleInputChange("category_id", value)}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Selecione uma categoria" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhuma categoria</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              </div>
+
+              <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+                <Label htmlFor="category" className="text-sm font-medium">Categoria</Label>
+                <Select
+                  value={formData.category_id}
+                  onValueChange={(value) => handleInputChange("category_id", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhuma categoria</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -318,11 +317,11 @@ export const ProductForm = () => {
                 Configuração de Custos
               </h3>
               
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+                <Label htmlFor="cost_unit" className="text-sm font-medium">
+                  Custo Unitário (R$) *
+                </Label>
                 <div>
-                  <Label htmlFor="cost_unit" className="text-sm font-medium">
-                    Custo Unitário (R$) *
-                  </Label>
                   <Input
                     id="cost_unit"
                     type="number"
@@ -332,7 +331,6 @@ export const ProductForm = () => {
                     onChange={(e) => handleInputChange("cost_unit", parseFloat(e.target.value) || 0)}
                     placeholder="0,00"
                     className={cn(
-                      "mt-1",
                       errors.cost_unit && touched.cost_unit ? "border-destructive focus-visible:ring-destructive" : ""
                     )}
                     required
@@ -344,27 +342,28 @@ export const ProductForm = () => {
                     </div>
                   )}
                 </div>
-                
+              </div>
+
+              <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+                <Label htmlFor="packaging_cost" className="text-sm font-medium">
+                  Custo da Embalagem (R$)
+                </Label>
+                <Input
+                  id="packaging_cost"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.packaging_cost}
+                  onChange={(e) => handleInputChange("packaging_cost", parseFloat(e.target.value) || 0)}
+                  placeholder="0,00"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+                <Label htmlFor="tax_rate" className="text-sm font-medium">
+                  Alíquota de Imposto (%)
+                </Label>
                 <div>
-                  <Label htmlFor="packaging_cost" className="text-sm font-medium">
-                    Custo da Embalagem (R$)
-                  </Label>
-                  <Input
-                    id="packaging_cost"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.packaging_cost}
-                    onChange={(e) => handleInputChange("packaging_cost", parseFloat(e.target.value) || 0)}
-                    placeholder="0,00"
-                    className="mt-1"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="tax_rate" className="text-sm font-medium">
-                    Alíquota de Imposto (%)
-                  </Label>
                   <Input
                     id="tax_rate"
                     type="number"
@@ -375,7 +374,6 @@ export const ProductForm = () => {
                     onChange={(e) => handleInputChange("tax_rate", parseFloat(e.target.value) || 0)}
                     placeholder="0,00"
                     className={cn(
-                      "mt-1",
                       errors.tax_rate && touched.tax_rate ? "border-destructive focus-visible:ring-destructive" : ""
                     )}
                   />
@@ -409,25 +407,24 @@ export const ProductForm = () => {
               onToggle={optionalFields.toggle}
             >
               <div className="space-y-4">
-                <div>
+                <div className="grid md:grid-cols-[2fr_3fr] gap-6">
                   <Label htmlFor="sku" className="text-sm font-medium">SKU</Label>
                   <Input
                     id="sku"
                     value={formData.sku}
                     onChange={(e) => handleInputChange("sku", e.target.value)}
                     placeholder="Ex: SM-G991B"
-                    className="mt-1"
                   />
                 </div>
-                
-                <div>
+
+                <div className="grid md:grid-cols-[2fr_3fr] gap-6">
                   <Label htmlFor="description" className="text-sm font-medium">Descrição</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
                     placeholder="Descrição detalhada do produto..."
-                    className="mt-1 min-h-[80px]"
+                    className="min-h-[80px]"
                   />
                 </div>
               </div>

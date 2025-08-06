@@ -33,7 +33,7 @@ const Products = () => {
       actions={headerActions}
     >
       {isFormVisible && (
-        <div className="lg:col-span-12 xl:col-span-12">
+        <div className="w-full max-w-4xl lg:col-span-12 xl:col-span-12">
           <ProductForm />
         </div>
       )}

@@ -127,7 +127,7 @@ export default function AssistantsManagement() {
         breadcrumbs={breadcrumbs}
         actions={headerActions}
       >
-        <div className="lg:col-span-12">
+        <div className="w-full max-w-5xl lg:col-span-12">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-sm">

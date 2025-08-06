@@ -145,30 +145,32 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="grid md:grid-cols-[2fr_3fr] gap-6 space-y-0">
                   <FormLabel>Nome do Assistente</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Ex: Assistente Mercado Livre Premium" 
-                      {...field} 
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Nome descritivo para identificar o assistente.
-                  </FormDescription>
-                  <FormMessage />
+                  <div className="space-y-1">
+                    <FormControl>
+                      <Input
+                        placeholder="Ex: Assistente Mercado Livre Premium"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Nome descritivo para identificar o assistente.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="marketplace"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Marketplace</FormLabel>
+            <FormField
+              control={form.control}
+              name="marketplace"
+              render={({ field }) => (
+                <FormItem className="grid md:grid-cols-[2fr_3fr] gap-6 space-y-0">
+                  <FormLabel>Marketplace</FormLabel>
+                  <div className="space-y-1">
                     <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger>
@@ -187,16 +189,18 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
                       Marketplace para o qual este assistente será usado.
                     </FormDescription>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  </div>
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="mode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Modo</FormLabel>
+            <FormField
+              control={form.control}
+              name="mode"
+              render={({ field }) => (
+                <FormItem className="grid md:grid-cols-[2fr_3fr] gap-6 space-y-0">
+                  <FormLabel>Modo</FormLabel>
+                  <div className="space-y-1">
                     <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger>
@@ -215,35 +219,37 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
                       Modo de geração do assistente.
                     </FormDescription>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                  </div>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
               name="model"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="grid md:grid-cols-[2fr_3fr] gap-6 space-y-0">
                   <FormLabel>Modelo OpenAI</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o modelo" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {AVAILABLE_MODELS.map((model) => (
-                        <SelectItem key={model.value} value={model.value}>
-                          {model.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Modelo da OpenAI que será usado pelo assistente.
-                  </FormDescription>
-                  <FormMessage />
+                  <div className="space-y-1">
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o modelo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {AVAILABLE_MODELS.map((model) => (
+                          <SelectItem key={model.value} value={model.value}>
+                            {model.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Modelo da OpenAI que será usado pelo assistente.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />
@@ -252,20 +258,22 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
               control={form.control}
               name="instructions"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="grid md:grid-cols-[2fr_3fr] gap-6 space-y-0">
                   <FormLabel>Instruções</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Descreva detalhadamente como o assistente deve se comportar..."
-                      className="min-h-[120px] resize-none"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Instruções detalhadas para o comportamento do assistente. ({characterCount} caracteres, mínimo 50)
-                  </FormDescription>
-                  <FormMessage />
+                  <div className="space-y-1">
+                    <FormControl>
+                      <Textarea
+                        placeholder="Descreva detalhadamente como o assistente deve se comportar..."
+                        className="min-h-[120px] resize-none"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Instruções detalhadas para o comportamento do assistente. ({characterCount} caracteres, mínimo 50)
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />

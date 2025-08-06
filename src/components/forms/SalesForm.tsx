@@ -92,83 +92,79 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-md">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <Label htmlFor="product">Produto *</Label>
-                <Select 
-                  value={formData.product_id} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, product_id: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um produto" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        {product.name} {product.sku ? `(${product.sku})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="marketplace">Marketplace *</Label>
-                <Select 
-                  value={formData.marketplace_id} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, marketplace_id: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um marketplace" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {marketplaces.map((marketplace) => (
-                      <SelectItem key={marketplace.id} value={marketplace.id}>
-                        {marketplace.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+              <Label htmlFor="product">Produto *</Label>
+              <Select
+                value={formData.product_id}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, product_id: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um produto" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((product) => (
+                    <SelectItem key={product.id} value={product.id}>
+                      {product.name} {product.sku ? `(${product.sku})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div>
-                <Label htmlFor="price_charged">Preço Cobrado (R$) *</Label>
-                <Input
-                  id="price_charged"
-                  type="number"
-                  step="0.01"
-                  value={formData.price_charged}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price_charged: parseFloat(e.target.value) || 0 }))}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="quantity">Quantidade *</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  min="1"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="sold_at">Data/Hora da Venda *</Label>
-                <Input
-                  id="sold_at"
-                  type="datetime-local"
-                  value={formatDateForInput(formData.sold_at)}
-                  onChange={(e) => setFormData(prev => ({ ...prev, sold_at: formatDateFromInput(e.target.value) }))}
-                  required
-                />
-              </div>
+
+            <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+              <Label htmlFor="marketplace">Marketplace *</Label>
+              <Select
+                value={formData.marketplace_id}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, marketplace_id: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um marketplace" />
+                </SelectTrigger>
+                <SelectContent>
+                  {marketplaces.map((marketplace) => (
+                    <SelectItem key={marketplace.id} value={marketplace.id}>
+                      {marketplace.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
+
+            <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+              <Label htmlFor="price_charged">Preço Cobrado (R$) *</Label>
+              <Input
+                id="price_charged"
+                type="number"
+                step="0.01"
+                value={formData.price_charged}
+                onChange={(e) => setFormData(prev => ({ ...prev, price_charged: parseFloat(e.target.value) || 0 }))}
+                required
+              />
+            </div>
+
+            <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+              <Label htmlFor="quantity">Quantidade *</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min="1"
+                value={formData.quantity}
+                onChange={(e) => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                required
+              />
+            </div>
+
+            <div className="grid md:grid-cols-[2fr_3fr] gap-6">
+              <Label htmlFor="sold_at">Data/Hora da Venda *</Label>
+              <Input
+                id="sold_at"
+                type="datetime-local"
+                value={formatDateForInput(formData.sold_at)}
+                onChange={(e) => setFormData(prev => ({ ...prev, sold_at: formatDateFromInput(e.target.value) }))}
+                required
+              />
+            </div>
+
             <div className="flex gap-2">
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                 {editingId ? "Atualizar" : "Registrar"}
@@ -189,25 +185,24 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
           {isLoading ? (
             <p>Carregando...</p>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Produto</TableHead>
-                    <TableHead>Marketplace</TableHead>
-                    <TableHead>Preço</TableHead>
-                    <TableHead>Qtd</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sales.map((sale) => (
-                    <TableRow key={sale.id}>
-                      <TableCell className="font-medium break-words">
-                        {sale.products?.name}
-                      </TableCell>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Produto</TableHead>
+                  <TableHead>Marketplace</TableHead>
+                  <TableHead>Preço</TableHead>
+                  <TableHead>Qtd</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sales.map((sale) => (
+                  <TableRow key={sale.id}>
+                    <TableCell className="font-medium break-words">
+                      {sale.products?.name}
+                    </TableCell>
                       <TableCell className="break-words">
                         {sale.marketplaces?.name}
                       </TableCell>
@@ -244,7 +239,6 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
                   ))}
                 </TableBody>
               </Table>
-            </div>
           )}
         </CardContent>
       </Card>
