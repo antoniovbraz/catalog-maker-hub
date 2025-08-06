@@ -423,3 +423,9 @@ All colors MUST be HSL.
     @apply transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
   }
 }
+
+@layer components {
+  .highlight {
+    @apply col-span-full;
+  }
+}

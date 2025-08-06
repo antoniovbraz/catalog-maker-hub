@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardTitle } from "@/components/ui/card";
+import { BaseCard } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit, Package, Tag, Save, X, AlertCircle } from '@/components/ui/icons';
 import { useProductsWithCategories, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
@@ -247,15 +248,18 @@ export const ProductForm = () => {
   return (
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
-      <Card className="border border-border/50 shadow-card">
-        <CardHeader className="bg-card">
+      <BaseCard
+        className="border border-border/50 shadow-card"
+        title={
           <CardTitle className="flex items-center gap-2 text-xl">
             <Package className="size-6" />
             {editingId ? "Editar Produto" : "Novo Produto"}
           </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6 p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        }
+        contentPadding="p-6"
+        contentSpacing="space-y-6"
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
             {/* Informações Básicas */}
             <div className="space-y-4">
               <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
@@ -452,8 +456,7 @@ export const ProductForm = () => {
               )}
             </div>
           </form>
-        </CardContent>
-      </Card>
+      </BaseCard>
 
       {/* Lista de Produtos */}
       <CollapsibleCard
