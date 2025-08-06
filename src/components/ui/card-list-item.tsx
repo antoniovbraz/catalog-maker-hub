@@ -3,6 +3,7 @@ import * as React from "react"
 import { BaseCard, BaseCardProps } from "@/components/ui/base-card"
 import { Button } from "@/components/ui/button"
 import { Edit, Trash2 } from "@/components/ui/icons"
+import { toast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 
 export interface CardListItemProps extends Omit<BaseCardProps, "title" | "actions" | "status"> {
@@ -18,13 +19,28 @@ const CardListItem = React.forwardRef<HTMLDivElement, CardListItemProps>(
     { title, subtitle, status, onEdit, onDelete, children, className, ...props },
     ref
   ) => {
+    const [liveMessage, setLiveMessage] = React.useState("")
+
+    const handleEdit = () => {
+      setLiveMessage("Edit action initiated")
+      toast({ title: "Editing item" })
+      onEdit?.()
+    }
+
+    const handleDelete = () => {
+      setLiveMessage("Delete action initiated")
+      toast({ title: "Deleting item" })
+      onDelete?.()
+    }
+
     const actions = (
       <div className="flex items-center gap-2">
         {onEdit && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={onEdit}
+            onClick={handleEdit}
+            aria-label="Edit item"
             className="size-8"
           >
             <Edit className="size-4" />
@@ -34,7 +50,8 @@ const CardListItem = React.forwardRef<HTMLDivElement, CardListItemProps>(
           <Button
             variant="ghost"
             size="icon"
-            onClick={onDelete}
+            onClick={handleDelete}
+            aria-label="Delete item"
             className="size-8"
           >
             <Trash2 className="size-4" />
@@ -46,7 +63,10 @@ const CardListItem = React.forwardRef<HTMLDivElement, CardListItemProps>(
     return (
       <BaseCard
         ref={ref}
-        className={cn("h-full", className)}
+        className={cn(
+          "h-full hover:shadow-md transition-all active:scale-95 hover:bg-muted/50",
+          className
+        )}
         title={
           <div className="flex flex-col">
             <span className="font-medium leading-none">{title}</span>
@@ -59,6 +79,9 @@ const CardListItem = React.forwardRef<HTMLDivElement, CardListItemProps>(
         actions={actions}
         {...props}
       >
+        <span aria-live="polite" className="sr-only">
+          {liveMessage}
+        </span>
         {children}
       </BaseCard>
     )
