@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 const headingVariants = cva("font-bold", {
   variants: {
     variant: {
-      h1: "text-h1",
-      h2: "text-h2",
+      h1: "text-h1 font-playfair",
+      h2: "text-h2 font-playfair",
       h3: "text-h3",
       h4: "text-h4",
       h5: "text-h5",
