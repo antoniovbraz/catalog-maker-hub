@@ -4,6 +4,7 @@ import { Truck, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const Shipping = () => {
   const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
@@ -53,10 +54,16 @@ const Shipping = () => {
           isOpen={isListVisible}
           onToggle={toggleList}
         >
-          <div className="p-4 text-center text-muted-foreground">
-            <p>Lista de regras de frete será exibida aqui</p>
-            <p className="text-sm mt-1">Adicione uma nova regra para começar</p>
-          </div>
+          <EmptyState
+            icon={<Truck className="h-8 w-8" />}
+            title="Nenhuma regra de frete configurada"
+            description="Adicione uma nova regra para começar"
+            action={{
+              label: "Nova Regra",
+              onClick: showForm,
+              icon: <Plus className="w-4 h-4 mr-2" />,
+            }}
+          />
         </CollapsibleCard>
       </div>
     </ConfigurationPageLayout>
