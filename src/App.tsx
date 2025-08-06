@@ -20,6 +20,7 @@ import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
 import AdminDashboard from "./pages/AdminDashboard";
 import AssistantsManagement from "./pages/admin/AssistantsManagement";
+import ThemeSettings from "./pages/admin/ThemeSettings";
 import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
 
@@ -172,15 +173,25 @@ const App = () => (
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/admin/assistentes-ia" 
+          <Route
+            path="/admin/assistentes-ia"
             element={
               <ProtectedRoute requiredRole="super_admin">
                 <SharedLayout>
                   <AssistantsManagement />
                 </SharedLayout>
               </ProtectedRoute>
-            } 
+            }
+          />
+          <Route
+            path="/admin/theme"
+            element={
+              <ProtectedRoute requiredRole="super_admin">
+                <SharedLayout>
+                  <ThemeSettings />
+                </SharedLayout>
+              </ProtectedRoute>
+            }
           />
             
             {/* Catch-all route */}

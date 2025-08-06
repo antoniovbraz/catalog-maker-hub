@@ -663,6 +663,45 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      },
+      theme_settings: {
+        Row: {
+          id: string
+          primary_color: string
+          secondary_color: string
+          tertiary_color: string
+          font_heading: string
+          font_body: string
+          h1_size: string
+          h2_size: string
+          body_size: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          primary_color: string
+          secondary_color: string
+          tertiary_color: string
+          font_heading: string
+          font_body: string
+          h1_size: string
+          h2_size: string
+          body_size: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          primary_color?: string
+          secondary_color?: string
+          tertiary_color?: string
+          font_heading?: string
+          font_body?: string
+          h1_size?: string
+          h2_size?: string
+          body_size?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

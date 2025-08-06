@@ -2,6 +2,7 @@ import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import type { ThemeProviderProps } from "next-themes/dist/types";
 import { useEffect } from "react";
 import type { TokenOverrides } from "@/styles/tokens";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
@@ -31,23 +32,62 @@ function ThemeWatcher({ children }: { children: React.ReactNode }) {
     if (theme) {
       root.classList.add(theme);
     }
-
-    // Load and apply Super Admin token overrides
-    loadSuperAdminTokens().then(applyTokenOverrides);
   }, [theme]);
 
-  return <>{children}</>;
-}
+  useEffect(() => {
+    let mounted = true;
 
-// Fetch token overrides saved by the Super Admin.
-// In a real application this could be an API request; here we read from localStorage.
-async function loadSuperAdminTokens(): Promise<TokenOverrides> {
-  try {
-    const raw = localStorage.getItem("super-admin-tokens");
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
+    const applyFromDb = (data: any) => {
+      if (!data) return;
+      const overrides: TokenOverrides = {
+        colors: {
+          "color-primary": data.primary_color,
+          "color-secondary": data.secondary_color,
+          "color-tertiary": data.tertiary_color,
+        },
+        fonts: {
+          heading: data.font_heading,
+          body: data.font_body,
+        },
+        typography: {
+          h1: data.h1_size,
+          h2: data.h2_size,
+          body: data.body_size,
+        },
+      };
+      applyTokenOverrides(overrides);
+    };
+
+    const loadSettings = async () => {
+      const { data } = await supabase
+        .from("theme_settings")
+        .select("*")
+        .single();
+      if (mounted) {
+        applyFromDb(data);
+      }
+    };
+
+    loadSettings();
+
+    const channel = supabase
+      .channel("theme-settings")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "theme_settings" },
+        (payload) => {
+          applyFromDb(payload.new);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  return <>{children}</>;
 }
 
 // Apply token overrides by updating the corresponding CSS variables.
@@ -68,6 +108,7 @@ function applyTokenOverrides(overrides: TokenOverrides) {
   });
 
   Object.entries(overrides.fonts ?? {}).forEach(([key, value]) => {
+    loadGoogleFont(value);
     root.style.setProperty(`--font-${key}`, value);
   });
 
@@ -78,6 +119,16 @@ function applyTokenOverrides(overrides: TokenOverrides) {
   Object.entries(overrides.shadows ?? {}).forEach(([key, value]) => {
     root.style.setProperty(`--${key}`, value);
   });
+}
+
+function loadGoogleFont(font: string) {
+  const id = `gf-${font.replace(/\s+/g, '-')}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?family=${font.replace(/\s+/g, '+')}:wght@400;700&display=swap`;
+  document.head.appendChild(link);
 }
 
 export { useTheme };

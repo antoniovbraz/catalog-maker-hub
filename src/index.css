@@ -38,6 +38,7 @@ All colors MUST be HSL.
     --radius: 0rem; /* Corporate style: no rounding */
     --color-primary: hsl(var(--primary));
     --color-secondary: hsl(var(--secondary));
+    --color-tertiary: hsl(var(--accent));
     --card-radius: var(--radius);
 
     /* Sidebar System (adapted from corporate) */
