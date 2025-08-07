@@ -49,7 +49,7 @@ export function SmartForm({
       <CardHeader className="bg-card">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-foreground flex items-center gap-2">
+            <CardTitle className="text-brand-dark flex items-center gap-2">
               {title}
               {isEditing && <Badge variant="secondary">{editingLabel}</Badge>}
             </CardTitle>
@@ -74,12 +74,12 @@ export function SmartForm({
               {/* Section Header */}
               <div className="flex items-center gap-2 pb-2 border-b border-border">
                 {section.icon && (
-                  <div className="p-1.5 bg-primary/10 rounded text-primary">
+                  <div className="p-1.5 bg-brand-primary/10 rounded text-brand-primary">
                     {section.icon}
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <h3 className="font-semibold text-brand-dark flex items-center gap-2">
                     {section.title}
                     {section.required && (
                       <Badge variant="outline" className="text-xs">

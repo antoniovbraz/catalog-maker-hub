@@ -186,7 +186,7 @@ export function DataVisualization<T extends { id: string }>({
       <Card className={className}>
         <CardContent className="p-lg">
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary mx-auto"></div>
             <p className="text-muted-foreground mt-2">Carregando...</p>
           </div>
         </CardContent>

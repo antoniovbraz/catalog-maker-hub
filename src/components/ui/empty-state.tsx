@@ -25,7 +25,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
         {icon || <PackageOpen className="h-8 w-8 text-muted-foreground" />}
       </div>
 
-      <Heading variant="h3" className="text-foreground mb-sm">
+      <Heading variant="h3" className="text-brand-dark mb-sm">
         {title}
       </Heading>
 
