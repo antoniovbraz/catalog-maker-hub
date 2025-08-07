@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
@@ -201,21 +200,37 @@ const Sidebar = React.forwardRef<
 
     if (isMobile) {
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <SheetContent
+        <>
+          <div
+            ref={ref}
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className={cn(
+              "fixed inset-y-0 z-50 w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground transition-transform duration-200 md:hidden",
+              side === "left" ? "left-0" : "right-0",
+              openMobile
+                ? "translate-x-0"
+                : side === "left"
+                  ? "-translate-x-full"
+                  : "translate-x-full",
+              className
+            )}
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
               } as React.CSSProperties
             }
-            side={side}
+            {...props}
           >
             <nav className="flex size-full flex-col">{children}</nav>
-          </SheetContent>
-        </Sheet>
+          </div>
+          {openMobile && (
+            <div
+              className="fixed inset-0 z-40 bg-black/50 md:hidden"
+              onClick={() => setOpenMobile(false)}
+            />
+          )}
+        </>
       )
     }
 
@@ -768,3 +783,4 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
