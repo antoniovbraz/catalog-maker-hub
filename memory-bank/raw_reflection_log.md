@@ -35,3 +35,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Remember to verify script names before executing in automation.
 ---
+---
+Date: 2025-08-07
+TaskRef: "Tokenize hex colors in App.css and chart components"
+
+Learnings:
+- Tailwind's `theme()` function injects brand tokens into CSS variables via `@layer base`.
+- Recharts selectors can use Tailwind arbitrary variants to apply brand colors without hex codes.
+
+Difficulties:
+- Vitest's watch mode left a Sidebar accessibility test failing and required manual exit.
+
+Successes:
+- Replaced legacy hex codes with `brand.*`-based variables and utilities.
+
+Improvements_Identified_For_Consolidation:
+- Configure Vitest to run once in CI to avoid hanging on failures.
+---
