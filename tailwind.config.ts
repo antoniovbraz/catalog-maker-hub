@@ -20,7 +20,16 @@ export default {
 			}
 		},
                 extend: {
-                        colors,
+                        colors: {
+                                ...colors,
+                                brand: {
+                                        dark: colors.gunmetal,
+                                        primary: colors["fern-green"],
+                                        secondary: colors["tea-green"],
+                                        background: colors["anti-flash-white"],
+                                        danger: colors.cinnabar,
+                                },
+                        },
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-card': 'var(--gradient-card)',
