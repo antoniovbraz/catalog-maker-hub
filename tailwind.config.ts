@@ -28,6 +28,7 @@ export default {
                                         secondary: colors["tea-green"],
                                         background: colors["anti-flash-white"],
                                         danger: colors.cinnabar,
+                                        warning: colors.warning.DEFAULT,
                                 },
                         },
 			backgroundImage: {

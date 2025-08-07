@@ -17,3 +17,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Maintain a reusable script for future large-scale class refactors.
 ---
+
+---
+Date: 2025-08-07
+TaskRef: "Replace hard-coded Tailwind color classes with brand utilities across forms and pages"
+
+Learnings:
+- Adding a `warning` token under `brand` in Tailwind config enables consistent semantic yellow usage.
+- Ripgrep patterns with negative lookaheads help detect leftover default color classes.
+
+Difficulties:
+- `pnpm typecheck` script is named `type-check`; initial run failed until corrected.
+
+Successes:
+- Lint, type-check, and unit tests all passed after the color refactor.
+
+Improvements_Identified_For_Consolidation:
+- Remember to verify script names before executing in automation.
+---

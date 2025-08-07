@@ -90,7 +90,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-md">
+    <div className="fixed inset-0 bg-brand-dark/50 backdrop-blur-sm z-50 flex items-center justify-center p-md">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center pb-2">
           <div className="flex items-center justify-between mb-4">
@@ -124,7 +124,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
                   index === currentStep
                     ? 'border-primary bg-primary/5'
                     : index < currentStep
-                    ? 'border-green-500 bg-green-50'
+                    ? 'border-brand-primary bg-brand-primary/10'
                     : 'border-muted'
                 }`}
               >
@@ -132,7 +132,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
                   index === currentStep
                     ? 'bg-primary text-primary-foreground'
                     : index < currentStep
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-brand-primary text-brand-background'
                     : 'bg-muted text-muted-foreground'
                 }`}>
                   {index < currentStep ? (

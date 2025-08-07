@@ -58,7 +58,7 @@ export function SkeletonForm({ sections = 2, fieldsPerSection = 3 }: SkeletonFor
       <div className="rounded-lg border border-border/50 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-primary p-lg">
-          <Skeleton className="h-6 w-48 bg-white/20" />
+          <Skeleton className="h-6 w-48 bg-brand-background/20" />
         </div>
         
         {/* Form content */}

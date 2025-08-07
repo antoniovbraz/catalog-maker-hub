@@ -204,29 +204,29 @@ export default function AdminDashboard() {
       title: "Total de Usuários",
       value: allUsers?.length || 0,
       icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      color: "text-brand-primary",
+      bgColor: "bg-brand-primary/10"
     },
     {
       title: "Assinaturas Ativas", 
       value: revenue?.activeSubscriptions || 0,
       icon: Crown,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      color: "text-brand-secondary",
+      bgColor: "bg-brand-secondary/10"
     },
     {
       title: "Receita Mensal",
       value: `R$ ${(revenue?.monthly || 0).toFixed(2)}`,
       icon: DollarSign,
-      color: "text-green-600",
-      bgColor: "bg-green-50"
+      color: "text-brand-warning",
+      bgColor: "bg-brand-warning/10"
     },
     {
       title: "Receita Anual (Proj.)",
       value: `R$ ${(revenue?.yearly || 0).toFixed(2)}`,
       icon: TrendingUp,
-      color: "text-orange-600", 
-      bgColor: "bg-orange-50"
+      color: "text-brand-danger",
+      bgColor: "bg-brand-danger/10"
     }
   ];
 

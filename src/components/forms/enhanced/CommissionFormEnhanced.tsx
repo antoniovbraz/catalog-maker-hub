@@ -103,18 +103,18 @@ export function CommissionFormEnhanced({
   const getImpactPreview = (rate: number) => {
     if (rate === 0) return null;
     
-    let color = "text-green-600";
+    let color = "text-brand-primary";
     let label = "Baixo impacto";
-    let bgColor = "bg-green-50 border-green-200";
+    let bgColor = "bg-brand-primary/10 border-brand-primary/20";
     
     if (rate > 8 && rate <= 15) {
-      color = "text-yellow-600";
+      color = "text-brand-warning";
       label = "Impacto moderado";
-      bgColor = "bg-yellow-50 border-yellow-200";
+      bgColor = "bg-brand-warning/10 border-brand-warning/20";
     } else if (rate > 15) {
-      color = "text-red-600";
+      color = "text-brand-danger";
       label = "Alto impacto";
-      bgColor = "bg-red-50 border-red-200";
+      bgColor = "bg-brand-danger/10 border-brand-danger/20";
     }
     
     return (
