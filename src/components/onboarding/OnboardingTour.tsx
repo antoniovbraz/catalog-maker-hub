@@ -116,7 +116,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
 
         <CardContent className="space-y-lg">
           {/* Steps Overview */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {steps.map((s, index) => (
               <div
                 key={s.id}

@@ -418,7 +418,7 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <Tabs defaultValue="users" className="space-y-lg">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="w-4 h-4" />
             Usuários

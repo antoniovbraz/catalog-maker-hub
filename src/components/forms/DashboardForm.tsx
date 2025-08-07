@@ -164,7 +164,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
       </CardHeader>
       
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Package className="h-3 w-3" />
@@ -212,7 +212,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
         
         <div className="pt-2 border-t border-border/30 text-xs text-muted-foreground space-y-xs">
           <div className="font-medium text-foreground mb-2">Detalhamento:</div>
-          <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
             <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
             <div>Frete: R$ {result.frete.toFixed(2)}</div>
             <div>Taxa Cartão: {result.taxa_cartao.toFixed(1)}%</div>

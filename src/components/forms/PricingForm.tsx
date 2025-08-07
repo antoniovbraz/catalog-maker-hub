@@ -401,7 +401,7 @@ export const PricingForm = () => {
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 <div>Produto:</div>
                 <div className="font-medium">{pricingResult.product_name || 'N/A'}</div>
                 
@@ -442,7 +442,7 @@ export const PricingForm = () => {
                     <h4 className="font-semibold mb-3 text-brand-primary">
                       Análise do Preço Praticado
                     </h4>
-                     <div className="grid grid-cols-2 gap-2 text-sm">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                        <div>Preço Praticado:</div>
                        <div className="font-medium text-brand-primary">
                          {formatarMoeda(margemRealResult.preco_praticado || 0)}
