@@ -2,6 +2,22 @@
 
 ---
 Date: 2025-08-07
+TaskRef: "Refatorar utilitários de largura fixos para classes responsivas"
+
+Learnings:
+- `w-full max-w-sm md:w-96` evita overflow em telas de 375 px mantendo largura controlada em breakpoints maiores.
+- Testes com `pnpm test --run` encerram corretamente o Vitest sem ficar em modo watch.
+
+Difficulties:
+- Identificar quais classes `w-*` eram containers e quais eram ícones exigiu revisão manual.
+
+Successes:
+- Lint, type-check, testes e dev server rodaram sem erros após os ajustes de largura.
+
+Improvements_Identified_For_Consolidation:
+- Criar regra de lint para evitar `w-[0-9]+` em novos componentes.
+---
+Date: 2025-08-07
 TaskRef: "Swap Tailwind color tokens for brand equivalents in shadcn components"
 
 Learnings:

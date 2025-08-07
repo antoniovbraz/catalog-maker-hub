@@ -10,9 +10,9 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
     <div className="space-y-md">
       {/* Header skeleton */}
       <div className="flex items-center justify-between">
-        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-6 w-full max-w-sm md:w-96" />
         <div className="flex items-center gap-3">
-          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-full max-w-sm md:w-96" />
           <Skeleton className="h-10 w-24" />
         </div>
       </div>
@@ -58,7 +58,7 @@ export function SkeletonForm({ sections = 2, fieldsPerSection = 3 }: SkeletonFor
       <div className="rounded-lg border border-border/50 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-primary p-lg">
-          <Skeleton className="h-6 w-48 bg-brand-background/20" />
+          <Skeleton className="h-6 w-full max-w-sm md:w-96 bg-brand-background/20" />
         </div>
         
         {/* Form content */}
@@ -98,7 +98,7 @@ export function SkeletonCard({ count = 1 }: SkeletonCardProps) {
       {Array.from({ length: count }).map((_, index) => (
         <div key={index} className="rounded-lg border border-border/50 p-lg space-y-md">
           <div className="flex items-center justify-between">
-            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-6 w-full max-w-sm md:w-96" />
             <Skeleton className="h-8 w-8 rounded" />
           </div>
           <Skeleton className="h-4 w-full" />

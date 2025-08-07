@@ -349,7 +349,7 @@ export default function AdminDashboard() {
 
         {/* Content skeleton */}
         <div className="space-y-4">
-          <div className="h-10 w-96 bg-muted rounded animate-pulse" />
+          <div className="h-10 w-full max-w-sm md:w-96 bg-muted rounded animate-pulse" />
           <div className="bg-card rounded-lg border p-6">
             <div className="space-y-4">
               <div className="h-6 w-48 bg-muted rounded animate-pulse" />
