@@ -259,7 +259,15 @@ export const ProductForm = () => {
         contentPadding="p-6"
         contentSpacing="space-y-6"
       >
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          aria-label="Formulário de produto"
+          aria-describedby="product-form-description"
+        >
+          <span id="product-form-description" className="sr-only">
+            Use este formulário para cadastrar ou atualizar produtos
+          </span>
             {/* Informações Básicas */}
             <div className="space-y-4">
               <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">

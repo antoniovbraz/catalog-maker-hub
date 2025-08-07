@@ -15,8 +15,13 @@ const NavigationMenu = React.forwardRef<
       "relative z-10 flex max-w-max flex-1 items-center justify-center",
       className
     )}
+    aria-label="Navegação principal"
+    aria-describedby="navigation-menu-description"
     {...props}
   >
+    <span id="navigation-menu-description" className="sr-only">
+      Acesse as seções principais do site
+    </span>
     {children}
     <NavigationMenuViewport />
   </NavigationMenuPrimitive.Root>

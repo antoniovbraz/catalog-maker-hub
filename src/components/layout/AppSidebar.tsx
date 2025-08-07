@@ -219,8 +219,14 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0 bg-sidebar">
-      <SidebarHeader className="p-lg">
+    <>
+      <Sidebar
+        collapsible="icon"
+        className="border-r-0 bg-sidebar"
+        aria-label="Navegação principal"
+        aria-describedby="sidebar-description"
+      >
+        <SidebarHeader className="p-lg">
         <div className="flex items-center gap-3">
           <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
             <Zap className="size-5 text-primary" />
@@ -255,18 +261,19 @@ export function AppSidebar() {
                 />
               ))}
 
-              {menuGroups.map((group) => (
-                <CollapsibleMenuGroup
-                  key={group.id}
-                  title={group.title}
-                  icon={group.icon}
-                  items={group.items}
-                  collapsed={collapsed}
-                  location={location}
-                />
-              ))}
+                {menuGroups.map((group) => (
+                  <CollapsibleMenuGroup
+                    key={group.id}
+                    title={group.title}
+                    icon={group.icon}
+                    items={group.items}
+                    collapsed={collapsed}
+                    location={location}
+                  />
+                ))}
+            </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+          </SidebarGroup>
 
         {/* Account & Settings */}
         <SidebarGroup>
@@ -308,7 +315,11 @@ export function AppSidebar() {
             </SidebarGroup>
           )}
         </SidebarContent>
-    </Sidebar>
-  );
-}
+      </Sidebar>
+      <span id="sidebar-description" className="sr-only">
+        Menu principal da aplicação
+      </span>
+    </>
+    );
+  }
 

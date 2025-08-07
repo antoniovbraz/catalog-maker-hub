@@ -20,7 +20,25 @@ export default {
 			}
 		},
                 extend: {
-                        colors: tokens.colors,
+                        colors: {
+                                ...tokens.colors,
+                                destructive: {
+                                        DEFAULT: 'hsl(349 100% 35%)',
+                                        foreground: '#ffffff',
+                                },
+                                success: {
+                                        DEFAULT: 'hsl(175 77% 26%)',
+                                        foreground: '#ffffff',
+                                },
+                                warning: {
+                                        DEFAULT: 'hsl(26 90% 37%)',
+                                        foreground: '#ffffff',
+                                },
+                                muted: {
+                                        DEFAULT: 'hsl(220 9% 46%)',
+                                        foreground: '#ffffff',
+                                },
+                        },
                         backgroundImage: {
                                 'gradient-primary': 'var(--gradient-primary)',
                                 'gradient-card': 'var(--gradient-card)',

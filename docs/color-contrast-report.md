@@ -7,10 +7,10 @@ Contraste calculado a partir dos valores padrão em `src/index.css`.
 | background vs foreground | 9.94 | Sim |
 | primary | 6.61 | Sim |
 | secondary | 9.10 | Sim |
-| destructive | 3.78 | Não |
-| success | 3.33 | Não |
-| warning | 2.13 | Não |
-| muted | 4.19 | Não |
+| destructive | 7.33 | Sim |
+| success | 5.47 | Sim |
+| warning | 5.02 | Sim |
+| muted | 4.83 | Sim |
 | accent | 8.24 | Sim |
 | popover | 10.20 | Sim |
 | card | 10.20 | Sim |
