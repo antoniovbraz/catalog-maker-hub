@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -114,7 +114,7 @@ export default function Subscription() {
 
       {/* Current Subscription Status */}
       {currentSubscription && (
-        <Card className="mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+        <Card variant="highlight" className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Badge className={getPlanColor(currentSubscription.plan?.name || '')}>
@@ -206,8 +206,9 @@ export default function Subscription() {
           const isRecommended = plan.name === 'pro';
           
           return (
-            <Card 
+            <Card
               key={plan.id}
+              variant="pricing"
               className={`relative ${isRecommended ? 'scale-105 border-primary shadow-card' : ''} ${
                 isCurrent ? 'ring-2 ring-primary/50' : ''
               }`}
