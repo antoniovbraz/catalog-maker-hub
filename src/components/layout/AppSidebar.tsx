@@ -1,4 +1,4 @@
-import { 
+import {
   LayoutDashboard,
   Target,
   Store,
@@ -47,23 +47,46 @@ const mainMenuItems = [
   { id: "strategy", title: "Estratégia", icon: Target, path: "/strategy" },
 ];
 
-const configMenuItems = [
-  { id: "marketplaces", title: "Marketplaces", icon: Store, path: "/marketplaces" },
-  { id: "categories", title: "Categorias", icon: FolderOpen, path: "/categories" },
-  { id: "shipping", title: "Frete", icon: Truck, path: "/shipping" },
-  { id: "commissions", title: "Comissões", icon: Percent, path: "/commissions" },
-  { id: "fixed-fees", title: "Taxas Fixas", icon: DollarSign, path: "/fixed-fees" },
+const menuGroups = [
+  {
+    id: "settings",
+    title: "Configurações",
+    icon: Settings,
+    items: [
+      { id: "marketplaces", title: "Marketplaces", icon: Store, path: "/marketplaces" },
+      { id: "categories", title: "Categorias", icon: FolderOpen, path: "/categories" },
+      { id: "shipping", title: "Frete", icon: Truck, path: "/shipping" },
+      { id: "commissions", title: "Comissões", icon: Percent, path: "/commissions" },
+      { id: "fixed-fees", title: "Taxas Fixas", icon: DollarSign, path: "/fixed-fees" },
+    ],
+  },
+  {
+    id: "operations",
+    title: "Operações",
+    icon: Activity,
+    items: [
+      { id: "products", title: "Produtos", icon: Package, path: "/products" },
+      { id: "sales", title: "Vendas", icon: BarChart3, path: "/sales" },
+      { id: "pricing", title: "Precificação", icon: Calculator, path: "/pricing" },
+      { id: "ad-generator", title: "Gerador de Anúncios", icon: Zap, path: "/ad-generator" },
+    ],
+  },
 ];
 
-const operationsMenuItems = [
-  { id: "products", title: "Produtos", icon: Package, path: "/products" },
-  { id: "sales", title: "Vendas", icon: BarChart3, path: "/sales" },
-  { id: "pricing", title: "Precificação", icon: Calculator, path: "/pricing" },
-  { id: "ad-generator", title: "Gerador de Anúncios", icon: Zap, path: "/ad-generator" },
+const accountMenuItems = [
+  { id: "subscription", title: "Assinaturas", icon: Crown, path: "/subscription" },
 ];
+
+const adminMenuItems = [
+  { id: "admin-dashboard", title: "Dashboard Admin", icon: Shield, path: "/admin" },
+  { id: "admin-ai", title: "Assistentes IA", icon: Bot, path: "/admin/assistentes-ia" },
+  { id: "admin-theme", title: "Tema", icon: Palette, path: "/admin/theme" },
+];
+
+type MenuItemType = (typeof mainMenuItems)[0];
 
 interface MenuItemProps {
-  item: typeof mainMenuItems[0];
+  item: MenuItemType;
   collapsed: boolean;
   isActive: boolean;
 }
@@ -93,7 +116,7 @@ function MenuItem({ item, collapsed, isActive }: MenuItemProps) {
 interface CollapsibleMenuGroupProps {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
-  items: typeof configMenuItems;
+  items: MenuItemType[];
   collapsed: boolean;
   location: ReturnType<typeof useLocation>;
 }
@@ -103,10 +126,10 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
     const stored = localStorage.getItem(`sidebar-group-${title.toLowerCase()}`);
     return stored !== null ? JSON.parse(stored) : true;
   });
-  
+
   const [userClosedManually, setUserClosedManually] = useState(false);
 
-  const hasActiveItem = items.some(item => location.pathname === item.path);
+  const hasActiveItem = items.some(item => location.pathname.startsWith(item.path));
 
   // Auto-open only if user hasn't manually closed and there's an active item
   useEffect(() => {
@@ -139,7 +162,14 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
     <SidebarMenuItem>
       <Collapsible open={isOpen} onOpenChange={handleToggle}>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton className="h-11 w-full justify-start gap-3 rounded-lg transition-all duration-200">
+          <SidebarMenuButton
+            className={cn(
+              "h-11 w-full justify-start gap-3 rounded-lg transition-all duration-200",
+              hasActiveItem
+                ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            )}
+          >
             <Icon className="size-5 shrink-0" />
             {!collapsed && (
               <>
@@ -162,7 +192,7 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
                   <SidebarMenuSubButton
                     asChild
                     className={cn(
-                      location.pathname === item.path
+                      location.pathname.startsWith(item.path)
                         ? "bg-sidebar-primary text-sidebar-primary-foreground"
                         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     )}
@@ -221,28 +251,20 @@ export function AppSidebar() {
                   key={item.id}
                   item={item}
                   collapsed={collapsed}
-                  isActive={location.pathname === item.path}
+                  isActive={location.pathname.startsWith(item.path)}
                 />
               ))}
-              
-              {/* Configurações Group */}
-              <CollapsibleMenuGroup
-                title="Configurações"
-                icon={Settings}
-                items={configMenuItems}
-                collapsed={collapsed}
-                location={location}
-              />
-              
-              {/* Operações Group */}
-              <CollapsibleMenuGroup
-                title="Operações"
-                icon={Activity}
-                items={operationsMenuItems}
-                collapsed={collapsed}
-                location={location}
-              />
-            </SidebarMenu>
+
+              {menuGroups.map((group) => (
+                <CollapsibleMenuGroup
+                  key={group.id}
+                  title={group.title}
+                  icon={group.icon}
+                  items={group.items}
+                  collapsed={collapsed}
+                  location={location}
+                />
+              ))}
           </SidebarGroupContent>
         </SidebarGroup>
 
@@ -253,36 +275,14 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  className={cn(
-                    "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
-                    location.pathname === '/subscription'
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  )}
-                >
-                  <Link to="/subscription">
-                    <Crown className="size-5 shrink-0" />
-                    {!collapsed && <span className="font-medium">Assinaturas</span>}
-                    {collapsed && <div className="sr-only">Assinaturas</div>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className={cn(
-                    "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
-                    "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  )}
-                >
-                  <Settings className="size-5 shrink-0" />
-                  {!collapsed && <span className="font-medium">Configurações</span>}
-                  {collapsed && <div className="sr-only">Configurações</div>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {accountMenuItems.map((item) => (
+                <MenuItem
+                  key={item.id}
+                  item={item}
+                  collapsed={collapsed}
+                  isActive={location.pathname.startsWith(item.path)}
+                />
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -294,59 +294,16 @@ export function AppSidebar() {
               {!collapsed ? "Administração" : ""}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
-                      location.pathname === '/admin'
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    )}
-                  >
-                    <Link to="/admin">
-                      <Shield className="size-5 shrink-0" />
-                      {!collapsed && <span className="font-medium">Dashboard Admin</span>}
-                      {collapsed && <div className="sr-only">Dashboard Admin</div>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
-                      location.pathname === '/admin/assistentes-ia'
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    )}
-                  >
-                    <Link to="/admin/assistentes-ia">
-                      <Bot className="size-5 shrink-0" />
-                      {!collapsed && <span className="font-medium">Assistentes IA</span>}
-                      {collapsed && <div className="sr-only">Assistentes IA</div>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      "w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200",
-                      location.pathname === '/admin/theme'
-                        ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    )}
-                  >
-                    <Link to="/admin/theme">
-                      <Palette className="size-5 shrink-0" />
-                      {!collapsed && <span className="font-medium">Tema</span>}
-                      {collapsed && <div className="sr-only">Tema</div>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
+                <SidebarMenu>
+                  {adminMenuItems.map((item) => (
+                    <MenuItem
+                      key={item.id}
+                      item={item}
+                      collapsed={collapsed}
+                      isActive={location.pathname.startsWith(item.path)}
+                    />
+                  ))}
+                </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           )}
@@ -354,3 +311,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
