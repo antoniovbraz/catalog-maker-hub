@@ -286,7 +286,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <EnhancedTooltip
                   title="Produtos Estrela"
                   details={[
@@ -407,7 +407,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 h-96">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-96">
                 {/* Top Left: Alta Margem + Baixo Giro */}
                 <Card className="bg-brand-secondary/10 border-brand-secondary/20">
                   <CardHeader className="pb-2">

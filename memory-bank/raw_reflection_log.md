@@ -104,3 +104,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar utilitário ou wrapper reutilizável para tabelas responsivas evitando repetição de código.
 ---
+---
+Date: 2025-08-07
+TaskRef: "Refatorar grids fixos para responsivos com breakpoints"
+
+Learnings:
+- Padrão `grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` mantém legibilidade em 375 px sem sacrificar desktop.
+- `rg "grid-cols-[234]"` identifica grids sem prefixos responsivos.
+
+Difficulties:
+- Diversas formas tinham seções pequenas que exigiram julgamento para definir breakpoints adequados.
+
+Successes:
+- Lint, typecheck, testes e dev server rodaram limpos após ajustes responsivos.
+
+Improvements_Identified_For_Consolidation:
+- Avaliar regra de lint para evitar `grid-cols-*` sem prefixos em novos componentes.
+---

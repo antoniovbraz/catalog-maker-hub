@@ -198,7 +198,7 @@ export default function AdGenerator() {
                 <CardTitle className="text-lg">Configuração do Chat</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                   <div>
                     <Label htmlFor="chat-product">Produto</Label>
                     <Select value={selectedProductId} onValueChange={setSelectedProductId}>
@@ -369,7 +369,7 @@ export default function AdGenerator() {
 
               {/* Grid de Imagens - Responsivo sem scroll interno */}
               {images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {images.map((image: ProductImage) => (
                     <div key={image.id} className="relative group">
                       <img
@@ -536,7 +536,7 @@ export default function AdGenerator() {
                     <Eye className="w-3 h-3 mr-2" />
                     Visualizar Preview
                   </Button>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Button size="sm" variant="outline">
                       📋 Copiar Tudo
                     </Button>

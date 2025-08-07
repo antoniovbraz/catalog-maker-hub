@@ -295,7 +295,7 @@ export function SimpleMarketplaceForm({
                       </div>
                       
                       {!allCategoriesSelected && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-xs max-h-32 overflow-y-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-xs max-h-32 overflow-y-auto">
                           {categories.map((category) => {
                             const isSelected = selectedCategories.includes(category.id);
                             return (
