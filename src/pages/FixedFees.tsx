@@ -9,7 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner, SuccessToast } from "@/components/ui/feedback";
+import { useState } from "react";
 
 const FixedFees = () => {
   const { isFormVisible, showForm, hideForm } = useFormVisibility({
@@ -19,6 +20,7 @@ const FixedFees = () => {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   interface FixedFeeRule {
     id: string;
@@ -52,7 +54,12 @@ const FixedFees = () => {
     }
   ];
 
-  const { data: fixedFeeRules = [], isLoading } = useQuery({
+  const {
+    data: fixedFeeRules = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["marketplace_fixed_fee_rules"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -79,7 +86,7 @@ const FixedFees = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules"] });
-      toast({ title: "Taxa fixa excluída com sucesso!" });
+      setSuccessMessage("Taxa fixa excluída com sucesso!");
     },
     onError: (error) => {
       const friendlyMessage = handleSupabaseError(error);
@@ -135,10 +142,13 @@ const FixedFees = () => {
           }
         >
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full" />
-              ))}
+            <div className="py-12">
+              <LoadingSpinner />
+            </div>
+          ) : isError ? (
+            <div className="p-4 text-center text-destructive">
+              Erro ao carregar taxas fixas: {" "}
+              {error instanceof Error ? error.message : "Erro desconhecido"}
             </div>
           ) : fixedFeeRules.length === 0 ? (
             <EmptyState
@@ -179,11 +189,17 @@ const FixedFees = () => {
                       <span className="text-sm text-muted-foreground">{rangeText}</span>
                     )}
                   </CardListItem>
-                )
+                );
               })}
             </div>
           )}
         </BaseCard>
+        {successMessage && (
+          <SuccessToast
+            message={successMessage}
+            onClose={() => setSuccessMessage(null)}
+          />
+        )}
       </div>
     </ConfigurationPageLayout>
   );

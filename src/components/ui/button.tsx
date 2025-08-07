@@ -7,20 +7,31 @@ import { colors, spacing, typography } from "@/styles/design-system"
 
 const buttonVariants = cva(
   cn(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background transition-all hover:shadow-md active:scale-95 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-md ring-offset-background transition-all hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
     typography.body,
     spacing.gap.sm
   ),
   {
     variants: {
       variant: {
-        default: cn(colors.primary, "hover:bg-primary/90"),
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: cn(
+          colors.primary,
+          "hover:bg-primary/90 focus:bg-primary/80 active:bg-primary/95"
+        ),
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:bg-destructive/80 active:bg-destructive/95",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: cn(colors.secondary, "hover:bg-secondary/80"),
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: cn(colors.primaryText, "underline-offset-4 hover:underline"),
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent/80 active:bg-accent/70",
+        secondary: cn(
+          colors.secondary,
+          "hover:bg-secondary/80 focus:bg-secondary/70 active:bg-secondary/60"
+        ),
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground focus:bg-accent/80 active:bg-accent/70",
+        link: cn(
+          colors.primaryText,
+          "underline-offset-4 hover:underline focus:underline active:text-primary/90"
+        ),
       },
       size: {
         default: cn("h-10", spacing.px.md, spacing.py.sm),
@@ -47,7 +58,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={buttonVariants({ variant, size, className })}
         ref={ref}
         {...props}
       />
