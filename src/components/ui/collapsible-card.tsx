@@ -35,7 +35,7 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-brand-dark"
               >
                 {isOpen ? (
                   <ChevronUp className="h-3 w-3" />

@@ -67,7 +67,7 @@ export function ThemeManager() {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{themeOption.name}</span>
                 {theme === themeOption.id && (
-                  <Monitor className="h-3 w-3 text-primary" />
+                  <Monitor className="h-3 w-3 text-brand-primary" />
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
