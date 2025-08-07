@@ -189,52 +189,54 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
           {isLoading ? (
             <p>Carregando...</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Produto</TableHead>
-                  <TableHead>Marketplace</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Qtd</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sales.map((sale) => (
-                  <TableRow key={sale.id}>
-                    <TableCell className="font-medium">{sale.products?.name}</TableCell>
-                    <TableCell>{sale.marketplaces?.name}</TableCell>
-                    <TableCell>{formatarMoeda(sale.price_charged)}</TableCell>
-                    <TableCell>{sale.quantity}</TableCell>
-                    <TableCell>{formatarMoeda(sale.price_charged * sale.quantity)}</TableCell>
-                    <TableCell>
-                      {format(new Date(sale.sold_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(sale)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deleteMutation.mutate(sale.id)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto w-full">
+              <Table className="min-w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Produto</TableHead>
+                    <TableHead>Marketplace</TableHead>
+                    <TableHead>Preço</TableHead>
+                    <TableHead>Qtd</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {sales.map((sale) => (
+                    <TableRow key={sale.id}>
+                      <TableCell className="font-medium">{sale.products?.name}</TableCell>
+                      <TableCell>{sale.marketplaces?.name}</TableCell>
+                      <TableCell>{formatarMoeda(sale.price_charged)}</TableCell>
+                      <TableCell>{sale.quantity}</TableCell>
+                      <TableCell>{formatarMoeda(sale.price_charged * sale.quantity)}</TableCell>
+                      <TableCell>
+                        {format(new Date(sale.sold_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(sale)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteMutation.mutate(sale.id)}
+                            disabled={deleteMutation.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

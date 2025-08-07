@@ -135,51 +135,53 @@ const FixedFees = () => {
                 <p className="text-sm mt-1">Adicione uma nova taxa para começar</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Marketplace</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Faixa</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {fixedFeeRules.map((rule) => (
-                    <TableRow key={rule.id}>
-                      <TableCell className="font-medium">{rule.marketplaces?.name}</TableCell>
-                      <TableCell>
-                        {RULE_TYPES.find(t => t.value === rule.rule_type)?.label}
-                      </TableCell>
-                      <TableCell>
-                         {(rule.rule_type === "faixa" || rule.rule_type === "percentual") && rule.range_min !== null && rule.range_max !== null
-                           ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
-                           : rule.rule_type === "constante" ? "Todas as faixas" : "-"
-                         }
-                       </TableCell>
-                       <TableCell>
-                         {rule.rule_type === "percentual"
-                          ? `${rule.value.toFixed(2)}%`
-                          : `R$ ${rule.value.toFixed(2)}`
-                        }
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate(rule.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              <div className="overflow-x-auto w-full">
+                <Table className="min-w-full">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Marketplace</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Faixa</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {fixedFeeRules.map((rule) => (
+                      <TableRow key={rule.id}>
+                        <TableCell className="font-medium">{rule.marketplaces?.name}</TableCell>
+                        <TableCell>
+                          {RULE_TYPES.find(t => t.value === rule.rule_type)?.label}
+                        </TableCell>
+                        <TableCell>
+                           {(rule.rule_type === "faixa" || rule.rule_type === "percentual") && rule.range_min !== null && rule.range_max !== null
+                             ? `R$ ${rule.range_min.toFixed(2)} - R$ ${rule.range_max.toFixed(2)}`
+                             : rule.rule_type === "constante" ? "Todas as faixas" : "-"
+                           }
+                         </TableCell>
+                         <TableCell>
+                           {rule.rule_type === "percentual"
+                            ? `${rule.value.toFixed(2)}%`
+                            : `R$ ${rule.value.toFixed(2)}`
+                          }
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteMutation.mutate(rule.id)}
+                              disabled={deleteMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
