@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/Card";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";

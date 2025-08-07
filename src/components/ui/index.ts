@@ -1,4 +1,5 @@
 // Export all new UI components
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from "./Card"
 export { StatusBadge } from "./status-badge"
 export { SmartForm } from "./smart-form"
 export { DataVisualization } from "./data-visualization"
