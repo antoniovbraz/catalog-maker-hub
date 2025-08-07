@@ -3,13 +3,14 @@ import { OnboardingTour } from "@/components/onboarding/OnboardingTour";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { BaseCard } from "@/components/ui";
 import { Heading, Text } from "@/components/ui/typography";
+import { ResponsiveGrid } from "@/components/layout";
 
 const Dashboard = () => {
   const { showOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
 
   return (
     <>
-      <div className="space-y-lg">
+      <ResponsiveGrid cols={{ default: 1 }} gap="lg">
         {/* Page Header */}
         <div className="space-y-sm">
           <Heading
@@ -30,7 +31,7 @@ const Dashboard = () => {
         >
           <DashboardForm />
         </BaseCard>
-      </div>
+      </ResponsiveGrid>
       
       {showOnboarding && (
         <OnboardingTour 

@@ -1,5 +1,5 @@
 import { CategoryForm } from "@/components/forms/CategoryForm";
-import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
+import { ConfigurationPageLayout, ResponsiveGrid } from "@/components/layout";
 import { FolderTree, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { BaseCard, CardListItem } from "@/components/ui";
@@ -77,11 +77,11 @@ const Categories = () => {
           contentPadding="px-6 pb-4 pt-0"
         >
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <ResponsiveGrid cols={{ default: 1, sm: 2, lg: 3, xl: 4 }} gap="md">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-24 w-full" />
               ))}
-            </div>
+            </ResponsiveGrid>
           ) : categories.length === 0 ? (
             <EmptyState
               icon={<FolderTree className="size-8" />}
@@ -94,7 +94,7 @@ const Categories = () => {
               }}
             />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <ResponsiveGrid cols={{ default: 1, sm: 2, lg: 3, xl: 4 }} gap="md">
               {categories.map((category) => (
                 <CardListItem
                   key={category.id}
@@ -104,7 +104,7 @@ const Categories = () => {
                   onDelete={() => deleteMutation.mutate(category.id)}
                 />
               ))}
-            </div>
+            </ResponsiveGrid>
           )}
         </BaseCard>
       </div>
