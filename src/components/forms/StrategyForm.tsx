@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, Suspense, lazy } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { TrendingUp, BarChart3, Target, Package, PieChart, ScatterChart, AlertTriangle, Star } from '@/components/ui/icons';
 import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
-import { QuadrantScatterChart } from "@/components/charts/QuadrantScatterChart";
-import { QuadrantDonutChart } from "@/components/charts/QuadrantDonutChart";
-import { RevenueByQuadrantChart } from "@/components/charts/RevenueByQuadrantChart";
+const QuadrantScatterChart = lazy(() => import("@/components/charts/QuadrantScatterChart"));
+const QuadrantDonutChart = lazy(() => import("@/components/charts/QuadrantDonutChart"));
+const RevenueByQuadrantChart = lazy(() => import("@/components/charts/RevenueByQuadrantChart"));
 
 interface SalesData {
   product_id: string;
@@ -362,7 +362,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     Distribuição dos Quadrantes
                   </h4>
                   <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
-                    <QuadrantDonutChart quadrantCounts={strategyAnalysis.quadrantCounts} />
+                    <Suspense fallback={<div>Carregando gráfico...</div>}>
+                      <QuadrantDonutChart quadrantCounts={strategyAnalysis.quadrantCounts} />
+                    </Suspense>
                   </div>
                 </div>
                 <div className="transition-all duration-300 hover:scale-[1.02]">
@@ -371,7 +373,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     Receita por Quadrante
                   </h4>
                   <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
-                    <RevenueByQuadrantChart data={strategyAnalysis.products} />
+                    <Suspense fallback={<div>Carregando gráfico...</div>}>
+                      <RevenueByQuadrantChart data={strategyAnalysis.products} />
+                    </Suspense>
                   </div>
                 </div>
               </div>
@@ -390,11 +394,13 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="bg-gradient-to-br from-card to-card/50">
-              <QuadrantScatterChart 
-                data={strategyAnalysis.products}
-                margeLimitAlta={margeLimitAlta}
-                giroLimitAlto={giroLimitAlto}
-              />
+              <Suspense fallback={<div>Carregando gráfico...</div>}>
+                <QuadrantScatterChart
+                  data={strategyAnalysis.products}
+                  margeLimitAlta={margeLimitAlta}
+                  giroLimitAlto={giroLimitAlto}
+                />
+              </Suspense>
             </CardContent>
           </Card>
 

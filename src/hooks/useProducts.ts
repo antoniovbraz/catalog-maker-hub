@@ -9,6 +9,8 @@ export function useProducts() {
   return useQuery({
     queryKey: [PRODUCTS_QUERY_KEY],
     queryFn: () => productsService.getAll(),
+    select: (data) =>
+      data.sort((a, b) => a.name.localeCompare(b.name)),
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 }
@@ -17,6 +19,8 @@ export function useProductsWithCategories() {
   return useQuery({
     queryKey: [PRODUCTS_QUERY_KEY, "with-categories"],
     queryFn: () => productsService.getAllWithCategories(),
+    select: (data) =>
+      data.sort((a, b) => a.name.localeCompare(b.name)),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -26,6 +30,7 @@ export function useProduct(id: string) {
     queryKey: [PRODUCTS_QUERY_KEY, id],
     queryFn: () => productsService.getById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

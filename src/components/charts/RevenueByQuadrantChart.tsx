@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { formatarMoeda } from "@/utils/pricing";
 import { ChartTooltipProps } from '@/types/charts';
@@ -25,23 +25,29 @@ const QUADRANT_CONFIG = {
   baixa_margem_baixo_giro: { name: "❓ Questionáveis", color: colors.destructive.DEFAULT },
 };
 
-export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ data }) => {
+const RevenueByQuadrantChartComponent: React.FC<RevenueByQuadrantChartProps> = ({ data }) => {
   // Aggregate revenue by quadrant
-  const chartData = Object.entries(QUADRANT_CONFIG).map(([quadrant, config]) => {
-    const quadrantProducts = data.filter(p => p.quadrant === quadrant);
-    const totalRevenue = quadrantProducts.reduce((sum, p) => sum + p.total_revenue, 0);
-    const productCount = quadrantProducts.length;
-    const avgRevenue = productCount > 0 ? totalRevenue / productCount : 0;
-    
-    return {
-      name: config.name,
-      quadrant,
-      totalRevenue,
-      avgRevenue,
-      productCount,
-      color: config.color,
-    };
-  }).filter(item => item.productCount > 0);
+  const chartData = useMemo(
+    () =>
+      Object.entries(QUADRANT_CONFIG)
+        .map(([quadrant, config]) => {
+          const quadrantProducts = data.filter(p => p.quadrant === quadrant);
+          const totalRevenue = quadrantProducts.reduce((sum, p) => sum + p.total_revenue, 0);
+          const productCount = quadrantProducts.length;
+          const avgRevenue = productCount > 0 ? totalRevenue / productCount : 0;
+
+          return {
+            name: config.name,
+            quadrant,
+            totalRevenue,
+            avgRevenue,
+            productCount,
+            color: config.color,
+          };
+        })
+        .filter(item => item.productCount > 0),
+    [data]
+  );
 
   const CustomTooltip = ({ active, payload, label }: ChartTooltipProps) => {
     if (active && payload && payload.length) {
@@ -98,3 +104,5 @@ export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ 
     </div>
   );
 };
+
+export const RevenueByQuadrantChart = React.memo(RevenueByQuadrantChartComponent);
