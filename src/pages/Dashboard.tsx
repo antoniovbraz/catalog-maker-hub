@@ -9,25 +9,24 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="page-content">
+      <div className="space-y-lg">
         {/* Page Header */}
-        <div className="page-header">
+        <div className="space-y-sm">
           <Heading
             variant="h1"
-            className="text-h1 bg-gradient-to-r from-primary to-primary/70 bg-clip-text tracking-tight text-transparent"
+            className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text tracking-tight text-transparent"
           >
             📊 Dashboard
           </Heading>
-          <Text className="text-body text-muted-foreground">
+          <Text className="text-h5 text-muted-foreground">
             Compare preços e margens entre diferentes marketplaces para seus produtos
           </Text>
         </div>
 
         {/* Main Content */}
         <BaseCard
-          className="dashboard-card"
+          className="border-0 bg-gradient-subtle shadow-card"
           contentPadding="p-lg"
-          contentSpacing="space-lg"
         >
           <DashboardForm />
         </BaseCard>

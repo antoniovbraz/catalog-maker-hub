@@ -12,7 +12,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   return (
     <NextThemesProvider
-      themes={["corporate", "dark"]}
+      themes={["light", "dark", "corporate", "windows7"]}
       defaultTheme={defaultTheme ?? "corporate"}
       enableSystem={enableSystem ?? false}
       {...props}
@@ -29,7 +29,7 @@ function ThemeWatcher({ children }: { children: React.ReactNode }) {
     const root = document.documentElement;
 
     // Remove previous theme classes
-    root.classList.remove("corporate", "dark");
+    root.classList.remove("light", "dark", "corporate", "windows7");
 
     // Add current theme class
     if (theme) {

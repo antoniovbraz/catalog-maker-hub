@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/collapsible"
 import { cn } from "@/lib/utils"
 
-export interface BaseCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface BaseCardProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode
   title?: React.ReactNode
   status?: React.ReactNode
