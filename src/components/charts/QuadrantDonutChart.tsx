@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { ChartTooltipProps, ChartLegendProps } from '@/types/charts';
 import { colors } from "@/styles/tokens";
@@ -45,16 +45,23 @@ const QUADRANT_DATA = [
   },
 ];
 
-export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrantCounts }) => {
-  const data = QUADRANT_DATA.map(quadrant => ({
-    name: quadrant.name,
-    value: quadrantCounts[quadrant.key as keyof QuadrantCounts],
-    color: quadrant.color,
-    emoji: quadrant.emoji,
-    description: quadrant.description,
-  })).filter(item => item.value > 0);
+const QuadrantDonutChartComponent: React.FC<QuadrantDonutChartProps> = ({ quadrantCounts }) => {
+  const data = useMemo(
+    () =>
+      QUADRANT_DATA.map(quadrant => ({
+        name: quadrant.name,
+        value: quadrantCounts[quadrant.key as keyof QuadrantCounts],
+        color: quadrant.color,
+        emoji: quadrant.emoji,
+        description: quadrant.description,
+      })).filter(item => item.value > 0),
+    [quadrantCounts]
+  );
 
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const total = useMemo(
+    () => data.reduce((sum, item) => sum + item.value, 0),
+    [data]
+  );
 
   const CustomTooltip = ({ active, payload }: ChartTooltipProps) => {
     if (active && payload && payload.length) {
@@ -125,3 +132,5 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
     </div>
   );
 };
+
+export const QuadrantDonutChart = React.memo(QuadrantDonutChartComponent);

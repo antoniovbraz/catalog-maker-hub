@@ -9,6 +9,8 @@ export function useCategories() {
   return useQuery({
     queryKey: [CATEGORIES_QUERY_KEY],
     queryFn: () => categoriesService.getAll(),
+    select: (data) =>
+      data.sort((a, b) => a.name.localeCompare(b.name)),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -18,6 +20,7 @@ export function useCategory(id: string) {
     queryKey: [CATEGORIES_QUERY_KEY, id],
     queryFn: () => categoriesService.getById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

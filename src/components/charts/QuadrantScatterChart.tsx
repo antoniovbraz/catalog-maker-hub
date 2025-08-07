@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { ChartTooltipProps } from '@/types/charts';
 import { colors } from "@/styles/tokens";
@@ -34,21 +34,30 @@ const getQuadrantColor = (quadrant: ProductStrategy["quadrant"]) => {
   }
 };
 
-export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
+const QuadrantScatterChartComponent: React.FC<QuadrantScatterChartProps> = ({
   data,
   margeLimitAlta,
   giroLimitAlto,
 }) => {
-  const scatterData = data.map((item, index) => ({
-    x: item.giro_percentage,
-    y: item.margin_percentage,
-    z: Math.log(item.total_revenue + 1) * 5, // Size based on revenue
-    name: item.product_name,
-    marketplace: item.marketplace_name,
-    quadrant: item.quadrant,
-    revenue: item.total_revenue,
-    index,
-  }));
+  const scatterData = useMemo(
+    () =>
+      data.map((item, index) => ({
+        x: item.giro_percentage,
+        y: item.margin_percentage,
+        z: Math.log(item.total_revenue + 1) * 5, // Size based on revenue
+        name: item.product_name,
+        marketplace: item.marketplace_name,
+        quadrant: item.quadrant,
+        revenue: item.total_revenue,
+        index,
+      })),
+    [data]
+  );
+
+  const maxMargin = useMemo(
+    () => Math.max(...data.map(d => d.margin_percentage)),
+    [data]
+  );
 
   const CustomTooltip = ({ active, payload }: ChartTooltipProps) => {
     if (active && payload && payload.length) {
@@ -108,22 +117,22 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
           />
           
           {/* Quadrant dividers */}
-          <line 
-            x1={`${giroLimitAlto}%`} 
-            y1="0%" 
-            x2={`${giroLimitAlto}%`} 
-            y2="100%" 
+          <line
+            x1={`${giroLimitAlto}%`}
+            y1="0%"
+            x2={`${giroLimitAlto}%`}
+            y2="100%"
             stroke={colors.muted.foreground}
-            strokeDasharray="5,5" 
+            strokeDasharray="5,5"
             opacity={0.5}
           />
-          <line 
-            x1="0%" 
-            y1={`${100 - (margeLimitAlta / Math.max(...data.map(d => d.margin_percentage)) * 100)}%`} 
-            x2="100%" 
-            y2={`${100 - (margeLimitAlta / Math.max(...data.map(d => d.margin_percentage)) * 100)}%`} 
+          <line
+            x1="0%"
+            y1={`${100 - (margeLimitAlta / maxMargin * 100)}%`}
+            x2="100%"
+            y2={`${100 - (margeLimitAlta / maxMargin * 100)}%`}
             stroke={colors.muted.foreground}
-            strokeDasharray="5,5" 
+            strokeDasharray="5,5"
             opacity={0.5}
           />
           
@@ -143,3 +152,5 @@ export const QuadrantScatterChart: React.FC<QuadrantScatterChartProps> = ({
     </div>
   );
 };
+
+export const QuadrantScatterChart = React.memo(QuadrantScatterChartComponent);

@@ -9,6 +9,8 @@ export function useMarketplaces() {
   return useQuery({
     queryKey: [MARKETPLACES_QUERY_KEY],
     queryFn: () => marketplacesService.getAll(),
+    select: (data) =>
+      data.sort((a, b) => a.name.localeCompare(b.name)),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -25,6 +27,8 @@ export function useMarketplacePlatforms() {
   return useQuery({
     queryKey: [MARKETPLACES_QUERY_KEY, 'platforms'],
     queryFn: () => marketplacesService.getPlatforms(),
+    select: (data) =>
+      data.sort((a, b) => a.name.localeCompare(b.name)),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -43,6 +47,7 @@ export function useMarketplace(id: string) {
     queryKey: [MARKETPLACES_QUERY_KEY, id],
     queryFn: () => marketplacesService.getById(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
