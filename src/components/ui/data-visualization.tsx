@@ -101,84 +101,86 @@ export function DataVisualization<T extends { id: string }>({
   };
 
   const renderTableView = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {columns.map((column) => (
-            <TableHead 
-              key={String(column.key)} 
-              className={cn(
-                column.sortable && "cursor-pointer hover:bg-muted/50 transition-colors",
-                column.className
-              )}
-              onClick={() => column.sortable && handleSort(String(column.key))}
-            >
-              <div className="flex items-center gap-2">
-                {column.header}
-                {column.sortable && sortColumn === String(column.key) && (
-                  sortDirection === "asc" ? 
-                    <SortAsc className="w-4 h-4" /> : 
-                    <SortDesc className="w-4 h-4" />
-                )}
-              </div>
-            </TableHead>
-          ))}
-          {actions.length > 0 && <TableHead>Ações</TableHead>}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {paginatedData.map((item) => (
-          <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+    <div className="overflow-x-auto w-full">
+      <Table className="min-w-full">
+        <TableHeader>
+          <TableRow>
             {columns.map((column) => (
-              <TableCell key={String(column.key)} className={column.className}>
-                {column.render ? 
-                  column.render(item) : 
-                  String(getValue(item, String(column.key)))
-                }
-              </TableCell>
-            ))}
-            {actions.length > 0 && (
-              <TableCell>
+              <TableHead
+                key={String(column.key)}
+                className={cn(
+                  column.sortable && "cursor-pointer hover:bg-muted/50 transition-colors",
+                  column.className
+                )}
+                onClick={() => column.sortable && handleSort(String(column.key))}
+              >
                 <div className="flex items-center gap-2">
-                  {actions.slice(0, 2).map((action, index) => (
-                    <Button
-                      key={index}
-                      size="sm"
-                      variant={action.variant || "outline"}
-                      onClick={() => action.onClick(item)}
-                      disabled={action.disabled?.(item)}
-                    >
-                      {action.icon}
-                    </Button>
-                  ))}
-                  {actions.length > 2 && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="ghost">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {actions.slice(2).map((action, index) => (
-                          <DropdownMenuItem
-                            key={index}
-                            onClick={() => action.onClick(item)}
-                            disabled={action.disabled?.(item)}
-                          >
-                            {action.icon}
-                            {action.label}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  {column.header}
+                  {column.sortable && sortColumn === String(column.key) && (
+                    sortDirection === "asc" ?
+                      <SortAsc className="w-4 h-4" /> :
+                      <SortDesc className="w-4 h-4" />
                   )}
                 </div>
-              </TableCell>
-            )}
+              </TableHead>
+            ))}
+            {actions.length > 0 && <TableHead>Ações</TableHead>}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {paginatedData.map((item) => (
+            <TableRow key={item.id} className="hover:bg-muted/50 transition-colors">
+              {columns.map((column) => (
+                <TableCell key={String(column.key)} className={column.className}>
+                  {column.render ?
+                    column.render(item) :
+                    String(getValue(item, String(column.key)))
+                  }
+                </TableCell>
+              ))}
+              {actions.length > 0 && (
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {actions.slice(0, 2).map((action, index) => (
+                      <Button
+                        key={index}
+                        size="sm"
+                        variant={action.variant || "outline"}
+                        onClick={() => action.onClick(item)}
+                        disabled={action.disabled?.(item)}
+                      >
+                        {action.icon}
+                      </Button>
+                    ))}
+                    {actions.length > 2 && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="ghost">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {actions.slice(2).map((action, index) => (
+                            <DropdownMenuItem
+                              key={index}
+                              onClick={() => action.onClick(item)}
+                              disabled={action.disabled?.(item)}
+                            >
+                              {action.icon}
+                              {action.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
+                </TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 
   if (isLoading) {

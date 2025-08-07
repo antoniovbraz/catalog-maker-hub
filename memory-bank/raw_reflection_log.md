@@ -70,3 +70,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Create a checklist for color token migrations to ensure gradient utilities are lint-compliant.
 ---
+
+---
+Date: 2025-08-07
+TaskRef: "Wrap shadcn Table components with horizontal scroll containers"
+
+Learnings:
+- Adicionando um wrapper `overflow-x-auto` com `w-full` resolve overflow horizontal sem quebrar layout.
+- `min-w-full` nas tabelas evita compressão de colunas em telas estreitas.
+
+Difficulties:
+- Nenhuma complicação significativa ao atualizar múltiplos componentes.
+
+Successes:
+- Lint, type-check e testes passaram após as alterações.
+
+Improvements_Identified_For_Consolidation:
+- Criar utilitário ou wrapper reutilizável para tabelas responsivas evitando repetição de código.
+---
