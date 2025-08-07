@@ -333,7 +333,9 @@ export default function AdGenerator() {
               <div
                 className={cn(
                   "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
-                  dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25",
+                  dragOver
+                    ? "border-brand-primary bg-brand-primary/5"
+                    : "border-muted-foreground/25",
                   !selectedProductId && "opacity-50 pointer-events-none"
                 )}
                 onDragOver={handleDragOver}

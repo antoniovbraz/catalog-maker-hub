@@ -14,7 +14,7 @@ const Dashboard = () => {
         <div className="space-y-sm">
           <Heading
             variant="h1"
-            className="tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
+            className="tracking-tight bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent"
           >
             📊 Dashboard
           </Heading>

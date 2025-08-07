@@ -82,10 +82,10 @@ export default function Auth() {
       <div className="w-full max-w-md mx-4">
         {/* Logo and Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-            <Zap className="w-8 h-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-primary/10 rounded-full mb-4">
+            <Zap className="w-8 h-8 text-brand-primary" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent">
             Peepers Hub
           </h1>
           <p className="text-muted-foreground mt-2">

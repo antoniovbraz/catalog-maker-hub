@@ -115,8 +115,8 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
       className={`
         group relative bg-gradient-to-br from-card to-card/50
         transition-all duration-300 ease-in-out
-        hover:shadow-elegant hover:border-primary/30
-        hover:scale-[1.02] hover:bg-gradient-to-br hover:from-card hover:to-primary/5
+        hover:shadow-elegant hover:border-brand-primary/30
+        hover:scale-[1.02] hover:bg-gradient-to-br hover:from-card hover:to-brand-primary
         ${isDragging ? 'z-50 rotate-1 scale-105 shadow-elegant' : ''}
       `}
       {...attributes}
@@ -127,7 +127,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           </Badge>
         )}
       <div {...listeners} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 touch-none">
-        <GripVertical className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors cursor-grab active:cursor-grabbing" />
+        <GripVertical className="h-4 w-4 text-muted-foreground hover:text-brand-primary transition-colors cursor-grab active:cursor-grabbing" />
       </div>
       
       <CardHeader>
@@ -202,10 +202,10 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           <div className="text-xs font-medium text-foreground mb-2">
             Para atingir {result.margem_desejada.toFixed(1)}% de margem:
           </div>
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 p-3 rounded-lg">
+          <div className="bg-gradient-to-r from-brand-primary to-brand-primary border border-brand-primary/20 p-3 rounded-lg">
             <div className="flex items-center justify-between">
-              <span className="text-primary font-medium">Preço Sugerido:</span>
-              <span className="font-bold text-primary">R$ {result.preco_sugerido.toFixed(2)}</span>
+              <span className="text-brand-primary font-medium">Preço Sugerido:</span>
+              <span className="font-bold text-brand-primary">R$ {result.preco_sugerido.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -529,7 +529,9 @@ export const DashboardForm = () => {
               <Target className="h-5 w-5" />
               Marketplaces
               <Badge variant="secondary">{selectedMarketplaces.length}/6</Badge>
-              {isRecalculating && <RefreshCw className="h-4 w-4 animate-spin text-primary" />}
+              {isRecalculating && (
+                <RefreshCw className="h-4 w-4 animate-spin text-brand-primary" />
+              )}
             </CardTitle>
             <CardDescription>
               Selecione até 6 marketplaces para comparar - os dados serão atualizados automaticamente

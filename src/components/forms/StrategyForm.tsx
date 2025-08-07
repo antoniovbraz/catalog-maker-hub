@@ -358,7 +358,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="transition-all duration-300 hover:scale-[1.02]">
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <PieChart className="h-4 w-4 text-primary" />
+                    <PieChart className="h-4 w-4 text-brand-primary" />
                     Distribuição dos Quadrantes
                   </h4>
                   <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
@@ -367,7 +367,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </div>
                 <div className="transition-all duration-300 hover:scale-[1.02]">
                   <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4 text-primary" />
+                    <BarChart3 className="h-4 w-4 text-brand-primary" />
                     Receita por Quadrante
                   </h4>
                   <div className="rounded-lg border bg-gradient-to-br from-card to-card/50 p-md">
@@ -382,7 +382,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
           <Card className="transition-all duration-300 hover:shadow-elegant">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ScatterChart className="h-5 w-5 text-primary" />
+                <ScatterChart className="h-5 w-5 text-brand-primary" />
                 Posicionamento Estratégico
               </CardTitle>
               <CardDescription>

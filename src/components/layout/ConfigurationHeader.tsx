@@ -54,7 +54,7 @@ export function ConfigurationHeader({
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               {icon && (
-                <div className="p-sm bg-primary/10 rounded-lg text-primary">
+                <div className="p-sm bg-brand-primary/10 rounded-lg text-brand-primary">
                   {icon}
                 </div>
               )}

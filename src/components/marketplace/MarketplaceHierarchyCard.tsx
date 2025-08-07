@@ -31,7 +31,7 @@ export const MarketplaceHierarchyCard = ({
       <CardHeader className="bg-muted/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Store className="w-5 h-5 text-primary" />
+            <Store className="w-5 h-5 text-brand-primary" />
             <div>
               <CardTitle className="text-lg">{platform.name}</CardTitle>
               <div className="flex items-center gap-2 mt-1">

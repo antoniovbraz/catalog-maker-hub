@@ -195,7 +195,7 @@ export function SimpleMarketplaceForm({
             <CardDescription className="mt-xs">
               {getDescription()}
               {isCreatingModality && platformName && (
-                <span className="block mt-xs text-primary font-medium">
+                <span className="block mt-xs text-brand-primary font-medium">
                   Para a plataforma: {platformName}
                 </span>
               )}
@@ -236,7 +236,7 @@ export function SimpleMarketplaceForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowOptional(!showOptional)}
-                className="text-sm text-muted-foreground hover:text-primary p-0 h-auto"
+                className="text-sm text-muted-foreground hover:text-brand-primary p-0 h-auto"
               >
                 <Plus className={cn("w-3 h-3 mr-1 transition-transform", showOptional && "rotate-45")} />
                 Opções avançadas
