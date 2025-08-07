@@ -40,7 +40,7 @@ export function AppHeader() {
             <div className="flex items-center justify-center w-8 h-8 bg-gradient-primary rounded-lg shadow-card">
               <Zap className="w-5 h-5 text-brand-background" />
             </div>
-            <span className="font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hidden sm:inline">
+            <span className="font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent hidden sm:inline">
               Catalog Maker Hub
             </span>
           </div>
@@ -53,7 +53,7 @@ export function AppHeader() {
               placeholder="Buscar produtos, categorias, marketplaces... (Ctrl+K)"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              className="pl-10 pr-10 bg-muted/50 border-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:bg-background transition-all duration-200"
+              className="pl-10 pr-10 bg-muted/50 border-0 focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:bg-background transition-all duration-200"
             />
           </div>
 
@@ -115,7 +115,7 @@ export function AppHeader() {
                 tabIndex={0}
               >
                 <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                  <AvatarFallback className="bg-brand-primary text-brand-background text-sm">
                     {getUserInitials(profile?.full_name)}
                   </AvatarFallback>
                 </Avatar>

@@ -52,3 +52,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Configure Vitest to run once in CI to avoid hanging on failures.
 ---
+---
+Date: 2025-08-07
+TaskRef: "Verify layout breakpoints after color token updates and remove overlapping utilities"
+
+Learnings:
+- Tailwind eslint rule `no-custom-classname` flags gradient color stops with opacity (e.g., `to-brand-primary/5`), requiring simpler class usage.
+- Running `pnpm test --run` avoids watch mode hangs in CI.
+
+Difficulties:
+- Multiple files still used legacy `primary` classes; careful `rg` searches were needed to catch them all.
+
+Successes:
+- Lint, type-check, tests and dev server all ran cleanly after updates.
+- Manual review confirmed responsive classes (`sm:`, `md:`, `lg:`) remained intact across pages.
+
+Improvements_Identified_For_Consolidation:
+- Create a checklist for color token migrations to ensure gradient utilities are lint-compliant.
+---

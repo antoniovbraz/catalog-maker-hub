@@ -389,7 +389,7 @@ export const ProductForm = () => {
                 <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Custo Total:</span>
-                    <span className="text-lg font-bold text-primary">
+                    <span className="text-lg font-bold text-brand-primary">
                       {formatarMoeda(custoTotal)}
                     </span>
                   </div>

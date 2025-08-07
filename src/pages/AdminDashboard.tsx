@@ -371,8 +371,8 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-brand-primary" />
             </div>
             Dashboard Admin
           </h1>

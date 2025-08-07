@@ -104,8 +104,8 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
           
           <Progress value={progress} className="mb-6" />
           
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-            <step.icon className="w-8 h-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-primary/10 rounded-full mb-4">
+            <step.icon className="w-8 h-8 text-brand-primary" />
           </div>
           
           <CardTitle className="text-2xl mb-2">{step.title}</CardTitle>
@@ -122,7 +122,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
                 key={s.id}
                 className={`p-3 rounded-lg border text-center transition-all ${
                   index === currentStep
-                    ? 'border-primary bg-primary/5'
+                    ? 'border-brand-primary bg-brand-primary/5'
                     : index < currentStep
                     ? 'border-brand-primary bg-brand-primary/10'
                     : 'border-muted'
@@ -130,7 +130,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
               >
                 <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full mb-2 ${
                   index === currentStep
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'bg-brand-primary text-brand-background'
                     : index < currentStep
                     ? 'bg-brand-primary text-brand-background'
                     : 'bg-muted text-muted-foreground'

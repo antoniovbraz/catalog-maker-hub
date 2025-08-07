@@ -424,8 +424,8 @@ export const PricingForm = () => {
                 
                 <Separator className="col-span-2 my-2" />
                 
-                <div className="text-lg font-bold text-primary">Preço Sugerido:</div>
-                <div className="text-lg font-bold text-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
+                <div className="text-lg font-bold text-brand-primary">Preço Sugerido:</div>
+                <div className="text-lg font-bold text-brand-primary">{formatarMoeda(pricingResult.preco_sugerido || 0)}</div>
                 
                 <div className="font-semibold">Margem Unitária:</div>
                 <div className="font-semibold">{formatarMoeda(pricingResult.margem_unitaria || 0)}</div>

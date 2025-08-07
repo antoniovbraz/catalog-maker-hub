@@ -81,10 +81,10 @@ export default function Subscription() {
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       {/* Header */}
       <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-          <Crown className="w-8 h-8 text-primary" />
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-primary/10 rounded-full mb-4">
+          <Crown className="w-8 h-8 text-brand-primary" />
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent mb-4">
           Escolha seu Plano
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -94,7 +94,7 @@ export default function Subscription() {
 
       {/* Current Subscription Status */}
       {currentSubscription && (
-        <Card className="mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+        <Card className="mb-8 border-brand-primary/20 bg-gradient-to-r from-brand-primary to-brand-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Badge className={getPlanColor(currentSubscription.plan?.name || '')}>
@@ -186,14 +186,14 @@ export default function Subscription() {
           const isRecommended = plan.name === 'pro';
           
           return (
-            <Card 
+            <Card
               key={plan.id}
-              className={`relative ${isRecommended ? 'border-primary shadow-lg scale-105' : ''} ${
-                isCurrent ? 'ring-2 ring-primary/50' : ''
+              className={`relative ${isRecommended ? 'border-brand-primary shadow-lg scale-105' : ''} ${
+                isCurrent ? 'ring-2 ring-brand-primary/50' : ''
               }`}
             >
               {isRecommended && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary">
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-brand-primary">
                   Recomendado
                 </Badge>
               )}

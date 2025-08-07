@@ -266,7 +266,7 @@ All colors MUST be HSL.
 
   /* Focus styles */
   *:focus-visible {
-    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2 ring-offset-background;
   }
 }
 
