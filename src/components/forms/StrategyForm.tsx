@@ -184,11 +184,11 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
 
   const getQuadrantColor = (quadrant: ProductStrategy["quadrant"]) => {
     switch (quadrant) {
-      case "alta_margem_alto_giro": return "bg-green-100 border-green-300 text-green-800";
-      case "alta_margem_baixo_giro": return "bg-blue-100 border-blue-300 text-blue-800";
-      case "baixa_margem_alto_giro": return "bg-yellow-100 border-yellow-300 text-yellow-800";
-      case "baixa_margem_baixo_giro": return "bg-red-100 border-red-300 text-red-800";
-      default: return "bg-gray-100 border-gray-300 text-gray-800";
+      case "alta_margem_alto_giro": return "bg-brand-primary/10 border-brand-primary/30 text-brand-primary";
+      case "alta_margem_baixo_giro": return "bg-brand-secondary/10 border-brand-secondary/30 text-brand-secondary";
+      case "baixa_margem_alto_giro": return "bg-brand-warning/10 border-brand-warning/30 text-brand-warning";
+      case "baixa_margem_baixo_giro": return "bg-brand-danger/10 border-brand-danger/30 text-brand-danger";
+      default: return "bg-brand-background border-brand-dark/30 text-brand-dark";
     }
   };
 
@@ -294,10 +294,10 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Excelente", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 transition-colors cursor-help">
+                  <div className="text-center p-3 rounded-lg bg-brand-primary/10 border border-brand-primary/20 hover:bg-brand-primary/20 transition-colors cursor-help">
                     <div className="flex items-center justify-center gap-2 mb-1">
-                      <Star className="h-4 w-4 text-green-600" />
-                      <div className="text-2xl font-bold text-green-600">
+                      <Star className="h-4 w-4 text-brand-primary" />
+                      <div className="text-2xl font-bold text-brand-primary">
                         {strategyAnalysis.quadrantCounts.alta_margem_alto_giro}
                       </div>
                     </div>
@@ -312,8 +312,8 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Boa margem, baixo volume", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors cursor-help">
-                    <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-center p-3 rounded-lg bg-brand-secondary/10 border border-brand-secondary/20 hover:bg-brand-secondary/20 transition-colors cursor-help">
+                    <div className="text-2xl font-bold text-brand-secondary">
                       {strategyAnalysis.quadrantCounts.alta_margem_baixo_giro}
                     </div>
                     <div className="text-sm text-muted-foreground">💎 Joias</div>
@@ -327,8 +327,8 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Alto volume, baixa margem", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 transition-colors cursor-help">
-                    <div className="text-2xl font-bold text-yellow-600">
+                  <div className="text-center p-3 rounded-lg bg-brand-warning/10 border border-brand-warning/20 hover:bg-brand-warning/20 transition-colors cursor-help">
+                    <div className="text-2xl font-bold text-brand-warning">
                       {strategyAnalysis.quadrantCounts.baixa_margem_alto_giro}
                     </div>
                     <div className="text-sm text-muted-foreground">🔄 Movimento</div>
@@ -342,10 +342,10 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                     { label: "Performance", value: "Crítica", format: "text" }
                   ]}
                 >
-                  <div className="text-center p-3 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 transition-colors cursor-help">
+                  <div className="text-center p-3 rounded-lg bg-brand-danger/10 border border-brand-danger/20 hover:bg-brand-danger/20 transition-colors cursor-help">
                     <div className="flex items-center justify-center gap-2 mb-1">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <div className="text-2xl font-bold text-red-600">
+                      <AlertTriangle className="h-4 w-4 text-brand-danger" />
+                      <div className="text-2xl font-bold text-brand-danger">
                         {strategyAnalysis.quadrantCounts.baixa_margem_baixo_giro}
                       </div>
                     </div>
@@ -409,7 +409,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
             <CardContent>
               <div className="grid grid-cols-2 gap-4 h-96">
                 {/* Top Left: Alta Margem + Baixo Giro */}
-                <Card className="bg-blue-50 border-blue-200">
+                <Card className="bg-brand-secondary/10 border-brand-secondary/20">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">💎 Joias</CardTitle>
@@ -427,7 +427,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                         .filter(p => p.quadrant === "alta_margem_baixo_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-brand-background rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -437,7 +437,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </Card>
 
                 {/* Top Right: Alta Margem + Alto Giro */}
-                <Card className="bg-green-50 border-green-200">
+                <Card className="bg-brand-primary/10 border-brand-primary/20">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">⭐ Estrelas</CardTitle>
@@ -455,7 +455,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                         .filter(p => p.quadrant === "alta_margem_alto_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-brand-background rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -465,7 +465,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </Card>
 
                 {/* Bottom Left: Baixa Margem + Baixo Giro */}
-                <Card className="bg-red-50 border-red-200">
+                <Card className="bg-brand-danger/10 border-brand-danger/20">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">❓ Questionáveis</CardTitle>
@@ -483,7 +483,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                         .filter(p => p.quadrant === "baixa_margem_baixo_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-brand-background rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>
@@ -493,7 +493,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 </Card>
 
                 {/* Bottom Right: Baixa Margem + Alto Giro */}
-                <Card className="bg-yellow-50 border-yellow-200">
+                <Card className="bg-brand-warning/10 border-brand-warning/20">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm">🔄 Movimento</CardTitle>
@@ -511,7 +511,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                         .filter(p => p.quadrant === "baixa_margem_alto_giro")
                         .slice(0, 5)
                         .map((product, i) => (
-                        <div key={i} className="text-xs p-xs bg-white rounded border">
+                        <div key={i} className="text-xs p-xs bg-brand-background rounded border">
                           <div className="font-medium truncate">{product.product_name}</div>
                           <div className="text-muted-foreground">{product.marketplace_name}</div>
                         </div>

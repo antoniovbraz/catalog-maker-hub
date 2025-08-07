@@ -30,9 +30,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
 const MARKETPLACE_OPTIONS = [
-  { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-yellow-500' },
-  { value: 'shopee', label: 'Shopee', icon: '🛍️', color: 'bg-orange-500' },
-  { value: 'instagram', label: 'Instagram', icon: '📸', color: 'bg-pink-500' },
+  { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-brand-primary' },
+  { value: 'shopee', label: 'Shopee', icon: '🛍️', color: 'bg-brand-danger' },
+  { value: 'instagram', label: 'Instagram', icon: '📸', color: 'bg-brand-secondary' },
 ] as const;
 
 export default function AdGenerator() {
@@ -375,7 +375,7 @@ export default function AdGenerator() {
                         alt="Produto"
                         className="w-full h-24 object-cover rounded-md border"
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
                         <Button
                           size="sm"
                           variant="secondary"

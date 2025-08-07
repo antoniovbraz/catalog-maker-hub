@@ -15,15 +15,15 @@ const NotFound = () => {
   }, [location.pathname, logger]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-brand-background">
       <div className="text-center">
         <Heading variant="h1" className="mb-md">
           404
         </Heading>
-        <Text className="text-gray-600 text-h4 mb-md">
+        <Text className="text-brand-dark text-h4 mb-md">
           Oops! Page not found
         </Text>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
+        <a href="/" className="text-brand-primary hover:text-brand-dark underline">
           Return to Home
         </a>
       </div>

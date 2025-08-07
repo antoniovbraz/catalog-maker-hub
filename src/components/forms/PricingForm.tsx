@@ -439,12 +439,12 @@ export const PricingForm = () => {
                 <>
                   <Separator className="my-4" />
                   <div className="bg-muted/30 p-4 rounded-lg">
-                    <h4 className="font-semibold mb-3 text-orange-600 dark:text-orange-400">
+                    <h4 className="font-semibold mb-3 text-brand-primary">
                       Análise do Preço Praticado
                     </h4>
                      <div className="grid grid-cols-2 gap-2 text-sm">
                        <div>Preço Praticado:</div>
-                       <div className="font-medium text-orange-600 dark:text-orange-400">
+                       <div className="font-medium text-brand-primary">
                          {formatarMoeda(margemRealResult.preco_praticado || 0)}
                        </div>
                        
@@ -457,7 +457,7 @@ export const PricingForm = () => {
                        <div className={`font-medium ${
                          (margemRealResult.margem_percentual_real || 0) < 0 
                            ? 'text-destructive' 
-                           : 'text-green-600 dark:text-green-400'
+                           : 'text-brand-primary'
                        }`}>
                          {formatarPercentual(margemRealResult.margem_percentual_real || 0)}
                        </div>
@@ -466,11 +466,11 @@ export const PricingForm = () => {
                        <div className="col-span-2 mt-2 pt-2 border-t">
                          <div className="text-xs text-muted-foreground">
                            {(margemRealResult.margem_percentual_real || 0) < (pricingResult.margem_percentual || 0) ? (
-                             <span className="text-amber-600 dark:text-amber-400">
+                             <span className="text-brand-warning">
                                ⚠️ Margem real é menor que a desejada
                              </span>
                            ) : (
-                             <span className="text-green-600 dark:text-green-400">
+                             <span className="text-brand-primary">
                                ✅ Margem real está dentro do esperado
                              </span>
                            )}

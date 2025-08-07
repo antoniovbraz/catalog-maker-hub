@@ -56,9 +56,9 @@ export default function Subscription() {
   const getPlanColor = (planName: string) => {
     switch (planName) {
       case 'free': return 'bg-muted text-muted-foreground';
-      case 'basic': return 'bg-blue-500 text-white';
-      case 'pro': return 'bg-purple-500 text-white';
-      case 'enterprise': return 'bg-gradient-to-r from-purple-600 to-blue-600 text-white';
+      case 'basic': return 'bg-brand-primary text-brand-background';
+      case 'pro': return 'bg-brand-secondary text-brand-dark';
+      case 'enterprise': return 'bg-gradient-primary text-brand-background';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -199,7 +199,7 @@ export default function Subscription() {
               )}
               
               {isCurrent && (
-                <Badge className="absolute -top-3 right-4 bg-green-600">
+                <Badge className="absolute -top-3 right-4 bg-brand-primary">
                   Atual
                 </Badge>
               )}
@@ -246,7 +246,7 @@ export default function Subscription() {
                       
                       return (
                         <li key={feature} className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-green-600" />
+                          <Check className="h-4 w-4 text-brand-primary" />
                           {featureLabels[feature] || feature}
                         </li>
                       );

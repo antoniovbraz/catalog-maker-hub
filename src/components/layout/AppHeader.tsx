@@ -38,7 +38,7 @@ export function AppHeader() {
           {/* Logo */}
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="flex items-center justify-center w-8 h-8 bg-gradient-primary rounded-lg shadow-card">
-              <Zap className="w-5 h-5 text-white" />
+              <Zap className="w-5 h-5 text-brand-background" />
             </div>
             <span className="font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hidden sm:inline">
               Catalog Maker Hub
