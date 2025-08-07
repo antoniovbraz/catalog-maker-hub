@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { ConfigurationHeader } from "./ConfigurationHeader";
 import { PageTransition } from "@/components/common/PageTransition";
+import { spacing } from "@/styles/design-system";
+import { cn } from "@/lib/utils";
 
 interface ConfigurationPageLayoutProps {
   title: string;
@@ -28,10 +30,11 @@ export function ConfigurationPageLayout({
         actions={actions}
         breadcrumbs={breadcrumbs}
       />
-      
-      <main className="container mx-auto px-4 py-6 sm:px-6">
+
+      <main className={cn("container mx-auto", spacing.px.md, spacing.py.lg, `sm:${spacing.px.lg}`)}>
         <PageTransition>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 xl:grid-cols-12">
+          <div className={cn("grid grid-cols-1", spacing.gap.lg, "lg:grid-cols-12 xl:grid-cols-12")}
+          >
             {children}
           </div>
         </PageTransition>
