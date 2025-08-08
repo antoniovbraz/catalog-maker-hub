@@ -52,7 +52,7 @@ export const colors = {
   },
   /* Corporate Theme Colors */
   gunmetal: '200 40% 13%',
-  'fern-green': '100 27% 43%',
+  'fern-green': '118.57 19.44% 42.35%',
   'tea-green': '100 58% 83%',
   'anti-flash-white': '0 0% 100%',
   cinnabar: '12 77% 55%',

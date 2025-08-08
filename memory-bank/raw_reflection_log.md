@@ -42,4 +42,22 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Documentar comandos corretos para executar apenas testes Vitest e configurar ambiente do Playwright.
 ---
+Date: 2025-08-08
+TaskRef: "Aplicar cor fern green aos botões do tema Corporate"
+
+Learnings:
+- Converter a cor 588157 (hex) para HSL (118.57 19.44% 42.35%) garante consistência com tokens Tailwind.
+- Substituições globais em `index.css` também afetam gradientes e sombras do tema.
+
+Difficulties:
+- `pnpm dev` não exibiu logs diretamente; usei execução em background com redirecionamento.
+- `npx playwright test` falhou por ausência de navegadores instalados.
+
+Successes:
+- Tokens e variáveis CSS atualizados para usar o tom "fern green".
+- Lint, type-check e testes unitários rodaram sem erros.
+
+Improvements_Identified_For_Consolidation:
+- Registrar método rápido para converter hex em HSL ao ajustar temas.
+---
 ---

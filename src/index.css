@@ -32,7 +32,7 @@ All colors MUST be HSL.
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 258 56% 52%;
-    --brand-primary: 100 27% 43%;
+    --brand-primary: 118.57 19.44% 42.35%;
     --brand-secondary: 100 58% 83%;
     --brand-dark: 200 40% 13%;
     --radius: 0rem; /* Corporate style: no rounding */
@@ -101,7 +101,7 @@ All colors MUST be HSL.
     --card-foreground: 200 40% 13%;
     --popover: 0 0% 100%;
     --popover-foreground: 200 40% 13%;
-    --primary: 100 27% 43%; /* fern green */
+    --primary: 118.57 19.44% 42.35%; /* fern green */
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 100%;
     --secondary-foreground: 200 40% 13%;
@@ -111,37 +111,37 @@ All colors MUST be HSL.
     --accent-foreground: 200 40% 13%;
     --destructive: 12 77% 55%; /* cinnabar */
     --destructive-foreground: 0 0% 100%;
-    --success: 100 27% 43%;
+    --success: 118.57 19.44% 42.35%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     --border: 0 0% 85%;
     --input: 0 0% 85%;
-    --ring: 100 27% 43%;
+    --ring: 118.57 19.44% 42.35%;
     --radius: 0rem; /* No rounding for serious look */
 
     --sidebar-background: 200 40% 13%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 100 58% 83%;
     --sidebar-primary-foreground: 200 40% 13%;
-    --sidebar-accent: 100 27% 43%;
+    --sidebar-accent: 118.57 19.44% 42.35%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 200 40% 18%;
-    --sidebar-ring: 100 27% 43%;
+    --sidebar-ring: 118.57 19.44% 42.35%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(100 27% 43%), hsl(100 58% 83%));
-    --gradient-card: linear-gradient(135deg, hsl(200 40% 13%), hsl(100 27% 43%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(100 27% 43% / 0.02));
-    --gradient-config: linear-gradient(135deg, hsl(100 27% 43%), hsl(100 58% 83%));
+    --gradient-primary: linear-gradient(135deg, hsl(118.57 19.44% 42.35%), hsl(100 58% 83%));
+    --gradient-card: linear-gradient(135deg, hsl(200 40% 13%), hsl(118.57 19.44% 42.35%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(118.57 19.44% 42.35% / 0.02));
+    --gradient-config: linear-gradient(135deg, hsl(118.57 19.44% 42.35%), hsl(100 58% 83%));
     --shadow-elegant: 0 4px 20px -4px hsl(200 40% 13% / 0.15);
     --shadow-card: 0 2px 10px hsl(200 40% 13% / 0.1);
     --shadow-hover: 0 6px 20px -6px hsl(200 40% 13% / 0.2);
     --shadow-form: 0 1px 5px hsl(200 40% 13% / 0.08);
     --shadow-floating: 0 8px 25px -8px hsl(200 40% 13% / 0.2);
-    --shadow-glow: 0 0 15px hsl(100 27% 43% / 0.3);
+    --shadow-glow: 0 0 15px hsl(118.57 19.44% 42.35% / 0.3);
     
     /* Configuration page specific colors */
-    --config-primary: 100 27% 43%;
+    --config-primary: 118.57 19.44% 42.35%;
     --config-secondary: 0 0% 100%;
     --config-accent: 100 58% 83%;
     --config-background: 0 0% 100%;
