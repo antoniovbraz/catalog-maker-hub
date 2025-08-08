@@ -87,7 +87,7 @@ export default function Subscription() {
         <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent mb-4">
           Escolha seu Plano
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           Desbloqueie todo o potencial do Peepers Hub com ferramentas avançadas para seu marketplace
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function Subscription() {
                 {getPlanIcon(currentSubscription.plan?.name || '')}
                 {currentSubscription.plan?.display_name}
               </Badge>
-              <span className="text-lg">Plano Atual</span>
+              <span className="text-base sm:text-lg md:text-xl">Plano Atual</span>
             </CardTitle>
             <CardDescription>
               Status: <Badge variant={currentSubscription.status === 'active' ? 'default' : 'secondary'}>
@@ -209,7 +209,7 @@ export default function Subscription() {
                   {getPlanIcon(plan.name)}
                 </div>
                 
-                <CardTitle className="text-xl">{plan.display_name}</CardTitle>
+                <CardTitle className="text-base sm:text-lg md:text-xl">{plan.display_name}</CardTitle>
                 <CardDescription className="text-sm">{plan.description}</CardDescription>
                 
                 <div className="mt-4">

@@ -155,3 +155,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar utilitário padrão para grupos de botões responsivos.
 ---
+---
+Date: 2025-08-08
+TaskRef: "Adjust text utilities to responsive variants"
+
+Learnings:
+- `text-base sm:text-lg md:text-xl` evita tipografia exagerada em telas de 375 px.
+- Ripgrep localiza rapidamente tamanhos de texto fixos em páginas.
+
+Difficulties:
+- Saída do lint contém centenas de avisos Tailwind, mas nenhum erro.
+
+Successes:
+- Lint, type-check, testes e servidor de desenvolvimento rodaram sem falhas após os ajustes.
+
+Improvements_Identified_For_Consolidation:
+- Considerar regra de lint para impedir `text-lg`/`text-xl` isolados em novos componentes.
+---
