@@ -225,3 +225,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Documentar padrão de uso de variáveis CSS via Tailwind para futuros componentes.
 ---
+---
+Date: 2025-08-08
+TaskRef: "Wrap toast to use brand tokens and remove default colors"
+
+Learnings:
+- Wrappers em `components/common` permitem ajustar variantes sem alterar `ui` original.
+- `rg "bg-(red|blue|green|...)"` verifica rapidamente ausência de cores padrão.
+
+Difficulties:
+- `pnpm test --run` e `npx playwright test` falharam por configurações e navegadores ausentes.
+
+Successes:
+- Lint, type-check e servidor de desenvolvimento executaram sem erros.
+- Nenhuma classe `bg-red-*` restante após os ajustes de tema.
+
+Improvements_Identified_For_Consolidation:
+- Preparar scripts que instalam navegadores do Playwright para evitar falhas nos testes.
+---
