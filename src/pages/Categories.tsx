@@ -44,6 +44,7 @@ const Categories = () => {
     {
       key: 'description',
       header: 'Descrição',
+      className: 'break-words',
       render: (item: CategoryType) => (
         <span className="text-muted-foreground">
           {item.description || "Sem descrição"}

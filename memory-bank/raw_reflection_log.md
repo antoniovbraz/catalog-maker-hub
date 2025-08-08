@@ -121,3 +121,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Avaliar regra de lint para evitar `grid-cols-*` sem prefixos em novos componentes.
 ---
+---
+Date: 2025-08-07
+TaskRef: "Aplicar break-words em descrições de tabelas"
+
+Learnings:
+- `DataVisualization` aplica a mesma `className` ao cabeçalho e à célula; ao usar `break-words` evita overflow de descrições longas.
+- Um teste com string contínua valida que a classe é realmente renderizada.
+
+Difficulties:
+- `pnpm test` inicia em modo watch; é necessário usar `--run` para encerrar.
+
+Successes:
+- Lint, type-check, testes unitários e servidor de desenvolvimento funcionaram sem erros.
+
+Improvements_Identified_For_Consolidation:
+- Futuramente separar `cellClassName` de `className` em `DataVisualization` para estilizar cabeçalhos e células de forma independente.
+---
