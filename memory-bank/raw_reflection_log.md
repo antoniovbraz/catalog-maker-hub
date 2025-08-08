@@ -243,3 +243,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Preparar scripts que instalam navegadores do Playwright para evitar falhas nos testes.
 ---
+
+---
+Date: 2025-08-08
+TaskRef: "Replace fixed widths with responsive utilities"
+
+Learnings:
+- `flex-wrap` combinado com `w-full sm:w-*` elimina overflow em cabeçalhos de tabelas.
+- Verificação com Playwright a 320 px e 768 px assegura que a página de login não possui scroll horizontal.
+
+Difficulties:
+- `pnpm test --run` e `npx playwright test` falharam por testes existentes dependentes de autenticação.
+
+Successes:
+- Lint e type-check executaram sem erros após ajustes responsivos.
+
+Improvements_Identified_For_Consolidation:
+- Automatizar login de teste para validar rotas protegidas em verificação de overflow.
+---

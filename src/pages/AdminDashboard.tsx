@@ -321,14 +321,14 @@ export default function AdminDashboard() {
     return (
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         {/* Header skeleton */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="space-y-2">
-            <div className="h-8 w-64 bg-muted rounded animate-pulse" />
-            <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div className="space-y-2 flex-1">
+            <div className="h-8 w-full sm:w-64 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-full sm:w-48 bg-muted rounded animate-pulse" />
           </div>
-          <div className="flex gap-2">
-            <div className="h-9 w-32 bg-muted rounded animate-pulse" />
-            <div className="h-9 w-36 bg-muted rounded animate-pulse" />
+          <div className="flex gap-2 flex-wrap">
+            <div className="h-9 w-full sm:w-32 bg-muted rounded animate-pulse" />
+            <div className="h-9 w-full sm:w-36 bg-muted rounded animate-pulse" />
           </div>
         </div>
 
@@ -338,8 +338,8 @@ export default function AdminDashboard() {
             <div key={i} className="bg-card rounded-lg border p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-                  <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-full sm:w-24 bg-muted rounded animate-pulse" />
+                  <div className="h-8 w-full sm:w-16 bg-muted rounded animate-pulse" />
                 </div>
                 <div className="h-12 w-12 bg-muted rounded-full animate-pulse" />
               </div>
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
           <div className="h-10 w-full max-w-sm md:w-96 bg-muted rounded animate-pulse" />
           <div className="bg-card rounded-lg border p-6">
             <div className="space-y-4">
-              <div className="h-6 w-48 bg-muted rounded animate-pulse" />
+              <div className="h-6 w-full sm:w-48 bg-muted rounded animate-pulse" />
               <div className="space-y-2">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="h-12 bg-muted rounded animate-pulse" />
