@@ -32,7 +32,7 @@ export function AppHeader() {
     <header role="banner" className="h-14 sm:h-16 md:h-20 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left section - Sidebar trigger, logo and search */}
-        <div className="flex items-center gap-2 sm:gap-4 flex-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 flex-1">
           <SidebarTrigger className="h-8 w-8 sm:h-9 sm:w-9" />
 
           {/* Logo */}
@@ -90,7 +90,7 @@ export function AppHeader() {
         </div>
 
         {/* Right section - Theme Manager, Notifications and user */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           {/* Theme Manager */}
           <ThemeManager />
           

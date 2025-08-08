@@ -234,7 +234,7 @@ export function AssistantForm({ open, onOpenChange, assistant, onSuccess }: Assi
               )}
             />
 
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex flex-wrap justify-start gap-2 pt-4 sm:justify-end">
               <Button
                 type="button"
                 variant="outline"

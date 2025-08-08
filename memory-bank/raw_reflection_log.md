@@ -138,3 +138,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Futuramente separar `cellClassName` de `className` em `DataVisualization` para estilizar cabeçalhos e células de forma independente.
 ---
+---
+Date: 2025-08-07
+TaskRef: "Ensure button groups wrap on small screens"
+
+Learnings:
+- `flex-wrap` com `gap-2` evita overflow de botões em telas de 375 px.
+- `justify-start` combinado com `sm:justify-end` mantém alinhamento em desktop.
+
+Difficulties:
+- Localizar todos os grupos de botões exigiu script Node para varrer o projeto.
+
+Successes:
+- Lint, type-check e testes passaram após aplicar as classes responsivas.
+
+Improvements_Identified_For_Consolidation:
+- Criar utilitário padrão para grupos de botões responsivos.
+---

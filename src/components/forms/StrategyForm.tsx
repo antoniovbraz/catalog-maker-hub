@@ -251,9 +251,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               />
             </div>
 
-            <div className="flex gap-2">
-              <Button 
-                onClick={handleCalculate} 
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={handleCalculate}
                 disabled={isLoading}
                 className="flex-1"
               >
