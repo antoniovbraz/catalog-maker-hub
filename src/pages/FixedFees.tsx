@@ -150,7 +150,7 @@ const FixedFees = () => {
                     {fixedFeeRules.map((rule) => (
                       <TableRow key={rule.id}>
                         <TableCell className="font-medium">{rule.marketplaces?.name}</TableCell>
-                        <TableCell>
+                        <TableCell className="break-words">
                           {RULE_TYPES.find(t => t.value === rule.rule_type)?.label}
                         </TableCell>
                         <TableCell>

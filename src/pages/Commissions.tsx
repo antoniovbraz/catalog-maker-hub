@@ -39,6 +39,7 @@ const Commissions = () => {
     {
       key: "category",
       header: "Categoria",
+      className: "break-words",
       render: (commission: CommissionWithDetails) => (
         <div className="flex items-center gap-2">
           <span>{commission.categories?.name || 'Padrão'}</span>
