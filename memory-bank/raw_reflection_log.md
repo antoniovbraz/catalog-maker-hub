@@ -261,3 +261,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Automatizar login de teste para validar rotas protegidas em verificação de overflow.
 ---
+---
+Date: 2025-08-08
+TaskRef: "Padronizar fundos brancos no tema Corporate"
+
+Learnings:
+- Ajustar variáveis de tema exige sincronizar tokens Tailwind e documentação.
+- Gradientes que referenciam `--background` também devem refletir o novo valor.
+
+Difficulties:
+- Avaliar se o sidebar deveria seguir o novo fundo branco sem quebrar contraste.
+
+Successes:
+- Lint, type-check e testes foram executados após atualização das cores de fundo.
+
+Improvements_Identified_For_Consolidation:
+- Considerar guideline explícita sobre escopo dos tokens de fundo para evitar ambiguidades futuras.
+---
