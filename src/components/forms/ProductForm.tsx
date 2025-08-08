@@ -5,19 +5,22 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Package, Tag, Save, X, AlertCircle } from '@/components/ui/icons';
-import { useProductsWithCategories, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
+import { Package, Tag, Save, X, AlertCircle } from '@/components/ui/icons';
+import { useCreateProduct, useUpdateProduct } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { ProductWithCategory, ProductFormData } from "@/types/products";
 import { formatarMoeda } from "@/utils/pricing";
-import { DataVisualization } from "@/components/ui/data-visualization";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
 
-export const ProductForm = () => {
+interface ProductFormProps {
+  editingProduct?: ProductWithCategory | null;
+  onCancel?: () => void;
+}
+
+export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {}) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -33,10 +36,8 @@ export const ProductForm = () => {
   const [touched, setTouched] = useState<Partial<Record<keyof ProductFormData, boolean>>>({});
 
   const { data: categories = [] } = useCategories();
-  const { data: products = [], isLoading } = useProductsWithCategories();
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
-  const deleteMutation = useDeleteProduct();
 
   // Validação em tempo real
   const validateField = (name: keyof ProductFormData, value: string | number) => {
@@ -155,94 +156,34 @@ export const ProductForm = () => {
     setTouched({});
   };
 
-  const handleEdit = (product: ProductWithCategory) => {
-    setFormData({
-      name: product.name,
-      description: product.description || "",
-      sku: product.sku || "",
-      category_id: product.category_id || "none",
-      cost_unit: product.cost_unit || 0,
-      packaging_cost: product.packaging_cost || 0,
-      tax_rate: product.tax_rate || 0
-    });
-    setEditingId(product.id);
-    setErrors({});
-    setTouched({});
-  };
+  useEffect(() => {
+    if (editingProduct) {
+      setFormData({
+        name: editingProduct.name,
+        description: editingProduct.description || "",
+        sku: editingProduct.sku || "",
+        category_id: editingProduct.category_id || "none",
+        cost_unit: editingProduct.cost_unit || 0,
+        packaging_cost: editingProduct.packaging_cost || 0,
+        tax_rate: editingProduct.tax_rate || 0
+      });
+      setEditingId(editingProduct.id);
+      setErrors({});
+      setTouched({});
+    } else {
+      resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingProduct]);
 
   // Calcular custo total para exibição
   const custoTotal = formData.cost_unit + formData.packaging_cost;
 
-  // Configurar colunas da tabela
-  const columns = [
-    {
-      key: 'name',
-      header: 'Nome',
-      render: (item: ProductWithCategory) => (
-        <div className="flex items-center gap-2">
-          <Package className="w-4 h-4 text-muted-foreground" />
-          <div>
-            <span className="font-medium">{item.name}</span>
-            {item.sku && (
-              <Badge variant="outline" className="ml-2 text-xs">
-                {item.sku}
-              </Badge>
-            )}
-          </div>
-        </div>
-      )
-    },
-    {
-      key: 'categories.name',
-      header: 'Categoria',
-      render: (item: ProductWithCategory) => (
-        <div className="flex items-center gap-1">
-          <Tag className="w-3 h-3 text-muted-foreground" />
-          <span>{item.categories?.name || "Sem categoria"}</span>
-        </div>
-      )
-    },
-    {
-      key: 'cost_unit',
-      header: 'Custo Unit.',
-      render: (item: ProductWithCategory) => (
-        <span className="font-mono text-sm">{formatarMoeda(item.cost_unit || 0)}</span>
-      )
-    },
-    {
-      key: 'packaging_cost',
-      header: 'Embalagem',
-      render: (item: ProductWithCategory) => (
-        <span className="font-mono text-sm text-muted-foreground">
-          {formatarMoeda(item.packaging_cost || 0)}
-        </span>
-      )
-    }
-  ];
-
-  const actions = [
-    {
-      label: 'Editar',
-      icon: <Edit className="w-4 h-4" />,
-      onClick: (product: ProductWithCategory) => handleEdit(product)
-    },
-    {
-      label: 'Excluir',
-      icon: <Trash2 className="w-4 h-4" />,
-      onClick: (product: ProductWithCategory) => deleteMutation.mutate(product.id),
-      variant: 'destructive' as const
-    }
-  ];
-
-  const productsList = useCollapsibleSection({ 
-    storageKey: 'products-list', 
-    defaultOpen: false 
+  const optionalFields = useCollapsibleSection({
+    storageKey: 'products-optional-fields',
+    defaultOpen: false
   });
 
-  const optionalFields = useCollapsibleSection({ 
-    storageKey: 'products-optional-fields', 
-    defaultOpen: false 
-  });
 
   return (
     <div className="space-y-6">
@@ -440,10 +381,13 @@ export const ProductForm = () => {
                 {editingId ? "Atualizar Produto" : "Criar Produto"}
               </Button>
               {editingId && (
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={resetForm}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    resetForm();
+                    onCancel?.();
+                  }}
                   className="h-11 min-w-[120px]"
                 >
                   <X className="w-4 h-4 mr-2" />
@@ -454,30 +398,6 @@ export const ProductForm = () => {
           </form>
         </CardContent>
       </Card>
-
-      {/* Lista de Produtos */}
-      <CollapsibleCard
-        title="Produtos Cadastrados"
-        icon={<Package className="w-4 h-4" />}
-        isOpen={productsList.isOpen}
-        onToggle={productsList.toggle}
-      >
-        <DataVisualization
-          title=""
-          data={products}
-          columns={columns}
-          actions={actions}
-          isLoading={isLoading}
-          emptyState={
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Nenhum produto cadastrado</p>
-              <p className="text-sm text-muted-foreground">
-                Crie seu primeiro produto usando o formulário acima
-              </p>
-            </div>
-          }
-        />
-      </CollapsibleCard>
     </div>
   );
 };
