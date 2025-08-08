@@ -3,8 +3,10 @@
 ## Introdução
 O design system centraliza estilos, componentes e padrões de interface para garantir consistência e escalabilidade em toda a aplicação.
 
+Toda estilização é feita exclusivamente com Tailwind CSS e componentes shadcn/ui; arquivos `.css` ou bibliotecas de estilo extras não são permitidos.
+
 ## Tokens
-- **Cores, tipografia e espaçamento**: centralizados em `src/styles/tokens.ts` e importados pelo `tailwind.config.ts` e pelos componentes que precisarem dessas variáveis.
+- **Cores, tipografia e espaçamento**: centralizados em `src/styles/tokens.ts`, expostos como utilitários `brand-*` no `tailwind.config.ts` e usados pelos componentes. Não utilize hexadecimais diretos.
 - **Radius**: tokens de borda preservam a identidade visual em elementos interativos.
 
 ## Componentes Base
@@ -81,6 +83,7 @@ Checklist básico para novos componentes:
 - Forneça `alt` para imagens e `aria-label` quando necessário.
 - Assegure navegação completa por teclado.
 - Teste com leitores de tela e mantenha foco visível.
+- Execute testes automatizados com `npx playwright test tests/a11y.spec.ts` (`axe-core`).
 
 ## Performance
 

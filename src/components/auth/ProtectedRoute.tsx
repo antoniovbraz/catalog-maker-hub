@@ -38,7 +38,7 @@ export function ProtectedRoute({
   }
 
   // E2E bypass for tests
-  if ((window as any).__E2E__ === true) {
+  if ((window as Window & { __E2E__?: boolean }).__E2E__ === true) {
     return <>{children}</>;
   }
 

@@ -172,3 +172,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Considerar regra de lint para impedir `text-lg`/`text-xl` isolados em novos componentes.
 ---
+
+---
+Date: 2025-08-08
+TaskRef: "Documentar tokens brand e verificação de acessibilidade"
+
+Learnings:
+- Incluir comandos `rg` e testes `axe-core` no checklist evita regressões de estilo e acessibilidade.
+
+Difficulties:
+- Nenhuma.
+
+Successes:
+- README, AGENTS e docs atualizados para uso exclusivo de Tailwind/shadcn e tokens `brand-*`.
+
+Improvements_Identified_For_Consolidation:
+- Criar script `pnpm check:colors` para automatizar a busca por cores hexadecimais.
+---

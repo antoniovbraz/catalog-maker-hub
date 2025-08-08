@@ -26,6 +26,11 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 - `npm run test:coverage` – executa os testes com relatório de cobertura
 - `npm run preview` – visualiza o build de produção localmente
 
+## Estilo e Componentes
+- Estilos devem ser escritos exclusivamente com **Tailwind CSS**.
+- Componentes base devem seguir o catálogo **shadcn/ui**.
+- Cores e tipografia usam apenas tokens `brand-*`; CSS legado ou bibliotecas de estilo extras não são permitidos.
+
 ## Diretrizes de Contribuição
 1. Faça um fork do repositório e crie um branch para a sua feature ou correção.
 2. Garanta que o código está formatado e que `npm run lint` e `npm test` executam sem erros.
