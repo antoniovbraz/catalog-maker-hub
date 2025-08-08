@@ -79,3 +79,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar script de migração automática para tokens, evitando edições manuais extensas em futuras paletas.
 ---
+Date: 2025-08-08
+TaskRef: "Separar ProductForm e ProductList, aplicar useFormVisibility"
+
+Learnings:
+- Ao separar o formulário da listagem foi necessário elevar o estado de edição para a página e expor callbacks.
+- O hook `useFormVisibility` facilita layouts responsivos ao alternar visibilidade do formulário e da tabela.
+
+Difficulties:
+- `pnpm lint` retornou diversos erros relacionados ao plugin Tailwind já existentes no projeto.
+- Testes Vitest executaram arquivos Playwright e falharam; `npx playwright test` requisitou instalação de navegadores.
+
+Successes:
+- Criado componente `ProductList` reutilizando `DataVisualization` e removido código de listagem do `ProductForm`.
+- Página de Produtos agora exibe formulário e lista em colunas controladas por `useFormVisibility`.
+
+Improvements_Identified_For_Consolidation:
+- Padronizar o padrão de lifting state para edição de entidades para reduzir duplicação entre páginas.
+---
