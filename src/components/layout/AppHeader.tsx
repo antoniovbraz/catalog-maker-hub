@@ -47,9 +47,10 @@ export function AppHeader() {
 
           {/* Global Search with improved styling */}
           <div role="search" className="relative max-w-lg flex-1 hidden md:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Command className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
+            <Command className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
             <Input
+              aria-label="Buscar"
               placeholder="Buscar produtos, categorias, marketplaces... (Ctrl+K)"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
@@ -76,9 +77,10 @@ export function AppHeader() {
               tabIndex={-1}
             >
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" aria-hidden="true" />
                 <Input
                   autoFocus
+                  aria-label="Buscar"
                   placeholder="Buscar produtos, categorias, marketplaces..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}

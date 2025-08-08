@@ -52,15 +52,17 @@ export const MarketplaceHierarchyCard = ({
               variant="outline"
               size="sm"
               onClick={() => onEditPlatform(platform)}
+              aria-label="Editar plataforma"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-4 h-4" aria-hidden="true" />
             </Button>
             <Button
               variant="destructive"
               size="sm"
               onClick={() => onDeletePlatform(platform.id)}
+              aria-label="Excluir plataforma"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4" aria-hidden="true" />
             </Button>
           </div>
         </div>
@@ -121,16 +123,18 @@ export const MarketplaceHierarchyCard = ({
                         size="sm"
                         onClick={() => onEditModality(modality)}
                         className="h-8 w-8 p-0"
+                        aria-label="Editar modalidade"
                       >
-                        <Settings className="w-3 h-3" />
+                        <Settings className="w-3 h-3" aria-hidden="true" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onDeleteModality(modality.id)}
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        aria-label="Excluir modalidade"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3 h-3" aria-hidden="true" />
                       </Button>
                     </div>
                   </div>

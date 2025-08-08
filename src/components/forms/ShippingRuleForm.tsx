@@ -347,16 +347,18 @@ export const ShippingRuleForm = ({ onCancel }: ShippingRuleFormProps) => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleEdit(rule)}
+                            aria-label="Editar regra de frete"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4" aria-hidden="true" />
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
                             onClick={() => deleteMutation.mutate(rule.id)}
                             disabled={deleteMutation.isPending}
+                            aria-label="Excluir regra de frete"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </TableCell>
