@@ -19,11 +19,11 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
   return (
     <div className="space-y-md">
       {/* Header skeleton */}
-      <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
         <Skeleton className="h-6 w-full max-w-sm md:w-96" />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap w-full sm:w-auto">
           <Skeleton className="h-10 w-full max-w-sm md:w-96" />
-          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-full sm:w-24" />
         </div>
       </div>
 
@@ -33,9 +33,9 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
         <div className="bg-muted/50 p-md border-b">
           <div className={cn("grid gap-4", gridTemplate)}>
             {Array.from({ length: columns }).map((_, i) => (
-              <Skeleton key={i} className="h-4 w-20" />
+              <Skeleton key={i} className="h-4 w-full sm:w-20" />
             ))}
-            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-full sm:w-16" />
           </div>
         </div>
         
@@ -75,11 +75,11 @@ export function SkeletonForm({ sections = 2, fieldsPerSection = 3 }: SkeletonFor
         <div className="p-lg space-y-lg">
           {Array.from({ length: sections }).map((_, sectionIndex) => (
             <div key={sectionIndex} className="space-y-md">
-              <Skeleton className="h-5 w-32" />
+              <Skeleton className="h-5 w-full sm:w-32" />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Array.from({ length: fieldsPerSection }).map((_, fieldIndex) => (
                   <div key={fieldIndex} className="space-y-sm">
-                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-full sm:w-20" />
                     <Skeleton className="h-10 w-full" />
                   </div>
                 ))}
@@ -88,9 +88,9 @@ export function SkeletonForm({ sections = 2, fieldsPerSection = 3 }: SkeletonFor
           ))}
           
           {/* Buttons */}
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-3 pt-4 border-t flex-wrap">
             <Skeleton className="h-11 flex-1" />
-            <Skeleton className="h-11 w-24" />
+            <Skeleton className="h-11 w-full sm:w-24" />
           </div>
         </div>
       </div>
@@ -107,15 +107,15 @@ export function SkeletonCard({ count = 1 }: SkeletonCardProps) {
     <div className="space-y-md">
       {Array.from({ length: count }).map((_, index) => (
         <div key={index} className="rounded-lg border border-border/50 p-lg space-y-md">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <Skeleton className="h-6 w-full max-w-sm md:w-96" />
             <Skeleton className="h-8 w-8 rounded" />
           </div>
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-2/3" />
-          <div className="flex gap-2">
-            <Skeleton className="h-6 w-16" />
-            <Skeleton className="h-6 w-20" />
+          <div className="flex gap-2 flex-wrap">
+            <Skeleton className="h-6 w-full sm:w-16" />
+            <Skeleton className="h-6 w-full sm:w-20" />
           </div>
         </div>
       ))}
