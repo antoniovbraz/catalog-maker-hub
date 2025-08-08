@@ -29,7 +29,7 @@ export function AppHeader() {
   };
 
   return (
-    <header role="banner" className="h-14 sm:h-16 md:h-20 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <header role="banner" className="h-14 sm:h-16 md:h-20 border-b border-border bg-foreground/95 text-background backdrop-blur supports-[backdrop-filter]:bg-foreground/60 sticky top-0 z-50">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left section - Sidebar trigger, logo and search */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 flex-1">
@@ -38,9 +38,9 @@ export function AppHeader() {
           {/* Logo */}
           <div className="flex items-center gap-1 sm:gap-2">
             <div className="flex items-center justify-center w-8 h-8 bg-gradient-primary rounded-lg shadow-card">
-              <Zap className="w-5 h-5 text-brand-background" />
+              <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent hidden sm:inline">
+            <span className="font-bold text-base sm:text-lg md:text-xl bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent hidden sm:inline">
               Catalog Maker Hub
             </span>
           </div>
@@ -54,7 +54,7 @@ export function AppHeader() {
               placeholder="Buscar produtos, categorias, marketplaces... (Ctrl+K)"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              className="pl-10 pr-10 bg-muted/50 border-0 focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:bg-background transition-all duration-200"
+              className="pl-10 pr-10 bg-muted/50 border-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:bg-background transition-all duration-200"
             />
           </div>
 
@@ -117,7 +117,7 @@ export function AppHeader() {
                 tabIndex={0}
               >
                 <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-brand-primary text-brand-background text-sm">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                     {getUserInitials(profile?.full_name)}
                   </AvatarFallback>
                 </Avatar>

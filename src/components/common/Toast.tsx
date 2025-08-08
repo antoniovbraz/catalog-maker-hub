@@ -19,7 +19,7 @@ const ToastAction = React.forwardRef<
   <UiToastAction
     ref={ref}
     className={cn(
-      "group-[.destructive]:border-brand-danger/40 group-[.destructive]:hover:border-brand-danger/30 group-[.destructive]:hover:bg-brand-danger group-[.destructive]:hover:text-brand-background group-[.destructive]:focus:ring-brand-danger",
+      "group-[.destructive]:border-destructive/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
       className
     )}
     {...props}
@@ -34,7 +34,7 @@ const ToastClose = React.forwardRef<
   <UiToastClose
     ref={ref}
     className={cn(
-      "group-[.destructive]:text-brand-background/80 group-[.destructive]:hover:text-brand-background group-[.destructive]:focus:ring-brand-danger group-[.destructive]:focus:ring-offset-brand-danger",
+      "group-[.destructive]:text-destructive-foreground/80 group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive group-[.destructive]:focus:ring-offset-destructive",
       className
     )}
     {...props}

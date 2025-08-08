@@ -51,7 +51,7 @@ export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ 
       const productCount = Number(data.productCount || 0);
       
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
+        <div className="bg-card border border-border rounded-lg shadow-lg p-3 text-sm text-card-foreground">
           <p className="font-medium">{String(label || '')}</p>
           <p>Receita Total: {formatarMoeda(totalRevenue)}</p>
           <p>Receita Média: {formatarMoeda(avgRevenue)}</p>

@@ -190,12 +190,12 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0 bg-sidebar">
       <SidebarHeader className="p-lg">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-brand-primary/10 rounded-lg flex items-center justify-center">
-            <Zap className="w-5 h-5 text-brand-primary" />
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <Zap className="w-5 h-5 text-primary" />
           </div>
           {!collapsed && (
             <div className="flex-1">
-                <h2 className="text-lg font-bold bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent">
+                <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
                 Peepers Hub
               </h2>
               <p className="text-xs text-sidebar-foreground/70">

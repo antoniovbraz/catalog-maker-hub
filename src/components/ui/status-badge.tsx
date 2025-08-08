@@ -34,7 +34,7 @@ const statusConfig: Record<StatusType, {
     icon: <Settings className="w-3 h-3" />,
     label: "Configurado",
     variant: "default",
-    className: "bg-brand-primary text-brand-background"
+    className: "bg-primary text-primary-foreground"
   },
   pending: {
     icon: <Clock className="w-3 h-3" />,
@@ -46,7 +46,7 @@ const statusConfig: Record<StatusType, {
     icon: <AlertCircle className="w-3 h-3" />,
     label: "Erro",
     variant: "destructive",
-    className: "bg-brand-danger text-brand-background"
+    className: "bg-destructive text-destructive-foreground"
   },
   warning: {
     icon: <AlertCircle className="w-3 h-3" />,
