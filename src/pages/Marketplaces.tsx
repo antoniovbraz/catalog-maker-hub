@@ -126,7 +126,7 @@ const Marketplaces = () => {
               {hierarchicalMarketplaces.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
                   <Store className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h4 className="text-lg font-medium mb-2">Nenhuma plataforma cadastrada</h4>
+                  <h4 className="text-base sm:text-lg md:text-xl font-medium mb-2">Nenhuma plataforma cadastrada</h4>
                   <p className="text-muted-foreground mb-4">
                     Comece criando sua primeira plataforma de marketplace
                   </p>

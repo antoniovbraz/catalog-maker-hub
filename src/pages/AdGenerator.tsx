@@ -195,7 +195,7 @@ export default function AdGenerator() {
           {selectedProductId && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Configuração do Chat</CardTitle>
+                <CardTitle className="text-base sm:text-lg md:text-xl">Configuração do Chat</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
@@ -430,7 +430,7 @@ export default function AdGenerator() {
                     className="h-auto p-3 flex items-center justify-start gap-3"
                     onClick={() => setSelectedMarketplace(option.value)}
                   >
-                    <span className="text-xl">{option.icon}</span>
+                    <span className="text-base sm:text-lg md:text-xl">{option.icon}</span>
                     <span className="text-sm font-medium">{option.label}</span>
                   </Button>
                 ))}

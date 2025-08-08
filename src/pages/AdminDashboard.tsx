@@ -465,7 +465,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent className="text-center py-12">
                 <Activity className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2">
                   Funcionalidade em Desenvolvimento
                 </h3>
                 <p className="text-muted-foreground">
