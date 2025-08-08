@@ -367,7 +367,7 @@ export const PricingForm = () => {
           </CollapsibleCard>
           
           {/* Botões de Ação */}
-          <div className="flex gap-3 pt-4 border-t border-border">
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
             <Button
               onClick={handleCalculate}
               disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}

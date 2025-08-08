@@ -186,7 +186,7 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
           </CollapsibleCard>
 
           {/* Botões de Ação */}
-          <div className="flex gap-3 pt-4 border-t border-border">
+          <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
             <Button
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}

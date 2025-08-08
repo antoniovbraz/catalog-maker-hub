@@ -164,7 +164,7 @@ export default function AdGenerator() {
       <div className="xl:col-span-12 mb-6">
         <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
           <span className="font-medium">Modo de Geração:</span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant={mode === 'quick' ? 'default' : 'outline'}
               size="sm"
@@ -377,7 +377,7 @@ export default function AdGenerator() {
                         alt="Produto"
                         className="w-full h-24 object-cover rounded-md border"
                       />
-                      <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-wrap items-center justify-center gap-2">
                         <Button
                           size="sm"
                           variant="secondary"

@@ -325,22 +325,22 @@ export function SimpleMarketplaceForm({
           </div>
 
           {/* Botões de ação */}
-          <div className="flex justify-end gap-sm pt-md border-t">
-            <Button 
-              type="button" 
-              variant="outline" 
+          <div className="flex flex-wrap justify-start gap-2 pt-md border-t sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
               onClick={onCancel}
               disabled={isSubmitting}
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={!formData.name.trim() || isSubmitting}
               className="min-w-[120px]"
             >
               {isSubmitting ? (
-                <div className="flex items-center gap-sm">
+                <div className="flex items-center gap-2">
                   <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                   {isEditing ? 'Salvando...' : 'Criando...'}
                 </div>

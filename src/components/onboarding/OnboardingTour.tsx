@@ -157,7 +157,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between pt-4">
+          <div className="flex flex-wrap justify-between gap-2 pt-4">
             <Button
               variant="outline"
               onClick={prevStep}

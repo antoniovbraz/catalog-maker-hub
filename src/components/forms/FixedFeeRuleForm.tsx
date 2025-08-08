@@ -269,7 +269,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
             />
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
               {editingId ? "Atualizar" : "Criar"}
             </Button>
