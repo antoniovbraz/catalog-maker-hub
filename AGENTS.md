@@ -9,7 +9,7 @@
 Antes de executar qualquer tarefa, carregue estes arquivos:
 
 1. `CUSTOM_KNOWLEDGE.md` – arquitetura, regras de negócio e convenções.
-2. `docs/design-system.md` – tokens de tema (Corporate) e padrões de UI.
+2. `docs/DESIGN_SYSTEM.md` – tokens de tema (Corporate) e padrões de UI.
 3. `docs/continuous-improvement.md` – protocolo de reflexão/registro de aprendizado.
 
 Se um desses arquivos mudar, refaça o parsing para manter o contexto atualizado.
@@ -43,18 +43,20 @@ Se um desses arquivos mudar, refaça o parsing para manter o contexto atualizado
 - **TypeScript estrito** – `noImplicitAny`, `strictNullChecks` habilitados.
 - **React Hook Form + Zod** em todo formulário.
 - **React Query** para dados remotos; nunca `fetch` direto.
-- **Cores & tipografia** → utilitários `brand.*` (tema Corporate).
+- **Estilos** → apenas Tailwind CSS + shadcn/ui; cores e tipografia via tokens `brand-*` (tema Corporate); sem CSS legado.
 - **Commits**: *conventional* em **português** (`feat:`, `fix:` …).
 
 ---
 
 ## 5. Pipeline de verificação rápida
 
-1. `pnpm lint && pnpm typecheck` – sem erros.
-2. `pnpm test` – cobertura ≥ metas por camada.
-3. `pnpm dev` – UI carrega em tema Corporate sem erros de console.
-4. Mobile (375 px), Desktop (1280 px) – layout íntegro.
-5. `raw_reflection_log.md` atualizado com aprendizados.
+1. `pnpm lint && pnpm type-check` – sem erros.
+2. `pnpm test --run` – cobertura ≥ metas por camada.
+3. `npx playwright test tests/a11y.spec.ts` – acessibilidade (`axe-core`).
+4. `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` – não deve haver cores hex fora dos tokens `brand-*`.
+5. `pnpm dev` – UI carrega em tema Corporate sem erros de console.
+6. Mobile (375 px), Desktop (1280 px) – layout íntegro.
+7. `raw_reflection_log.md` atualizado com aprendizados.
 
 ---
 
@@ -73,7 +75,8 @@ Qualquer novo diretório deve ser documentado no PR.
 
 ## 7. Checklist automático antes de PR
 
--
+- `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` – confirmar ausência de cores fora dos tokens `brand-*`.
+- `npx playwright test tests/a11y.spec.ts` – validar acessibilidade com `axe-core`.
 
 > **Falha em qualquer item bloqueia merge.**
 

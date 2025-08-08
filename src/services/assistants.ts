@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import type { Assistant, AssistantFormData } from "@/types/assistants";

@@ -75,6 +75,7 @@ margemReal = ((precoVenda - custoTotal - taxas) / precoVenda) * 100
 - Estado remoto → **React Query**; nada de `fetch` direto.
 - UI base → **shadcn/ui** (não editar `components/ui`).
 - Camada de dados via `services/`.
+- Estilos exclusivamente com **Tailwind CSS** e tokens `brand-*`; arquivos `.css` legados são proibidos.
 
 #### Exemplo Service
 
@@ -97,7 +98,7 @@ export class ProductsService {
 
 - **Abas reordenáveis** com `@dnd-kit` (Dashboard → … → Precificação).
 - **Responsivo** first – breakpoints `sm / md / lg / xl`.
-- Tokens de cor/typografia via tema **Corporate** (`brand.*`).
+- Tokens de cor/typografia via tema **Corporate** (`brand-*`).
 
 ---
 
@@ -118,7 +119,11 @@ export class ProductsService {
 | hooks          | 70 %             |
 | components     | 50 %             |
 
-Ferramentas: **ESLint · Prettier · Vitest · Testing Library**.
+Ferramentas: **ESLint · Prettier · Vitest · Testing Library · Playwright/axe-core**.
+
+Verificações adicionais:
+- `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` garante ausência de cores fora dos tokens `brand-*`.
+- `npx playwright test tests/a11y.spec.ts` valida acessibilidade.
 
 ---
 
