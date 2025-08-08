@@ -8,6 +8,7 @@ Toda estilização é feita exclusivamente com Tailwind CSS e componentes shadcn
 ## Tokens
 - **Cores, tipografia e espaçamento**: centralizados em `src/styles/tokens.ts`, expostos como utilitários `brand-*` no `tailwind.config.ts` e usados pelos componentes. Não utilize hexadecimais diretos.
 - **Radius**: tokens de borda preservam a identidade visual em elementos interativos.
+- **Tema Corporate**: todos os fundos utilizam branco puro (`brand-background`).
 
 ## Componentes Base
 Componentes atômicos ficam em `src/components/ui` (shadcn/ui) e não devem ser modificados diretamente.

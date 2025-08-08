@@ -95,7 +95,7 @@ All colors MUST be HSL.
 
   /* Corporate Theme - Serious and Professional */
   .corporate {
-    --background: 0 0% 94%; /* anti-flash white */
+    --background: 0 0% 100%; /* white */
     --foreground: 200 40% 13%; /* gunmetal */
     --card: 0 0% 100%;
     --card-foreground: 200 40% 13%;
@@ -103,9 +103,9 @@ All colors MUST be HSL.
     --popover-foreground: 200 40% 13%;
     --primary: 100 27% 43%; /* fern green */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 91%;
+    --secondary: 0 0% 100%;
     --secondary-foreground: 200 40% 13%;
-    --muted: 0 0% 88%;
+    --muted: 0 0% 100%;
     --muted-foreground: 200 20% 35%;
     --accent: 100 58% 83%; /* tea green */
     --accent-foreground: 200 40% 13%;
@@ -131,7 +131,7 @@ All colors MUST be HSL.
 
     --gradient-primary: linear-gradient(135deg, hsl(100 27% 43%), hsl(100 58% 83%));
     --gradient-card: linear-gradient(135deg, hsl(200 40% 13%), hsl(100 27% 43%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 94%), hsl(100 27% 43% / 0.02));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(100 27% 43% / 0.02));
     --gradient-config: linear-gradient(135deg, hsl(100 27% 43%), hsl(100 58% 83%));
     --shadow-elegant: 0 4px 20px -4px hsl(200 40% 13% / 0.15);
     --shadow-card: 0 2px 10px hsl(200 40% 13% / 0.1);
@@ -142,8 +142,9 @@ All colors MUST be HSL.
     
     /* Configuration page specific colors */
     --config-primary: 100 27% 43%;
-    --config-secondary: 0 0% 88%;
+    --config-secondary: 0 0% 100%;
     --config-accent: 100 58% 83%;
+    --config-background: 0 0% 100%;
     --config-warning: 12 77% 55%;
 
     /* Typography */
