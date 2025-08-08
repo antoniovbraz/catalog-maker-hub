@@ -241,7 +241,7 @@ export default function AdGenerator() {
                 marketplace={selectedMarketplace || 'mercado_livre'}
                 onResultGenerated={(result) => {
                   console.log('Resultado gerado:', result);
-                  setGeneratedResult({ description: result });
+                  setGeneratedResult({ description: String(result) });
                 }}
               />
             </CardContent>

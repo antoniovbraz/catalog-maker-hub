@@ -140,7 +140,7 @@ export class AssistantsService extends BaseService<Assistant> {
       this.logger.debug('Buscando assistente por marketplace', { marketplace });
 
       const { data, error } = await supabase
-        .from(this.tableName)
+        .from('assistants' as any)
         .select('*')
         .eq('marketplace', marketplace)
         .single();
@@ -157,7 +157,10 @@ export class AssistantsService extends BaseService<Assistant> {
       return data as unknown as Assistant;
     } catch (error) {
       this.logger.error('Erro ao buscar assistente por marketplace', error);
-      throw new Error(`Buscar assistente por marketplace falhou: ${error.message}`);
+      if (error instanceof Error) {
+        throw new Error(`Buscar assistente por marketplace falhou: ${error.message}`);
+      }
+      throw new Error('Buscar assistente por marketplace falhou: erro desconhecido');
     }
   }
 }

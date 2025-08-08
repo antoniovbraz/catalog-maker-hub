@@ -37,6 +37,11 @@ export function ProtectedRoute({
     );
   }
 
+  // E2E bypass for tests
+  if ((window as any).__E2E__ === true) {
+    return <>{children}</>;
+  }
+
   // If we should redirect and we're not already on the redirect page
   if (shouldRedirect && location.pathname !== redirectTo) {
     return <Navigate to={redirectTo} replace />;

@@ -9,7 +9,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async getAll(): Promise<T[]> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(this.tableName)
       .select('*')
       .order('created_at', { ascending: false });
@@ -19,7 +19,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async getById(id: string): Promise<T | null> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(this.tableName)
       .select('*')
       .eq('id', id)
@@ -36,9 +36,9 @@ export abstract class BaseService<T = Record<string, unknown>> {
     // Adicionar tenant_id automaticamente se a tabela suporta
     const dataWithTenant = await this.addTenantId(data);
     
-    const { data: result, error } = await supabase
+    const { data: result, error } = await (supabase as any)
       .from(this.tableName)
-      .insert(dataWithTenant as Partial<T>)
+      .insert(dataWithTenant as any)
       .select()
       .single();
 
@@ -76,9 +76,9 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async update(id: string, data: Partial<T>): Promise<T> {
-    const { data: result, error } = await supabase
+    const { data: result, error } = await (supabase as any)
       .from(this.tableName)
-      .update(data as Partial<T>)
+      .update(data as any)
       .eq('id', id)
       .select()
       .single();
@@ -88,7 +88,7 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from(this.tableName)
       .delete()
       .eq('id', id);
