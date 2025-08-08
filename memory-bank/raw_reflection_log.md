@@ -189,3 +189,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar script `pnpm check:colors` para automatizar a busca por cores hexadecimais.
 ---
+
+---
+Date: 2025-08-08
+TaskRef: "Remover App.css e migrar tokens de marca"
+
+Learnings:
+- Adicionar variáveis `--brand-*` ao `index.css` mantém tokens acessíveis após exclusão do CSS legado.
+- `rg` confirma ausência de importações de `App.css` no projeto.
+
+Difficulties:
+- Nenhuma.
+
+Successes:
+- Lint, type-check, testes e servidor de desenvolvimento rodaram sem erros após a remoção do arquivo.
+
+Improvements_Identified_For_Consolidation:
+- Avaliar remoção periódica de referências a arquivos obsoletos na base de código.
+---

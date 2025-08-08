@@ -32,6 +32,9 @@ All colors MUST be HSL.
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 258 56% 52%;
+    --brand-primary: 100 27% 43%;
+    --brand-secondary: 100 58% 83%;
+    --brand-dark: 200 40% 13%;
     --radius: 0rem; /* Corporate style: no rounding */
 
     /* Sidebar System (adapted from corporate) */
