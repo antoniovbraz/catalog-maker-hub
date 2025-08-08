@@ -207,3 +207,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Avaliar remoção periódica de referências a arquivos obsoletos na base de código.
 ---
+
+---
+Date: 2025-08-08
+TaskRef: "Migrate inline styles to Tailwind utilities"
+
+Learnings:
+- Tailwind arbitrary properties `[--var:value]` substituem `<style>` dinâmicas mantendo temas.
+- Transforms do `dnd-kit` exigem variáveis CSS para refletir `translate` em tempo real.
+
+Difficulties:
+- Testes de acessibilidade Playwright falharam por falta de navegadores instalados.
+
+Successes:
+- Componentes de gráficos e formulários agora usam classes utilitárias sem `style=` direto.
+
+Improvements_Identified_For_Consolidation:
+- Documentar padrão de uso de variáveis CSS via Tailwind para futuros componentes.
+---

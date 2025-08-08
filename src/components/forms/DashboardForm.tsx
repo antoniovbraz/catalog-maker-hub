@@ -16,6 +16,7 @@ import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
 import { PRICING_CONFIG } from "@/lib/config";
 import { useLogger } from "@/utils/logger";
 import { colors } from "@/styles/tokens";
+import { cn } from "@/lib/utils";
 import { 
   DndContext, 
   closestCenter, 
@@ -101,24 +102,21 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    cursor: isDragging ? 'grabbing' : 'grab',
-  };
+  } as React.CSSProperties;
 
   // Simular dados históricos para sparkline (em um app real, viriam do banco)
   const sparklineData = Array.from({ length: 7 }, () => Math.random() * 10 + result.margem_percentual);
 
   return (
-    <Card 
-      ref={setNodeRef} 
-      style={style} 
-      className={`
-        group relative bg-gradient-to-br from-card to-card/50
-        transition-all duration-300 ease-in-out
-        hover:shadow-elegant hover:border-brand-primary/30
-        hover:scale-[1.02] hover:bg-gradient-to-br hover:from-card hover:to-brand-primary
-        ${isDragging ? 'z-50 rotate-1 scale-105 shadow-elegant' : ''}
-      `}
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "group relative bg-gradient-to-br from-card to-card/50 transition-all duration-300 ease-in-out hover:shadow-elegant hover:border-brand-primary/30 hover:scale-[1.02] hover:bg-gradient-to-br hover:from-card hover:to-brand-primary",
+        isDragging
+          ? "z-50 rotate-1 scale-105 shadow-elegant opacity-50 cursor-grabbing"
+          : "cursor-grab"
+      )}
       {...attributes}
     >
         {index === 0 && (

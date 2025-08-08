@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface SkeletonTableProps {
   rows?: number;
@@ -6,6 +7,15 @@ interface SkeletonTableProps {
 }
 
 export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
+  const gridTemplates: Record<number, string> = {
+    1: "[grid-template-columns:1fr_auto]",
+    2: "[grid-template-columns:repeat(2,1fr)_auto]",
+    3: "[grid-template-columns:repeat(3,1fr)_auto]",
+    4: "[grid-template-columns:repeat(4,1fr)_auto]",
+    5: "[grid-template-columns:repeat(5,1fr)_auto]",
+    6: "[grid-template-columns:repeat(6,1fr)_auto]",
+  };
+  const gridTemplate = gridTemplates[columns] ?? gridTemplates[4];
   return (
     <div className="space-y-md">
       {/* Header skeleton */}
@@ -21,7 +31,7 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
       <div className="rounded-lg border border-border/50 overflow-hidden">
         {/* Table header */}
         <div className="bg-muted/50 p-md border-b">
-          <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr) auto` }}>
+          <div className={cn("grid gap-4", gridTemplate)}>
             {Array.from({ length: columns }).map((_, i) => (
               <Skeleton key={i} className="h-4 w-20" />
             ))}
@@ -33,7 +43,7 @@ export function SkeletonTable({ rows = 5, columns = 4 }: SkeletonTableProps) {
         <div className="space-y-0">
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <div key={rowIndex} className="p-md border-b last:border-b-0">
-              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr) auto` }}>
+              <div className={cn("grid gap-4", gridTemplate)}>
                 {Array.from({ length: columns }).map((_, colIndex) => (
                   <Skeleton key={colIndex} className="h-4 w-full" />
                 ))}

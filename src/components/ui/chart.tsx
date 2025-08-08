@@ -3,8 +3,7 @@ import * as RechartsPrimitive from "recharts"
 
 import { cn } from "@/lib/utils"
 
-// Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const
+type ThemeKeys = "light" | "dark"
 
 export type ChartConfig = {
   [k in string]: {
@@ -12,7 +11,7 @@ export type ChartConfig = {
     icon?: React.ComponentType
   } & (
     | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
+    | { color?: never; theme: Record<ThemeKeys, string> }
   )
 }
 
@@ -44,6 +43,19 @@ const ChartContainer = React.forwardRef<
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
+  const colorVars = Object.entries(config).flatMap(([key, itemConfig]) => {
+    if ("theme" in itemConfig && itemConfig.theme) {
+      return [
+        `[--color-${key}:${itemConfig.theme.light}]`,
+        `dark:[--color-${key}:${itemConfig.theme.dark}]`,
+      ]
+    }
+    if (itemConfig.color) {
+      return [`[--color-${key}:${itemConfig.color}]`]
+    }
+    return []
+  })
+
   return (
     <ChartContext.Provider value={{ config }}>
       <div
@@ -51,11 +63,11 @@ const ChartContainer = React.forwardRef<
         ref={ref}
         className={cn(
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-brand-dark [&_.recharts-cartesian-grid_line]:stroke-brand-secondary/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-brand-primary [&_.recharts-dot]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_]:stroke-brand-secondary [&_.recharts-radial-bar-background-sector]:fill-brand-secondary/30 [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-brand-secondary/30 [&_.recharts-reference-line_]:stroke-brand-secondary [&_.recharts-sector]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
+          colorVars,
           className
         )}
         {...props}
       >
-        <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
           {children}
         </RechartsPrimitive.ResponsiveContainer>
@@ -64,39 +76,6 @@ const ChartContainer = React.forwardRef<
   )
 })
 ChartContainer.displayName = "Chart"
-
-const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
-  const colorConfig = Object.entries(config).filter(
-    ([_, config]) => config.theme || config.color
-  )
-
-  if (!colorConfig.length) {
-    return null
-  }
-
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
-      }}
-    />
-  )
-}
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
@@ -206,7 +185,7 @@ const ChartTooltipContent = React.forwardRef<
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+                            "shrink-0 rounded-[2px] bg-[--indicator-color] border-[--indicator-color]",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -215,12 +194,9 @@ const ChartTooltipContent = React.forwardRef<
                               "my-0.5": nestLabel && indicator === "dashed",
                             }
                           )}
-                          style={
-                            {
-                              "--color-bg": indicatorColor,
-                              "--color-border": indicatorColor,
-                            } as React.CSSProperties
-                          }
+                          style={{
+                            "--indicator-color": indicatorColor,
+                          } as React.CSSProperties}
                         />
                       )
                     )}
@@ -298,10 +274,8 @@ const ChartLegendContent = React.forwardRef<
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
+                  className="h-2 w-2 shrink-0 rounded-[2px] bg-[--legend-color]"
+                  style={{ "--legend-color": item.color } as React.CSSProperties}
                 />
               )}
               {itemConfig?.label}
@@ -359,5 +333,4 @@ export {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  ChartStyle,
 }
