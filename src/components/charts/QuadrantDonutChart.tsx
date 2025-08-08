@@ -2,6 +2,7 @@ import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { ChartTooltipProps, ChartLegendProps } from '@/types/charts';
 import { colors } from "@/styles/tokens";
+import { cn } from "@/lib/utils";
 
 interface QuadrantCounts {
   alta_margem_alto_giro: number;
@@ -19,6 +20,7 @@ const QUADRANT_DATA = [
     name: "Estrelas",
     key: "alta_margem_alto_giro",
     color: colors.success.DEFAULT,
+    bgClass: "bg-[hsl(var(--success))]",
     emoji: "⭐",
     description: "Alta Margem + Alto Giro",
   },
@@ -26,6 +28,7 @@ const QUADRANT_DATA = [
     name: "Joias",
     key: "alta_margem_baixo_giro",
     color: colors.primary.DEFAULT,
+    bgClass: "bg-[hsl(var(--primary))]",
     emoji: "💎",
     description: "Alta Margem + Baixo Giro",
   },
@@ -33,6 +36,7 @@ const QUADRANT_DATA = [
     name: "Movimento",
     key: "baixa_margem_alto_giro",
     color: colors.warning.DEFAULT,
+    bgClass: "bg-[hsl(var(--warning))]",
     emoji: "🔄",
     description: "Baixa Margem + Alto Giro",
   },
@@ -40,6 +44,7 @@ const QUADRANT_DATA = [
     name: "Questionáveis",
     key: "baixa_margem_baixo_giro",
     color: colors.destructive.DEFAULT,
+    bgClass: "bg-[hsl(var(--destructive))]",
     emoji: "❓",
     description: "Baixa Margem + Baixo Giro",
   },
@@ -50,6 +55,7 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
     name: quadrant.name,
     value: quadrantCounts[quadrant.key as keyof QuadrantCounts],
     color: quadrant.color,
+    bgClass: quadrant.bgClass,
     emoji: quadrant.emoji,
     description: quadrant.description,
   })).filter(item => item.value > 0);
@@ -79,10 +85,7 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
       <div className="flex flex-wrap justify-center gap-4 mt-4">
         {payload?.map((entry, index: number) => (
           <div key={index} className="flex items-center gap-2 text-sm">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
+            <div className={cn("w-3 h-3 rounded-full", entry.payload?.bgClass)} />
             <span>{String(entry.payload?.emoji || '')} {entry.value}</span>
             <span className="text-muted-foreground">
               ({String(entry.payload?.value || '')})
