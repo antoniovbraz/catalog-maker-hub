@@ -114,12 +114,17 @@ const Marketplaces = () => {
                 <div className="text-sm text-muted-foreground">
                   {totalPlatforms} plataformas, {totalModalities} modalidades
                 </div>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={toggleList}
+                  aria-label={isListVisible ? 'Ocultar lista' : 'Mostrar lista'}
                 >
-                  {isListVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {isListVisible ? (
+                    <EyeOff className="w-4 h-4" aria-hidden="true" />
+                  ) : (
+                    <Eye className="w-4 h-4" aria-hidden="true" />
+                  )}
                 </Button>
               </div>
               
