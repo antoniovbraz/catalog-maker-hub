@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, SortAsc, SortDesc, Grid, List, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 
 export interface DataColumn<T> {
   key: keyof T | string;
@@ -106,22 +105,28 @@ export function DataVisualization<T extends { id: string }>({
         <TableHeader>
           <TableRow>
             {columns.map((column) => (
-              <TableHead
-                key={String(column.key)}
-                className={cn(
-                  column.sortable && "cursor-pointer hover:bg-muted/50 transition-colors",
-                  column.className
+              <TableHead key={String(column.key)} className={column.className}>
+                {column.sortable ? (
+                  <button
+                    type="button"
+                    onClick={() => handleSort(String(column.key))}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors w-full text-left"
+                    aria-label={`Ordenar por ${column.header}`}
+                  >
+                    <span>{column.header}</span>
+                    {sortColumn === String(column.key) && (
+                      sortDirection === "asc" ? (
+                        <SortAsc className="w-4 h-4" aria-hidden="true" />
+                      ) : (
+                        <SortDesc className="w-4 h-4" aria-hidden="true" />
+                      )
+                    )}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {column.header}
+                  </div>
                 )}
-                onClick={() => column.sortable && handleSort(String(column.key))}
-              >
-                <div className="flex items-center gap-2">
-                  {column.header}
-                  {column.sortable && sortColumn === String(column.key) && (
-                    sortDirection === "asc" ?
-                      <SortAsc className="w-4 h-4" /> :
-                      <SortDesc className="w-4 h-4" />
-                  )}
-                </div>
               </TableHead>
             ))}
             {actions.length > 0 && <TableHead>Ações</TableHead>}
@@ -148,15 +153,18 @@ export function DataVisualization<T extends { id: string }>({
                         variant={action.variant || "outline"}
                         onClick={() => action.onClick(item)}
                         disabled={action.disabled?.(item)}
+                        aria-label={action.label}
                       >
-                        {action.icon}
+                        {action.icon && (
+                          <span aria-hidden="true">{action.icon}</span>
+                        )}
                       </Button>
                     ))}
                     {actions.length > 2 && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="ghost">
-                            <MoreHorizontal className="w-4 h-4" />
+                          <Button size="sm" variant="ghost" aria-label="Mais ações">
+                            <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -166,7 +174,9 @@ export function DataVisualization<T extends { id: string }>({
                               onClick={() => action.onClick(item)}
                               disabled={action.disabled?.(item)}
                             >
-                              {action.icon}
+                              {action.icon && (
+                                <span className="mr-2" aria-hidden="true">{action.icon}</span>
+                              )}
                               {action.label}
                             </DropdownMenuItem>
                           ))}
@@ -213,8 +223,12 @@ export function DataVisualization<T extends { id: string }>({
           <div className="flex flex-wrap items-center gap-2">
             {searchable && (
               <div className="relative w-full sm:w-auto">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4"
+                  aria-hidden="true"
+                />
                 <Input
+                  aria-label="Buscar"
                   placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -230,16 +244,18 @@ export function DataVisualization<T extends { id: string }>({
                   variant={viewMode === "table" ? "default" : "ghost"}
                   onClick={() => onViewModeChange("table")}
                   className="rounded-r-none"
+                  aria-label="Visualizar como tabela"
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-4 h-4" aria-hidden="true" />
                 </Button>
                 <Button
                   size="sm"
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   onClick={() => onViewModeChange("grid")}
                   className="rounded-l-none border-l"
+                  aria-label="Visualizar como grade"
                 >
-                  <Grid className="w-4 h-4" />
+                  <Grid className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             )}

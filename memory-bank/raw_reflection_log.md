@@ -261,3 +261,23 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Automatizar login de teste para validar rotas protegidas em verificação de overflow.
 ---
+---
+Date: 2025-08-08
+TaskRef: "Add accessibility labels to interactive icons"
+
+Learnings:
+- Botões com ícones precisam de `aria-label` e ícones decorativos devem usar `aria-hidden`.
+- `TableHead` interativo requer um `<button>` interno para suporte a teclado e leitor de tela.
+- Instalação de dependências do Playwright (`apt-get install` + `npx playwright install`) é necessária para executar testes de acessibilidade.
+
+Difficulties:
+- `pnpm test --run` incluiu arquivos Playwright e falhou; exclusão via CLI não funcionou.
+- `npx playwright test` exigiu bibliotecas do sistema e servidor local, resultando em erros de conexão.
+
+Successes:
+- Lint e type-check passaram sem erros após ajustes.
+- Adicionados `aria-label` e `aria-hidden` em vários componentes e páginas, melhorando a acessibilidade.
+
+Improvements_Identified_For_Consolidation:
+- Documentar comandos corretos para executar apenas testes Vitest e configurar ambiente do Playwright.
+---

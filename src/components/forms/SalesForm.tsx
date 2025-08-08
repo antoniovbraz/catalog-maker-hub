@@ -219,16 +219,18 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleEdit(sale)}
+                            aria-label="Editar venda"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-4 w-4" aria-hidden="true" />
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
                             onClick={() => deleteMutation.mutate(sale.id)}
                             disabled={deleteMutation.isPending}
+                            aria-label="Excluir venda"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </TableCell>

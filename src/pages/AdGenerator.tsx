@@ -378,20 +378,22 @@ export default function AdGenerator() {
                         className="w-full h-24 object-cover rounded-md border"
                       />
                       <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-wrap items-center justify-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => window.open(image.image_url, '_blank')}
-                        >
-                          <Eye className="w-3 h-3" />
-                        </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => window.open(image.image_url, '_blank')}
+                            aria-label="Visualizar imagem"
+                          >
+                            <Eye className="w-3 h-3" aria-hidden="true" />
+                          </Button>
                         <Button
                           size="sm"
                           variant="destructive"
                           onClick={() => deleteMutation.mutate(image.id)}
                           disabled={deleteMutation.isPending}
+                          aria-label="Excluir imagem"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3 h-3" aria-hidden="true" />
                         </Button>
                       </div>
                       <Badge 
@@ -488,8 +490,9 @@ export default function AdGenerator() {
                       size="sm"
                       variant="ghost"
                       onClick={() => navigator.clipboard.writeText(generatedResult.title)}
+                      aria-label="Copiar título"
                     >
-                      📋
+                      <span aria-hidden="true">📋</span>
                     </Button>
                   </div>
                   <div className="p-3 bg-muted/30 rounded-md text-sm">
@@ -505,8 +508,9 @@ export default function AdGenerator() {
                       size="sm"
                       variant="ghost"
                       onClick={() => navigator.clipboard.writeText(generatedResult.description)}
+                      aria-label="Copiar descrição"
                     >
-                      📋
+                      <span aria-hidden="true">📋</span>
                     </Button>
                   </div>
                   <div className="p-3 bg-muted/30 rounded-md text-sm whitespace-pre-wrap max-h-32 overflow-y-auto">
