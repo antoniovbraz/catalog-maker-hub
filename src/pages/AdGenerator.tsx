@@ -30,9 +30,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
 const MARKETPLACE_OPTIONS = [
-  { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-brand-primary' },
-  { value: 'shopee', label: 'Shopee', icon: '🛍️', color: 'bg-brand-danger' },
-  { value: 'instagram', label: 'Instagram', icon: '📸', color: 'bg-brand-secondary' },
+  { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-primary' },
+  { value: 'shopee', label: 'Shopee', icon: '🛍️', color: 'bg-destructive' },
+  { value: 'instagram', label: 'Instagram', icon: '📸', color: 'bg-secondary' },
 ] as const;
 
 export default function AdGenerator() {
@@ -334,7 +334,7 @@ export default function AdGenerator() {
                 className={cn(
                   "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
                   dragOver
-                    ? "border-brand-primary bg-brand-primary/5"
+                    ? "border-primary bg-primary/5"
                     : "border-muted-foreground/25",
                   !selectedProductId && "opacity-50 pointer-events-none"
                 )}
@@ -357,7 +357,7 @@ export default function AdGenerator() {
                 />
                 <Label
                   htmlFor="image-upload"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-background border rounded-md cursor-pointer hover:bg-muted"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-card border border-border text-card-foreground rounded-md cursor-pointer hover:bg-accent/40"
                 >
                   <ImageIcon className="w-4 h-4" />
                   Selecionar Imagens
@@ -377,7 +377,7 @@ export default function AdGenerator() {
                         alt="Produto"
                         className="w-full h-24 object-cover rounded-md border"
                       />
-                      <div className="absolute inset-0 bg-brand-dark/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-wrap items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex flex-wrap items-center justify-center gap-2">
                           <Button
                             size="sm"
                             variant="secondary"

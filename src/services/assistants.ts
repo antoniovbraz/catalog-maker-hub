@@ -2,10 +2,10 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import type { Assistant, AssistantFormData } from "@/types/assistants";
-import { useLogger } from "@/utils/logger";
+import { logger } from "@/utils/logger";
 
 export class AssistantsService extends BaseService<Assistant> {
-  private logger = useLogger('AssistantsService');
+  private logger = logger;
 
   constructor() {
     super('assistants');

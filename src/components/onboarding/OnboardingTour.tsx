@@ -90,7 +90,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-brand-dark/50 backdrop-blur-sm z-50 flex items-center justify-center p-md">
+    <div className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50 flex items-center justify-center p-md">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center pb-2">
           <div className="flex items-center justify-between mb-4">
@@ -104,8 +104,8 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
           
           <Progress value={progress} className="mb-6" />
           
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-primary/10 rounded-full mb-4">
-            <step.icon className="w-8 h-8 text-brand-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+            <step.icon className="w-8 h-8 text-primary" />
           </div>
           
           <CardTitle className="text-2xl mb-2">{step.title}</CardTitle>
@@ -122,17 +122,17 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
                 key={s.id}
                 className={`p-3 rounded-lg border text-center transition-all ${
                   index === currentStep
-                    ? 'border-brand-primary bg-brand-primary/5'
+                    ? 'border-primary bg-primary/5'
                     : index < currentStep
-                    ? 'border-brand-primary bg-brand-primary/10'
+                    ? 'border-primary bg-primary/10'
                     : 'border-muted'
                 }`}
               >
                 <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full mb-2 ${
                   index === currentStep
-                    ? 'bg-brand-primary text-brand-background'
+                    ? 'bg-primary text-primary-foreground'
                     : index < currentStep
-                    ? 'bg-brand-primary text-brand-background'
+                    ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground'
                 }`}>
                   {index < currentStep ? (

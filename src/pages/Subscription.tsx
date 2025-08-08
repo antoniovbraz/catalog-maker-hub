@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Check, Crown, Zap, Star, ArrowRight, Infinity } from '@/components/ui/icons';
+import { Check, Crown, Zap, Star, ArrowRight, Infinity as InfinityIcon } from '@/components/ui/icons';
 import { useSubscriptionPlans, useCurrentSubscription, useUsageTracking } from '@/hooks/useSubscription';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -56,9 +56,9 @@ export default function Subscription() {
   const getPlanColor = (planName: string) => {
     switch (planName) {
       case 'free': return 'bg-muted text-muted-foreground';
-      case 'basic': return 'bg-brand-primary text-brand-background';
-      case 'pro': return 'bg-brand-secondary text-brand-dark';
-      case 'enterprise': return 'bg-gradient-primary text-brand-background';
+      case 'basic': return 'bg-primary text-primary-foreground';
+      case 'pro': return 'bg-secondary text-foreground';
+      case 'enterprise': return 'bg-gradient-primary text-primary-foreground';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -81,10 +81,10 @@ export default function Subscription() {
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       {/* Header */}
       <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-primary/10 rounded-full mb-4">
-          <Crown className="w-8 h-8 text-brand-primary" />
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+          <Crown className="w-8 h-8 text-primary" />
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-primary to-brand-primary bg-clip-text text-transparent mb-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent mb-4">
           Escolha seu Plano
         </h1>
         <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -94,7 +94,7 @@ export default function Subscription() {
 
       {/* Current Subscription Status */}
       {currentSubscription && (
-        <Card className="mb-8 border-brand-primary/20 bg-gradient-to-r from-brand-primary to-brand-primary">
+        <Card className="mb-8 border-primary/20 bg-gradient-to-r from-primary to-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Badge className={getPlanColor(currentSubscription.plan?.name || '')}>
@@ -157,8 +157,8 @@ export default function Subscription() {
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              billingCycle === 'monthly' 
-                ? 'bg-background text-foreground shadow-sm' 
+              billingCycle === 'monthly'
+                ? 'bg-card text-card-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -167,8 +167,8 @@ export default function Subscription() {
           <button
             onClick={() => setBillingCycle('yearly')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              billingCycle === 'yearly' 
-                ? 'bg-background text-foreground shadow-sm' 
+              billingCycle === 'yearly'
+                ? 'bg-card text-card-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -188,18 +188,18 @@ export default function Subscription() {
           return (
             <Card
               key={plan.id}
-              className={`relative ${isRecommended ? 'border-brand-primary shadow-lg scale-105' : ''} ${
-                isCurrent ? 'ring-2 ring-brand-primary/50' : ''
+              className={`relative ${isRecommended ? 'border-primary shadow-lg scale-105' : ''} ${
+                isCurrent ? 'ring-2 ring-ring' : ''
               }`}
             >
               {isRecommended && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-brand-primary">
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary">
                   Recomendado
                 </Badge>
               )}
               
               {isCurrent && (
-                <Badge className="absolute -top-3 right-4 bg-brand-primary">
+                <Badge className="absolute -top-3 right-4 bg-primary">
                   Atual
                 </Badge>
               )}
@@ -246,7 +246,7 @@ export default function Subscription() {
                       
                       return (
                         <li key={feature} className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-brand-primary" />
+                          <Check className="h-4 w-4 text-primary" />
                           {featureLabels[feature] || feature}
                         </li>
                       );
@@ -272,7 +272,7 @@ export default function Subscription() {
                         <li key={limit} className="flex justify-between">
                           <span>{limitLabels[limit] || limit}:</span>
                           <span className="font-medium">
-                            {value === -1 ? <Infinity className="h-4 w-4 inline" /> : value.toLocaleString()}
+                            {value === -1 ? <InfinityIcon className="h-4 w-4 inline" /> : value.toLocaleString()}
                           </span>
                         </li>
                       );

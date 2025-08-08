@@ -60,4 +60,22 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Registrar método rápido para converter hex em HSL ao ajustar temas.
 ---
+------
+Date: 2025-08-08
+TaskRef: "Aplicar paleta Corporate com tokens HSL"
+
+Learnings:
+- Padronizar cores via variáveis `--token` facilita trocar temas e evita hex espalhados.
+- Classes `ring-ring` usam a variável `--ring`, mantendo foco consistente.
+
+Difficulties:
+- Substituir todos os usos de `brand-*` exigiu mapear equivalências para `primary`, `secondary` e `destructive`.
+- Variáveis de tipografia e espaçamento haviam sido removidas ao reescrever o `:root` e precisaram ser reintroduzidas.
+
+Successes:
+- Componentes shadcn/ui agora consomem `hsl(var(--token))` e formulários usam `bg-card border-input focus-visible:ring-ring`.
+- Sidebar e Header adotaram fundo gunmetal com textos claros.
+
+Improvements_Identified_For_Consolidation:
+- Criar script de migração automática para tokens, evitando edições manuais extensas em futuras paletas.
 ---

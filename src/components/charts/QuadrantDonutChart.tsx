@@ -67,7 +67,7 @@ export const QuadrantDonutChart: React.FC<QuadrantDonutChartProps> = ({ quadrant
       const data = payload[0];
       const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : 0;
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
+        <div className="bg-card border border-border rounded-lg shadow-lg p-3 text-sm text-card-foreground">
           <div className="flex items-center gap-2">
             <span>{String(data.payload.emoji || '')}</span>
             <span className="font-medium">{data.name}</span>

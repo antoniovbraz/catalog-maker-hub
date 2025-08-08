@@ -22,14 +22,6 @@ export default {
                 extend: {
                         colors: {
                                 ...colors,
-                                brand: {
-                                        dark: colors.gunmetal,
-                                        primary: colors["fern-green"],
-                                        secondary: colors["tea-green"],
-                                        background: colors["anti-flash-white"],
-                                        danger: colors.cinnabar,
-                                        warning: colors.warning.DEFAULT,
-                                },
                         },
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
