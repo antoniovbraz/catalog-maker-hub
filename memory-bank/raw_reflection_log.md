@@ -133,3 +133,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Investigar estratégia para executar lint e testes isolando arquivos tocados para evitar ruído.
 ---
+---
+Date: 2025-08-09
+TaskRef: "Implement ShippingRulesTable with useShippingRules"
+
+Learnings:
+- Reutilizar DataVisualization para regras de frete padroniza ações e layout.
+- Hook dedicado `useShippingRules` centraliza acesso ao Supabase e facilita invalidação de cache.
+
+Difficulties:
+- Lint e testes apresentam erros pré-existentes de Tailwind e Playwright.
+
+Successes:
+- Tabela de regras de frete criada com suporte a exclusão e listagem colapsável.
+
+Improvements_Identified_For_Consolidation:
+- Definir estratégia para execução isolada de testes de unidade e Playwright.
+---

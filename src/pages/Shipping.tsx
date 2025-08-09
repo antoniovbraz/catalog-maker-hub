@@ -4,6 +4,7 @@ import { Truck, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { ShippingRulesTable } from "@/components/shipping/ShippingRulesTable";
 
 const Shipping = () => {
   const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
@@ -47,10 +48,7 @@ const Shipping = () => {
           isOpen={isListVisible}
           onToggle={toggleList}
         >
-          <div className="p-4 text-center text-muted-foreground">
-            <p>Lista de regras de frete será exibida aqui</p>
-            <p className="text-sm mt-1">Adicione uma nova regra para começar</p>
-          </div>
+          <ShippingRulesTable />
         </CollapsibleCard>
       </div>
     </ConfigurationPageLayout>
