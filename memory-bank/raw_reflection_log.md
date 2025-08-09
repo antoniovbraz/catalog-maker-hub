@@ -186,3 +186,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Documentar configuração mínima para rodar Playwright em ambientes limpos.
 ---
+---
+Date: 2025-08-09
+TaskRef: "Configurar ESLint com novos plugins"
+
+Learnings:
+- Alguns configs recomendados de plugins não são compatíveis diretamente com flat config e exigem ajustes manuais.
+- Ativar muitos conjuntos recomendados pode introduzir centenas de avisos em bases legadas.
+
+Difficulties:
+- `pnpm lint` inicialmente falhou por regras rígidas de import e Tailwind.
+- Testes Vitest e Playwright falharam devido a suites mal configuradas.
+
+Successes:
+- Lint final executou sem erros após desabilitar regras problemáticas.
+
+Improvements_Identified_For_Consolidation:
+- Registrar abordagem para converter configs do ESLint antigos para flat config.
+---
