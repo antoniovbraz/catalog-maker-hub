@@ -8,6 +8,8 @@ import localPlugin from "./eslint/rules/no-outside-ui-imports.js";
 import react from "eslint-plugin-react";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import importPlugin from "eslint-plugin-import";
+import prettier from "eslint-plugin-prettier";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 export default tseslint.config(
   { ignores: ["dist"] },
@@ -18,6 +20,7 @@ export default tseslint.config(
       react.configs.flat.recommended,
       react.configs.flat["jsx-runtime"],
       ...tailwindcss.configs["flat/recommended"],
+      eslintConfigPrettier,
     ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
@@ -32,6 +35,7 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
       tailwindcss,
       local: localPlugin,
+      prettier,
     },
     settings: {
       tailwindcss: {
@@ -76,6 +80,7 @@ export default tseslint.config(
       "jsx-a11y/heading-has-content": "off",
       "react/no-unknown-property": "off",
       "jsx-a11y/anchor-has-content": "off",
+      "prettier/prettier": "error",
     },
   }
 );
