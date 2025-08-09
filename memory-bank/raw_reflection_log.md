@@ -150,3 +150,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Definir estratégia para execução isolada de testes de unidade e Playwright.
 ---
+Date: 2025-08-09
+TaskRef: "Use shared icon exports in DataVisualization"
+
+Learnings:
+- Importar ícones via '@/components/ui/icons' evita uso direto de lucide-react e centraliza updates.
+- Busca com `rg` facilita garantir ausência de importações diretas em componentes compartilhados.
+
+Difficulties:
+- Lint e testes apresentaram erros preexistentes, dificultando validação completa.
+- Playwright falhou por configuração e dependências ausentes.
+
+Successes:
+- Linha de importação atualizada para usar ícones compartilhados.
+- Confirmei que nenhum componente fora de 'ui' importa lucide-react diretamente.
+
+Improvements_Identified_For_Consolidation:
+- Documentar abordagem para lidar com erros de lint e Playwright em ambiente legado.
+---
