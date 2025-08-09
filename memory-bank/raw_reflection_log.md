@@ -239,3 +239,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Automatizar processo de geração do baseline para comparações futuras.
 ---
+Date: 2025-08-09
+TaskRef: "Atualizar scripts de lint e format"
+
+Learnings:
+- Uso de glob limitado reduz escopo do ESLint para arquivos relevantes.
+- Scripts dedicados de formatação facilitam padronizar estilo com Prettier.
+
+Difficulties:
+- `pnpm lint` continua exibindo milhares de erros herdados.
+- Testes Playwright exigem navegadores instalados, causando falhas.
+
+Successes:
+- Scripts `lint`, `lint:fix` e `format` adicionados ao `package.json` e documentados.
+- `tsc --noEmit` executou sem erros.
+
+Improvements_Identified_For_Consolidation:
+- Investigar estratégias para reduzir ruído do ESLint em bases legadas.
+---
