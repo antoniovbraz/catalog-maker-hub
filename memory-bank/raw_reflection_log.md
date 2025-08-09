@@ -97,3 +97,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Padronizar o padrão de lifting state para edição de entidades para reduzir duplicação entre páginas.
 ---
+---
+Date: 2025-08-08
+TaskRef: "Substituir Card por CollapsibleCard em Categories"
+
+Learnings:
+- CollapsibleCard facilita colapsar a listagem reaproveitando o estado do hook `useFormVisibility`.
+- Ícones `Eye`/`EyeOff` no header oferecem feedback claro sobre visibilidade da lista.
+
+Difficulties:
+- `pnpm lint` reportou muitos erros antigos de Tailwind que não foram tratados.
+- Testes Playwright exigiram instalação de navegadores e ainda falharam por falta de servidor.
+
+Successes:
+- Página de categorias agora controla a listagem com `CollapsibleCard` e botão de visibilidade.
+
+Improvements_Identified_For_Consolidation:
+- Registrar no repositório como preparar ambiente para testes Playwright.
+---

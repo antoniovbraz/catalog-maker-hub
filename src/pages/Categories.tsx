@@ -1,8 +1,8 @@
 import { CategoryForm } from "@/components/forms/CategoryForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
-import { FolderTree, Plus, Edit, Trash2 } from "@/components/ui/icons";
+import { FolderTree, Plus, Edit, Trash2, Eye, EyeOff } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType } from "@/types/categories";
@@ -11,7 +11,7 @@ import { useState } from "react";
 
 const Categories = () => {
   const [editingCategory, setEditingCategory] = useState<CategoryType | null>(null);
-  const { isFormVisible, showForm, hideForm } = useFormVisibility({
+  const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
     formStorageKey: 'categories-form-visible',
     listStorageKey: 'categories-list-visible'
   });
@@ -74,6 +74,18 @@ const Categories = () => {
 
   const headerActions = (
     <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleList}
+        aria-label={isListVisible ? 'Ocultar lista' : 'Mostrar lista'}
+      >
+        {isListVisible ? (
+          <EyeOff className="w-4 h-4" aria-hidden="true" />
+        ) : (
+          <Eye className="w-4 h-4" aria-hidden="true" />
+        )}
+      </Button>
       <Button size="sm" onClick={showForm}>
         <Plus className="w-4 h-4 mr-2" />
         Nova Categoria
@@ -95,33 +107,30 @@ const Categories = () => {
         </div>
       )}
 
-      {/* Lista de categorias sempre visível */}
+      {/* Lista de categorias */}
       <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
-        <Card className="shadow-card border border-border/20">
-          <CardHeader className="py-3">
-            <CardTitle className="text-base flex items-center gap-2 font-medium text-muted-foreground">
-              <FolderTree className="w-4 h-4" />
-              <span>Categorias Cadastradas</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-4 px-6">
-            <DataVisualization
-              title=""
-              data={categories}
-              columns={columns}
-              actions={actions}
-              isLoading={isLoading}
-              emptyState={
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
-                  <p className="text-sm text-muted-foreground">
-                    Crie sua primeira categoria usando o formulário ao lado
-                  </p>
-                </div>
-              }
-            />
-          </CardContent>
-        </Card>
+        <CollapsibleCard
+          title="Categorias Cadastradas"
+          icon={<FolderTree className="w-4 h-4" />}
+          isOpen={isListVisible}
+          onToggle={toggleList}
+        >
+          <DataVisualization
+            title=""
+            data={categories}
+            columns={columns}
+            actions={actions}
+            isLoading={isLoading}
+            emptyState={
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
+                <p className="text-sm text-muted-foreground">
+                  Crie sua primeira categoria usando o formulário ao lado
+                </p>
+              </div>
+            }
+          />
+        </CollapsibleCard>
       </div>
     </ConfigurationPageLayout>
   );
