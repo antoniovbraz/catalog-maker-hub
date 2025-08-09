@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/components/ui/use-toast";
 import { Info } from '@/components/ui/icons';
 import { handleSupabaseError } from "@/utils/errors";
+import { FixedFeeRule } from "@/types/fixed-fees";
 
 interface Marketplace {
   id: string;
@@ -36,9 +37,10 @@ const RULE_TYPES = [
 
 interface FixedFeeRuleFormProps {
   onCancel?: () => void;
+  editingRule?: FixedFeeRule | null;
 }
 
-export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
+export const FixedFeeRuleForm = ({ onCancel, editingRule }: FixedFeeRuleFormProps) => {
   interface FixedFeeRuleFormData {
     marketplace_id: string;
     rule_type: string;
@@ -154,7 +156,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
     }
   };
 
-  const handleCancelEdit = () => {
+const handleCancelEdit = () => {
     setFormData({
       marketplace_id: "",
       rule_type: "",
@@ -163,7 +165,22 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
       value: ""
     });
     setEditingId(null);
-  };
+};
+
+  useEffect(() => {
+    if (editingRule) {
+      setFormData({
+        marketplace_id: editingRule.marketplace_id,
+        rule_type: editingRule.rule_type,
+        range_min: editingRule.range_min !== null ? editingRule.range_min.toString() : "",
+        range_max: editingRule.range_max !== null ? editingRule.range_max.toString() : "",
+        value: editingRule.value.toString(),
+      });
+      setEditingId(editingRule.id);
+    } else {
+      handleCancelEdit();
+    }
+  }, [editingRule]);
 
   const showRangeFields = formData.rule_type === "faixa" || formData.rule_type === "percentual";
 
