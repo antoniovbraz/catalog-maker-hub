@@ -222,3 +222,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Documentar como habilitar Prettier gradualmente para evitar avalanche de erros em bases legadas.
 ---
+---
+Date: 2025-08-09
+TaskRef: "Gerar baseline de lint"
+
+Learnings:
+- `npm run --silent lint -- --format json` gera relatório JSON sem cabeçalho do npm.
+- Script em Node facilitou contar erros e agrupar regras.
+
+Difficulties:
+- Execução inicial do lint registrou cabeçalho do npm, invalidando o JSON.
+
+Successes:
+- Baseline capturado com 6827 erros e 923 avisos.
+
+Improvements_Identified_For_Consolidation:
+- Automatizar processo de geração do baseline para comparações futuras.
+---
