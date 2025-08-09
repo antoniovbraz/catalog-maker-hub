@@ -115,3 +115,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Registrar no repositório como preparar ambiente para testes Playwright.
 ---
+---
+Date: 2025-08-09
+TaskRef: "Criar FixedFeesTable com DataVisualization e CollapsibleCard"
+
+Learnings:
+- Reutilizar DataVisualization facilita padronizar tabelas com ações configuráveis.
+- useFormVisibility combinado com CollapsibleCard fornece controle de exibição para mobile.
+
+Difficulties:
+- `pnpm lint` possui diversos erros preexistentes de Tailwind que impedem passagem do linter.
+- Testes Vitest/Playwright falharam por ausência de configuração e browsers.
+
+Successes:
+- Componente FixedFeesTable criado com edição/remoção e página FixedFees ajustada para colapsar lista.
+
+Improvements_Identified_For_Consolidation:
+- Investigar estratégia para executar lint e testes isolando arquivos tocados para evitar ruído.
+---
