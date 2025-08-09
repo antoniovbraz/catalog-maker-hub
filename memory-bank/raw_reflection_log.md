@@ -204,3 +204,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Registrar abordagem para converter configs do ESLint antigos para flat config.
 ---
+---
+Date: 2025-08-09
+TaskRef: "Configurar Prettier e integrá-lo ao ESLint"
+
+Learnings:
+- `eslint-config-prettier` precisa ser instalado e importado explicitamente no flat config.
+- O helper `tseslint.config` não aceita `plugin:prettier/recommended` diretamente; é necessário declarar o plugin e a regra manualmente.
+
+Difficulties:
+- `pnpm lint` exibiu milhares de erros de formatação herdados, tornando inviável validar o lint.
+- Playwright e testes unitários falharam por configuração e dependências ausentes.
+
+Successes:
+- `tsc --noEmit` executou sem erros, confirmando tipos válidos.
+
+Improvements_Identified_For_Consolidation:
+- Documentar como habilitar Prettier gradualmente para evitar avalanche de erros em bases legadas.
+---
