@@ -21,7 +21,9 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 - `npm run dev` – inicia o servidor de desenvolvimento
 - `npm run build` – gera o build de produção
 - `npm run build:dev` – gera o build em modo de desenvolvimento
-- `npm run lint` – executa a verificação de lint
+- `npm run lint` – executa o ESLint nos arquivos `ts/tsx` de `src`, `app`, `components` e `pages`
+- `npm run lint:fix` – corrige automaticamente os problemas reportados pelo ESLint
+- `npm run format` – formata o código com Prettier
 - `npm test` – executa a suite de testes
 - `npm run test:coverage` – executa os testes com relatório de cobertura
 - `npm run preview` – visualiza o build de produção localmente
