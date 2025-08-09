@@ -29,7 +29,7 @@ export function ConfigurationPageLayout({
         breadcrumbs={breadcrumbs}
       />
       
-      <main className="container mx-auto px-4 sm:px-6 py-6">
+      <main className="container max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <PageTransition>
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
             {children}
