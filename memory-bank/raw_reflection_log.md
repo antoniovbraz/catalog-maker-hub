@@ -168,3 +168,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Documentar abordagem para lidar com erros de lint e Playwright em ambiente legado.
 ---
+---
+Date: 2025-08-09
+TaskRef: "Ajustar largura do container em ConfigurationPageLayout"
+
+Learnings:
+- Adicionar `max-w-7xl` padroniza a largura dos layouts de configuração com `SharedLayout`.
+- Playwright depende de navegadores e bibliotecas de sistema instaladas para rodar testes.
+
+Difficulties:
+- `pnpm lint` falhou devido a erros pré-existentes em arquivos não relacionados.
+- `npx playwright test` não executou por falta de dependências do sistema mesmo após tentativa de instalação.
+
+Successes:
+- `ConfigurationPageLayout` agora usa `container max-w-7xl`, alinhando largura com o restante da aplicação.
+
+Improvements_Identified_For_Consolidation:
+- Documentar configuração mínima para rodar Playwright em ambientes limpos.
+---
