@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,12 +97,12 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
     }
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({ name: "", description: "" });
     setEditingId(null);
     setErrors({});
     setTouched({});
-  };
+  }, []);
 
   // Efeito para preencher formulário quando editingCategory for passado
   useEffect(() => {
@@ -117,7 +117,7 @@ export const CategoryForm = ({ onCancel, editingCategory }: CategoryFormProps = 
     } else {
       resetForm();
     }
-  }, [editingCategory]);
+  }, [editingCategory, resetForm]);
 
   const optionalFields = useCollapsibleSection({ 
     storageKey: 'categories-optional-fields', 

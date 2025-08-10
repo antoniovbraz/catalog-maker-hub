@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -156,7 +156,7 @@ export const FixedFeeRuleForm = ({ onCancel, editingRule }: FixedFeeRuleFormProp
     }
   };
 
-const handleCancelEdit = () => {
+  const handleCancelEdit = useCallback(() => {
     setFormData({
       marketplace_id: "",
       rule_type: "",
@@ -165,7 +165,7 @@ const handleCancelEdit = () => {
       value: ""
     });
     setEditingId(null);
-};
+  }, []);
 
   useEffect(() => {
     if (editingRule) {
@@ -180,7 +180,7 @@ const handleCancelEdit = () => {
     } else {
       handleCancelEdit();
     }
-  }, [editingRule]);
+  }, [editingRule, handleCancelEdit]);
 
   const showRangeFields = formData.rule_type === "faixa" || formData.rule_type === "percentual";
 

@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [logger]);
 
   const signIn = async (email: string, password: string) => {
     try {

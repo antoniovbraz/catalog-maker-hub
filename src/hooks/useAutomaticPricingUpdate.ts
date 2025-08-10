@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { pricingService } from "@/services/pricing";
 import { toast } from "@/components/ui/use-toast";
@@ -10,7 +10,7 @@ export function useAutomaticPricingUpdate() {
   const queryClient = useQueryClient();
   const isUpdatingRef = useRef(false);
 
-  const handleRulesUpdate = async (tableName: string, eventType: string) => {
+  const handleRulesUpdate = useCallback(async (tableName: string, eventType: string) => {
     // Evitar múltiplas execuções simultâneas
     if (isUpdatingRef.current) {
       logger.debug('Recálculo já em andamento, ignorando evento...', 'useAutomaticPricingUpdate');
@@ -47,7 +47,7 @@ export function useAutomaticPricingUpdate() {
     } finally {
       isUpdatingRef.current = false;
     }
-  };
+  }, [queryClient]);
 
   useEffect(() => {
     logger.info('Configurando listeners de atualização automática...', 'useAutomaticPricingUpdate');
@@ -110,7 +110,7 @@ export function useAutomaticPricingUpdate() {
       supabase.removeChannel(fixedFeesChannel);
       supabase.removeChannel(shippingChannel);
     };
-  }, []); // Removida a dependência do queryClient para evitar loops
+  }, [handleRulesUpdate]);
 
   return {
     triggerManualUpdate: () => handleRulesUpdate('manual', 'manual_trigger')

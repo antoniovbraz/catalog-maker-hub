@@ -257,3 +257,19 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Investigar estratégias para reduzir ruído do ESLint em bases legadas.
 ---
+Date: 2025-08-09
+TaskRef: "Ajustar dependências de hooks"
+
+Learnings:
+- `useCallback` estabiliza funções usadas em `useEffect`, evitando advertências de `exhaustive-deps`.
+- Incluir callbacks e objetos externos nos arrays de dependência previne closures obsoletas.
+
+Difficulties:
+- `pnpm lint` ainda falha devido a milhares de erros de formatação herdados.
+
+Successes:
+- Diversos `useEffect` e `useCallback` foram atualizados com dependências completas em formulários e contextos.
+
+Improvements_Identified_For_Consolidation:
+- Criar plano gradual para resolver erros de lint legados e ativar checagem automática de hooks.
+---

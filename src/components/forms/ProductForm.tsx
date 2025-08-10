@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -141,7 +141,7 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
     }
   };
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
       name: "",
       description: "",
@@ -154,7 +154,7 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
     setEditingId(null);
     setErrors({});
     setTouched({});
-  };
+  }, []);
 
   useEffect(() => {
     if (editingProduct) {
@@ -173,8 +173,7 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
     } else {
       resetForm();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editingProduct]);
+  }, [editingProduct, resetForm]);
 
   // Calcular custo total para exibição
   const custoTotal = formData.cost_unit + formData.packaging_cost;
