@@ -349,7 +349,7 @@ export const DashboardForm = () => {
     } finally {
       setIsRecalculating(false);
     }
-  }, [calculatePrice, savePricing, toast]);
+  }, [calculatePrice, savePricing, toast, logger]);
 
   const handleMarketplaceToggle = (marketplaceId: string) => {
     setSelectedMarketplaces(prev => {
@@ -417,7 +417,7 @@ export const DashboardForm = () => {
     };
 
     calculateRealMargins();
-  }, [savedPricings]);
+  }, [savedPricings, logger]);
 
   // Transform and organize saved pricing data for display
   const transformedResults = savedPricings
@@ -458,7 +458,7 @@ export const DashboardForm = () => {
     if (transformedResults.length > 0 && cardOrder.length === 0) {
       setCardOrder(transformedResults.map(r => r.marketplace_id));
     }
-  }, [transformedResults, cardOrder.length]);
+  }, [transformedResults, cardOrder]);
 
   // Drag and drop sensors
   const sensors = useSensors(
