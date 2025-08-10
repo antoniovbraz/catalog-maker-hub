@@ -1,8 +1,8 @@
+import { useMemo } from 'react';
 /**
  * Sistema de logging estruturado para a aplicação
  * Substitui console.log por um sistema mais profissional
  */
-
 export enum LogLevel {
   ERROR = 'error',
   WARN = 'warn', 
@@ -104,10 +104,10 @@ export const logger = new Logger();
  * Hook para logging em componentes React
  */
 export function useLogger(context: string) {
-  return {
+  return useMemo(() => ({
     error: (message: string, data?: unknown) => logger.error(message, context, data),
     warn: (message: string, data?: unknown) => logger.warn(message, context, data),
     info: (message: string, data?: unknown) => logger.info(message, context, data),
     debug: (message: string, data?: unknown) => logger.debug(message, context, data),
-  };
+  }), [context]);
 }
