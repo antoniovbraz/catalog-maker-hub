@@ -56,20 +56,45 @@ class Logger {
     }
   }
 
-  error(message: string, context?: string, data?: unknown): void {
-    this.log(this.formatMessage(LogLevel.ERROR, message, context, data));
+  // Overloads to support (message, data) and (message, context, data)
+  error(message: string, data?: unknown): void;
+  error(message: string, context: string, data?: unknown): void;
+  error(message: string, contextOrData?: string | unknown, data?: unknown): void {
+    if (typeof contextOrData === 'string') {
+      this.log(this.formatMessage(LogLevel.ERROR, message, contextOrData, data));
+    } else {
+      this.log(this.formatMessage(LogLevel.ERROR, message, undefined, contextOrData));
+    }
   }
 
-  warn(message: string, context?: string, data?: unknown): void {
-    this.log(this.formatMessage(LogLevel.WARN, message, context, data));
+  warn(message: string, data?: unknown): void;
+  warn(message: string, context: string, data?: unknown): void;
+  warn(message: string, contextOrData?: string | unknown, data?: unknown): void {
+    if (typeof contextOrData === 'string') {
+      this.log(this.formatMessage(LogLevel.WARN, message, contextOrData, data));
+    } else {
+      this.log(this.formatMessage(LogLevel.WARN, message, undefined, contextOrData));
+    }
   }
 
-  info(message: string, context?: string, data?: unknown): void {
-    this.log(this.formatMessage(LogLevel.INFO, message, context, data));
+  info(message: string, data?: unknown): void;
+  info(message: string, context: string, data?: unknown): void;
+  info(message: string, contextOrData?: string | unknown, data?: unknown): void {
+    if (typeof contextOrData === 'string') {
+      this.log(this.formatMessage(LogLevel.INFO, message, contextOrData, data));
+    } else {
+      this.log(this.formatMessage(LogLevel.INFO, message, undefined, contextOrData));
+    }
   }
 
-  debug(message: string, context?: string, data?: unknown): void {
-    this.log(this.formatMessage(LogLevel.DEBUG, message, context, data));
+  debug(message: string, data?: unknown): void;
+  debug(message: string, context: string, data?: unknown): void;
+  debug(message: string, contextOrData?: string | unknown, data?: unknown): void {
+    if (typeof contextOrData === 'string') {
+      this.log(this.formatMessage(LogLevel.DEBUG, message, contextOrData, data));
+    } else {
+      this.log(this.formatMessage(LogLevel.DEBUG, message, undefined, contextOrData));
+    }
   }
 }
 

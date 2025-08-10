@@ -144,14 +144,15 @@ export class AssistantsService extends BaseService<Assistant> {
         .from('assistants' as any)
         .select('*')
         .eq('marketplace', marketplace)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          this.logger.debug('Nenhum assistente encontrado para o marketplace', { marketplace });
-          return null;
-        }
         throw error;
+      }
+
+      if (!data) {
+        this.logger.debug('Nenhum assistente encontrado para o marketplace', { marketplace });
+        return null;
       }
 
       this.logger.debug('Assistente encontrado', data);

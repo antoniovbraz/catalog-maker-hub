@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { render } from '@testing-library/react';
 import { DataVisualization } from '@/components/ui/data-visualization';
 

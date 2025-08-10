@@ -55,7 +55,7 @@ describe('logError', () => {
       name: 'Error',
       stack: error.stack,
     });
-    expect(typeof data.timestamp).toBe('string');
+    expect(typeof (data as any).timestamp).toBe('string');
 
     spy.mockRestore();
   });

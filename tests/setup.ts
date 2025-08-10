@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 // Mock do Supabase Client
-const mockSupabaseClient = {
+const mockSupabaseClient: any = {
   from: vi.fn(() => ({
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
