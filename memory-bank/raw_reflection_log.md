@@ -330,3 +330,19 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Registrar estratégia para capturar logs de lint extensos sem interromper a execução.
 ---
+Date: 2025-08-11
+TaskRef: "Atualizar scripts de lint para escopar src"
+
+Learnings:
+- Restringir o glob do ESLint a `src` evita varredura desnecessária em pastas inexistentes.
+
+Difficulties:
+- `pnpm lint` ainda retorna milhares de erros herdados, impedindo validação limpa.
+
+Successes:
+- Scripts `lint` e `lint:fix` agora apontam para `src/**/*.{ts,tsx}`.
+- `pnpm type-check` rodou sem falhas após a mudança.
+
+Improvements_Identified_For_Consolidation:
+- Planejar abordagem incremental para corrigir backlog de erros de lint.
+---
