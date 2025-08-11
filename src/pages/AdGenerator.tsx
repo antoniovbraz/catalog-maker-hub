@@ -192,7 +192,6 @@ export default function AdGenerator() {
       {mode === 'strategic' ? (
         // Modo Estratégico - Chat Interface
         <div className="xl:col-span-12 space-y-6">
-          {selectedProductId && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-base sm:text-lg md:text-xl">Configuração do Chat</CardTitle>
@@ -232,7 +231,6 @@ export default function AdGenerator() {
                 </div>
               </CardContent>
             </Card>
-          )}
 
           <Card>
             <CardContent className="p-0">
