@@ -365,3 +365,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Investigar causa raiz da demora no teste de navegação da Sidebar para remover o timeout elevado.
 ---
+---
+Date: 2025-08-11
+TaskRef: "Ajustar lint e remover dependências desnecessárias"
+
+Learnings:
+- Atualização do .prettierrc com singleQuote alinhou estilo de aspas com o código existente.
+- Mover lista WIDTH_CLASSES para o escopo de módulo elimina dependência instável no useMemo.
+
+Difficulties:
+- `pnpm lint` ainda reporta milhares de erros herdados; correção completa exigiria refatoração massiva.
+
+Successes:
+- Arquivos alterados passam pelo ESLint individualmente.
+
+Improvements_Identified_For_Consolidation:
+- Necessário planejar mutirão de formatação para permitir que `pnpm lint` passe globalmente.
+---
