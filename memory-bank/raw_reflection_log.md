@@ -273,3 +273,44 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar plano gradual para resolver erros de lint legados e ativar checagem automática de hooks.
 ---
+Date: 2025-08-11
+TaskRef: "Auditoria geral do repositório"
+
+Learnings:
+- `pnpm lint` retornou aproximadamente 6600 erros de Prettier e avisos de ESLint, evidenciando ausência de formatação padronizada e regras aplicadas.
+- `pnpm test --run` misturou suites do Vitest e Playwright; Playwright acusou uso incorreto de `test.describe`.
+- `npx playwright test tests/a11y.spec.ts` falhou por navegadores não instalados, sugerindo executar `npx playwright install`.
+- `pnpm dev` iniciou sem erros, confirmando ambiente de desenvolvimento funcional.
+
+Difficulties:
+- Falha no lint impediu a execução encadeada do `type-check`, exigindo comando separado.
+- Execução do Playwright falhou por falta de dependências de navegador.
+
+Successes:
+- `tsc --noEmit` rodou sem erros de tipo.
+- `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` não encontrou cores hex fora dos tokens.
+- `pnpm dev` confirmou build local acessível.
+
+Improvements_Identified_For_Consolidation:
+- Criar baseline e plano gradual para resolver os erros de lint e formatação.
+- Documentar configuração do Playwright e isolar testes end-to-end dos testes unitários.
+---
+---
+Date: 2025-08-11
+TaskRef: "Remover Playwright e iniciar correção de lint"
+
+Learnings:
+- Remover Playwright exigiu atualizar `package.json`, lockfiles e documentação, além de excluir specs `a11y` e `responsiveness`.
+- `pnpm lint` continua apontando 6608 problemas, majoritariamente de formatação Prettier em arquivos legados.
+- `pnpm test --run` agora executa apenas Vitest e passou com 121 testes.
+
+Difficulties:
+- Volume de erros de lint torna execução demorada e ruidosa.
+
+Successes:
+- `tsc --noEmit` e `pnpm test --run` completaram sem falhas.
+- Dev server inicializa corretamente após remoção do Playwright.
+
+Improvements_Identified_For_Consolidation:
+- Definir estratégia incremental de `eslint --fix` por módulos para atingir zero erros/avisos.
+---
