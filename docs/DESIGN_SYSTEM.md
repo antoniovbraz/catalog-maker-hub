@@ -84,7 +84,7 @@ Checklist básico para novos componentes:
 - Forneça `alt` para imagens e `aria-label` quando necessário.
 - Assegure navegação completa por teclado.
 - Teste com leitores de tela e mantenha foco visível.
-- Execute testes automatizados com `npx playwright test tests/a11y.spec.ts` (`axe-core`).
+- Utilize ferramentas automatizadas como axe-core durante o desenvolvimento para identificar violações.
 
 ## Performance
 

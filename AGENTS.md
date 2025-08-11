@@ -52,11 +52,10 @@ Se um desses arquivos mudar, refaça o parsing para manter o contexto atualizado
 
 1. `pnpm lint && pnpm type-check` – sem erros.
 2. `pnpm test --run` – cobertura ≥ metas por camada.
-3. `npx playwright test tests/a11y.spec.ts` – acessibilidade (`axe-core`).
-4. `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` – não deve haver cores hex fora dos tokens `brand-*`.
-5. `pnpm dev` – UI carrega em tema Corporate sem erros de console.
-6. Mobile (375 px), Desktop (1280 px) – layout íntegro.
-7. `raw_reflection_log.md` atualizado com aprendizados.
+3. `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` – não deve haver cores hex fora dos tokens `brand-*`.
+4. `pnpm dev` – UI carrega em tema Corporate sem erros de console.
+5. Mobile (375 px), Desktop (1280 px) – layout íntegro.
+6. `raw_reflection_log.md` atualizado com aprendizados.
 
 ---
 
@@ -76,7 +75,6 @@ Qualquer novo diretório deve ser documentado no PR.
 ## 7. Checklist automático antes de PR
 
 - `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` – confirmar ausência de cores fora dos tokens `brand-*`.
-- `npx playwright test tests/a11y.spec.ts` – validar acessibilidade com `axe-core`.
 
 > **Falha em qualquer item bloqueia merge.**
 

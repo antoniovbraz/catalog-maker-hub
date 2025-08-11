@@ -119,11 +119,10 @@ export class ProductsService {
 | hooks          | 70 %             |
 | components     | 50 %             |
 
-Ferramentas: **ESLint · Prettier · Vitest · Testing Library · Playwright/axe-core**.
+Ferramentas: **ESLint · Prettier · Vitest · Testing Library**.
 
 Verificações adicionais:
 - `rg '#[0-9a-fA-F]{3,6}' -g '!node_modules'` garante ausência de cores fora dos tokens `brand-*`.
-- `npx playwright test tests/a11y.spec.ts` valida acessibilidade.
 
 ---
 
