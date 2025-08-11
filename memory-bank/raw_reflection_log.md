@@ -400,3 +400,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Planejar correção incremental do backlog de lint para habilitar validações automáticas.
 ---
+---
+Date: 2025-08-12
+TaskRef: "Substituir makeRequest por supabase.functions.invoke no AssistantsService"
+
+Learnings:
+- supabase.functions.invoke aceita métodos PUT e DELETE quando a URL inclui o id do recurso.
+- Hooks React Query facilitam reaproveitar cache ao invalidar a chave compartilhada após mutações.
+
+Difficulties:
+- Remover o wrapper makeRequest exigiu repetir tratamento de erro nas chamadas diretas.
+
+Successes:
+- Atualização e deleção de assistentes agora utilizam autenticação do Supabase de forma transparente.
+
+Improvements_Identified_For_Consolidation:
+- Avaliar criação de util genérico para invocar edge functions com métodos variados.
+---
