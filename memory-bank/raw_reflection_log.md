@@ -314,3 +314,19 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Definir estratégia incremental de `eslint --fix` por módulos para atingir zero erros/avisos.
 ---
+Date: 2025-08-11
+TaskRef: "Remover regra duplicada no-unused-vars do ESLint"
+
+Learnings:
+- Em projetos TypeScript, preferir `@typescript-eslint/no-unused-vars` evita conflito com a regra base `no-unused-vars`.
+
+Difficulties:
+- `pnpm lint` gera saída volumosa de erros de Prettier; limitar com `head` ocasionou `EPIPE`.
+
+Successes:
+- Configuração do ESLint agora usa apenas `@typescript-eslint/no-unused-vars`.
+- Lint, type-check e testes executados após a alteração (lint ainda reporta pendências herdadas).
+
+Improvements_Identified_For_Consolidation:
+- Registrar estratégia para capturar logs de lint extensos sem interromper a execução.
+---

@@ -65,7 +65,6 @@ export default tseslint.config(
       "tailwindcss/no-custom-classname": "off",
       "local/no-outside-ui-imports": "error",
       "import/order": "warn",
-      "no-unused-vars": "warn",
       "import/no-unresolved": "off",
       "react/display-name": "off",
       "react/prop-types": "off",
