@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 
 const Pricing = () => {
-  const { isFormVisible, showForm } = useFormVisibility({
+  const { isFormVisible, showForm, hideForm } = useFormVisibility({
     formStorageKey: 'pricing-form-visible',
     listStorageKey: 'pricing-list-visible'
   });
@@ -34,7 +34,7 @@ const Pricing = () => {
     >
       {isFormVisible && (
         <div className="xl:col-span-12">
-          <PricingForm />
+          <PricingForm onCancel={hideForm} />
         </div>
       )}
     </ConfigurationPageLayout>

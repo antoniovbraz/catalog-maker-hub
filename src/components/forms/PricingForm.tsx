@@ -38,7 +38,7 @@ interface MargemRealResult {
   margem_percentual_real: number;
 }
 
-export const PricingForm = () => {
+export const PricingForm = ({ onCancel }: { onCancel?: () => void } = {}) => {
   const { toast } = useToast();
   const logger = useLogger('PricingForm');
   const [formData, setFormData] = useState<PricingFormData>({
@@ -371,9 +371,18 @@ export const PricingForm = () => {
             <Button
               onClick={handleCalculate}
               disabled={calculatePriceMutation.isPending || calculateMargemRealMutation.isPending}
-              className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
+              className="flex-1 h-11"
             >
               {(calculatePriceMutation.isPending || calculateMargemRealMutation.isPending) ? "Calculando..." : "Calcular Preço"}
+            </Button>
+
+            <Button 
+              onClick={onCancel}
+              type="button"
+              variant="outline"
+              className="h-11 min-w-[120px]"
+            >
+              Cancelar
             </Button>
             
             {pricingResult && (

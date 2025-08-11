@@ -379,20 +379,18 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? "Atualizar Produto" : "Criar Produto"}
               </Button>
-              {editingId && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    resetForm();
-                    onCancel?.();
-                  }}
-                  className="h-11 min-w-[120px]"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancelar
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  resetForm();
+                  onCancel?.();
+                }}
+                className="h-11 min-w-[120px]"
+              >
+                <X className="w-4 h-4 mr-2" />
+                Cancelar
+              </Button>
             </div>
           </form>
         </CardContent>
