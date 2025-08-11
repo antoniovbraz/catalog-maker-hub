@@ -436,3 +436,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar util genérico para supabase CRUD evitando repetição de tipos.
 ---
+Date: 2025-08-11
+TaskRef: "Substituir console por logger nas funções e AdGenerator"
+
+Learnings:
+- Criar logger compartilhado para edge functions evita duplicação.
+- Logger omite dados sensíveis em produção, garantindo segurança nos logs.
+
+Difficulties:
+- Lint global falha com milhares de erros herdados; necessário capturar saída via arquivo.
+
+Successes:
+- Todos os console.log/error substituídos por logger.info/error/debug.
+- Testes, type-check e servidor dev executados após alteração.
+
+Improvements_Identified_For_Consolidation:
+- Considerar integração do logger das edge functions com sistema principal para unificação de formatos.
+---

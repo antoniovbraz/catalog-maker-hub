@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.53.0';
+import { logger } from "../_shared/logger.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +31,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log('Processando chat para marketplace:', marketplace);
+    logger.info('Processando chat para marketplace', marketplace);
 
     // Buscar assistente para o marketplace
     const { data: assistant } = await supabase
@@ -43,7 +44,7 @@ serve(async (req) => {
       throw new Error(`Assistente não encontrado para marketplace: ${marketplace}`);
     }
 
-    console.log('Assistente encontrado:', assistant.assistant_id);
+    logger.info('Assistente encontrado', assistant.assistant_id);
 
     let currentThreadId = thread_id;
 
@@ -61,7 +62,7 @@ serve(async (req) => {
 
       const threadData = await threadResponse.json();
       currentThreadId = threadData.id;
-      console.log('Nova thread criada:', currentThreadId);
+      logger.debug('Nova thread criada', currentThreadId);
     }
 
     // Preparar mensagem baseada no contexto
@@ -98,7 +99,7 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
       })
     });
 
-    console.log('Mensagem adicionada à thread');
+    logger.debug('Mensagem adicionada à thread');
 
     // Criar e executar run
     const runResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
@@ -114,7 +115,7 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
     });
 
     const runData = await runResponse.json();
-    console.log('Run criado:', runData.id);
+    logger.debug('Run criado', runData.id);
 
     // Aguardar conclusão do run
     let run = runData;
@@ -129,7 +130,7 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
       });
       
       run = await runStatusResponse.json();
-      console.log('Status do run:', run.status);
+      logger.debug('Status do run', run.status);
     }
 
     if (run.status !== 'completed') {
@@ -158,7 +159,7 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
 
     const responseText = assistantMessage?.content[0]?.text?.value || 'Erro ao obter resposta';
 
-    console.log('Resposta do assistente obtida');
+    logger.info('Resposta do assistente obtida');
 
     return new Response(JSON.stringify({
       thread_id: currentThreadId,
@@ -169,7 +170,7 @@ Agora inicie o processo estratégico conforme suas instruções. Faça o diagnó
     });
 
   } catch (error) {
-    console.error('Erro no chat:', error);
+    logger.error('Erro no chat', error);
     return new Response(JSON.stringify({ 
       error: error.message,
       status: 'error'

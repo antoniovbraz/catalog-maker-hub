@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { logger } from "../_shared/logger.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +31,7 @@ serve(async (req) => {
 
     const { assistant_id, product_info, marketplace, image_urls, custom_prompt, description_only }: GenerateAdRequest = await req.json();
 
-    console.log('Iniciando geração de anúncio', { assistant_id, marketplace, description_only });
+    logger.info('Iniciando geração de anúncio', { assistant_id, marketplace, description_only });
 
     // Criar thread no OpenAI
     const threadResponse = await fetch('https://api.openai.com/v1/threads', {
@@ -47,12 +48,12 @@ serve(async (req) => {
 
     if (!threadResponse.ok) {
       const error = await threadResponse.text();
-      console.error('Erro ao criar thread:', error);
+      logger.error('Erro ao criar thread', error);
       throw new Error(`Erro ao criar thread: ${error}`);
     }
 
     const thread = await threadResponse.json();
-    console.log('Thread criada:', thread.id);
+    logger.info('Thread criada', thread.id);
 
     // Preparar prompt baseado no tipo de geração
     let prompt = `${product_info}\n\n`;
@@ -90,11 +91,11 @@ serve(async (req) => {
 
     if (!messageResponse.ok) {
       const error = await messageResponse.text();
-      console.error('Erro ao adicionar mensagem:', error);
+      logger.error('Erro ao adicionar mensagem', error);
       throw new Error(`Erro ao adicionar mensagem: ${error}`);
     }
 
-    console.log('Mensagem adicionada à thread');
+    logger.debug('Mensagem adicionada à thread');
 
     // Executar assistente
     const runResponse = await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`, {
@@ -111,12 +112,12 @@ serve(async (req) => {
 
     if (!runResponse.ok) {
       const error = await runResponse.text();
-      console.error('Erro ao executar assistente:', error);
+      logger.error('Erro ao executar assistente', error);
       throw new Error(`Erro ao executar assistente: ${error}`);
     }
 
     const run = await runResponse.json();
-    console.log('Execução iniciada:', run.id);
+    logger.info('Execução iniciada', run.id);
 
     // Aguardar conclusão da execução
     let runStatus = run;
@@ -143,11 +144,11 @@ serve(async (req) => {
 
       runStatus = await statusResponse.json();
       attempts++;
-      console.log(`Status da execução (tentativa ${attempts}):`, runStatus.status);
+      logger.debug(`Status da execução (tentativa ${attempts})`, runStatus.status);
     }
 
     if (runStatus.status !== 'completed') {
-      console.error('Execução não concluída:', runStatus);
+      logger.error('Execução não concluída', runStatus);
       throw new Error(`Execução falhou com status: ${runStatus.status}`);
     }
 
@@ -178,7 +179,7 @@ serve(async (req) => {
     }
 
     const generatedContent = assistantMessage.content[0].text.value;
-    console.log('Conteúdo gerado:', generatedContent.substring(0, 200) + '...');
+    logger.debug('Conteúdo gerado', generatedContent.substring(0, 200) + '...');
 
     // Processar resposta baseado no tipo
     let result;
@@ -221,14 +222,14 @@ serve(async (req) => {
       };
     }
 
-    console.log('Resultado processado:', result);
+    logger.debug('Resultado processado', result);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Erro na generate-ad function:', error);
+    logger.error('Erro na generate-ad function', error);
     return new Response(JSON.stringify({ 
       error: error.message,
       details: 'Verifique os logs da função para mais detalhes'
