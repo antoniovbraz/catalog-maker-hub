@@ -8,7 +8,7 @@
 
 Antes de executar qualquer tarefa, carregue estes arquivos:
 
-1. `CUSTOM_KNOWLEDGE.md` – arquitetura, regras de negócio e convenções.
+1. `docs/CUSTOM_KNOWLEDGE.md` – arquitetura, regras de negócio e convenções.
 2. `docs/DESIGN_SYSTEM.md` – tokens de tema (Corporate) e padrões de UI.
 3. `docs/continuous-improvement.md` – protocolo de reflexão/registro de aprendizado.
 
