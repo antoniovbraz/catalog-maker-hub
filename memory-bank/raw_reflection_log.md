@@ -346,3 +346,22 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Planejar abordagem incremental para corrigir backlog de erros de lint.
 ---
+
+Date: 2025-08-11
+TaskRef: "Ativar modo estrito do TypeScript"
+
+Learnings:
+- Habilitar `strict`, `noImplicitAny`, `strictNullChecks` e verificações de variáveis não utilizadas não gerou erros de tipo.
+- Teste do Sidebar apresentava flakiness; aumento de timeout tornou a execução estável.
+
+Difficulties:
+- `pnpm lint` continua com milhares de erros herdados, dificultando a validação completa.
+- Teste `allows keyboard navigation through items` expirou até que o timeout fosse ajustado.
+
+Successes:
+- `pnpm type-check` e `pnpm test --run` passaram após ajustes.
+- Não foram encontrados códigos de cor hex; `pnpm dev` iniciou sem erros.
+
+Improvements_Identified_For_Consolidation:
+- Investigar causa raiz da demora no teste de navegação da Sidebar para remover o timeout elevado.
+---

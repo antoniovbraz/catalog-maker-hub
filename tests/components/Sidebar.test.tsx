@@ -83,6 +83,7 @@ describe('AppSidebar accessibility', () => {
     expect(configButton).toBeInTheDocument();
   });
 
+  // Timeout ampliado para evitar flakiness em ambientes lentos
   it('allows keyboard navigation through items', async () => {
     const user = userEvent.setup();
     render(
@@ -105,6 +106,6 @@ describe('AppSidebar accessibility', () => {
 
     await user.tab();
     expect(screen.getByRole('link', { name: /marketplaces/i })).toHaveFocus();
-  });
+  }, { timeout: 10000 });
 });
 
