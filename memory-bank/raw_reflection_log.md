@@ -382,3 +382,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Necessário planejar mutirão de formatação para permitir que `pnpm lint` passe globalmente.
 ---
+Date: 2025-08-11
+TaskRef: "Definir pnpm como gerenciador oficial"
+
+Learnings:
+- `corepack enable` é necessário no CI antes de usar `pnpm`.
+- Scripts devem usar `pnpm <script>` para executar comandos definidos no `package.json`.
+
+Difficulties:
+- `pnpm lint` acusou 6962 problemas herdados, impedindo verificação limpa.
+- Ajustar workflow exigiu trocar cache e instalar dependências com `--frozen-lockfile`.
+
+Successes:
+- Removidos `package-lock.json` e `bun.lockb`, evitando ambiguidade de gerenciadores.
+- README, CI e scripts de qualidade agora padronizados com `pnpm`.
+
+Improvements_Identified_For_Consolidation:
+- Planejar correção incremental do backlog de lint para habilitar validações automáticas.
+---

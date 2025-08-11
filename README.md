@@ -5,28 +5,28 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 
 ## Requisitos
 - Node.js 20 ou superior
-- npm 10 ou superior
+- pnpm 9 ou superior
 
 ## Instalação
 1. Clone o repositório: `git clone <URL-do-repositório>`
 2. Acesse a pasta do projeto: `cd catalog-maker-hub`
-3. Instale as dependências: `npm install`
+3. Instale as dependências: `pnpm install`
 4. Copie o arquivo `.env.example` para `.env` e ajuste as variáveis de ambiente conforme necessário
-5. Inicie o ambiente de desenvolvimento: `npm run dev`
+5. Inicie o ambiente de desenvolvimento: `pnpm dev`
 
 ## Variáveis de Ambiente
 - `VITE_AUTH_REDIRECT_URL`: URL utilizada pelo Supabase para redirecionar o usuário após o cadastro. Caso não seja definida, o aplicativo utilizará `window.location.origin`.
 
 ## Scripts Disponíveis
-- `npm run dev` – inicia o servidor de desenvolvimento
-- `npm run build` – gera o build de produção
-- `npm run build:dev` – gera o build em modo de desenvolvimento
-- `npm run lint` – executa o ESLint nos arquivos `ts/tsx` de `src`, `app`, `components` e `pages`
-- `npm run lint:fix` – corrige automaticamente os problemas reportados pelo ESLint
-- `npm run format` – formata o código com Prettier
-- `npm test` – executa a suite de testes
-- `npm run test:coverage` – executa os testes com relatório de cobertura
-- `npm run preview` – visualiza o build de produção localmente
+- `pnpm dev` – inicia o servidor de desenvolvimento
+- `pnpm build` – gera o build de produção
+- `pnpm build:dev` – gera o build em modo de desenvolvimento
+- `pnpm lint` – executa o ESLint nos arquivos `ts/tsx` de `src`, `app`, `components` e `pages`
+- `pnpm lint:fix` – corrige automaticamente os problemas reportados pelo ESLint
+- `pnpm format` – formata o código com Prettier
+- `pnpm test` – executa a suite de testes
+- `pnpm test:coverage` – executa os testes com relatório de cobertura
+- `pnpm preview` – visualiza o build de produção localmente
 
 ## Estilo e Componentes
 - Estilos devem ser escritos exclusivamente com **Tailwind CSS**.
@@ -35,7 +35,7 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 
 ## Diretrizes de Contribuição
 1. Faça um fork do repositório e crie um branch para a sua feature ou correção.
-2. Garanta que o código está formatado e que `npm run lint` e `npm test` executam sem erros.
+2. Garanta que o código está formatado e que `pnpm lint` e `pnpm test` executam sem erros.
 3. Descreva claramente as alterações no Pull Request.
 4. Aguarde revisão e aprovação antes de realizar o merge.
 

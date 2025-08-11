@@ -5,7 +5,7 @@ echo "🔍 Executando verificações de qualidade..."
 
 # Type check
 echo "📝 Verificando tipos TypeScript..."
-npx tsc --noEmit
+pnpm type-check
 if [ $? -ne 0 ]; then
     echo "❌ Erro na verificação de tipos"
     exit 1
@@ -13,7 +13,7 @@ fi
 
 # Lint
 echo "🧹 Executando ESLint..."
-npm run lint
+pnpm lint
 if [ $? -ne 0 ]; then
     echo "❌ Erro no linting"
     exit 1
@@ -21,7 +21,7 @@ fi
 
 # Tests
 echo "🧪 Executando testes..."
-npm test
+pnpm test
 if [ $? -ne 0 ]; then
     echo "❌ Erro nos testes"
     exit 1
@@ -29,7 +29,7 @@ fi
 
 # Tests with coverage
 echo "📊 Gerando relatório de cobertura..."
-npm run test:coverage
+pnpm test:coverage
 if [ $? -ne 0 ]; then
     echo "❌ Erro na cobertura dos testes"
     exit 1
