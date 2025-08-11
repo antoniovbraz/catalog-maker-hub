@@ -1,6 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from "@/integrations/supabase/client";
-import { PostgrestError } from "@supabase/supabase-js";
+import type {
+  PostgrestError,
+  PostgrestResponse,
+  PostgrestSingleResponse,
+} from "@supabase/supabase-js";
 
 export abstract class BaseService<T = Record<string, unknown>> {
   protected tableName: string;
@@ -10,36 +13,45 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async getAll(): Promise<T[]> {
-    const { data, error } = await (supabase as any)
-      .from(this.tableName)
-      .select('*')
-      .order('created_at', { ascending: false });
+    const {
+      data,
+      error,
+    }: PostgrestResponse<T> = await supabase
+      .from<T>(this.tableName)
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) this.handleError(error, `Buscar ${this.tableName}`);
-    return (data as T[]) || [];
+    return data ?? [];
   }
 
   async getById(id: string): Promise<T | null> {
-    const { data, error } = await (supabase as any)
-      .from(this.tableName)
-      .select('*')
-      .eq('id', id)
+    const {
+      data,
+      error,
+    }: PostgrestSingleResponse<T> = await supabase
+      .from<T>(this.tableName)
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') return null; // Not found
+      if (error.code === "PGRST116") return null; // Not found
       this.handleError(error, `Buscar ${this.tableName} por ID`);
     }
-    return data as T;
+    return data;
   }
 
   async create(data: Partial<T>): Promise<T> {
     // Adicionar tenant_id automaticamente se a tabela suporta
     const dataWithTenant = await this.addTenantId(data);
     
-    const { data: result, error } = await (supabase as any)
-      .from(this.tableName)
-      .insert(dataWithTenant as any)
+    const {
+      data: result,
+      error,
+    }: PostgrestSingleResponse<T> = await supabase
+      .from<T>(this.tableName)
+      .insert(dataWithTenant as T)
       .select()
       .single();
 
@@ -77,10 +89,13 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async update(id: string, data: Partial<T>): Promise<T> {
-    const { data: result, error } = await (supabase as any)
-      .from(this.tableName)
-      .update(data as any)
-      .eq('id', id)
+    const {
+      data: result,
+      error,
+    }: PostgrestSingleResponse<T> = await supabase
+      .from<T>(this.tableName)
+      .update(data)
+      .eq("id", id)
       .select()
       .single();
 
@@ -89,10 +104,10 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await (supabase as any)
-      .from(this.tableName)
+    const { error }: PostgrestResponse<T> = await supabase
+      .from<T>(this.tableName)
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) this.handleError(error, `Deletar ${this.tableName}`);
   }

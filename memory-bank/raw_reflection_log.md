@@ -417,3 +417,22 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Avaliar criação de util genérico para invocar edge functions com métodos variados.
 ---
+---
+Date: 2025-08-12
+TaskRef: "Tipar Supabase com generics e remover any em serviços"
+
+Learnings:
+- `PostgrestResponse<T>` permite tipar respostas evitando casts para `any`.
+- `supabase.functions.invoke` aceita generics para o retorno, removendo necessidade de `as` duplo.
+- Parâmetros de marketplace podem reutilizar `Assistant['marketplace']` para união forte.
+
+Difficulties:
+- Tipar `.insert` exigiu cast para `T` devido aos campos opcionais.
+
+Successes:
+- Serviços `base` e `assistants` agora usam generics e removem `eslint-disable`.
+- `pnpm type-check` e testes passaram após ajustes.
+
+Improvements_Identified_For_Consolidation:
+- Criar util genérico para supabase CRUD evitando repetição de tipos.
+---
