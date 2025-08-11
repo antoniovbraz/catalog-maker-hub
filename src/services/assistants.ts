@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import type { Assistant, AssistantFormData } from "@/types/assistants";
@@ -24,19 +23,22 @@ export class AssistantsService extends BaseService<Assistant> {
       }
 
       // Chamar edge function para criar assistente
-      const { data: result, error } = await supabase.functions.invoke('assistants', {
-        body: {
-          ...data,
-          tenant_id: tenantId,
+      const { data: result, error } = await supabase.functions.invoke<Assistant>(
+        "assistants",
+        {
+          body: {
+            ...data,
+            tenant_id: tenantId,
+          },
         },
-      });
+      );
 
       if (error) {
-        this.logger.error('Erro ao criar assistente', error);
+        this.logger.error("Erro ao criar assistente", error);
         throw new Error(`Falha ao criar assistente: ${error.message}`);
       }
 
-      this.logger.info('Assistente criado com sucesso', result);
+      this.logger.info("Assistente criado com sucesso", result);
       return result as Assistant;
     } catch (error) {
       this.logger.error('Erro na criação do assistente', error);
@@ -48,17 +50,20 @@ export class AssistantsService extends BaseService<Assistant> {
     try {
       this.logger.debug('Atualizando assistente', { id, data });
 
-      const { data: result, error } = await supabase.functions.invoke(`assistants/${id}`, {
-        method: 'PUT',
-        body: data,
-      });
+      const { data: result, error } = await supabase.functions.invoke<Assistant>(
+        `assistants/${id}`,
+        {
+          method: "PUT",
+          body: data,
+        },
+      );
 
       if (error) {
-        this.logger.error('Erro ao atualizar assistente', error);
+        this.logger.error("Erro ao atualizar assistente", error);
         throw new Error(`Falha ao atualizar assistente: ${error.message}`);
       }
 
-      this.logger.info('Assistente atualizado com sucesso', result);
+      this.logger.info("Assistente atualizado com sucesso", result);
       return result as Assistant;
     } catch (error) {
       this.logger.error('Erro na atualização do assistente', error);
@@ -70,8 +75,8 @@ export class AssistantsService extends BaseService<Assistant> {
     try {
       this.logger.debug('Deletando assistente', { id });
 
-      const { error } = await supabase.functions.invoke(`assistants/${id}`, {
-        method: 'DELETE',
+      const { error } = await supabase.functions.invoke<null>(`assistants/${id}`, {
+        method: "DELETE",
       });
 
       if (error) {
@@ -86,14 +91,16 @@ export class AssistantsService extends BaseService<Assistant> {
     }
   }
 
-  async getAssistantByMarketplace(marketplace: string): Promise<Assistant | null> {
+  async getAssistantByMarketplace(
+    marketplace: Assistant["marketplace"],
+  ): Promise<Assistant | null> {
     try {
       this.logger.debug('Buscando assistente por marketplace', { marketplace });
 
       const { data, error } = await supabase
-        .from('assistants' as any)
-        .select('*')
-        .eq('marketplace', marketplace)
+        .from<Assistant>("assistants")
+        .select("*")
+        .eq("marketplace", marketplace)
         .maybeSingle();
 
       if (error) {
@@ -101,12 +108,12 @@ export class AssistantsService extends BaseService<Assistant> {
       }
 
       if (!data) {
-        this.logger.debug('Nenhum assistente encontrado para o marketplace', { marketplace });
+        this.logger.debug("Nenhum assistente encontrado para o marketplace", { marketplace });
         return null;
       }
 
-      this.logger.debug('Assistente encontrado', data);
-      return data as unknown as Assistant;
+      this.logger.debug("Assistente encontrado", data);
+      return data;
     } catch (error) {
       this.logger.error('Erro ao buscar assistente por marketplace', error);
       if (error instanceof Error) {
