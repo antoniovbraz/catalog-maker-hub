@@ -28,6 +28,7 @@ import { AdChatInterface } from "@/components/forms/AdChatInterface";
 import { MarketplaceDestination, ProductImage } from "@/types/ads";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { useLogger } from "@/utils/logger";
 
 const MARKETPLACE_OPTIONS = [
   { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-primary' },
@@ -37,6 +38,7 @@ const MARKETPLACE_OPTIONS = [
 
 export default function AdGenerator() {
   const { toast } = useToast();
+  const logger = useLogger('AdGenerator');
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [selectedMarketplace, setSelectedMarketplace] = useState<MarketplaceDestination | "">("");
   const [customPrompt, setCustomPrompt] = useState("");
@@ -90,7 +92,7 @@ export default function AdGenerator() {
           sortOrder: images.length
         });
       } catch (error) {
-        console.error('Erro no upload:', error);
+        logger.error('Erro no upload', error);
       }
     }
     
@@ -133,7 +135,7 @@ export default function AdGenerator() {
       
       setGeneratedResult(result);
     } catch (error) {
-      console.error('Erro na geração:', error);
+      logger.error('Erro na geração', error);
     }
   };
 
@@ -238,7 +240,7 @@ export default function AdGenerator() {
                 productData={selectedProduct}
                 marketplace={selectedMarketplace || 'mercado_livre'}
                 onResultGenerated={(result) => {
-                  console.log('Resultado gerado:', result);
+                  logger.debug('Resultado gerado', result);
                   setGeneratedResult({ description: String(result) });
                 }}
               />
