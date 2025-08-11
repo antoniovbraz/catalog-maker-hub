@@ -1,4 +1,4 @@
-import { Percent, Plus, Calculator } from '@/components/ui/icons';
+import { Percent, Plus, Calculator, Trash2 } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -113,7 +113,7 @@ const Commissions = () => {
     },
     {
       label: "Excluir",
-      icon: <Percent className="w-4 h-4" />,
+      icon: <Trash2 className="w-4 h-4" />,
       onClick: (commission: CommissionWithDetails) => deleteMutation.mutate(commission.id),
       variant: "destructive" as const
     }

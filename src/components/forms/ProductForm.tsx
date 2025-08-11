@@ -374,7 +374,7 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
+                className="flex-1 h-11"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? "Atualizar Produto" : "Criar Produto"}
