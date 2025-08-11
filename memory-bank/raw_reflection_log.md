@@ -453,3 +453,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Considerar integração do logger das edge functions com sistema principal para unificação de formatos.
 ---
+Date: 2025-08-11
+TaskRef: "Adicionar script type-check e links de docs ao README"
+
+Learnings:
+- README exige seção dedicada para documentações chave.
+- Script `pnpm type-check` já existia no `package.json`, bastando documentá-lo.
+
+Difficulties:
+- `pnpm lint` falha com milhares de erros herdados, impedindo verificação limpa.
+
+Successes:
+- README agora lista `pnpm type-check` e links para `CUSTOM_KNOWLEDGE`, `DESIGN_SYSTEM` e `continuous-improvement`.
+- `pnpm type-check` e `pnpm test --run` executaram sem falhas.
+
+Improvements_Identified_For_Consolidation:
+- Priorizar correção do backlog de lint para possibilitar validação completa no CI.
+---

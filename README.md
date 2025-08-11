@@ -23,6 +23,7 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 - `pnpm build:dev` – gera o build em modo de desenvolvimento
 - `pnpm lint` – executa o ESLint nos arquivos `ts/tsx` de `src`, `app`, `components` e `pages`
 - `pnpm lint:fix` – corrige automaticamente os problemas reportados pelo ESLint
+- `pnpm type-check` – verifica os tipos TypeScript
 - `pnpm format` – formata o código com Prettier
 - `pnpm test` – executa a suite de testes
 - `pnpm test:coverage` – executa os testes com relatório de cobertura
@@ -32,6 +33,11 @@ Catalog Maker Hub é uma plataforma SaaS para gestão de marketplaces e definiç
 - Estilos devem ser escritos exclusivamente com **Tailwind CSS**.
 - Componentes base devem seguir o catálogo **shadcn/ui**.
 - Cores e tipografia usam apenas tokens `brand-*`; CSS legado ou bibliotecas de estilo extras não são permitidos.
+
+## Documentação
+- [Base de conhecimento](docs/CUSTOM_KNOWLEDGE.md)
+- [Design System](docs/DESIGN_SYSTEM.md)
+- [Melhoria contínua](docs/continuous-improvement.md)
 
 ## Diretrizes de Contribuição
 1. Faça um fork do repositório e crie um branch para a sua feature ou correção.
