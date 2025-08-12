@@ -556,3 +556,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Avaliar adoção de script de lint segmentado por arquivo para evitar ruído até que backlog seja resolvido.
 ---
+
+---
+Date: 2025-08-12
+TaskRef: "Tratar limites numéricos como strings na StrategyForm"
+
+Learnings:
+- Manter valores do formulário como string simplifica validação e evita tipos `number | string`.
+- Aplicar `Number.isNaN` após `parseFloat` garante fallback seguro para operações aritméticas.
+
+Difficulties:
+- `pnpm lint` continua falhando com milhares de erros herdados, dificultando verificação completa.
+
+Successes:
+- Estado e parsing ajustados conforme requisito e testes unitários passaram.
+
+Improvements_Identified_For_Consolidation:
+- Criar helper reutilizável para parsing seguro de campos numéricos.
+---
