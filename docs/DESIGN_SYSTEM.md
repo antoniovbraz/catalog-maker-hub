@@ -96,7 +96,7 @@ Diretrizes para manter a aplicação leve:
 
 ## Ferramentas Internas
 Utilize ferramentas internas para validar visualmente as variações:
-- `npm run storybook` abre o Storybook para conferir componentes e layouts em diferentes breakpoints.
+- `pnpm storybook` abre o Storybook para conferir componentes e layouts em diferentes breakpoints.
 - Publicar o Storybook pode servir como documentação viva do design system.
 
 ## Exemplos

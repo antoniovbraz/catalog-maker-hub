@@ -97,9 +97,9 @@ const form = useForm<ProductFormData>({
 
 ## Deploy e CI/CD
 A entrega contínua é gerenciada por GitHub Actions. Cada push ou Pull Request executa um pipeline que:
-1. Instala dependências e valida o lint (`npm run lint`).
+1. Instala dependências e valida o lint (`pnpm lint`).
 2. Executa a suíte de testes (`npm test`).
-3. Gera o build do frontend (`npm run build`).
+3. Gera o build do frontend (`pnpm build`).
 4. Aplica migrações e atualiza Edge Functions no Supabase.
 5. Publica o frontend em Vercel ou Netlify.
 
