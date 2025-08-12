@@ -488,3 +488,19 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Rever periodicamente docs quando scripts forem alterados.
 ---
+Date: 2025-08-12
+TaskRef: "Adicionar exemplos de corpo e erros do Assistants Service"
+
+Learnings:
+- Exemplos claros de requisição e resposta ajudam a padronizar o uso das edge functions.
+- Tabelar códigos de erro orienta melhor as estratégias de retry no React Query.
+
+Difficulties:
+- Ajustar documentação extensa exigiu cuidado para manter seções concisas.
+
+Successes:
+- Lint, type-check e testes executados sem falhas após a atualização dos docs.
+
+Improvements_Identified_For_Consolidation:
+- Considerar modelo único para documentar erros e retries em futuros serviços.
+---
