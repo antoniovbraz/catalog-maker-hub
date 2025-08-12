@@ -470,3 +470,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Priorizar correção do backlog de lint para possibilitar validação completa no CI.
 ---
+
+---
+Date: 2025-08-12
+TaskRef: "Atualizar docs para pnpm"
+
+Learnings:
+- Documentos devem referenciar scripts com `pnpm` para consistência.
+- Atualizar baseline de lint garante alinhamento com gerenciador oficial.
+
+Difficulties:
+- Nenhuma.
+
+Successes:
+- Docs ajustados e verificações executadas.
+
+Improvements_Identified_For_Consolidation:
+- Rever periodicamente docs quando scripts forem alterados.
+---

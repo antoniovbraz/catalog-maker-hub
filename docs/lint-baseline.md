@@ -1,6 +1,6 @@
 # Baseline de Lint
 
-Resultados de `npm run lint` em 2025-08-09:
+Resultados de `pnpm lint` em 2025-08-09:
 
 - **Erros:** 6827
 - **Avisos:** 923
