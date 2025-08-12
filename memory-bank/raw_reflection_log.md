@@ -538,3 +538,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Planejar migração gradual para remover dependência de joins desnecessários no Supabase.
 ---
+---
+Date: 2025-08-12
+TaskRef: "Normalizar campos opcionais do ProductForm para undefined"
+
+Learnings:
+- Substituir `null` por `undefined` evita divergência com `ProductFormData` derivado do Zod.
+- Componentes `Select` requerem valor sentinela cuidado; usar string vazia simplifica submissão.
+
+Difficulties:
+- `pnpm lint` retorna milhares de erros preexistentes, inviabilizando verificação limpa do repositório.
+
+Successes:
+- `pnpm type-check` e `pnpm test --run` executados sem falhas.
+- Objetos enviados pelas mutações agora omitem campos não preenchidos.
+
+Improvements_Identified_For_Consolidation:
+- Avaliar adoção de script de lint segmentado por arquivo para evitar ruído até que backlog seja resolvido.
+---
