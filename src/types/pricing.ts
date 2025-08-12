@@ -1,5 +1,21 @@
 import { z } from "zod";
-export type { SavedPricingRow } from "@/integrations/supabase/types";
+
+export interface SavedPricingRow {
+  product_id: string;
+  marketplace_id: string;
+  custo_total: number;
+  valor_fixo: number;
+  frete: number;
+  comissao: number;
+  preco_sugerido: number;
+  margem_unitaria: number;
+  margem_percentual: number;
+  preco_praticado: number | null;
+  taxa_cartao: number;
+  provisao_desconto: number;
+  margem_desejada: number;
+  marketplace_name: string;
+}
 
 export interface SavedPricingType {
   id: string;

@@ -65,8 +65,6 @@ interface SortableCardProps {
     taxa_cartao: number;
     provisao_desconto: number;
     margem_desejada: number;
-    product_name: string;
-    product_sku: string;
   };
   index: number;
 }
@@ -252,19 +250,36 @@ export const DashboardForm = () => {
     queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
     queryFn: async () => {
       if (!selectedProductId || selectedMarketplaces.length === 0) return [];
-      
+
       const { data, error } = await supabase
         .from("saved_pricing")
-        .select(`
-          *,
-          products!saved_pricing_product_id_fkey(name, sku),
-          marketplaces!saved_pricing_marketplace_id_fkey(name)
-        `)
+        .select(
+          `product_id, marketplace_id, custo_total, valor_fixo, frete, comissao, preco_sugerido, margem_unitaria, margem_percentual, preco_praticado, taxa_cartao, provisao_desconto, margem_desejada,
+          marketplaces!saved_pricing_marketplace_id_fkey(name)`
+        )
         .eq("product_id", selectedProductId)
         .in("marketplace_id", selectedMarketplaces);
-      
+
       if (error) throw error;
-      return data || [];
+
+      return (
+        data?.map((row) => ({
+          product_id: row.product_id,
+          marketplace_id: row.marketplace_id,
+          custo_total: row.custo_total,
+          valor_fixo: row.valor_fixo,
+          frete: row.frete,
+          comissao: row.comissao,
+          preco_sugerido: row.preco_sugerido,
+          margem_unitaria: row.margem_unitaria,
+          margem_percentual: row.margem_percentual,
+          preco_praticado: row.preco_praticado,
+          taxa_cartao: row.taxa_cartao,
+          provisao_desconto: row.provisao_desconto,
+          margem_desejada: row.margem_desejada,
+          marketplace_name: row.marketplaces?.name ?? "",
+        })) ?? []
+      );
     },
     enabled: !!selectedProductId && selectedMarketplaces.length > 0,
   });
@@ -408,20 +423,18 @@ export const DashboardForm = () => {
       const realMargin = realMargins[pricing.marketplace_id];
       return {
         marketplace_id: pricing.marketplace_id,
-        marketplace_name: 'Marketplace', // Will be populated from separate query
+        marketplace_name: pricing.marketplace_name,
         custo_total: pricing.custo_total,
         valor_fixo: pricing.valor_fixo,
         frete: pricing.frete,
         comissao: pricing.comissao,
         preco_sugerido: pricing.preco_sugerido,
-        margem_unitaria: realMargin?.margem_unitaria_real || pricing.margem_unitaria,
-        margem_percentual: realMargin?.margem_percentual_real || pricing.margem_percentual,
+        margem_unitaria: realMargin?.margem_unitaria_real ?? pricing.margem_unitaria,
+        margem_percentual: realMargin?.margem_percentual_real ?? pricing.margem_percentual,
         preco_praticado: pricing.preco_praticado,
         taxa_cartao: pricing.taxa_cartao,
         provisao_desconto: pricing.provisao_desconto,
         margem_desejada: pricing.margem_desejada,
-        product_name: '', // Will be populated from separate query
-        product_sku: '', // Will be populated from separate query
       };
     })
     .sort((a, b) => {
