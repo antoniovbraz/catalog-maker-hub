@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <NextThemesProvider 
+    <NextThemesProvider
       {...props}
       themes={["light", "dark", "corporate"]}
       defaultTheme="corporate"
@@ -22,10 +22,10 @@ function ThemeWatcher({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    
+
     // Remove previous theme classes
     root.classList.remove('light', 'dark', 'corporate');
-    
+
     // Add current theme class
     if (theme) {
       root.classList.add(theme);
@@ -34,5 +34,3 @@ function ThemeWatcher({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-
-export { useTheme };

@@ -41,12 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!isMounted) return;
-        
+
         logger.debug('Auth state change', { event, hasUser: !!session?.user });
-        
+
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
           // Defer profile fetch to avoid blocking auth state update
           setTimeout(() => {
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logger.debug('Initial session', { hasUser: !!session?.user });
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
           await fetchProfile(session.user.id);
         } else {
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [logger]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -104,12 +104,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         return { error };
       }
-      
+
       toast({
         title: "Login realizado com sucesso!",
         description: "Bem-vindo ao Peepers Hub"
       });
-      
+
       return { error: null };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -133,12 +133,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         return { error };
       }
-      
+
       toast({
         title: "Cadastro realizado com sucesso!",
         description: "Verifique seu email para confirmar a conta."
       });
-      
+
       return { error: null };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -157,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       setProfile(null);
       setSession(null);
-      
+
       toast({
         title: "Logout realizado",
         description: "Até logo!"
@@ -174,16 +174,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = async (data: Partial<Profile>) => {
     if (!user) return { error: new Error('Usuário não autenticado') };
-    
+
     try {
       const updated = await authService.updateProfile(user.id, data);
       setProfile(updated);
-      
+
       toast({
         title: "Perfil atualizado",
         description: "Suas informações foram salvas."
       });
-      
+
       return { error: null };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';

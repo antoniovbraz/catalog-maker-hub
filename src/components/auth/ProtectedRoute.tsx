@@ -10,10 +10,10 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-export function ProtectedRoute({ 
-  children, 
+export function ProtectedRoute({
+  children,
   requiredRole,
-  redirectTo = '/auth' 
+  redirectTo = '/auth'
 }: ProtectedRouteProps) {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
@@ -27,7 +27,7 @@ export function ProtectedRoute({
       logger.debug('Auth check', { user: !!user, profile: !!profile, needsRedirect, pathname: location.pathname });
       setShouldRedirect(needsRedirect);
     }
-  }, [loading, user, profile, location.pathname]);
+  }, [loading, user, profile, location.pathname, logger]);
 
   if (loading) {
     return (

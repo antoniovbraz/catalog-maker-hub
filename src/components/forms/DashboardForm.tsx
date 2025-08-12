@@ -16,19 +16,19 @@ import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
 import { PRICING_CONFIG } from "@/lib/config";
 import { useLogger } from "@/utils/logger";
 import { colors } from "@/styles/tokens";
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
   useSensors,
   DragEndEvent
 } from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  sortableKeyboardCoordinates, 
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable
 } from '@dnd-kit/sortable';
@@ -109,9 +109,9 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
   const sparklineData = Array.from({ length: 7 }, () => Math.random() * 10 + result.margem_percentual);
 
   return (
-    <Card 
-      ref={setNodeRef} 
-      style={style} 
+    <Card
+      ref={setNodeRef}
+      style={style}
       className={`
         group relative bg-gradient-to-br from-card to-card/50
         transition-all duration-300 ease-in-out
@@ -129,7 +129,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
       <div {...listeners} className="absolute right-2 top-2 touch-none opacity-0 transition-all duration-200 group-hover:opacity-100">
         <GripVertical className="size-4 cursor-grab text-muted-foreground transition-colors hover:text-primary active:cursor-grabbing" />
       </div>
-      
+
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           />
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="space-y-xs">
@@ -172,7 +172,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             </div>
             <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
           </div>
-          
+
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <DollarSign className="size-3" />
@@ -180,7 +180,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             </div>
             <div className="text-lg font-bold">R$ {result.preco_praticado.toFixed(2)}</div>
           </div>
-          
+
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <TrendingUp className="size-3" />
@@ -188,7 +188,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             </div>
             <div className="font-semibold text-success">R$ {result.margem_unitaria.toFixed(2)}</div>
           </div>
-          
+
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Target className="size-3" />
@@ -197,7 +197,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             <div className="font-medium">{result.comissao.toFixed(2)}%</div>
           </div>
         </div>
-        
+
         <div className="border-t border-border/50 pt-3">
           <div className="mb-2 text-xs font-medium text-foreground">
             Para atingir {result.margem_desejada.toFixed(1)}% de margem:
@@ -209,7 +209,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-xs border-t border-border/30 pt-2 text-xs text-muted-foreground">
           <div className="mb-2 font-medium text-foreground">Detalhamento:</div>
           <div className="grid grid-cols-2 gap-x-2 gap-y-1">
@@ -272,7 +272,7 @@ export const DashboardForm = () => {
     queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
     queryFn: async () => {
       if (!selectedProductId || selectedMarketplaces.length === 0) return [];
-      
+
       const { data, error } = await supabase
         .from("saved_pricing")
         .select(`
@@ -282,7 +282,7 @@ export const DashboardForm = () => {
         `)
         .eq("product_id", selectedProductId)
         .in("marketplace_id", selectedMarketplaces);
-      
+
       if (error) throw error;
       return data || [];
     },
@@ -294,7 +294,7 @@ export const DashboardForm = () => {
     if (!productId || marketplaceIds.length === 0) return;
 
     setIsRecalculating(true);
-    
+
     try {
       // Valores padrão para cálculo (podem ser configuráveis no futuro)
       const defaultParams = {
@@ -317,7 +317,7 @@ export const DashboardForm = () => {
 
             if (calculationResult && typeof calculationResult === 'object') {
               const result = calculationResult as Record<string, number>;
-            
+
             // Salvar automaticamente os dados atualizados
             await savePricing.mutateAsync({
               product_id: productId,
@@ -341,7 +341,7 @@ export const DashboardForm = () => {
       });
 
       await Promise.all(promises);
-      
+
       toast({
         title: "Dados atualizados",
         description: `Preços recalculados com as configurações mais atuais para ${marketplaceIds.length} marketplace(s)`,
@@ -351,7 +351,7 @@ export const DashboardForm = () => {
     } finally {
       setIsRecalculating(false);
     }
-  }, [calculatePrice, savePricing, toast]);
+  }, [calculatePrice, savePricing, toast, logger]);
 
   const handleMarketplaceToggle = (marketplaceId: string) => {
     setSelectedMarketplaces(prev => {
@@ -390,9 +390,9 @@ export const DashboardForm = () => {
   useEffect(() => {
     const calculateRealMargins = async () => {
       if (savedPricings.length === 0) return;
-      
+
         const newRealMargins: Record<string, {margem_unitaria_real: number; margem_percentual_real: number}> = {};
-      
+
       for (const pricing of savedPricings) {
         try {
           const { data, error } = await supabase.rpc('calcular_margem_real', {
@@ -414,12 +414,12 @@ export const DashboardForm = () => {
           logger.error('Erro ao calcular margem real', error);
         }
       }
-      
+
       setRealMargins(newRealMargins);
     };
 
     calculateRealMargins();
-  }, [savedPricings]);
+  }, [savedPricings, logger]);
 
   // Transform and organize saved pricing data for display
   const transformedResults = savedPricings
@@ -476,7 +476,7 @@ export const DashboardForm = () => {
     if (over && active.id !== over.id) {
       const oldIndex = cardOrder.indexOf(active.id as string);
       const newIndex = cardOrder.indexOf(over.id as string);
-      
+
       setCardOrder((items) => arrayMove(items, oldIndex, newIndex));
     }
   };
@@ -500,8 +500,8 @@ export const DashboardForm = () => {
           <CardContent>
             <div>
               <Label htmlFor="product">Produto *</Label>
-              <Select 
-                value={selectedProductId} 
+              <Select
+                value={selectedProductId}
                 onValueChange={setSelectedProductId}
               >
                 <SelectTrigger>
@@ -560,7 +560,7 @@ export const DashboardForm = () => {
             </div>
           </CardContent>
         </Card>
-      
+
       {/* Manual recalculation button */}
       {selectedProductId && selectedMarketplaces.length > 0 && (
         <div className="flex justify-end">
@@ -635,7 +635,7 @@ export const DashboardForm = () => {
       {selectedProductId && selectedMarketplaces.length > 0 && (
         <div className="space-y-md">
           <h3 className="text-lg font-semibold">Comparação de Preços</h3>
-          
+
           {isLoading ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(selectedMarketplaces.length)].map((_, i) => (
@@ -654,20 +654,20 @@ export const DashboardForm = () => {
               ))}
             </div>
           ) : results.length > 0 ? (
-            <DndContext 
+            <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
-              <SortableContext 
-                items={cardOrder} 
+              <SortableContext
+                items={cardOrder}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {results.map((result, index) => (
-                    <SortableCard 
-                      key={result.marketplace_id} 
-                      result={result} 
+                    <SortableCard
+                      key={result.marketplace_id}
+                      result={result}
                       index={index}
                     />
                   ))}

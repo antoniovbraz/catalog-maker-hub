@@ -6,21 +6,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import { PRICING_QUERY_KEY } from "./usePricing";
 import { logger } from "@/utils/logger";
 
+import { useCallback } from "react";
+
 export function useAutomaticPricingUpdate() {
   const queryClient = useQueryClient();
   const isUpdatingRef = useRef(false);
 
-  const handleRulesUpdate = async (tableName: string, eventType: string) => {
-    // Evitar múltiplas execuções simultâneas
-    if (isUpdatingRef.current) {
-      logger.debug('Recálculo já em andamento, ignorando evento...', 'useAutomaticPricingUpdate');
-      return;
-    }
+  const handleRulesUpdate = useCallback(
+    async (tableName: string, eventType: string) => {
+      // Evitar múltiplas execuções simultâneas
+      if (isUpdatingRef.current) {
+        logger.debug('Recálculo já em andamento, ignorando evento...', 'useAutomaticPricingUpdate');
+        return;
+      }
 
     logger.info(`Detectada mudança na tabela ${tableName} (${eventType})`, 'useAutomaticPricingUpdate');
-    
+
     isUpdatingRef.current = true;
-    
+
     try {
       toast({
         title: "Atualizando precificações",
@@ -28,15 +31,15 @@ export function useAutomaticPricingUpdate() {
       });
 
       const result = await pricingService.recalculateAllPricing();
-      
+
       // Invalidar cache das precificações para recarregar os dados
       queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY] });
-      
+
       toast({
         title: "Precificações atualizadas",
         description: `${result.updated} precificações foram recalculadas${result.errors > 0 ? ` (${result.errors} erros)` : ''}`,
       });
-      
+
     } catch (error) {
       logger.error('Erro no recálculo automático', 'useAutomaticPricingUpdate', error);
       toast({
@@ -47,11 +50,11 @@ export function useAutomaticPricingUpdate() {
     } finally {
       isUpdatingRef.current = false;
     }
-  };
+  }, [queryClient]); // <-- Add queryClient to dependency array
 
   useEffect(() => {
     logger.info('Configurando listeners de atualização automática...', 'useAutomaticPricingUpdate');
-    
+
     // Canal para mudanças nas comissões
     const commissionsChannel = supabase
       .channel('commissions-changes')
@@ -110,8 +113,7 @@ export function useAutomaticPricingUpdate() {
       supabase.removeChannel(fixedFeesChannel);
       supabase.removeChannel(shippingChannel);
     };
-  }, []); // Removida a dependência do queryClient para evitar loops
-
+  }, [handleRulesUpdate]); // Adicionada a dependência handleRulesUpdate
   return {
     triggerManualUpdate: () => handleRulesUpdate('manual', 'manual_trigger')
   };

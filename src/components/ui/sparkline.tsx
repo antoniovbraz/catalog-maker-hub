@@ -46,4 +46,4 @@ function Sparkline({ data, stroke = colors.primary.DEFAULT, size, className, ...
   )
 }
 
-export { Sparkline, sparklineVariants }
+export { Sparkline }
