@@ -1,40 +1,18 @@
 import { z } from "zod";
+import type {
+  SavedPricingRow as SupabaseSavedPricingRow,
+} from "@/integrations/supabase/types";
 
-export interface SavedPricingRow {
-  product_id: string;
-  marketplace_id: string;
-  custo_total: number;
-  valor_fixo: number;
-  frete: number;
-  comissao: number;
-  preco_sugerido: number;
-  margem_unitaria: number;
-  margem_percentual: number;
-  preco_praticado: number | null;
-  taxa_cartao: number;
-  provisao_desconto: number;
-  margem_desejada: number;
+/**
+ * Alias para a linha de `saved_pricing` gerada pelo Supabase.
+ * Centralizar este tipo evita divergências com o schema do banco.
+ */
+export type SavedPricingRow = SupabaseSavedPricingRow;
+
+/** Linha de precificação acompanhada do nome do marketplace (join). */
+export type SavedPricingWithMarketplace = SavedPricingRow & {
   marketplace_name: string;
-}
-
-export interface SavedPricingType {
-  id: string;
-  product_id: string;
-  marketplace_id: string;
-  custo_total: number;
-  valor_fixo: number;
-  frete: number;
-  comissao: number;
-  taxa_cartao: number;
-  provisao_desconto: number;
-  margem_desejada: number;
-  preco_sugerido: number;
-  preco_praticado: number | null;
-  margem_unitaria: number;
-  margem_percentual: number;
-  created_at: string;
-  updated_at: string;
-}
+};
 
 export interface PricingCalculationParams {
   productId: string;

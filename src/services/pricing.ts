@@ -1,17 +1,20 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
-import { SavedPricingType } from "@/types/pricing";
 import { logger } from "@/utils/logger";
+import type { SavedPricingRow } from "@/types/pricing";
+import type { ProductRow, MarketplaceRow } from "@/integrations/supabase/types";
 
-export class PricingService extends BaseService<SavedPricingType> {
+export class PricingService extends BaseService<SavedPricingRow> {
   constructor() {
     super('saved_pricing');
   }
 
-  async getAllWithDetails(): Promise<(SavedPricingType & { 
-    products: { id: string; name: string; sku: string };
-    marketplaces: { id: string; name: string };
-  })[]> {
+  async getAllWithDetails(): Promise<
+    (SavedPricingRow & {
+      products: Pick<ProductRow, "id" | "name" | "sku">;
+      marketplaces: Pick<MarketplaceRow, "id" | "name">;
+    })[]
+  > {
     const { data, error } = await supabase
       .from('saved_pricing')
       .select(`
@@ -32,7 +35,10 @@ export class PricingService extends BaseService<SavedPricingType> {
     return data || [];
   }
 
-  async getByProductAndMarketplace(productId: string, marketplaceId: string): Promise<SavedPricingType[]> {
+  async getByProductAndMarketplace(
+    productId: string,
+    marketplaceId: string,
+  ): Promise<SavedPricingRow[]> {
     const { data, error } = await supabase
       .from('saved_pricing')
       .select('*')
@@ -90,7 +96,9 @@ export class PricingService extends BaseService<SavedPricingType> {
       return (data as Record<string, unknown>) || {};
     }
 
-  async upsert(data: Omit<SavedPricingType, 'id' | 'created_at' | 'updated_at'>): Promise<SavedPricingType> {
+  async upsert(
+    data: Omit<SavedPricingRow, 'id' | 'created_at' | 'updated_at'>,
+  ): Promise<SavedPricingRow> {
     const { data: result, error } = await supabase
       .from('saved_pricing')
       .upsert(data, {

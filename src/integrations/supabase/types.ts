@@ -838,7 +838,13 @@ export type CompositeTypes<
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
-export type SavedPricingRow = Tables<"saved_pricing">;
+// Aliases de conveniência para evitar interfaces manuais
+export type SavedPricingRow = Database['public']['Tables']['saved_pricing']['Row'];
+export type SavedPricingInsert = Database['public']['Tables']['saved_pricing']['Insert'];
+export type SavedPricingUpdate = Database['public']['Tables']['saved_pricing']['Update'];
+
+export type ProductRow = Database['public']['Tables']['products']['Row'];
+export type MarketplaceRow = Database['public']['Tables']['marketplaces']['Row'];
 
 export const Constants = {
   public: {

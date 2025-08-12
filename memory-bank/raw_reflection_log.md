@@ -592,3 +592,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Priorizar limpeza do backlog de lint para agilizar validações futuras.
 ---
+
+---
+Date: 2025-08-12
+TaskRef: "Map Supabase aliases for saved pricing"
+
+Learnings:
+- Exportar aliases de linhas do Supabase evita divergência entre interfaces e esquema.
+- Usar `Pick` sobre tipos gerados permite consultas seletivas sem redefinir campos.
+
+Difficulties:
+- `pnpm lint` continua falhando com milhares de erros de formatação existentes.
+
+Successes:
+- `pnpm type-check` e `pnpm test --run` passaram após refatoração de tipos.
+
+Improvements_Identified_For_Consolidation:
+- Propagar gradualmente o uso de aliases do Supabase em outros módulos para eliminar interfaces manuais.
+---

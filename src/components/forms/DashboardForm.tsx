@@ -17,7 +17,13 @@ import { PRICING_CONFIG } from "@/lib/config";
 import { useLogger } from "@/utils/logger";
 import { colors } from "@/styles/tokens";
 import { cn } from "@/lib/utils";
-import type { SavedPricingRow } from "@/types/pricing";
+import type {
+  SavedPricingWithMarketplace,
+} from "@/types/pricing";
+import type {
+  ProductRow,
+  MarketplaceRow,
+} from "@/integrations/supabase/types";
 import { 
   DndContext, 
   closestCenter, 
@@ -36,36 +42,14 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-}
-
-interface Marketplace {
-  id: string;
-  name: string;
-}
-
 type SortOption = "margem_percentual" | "margem_unitaria" | "preco_sugerido";
+
+type ProductSelect = Pick<ProductRow, "id" | "name" | "sku">;
+type MarketplaceSelect = Pick<MarketplaceRow, "id" | "name">;
 
 // Componente para card drag-and-drop individual
 interface SortableCardProps {
-  result: {
-    marketplace_id: string;
-    marketplace_name: string;
-    custo_total: number;
-    valor_fixo: number;
-    frete: number;
-    comissao: number;
-    preco_sugerido: number;
-    margem_unitaria: number;
-    margem_percentual: number;
-    preco_praticado: number | null;
-    taxa_cartao: number;
-    provisao_desconto: number;
-    margem_desejada: number;
-  };
+  result: SavedPricingWithMarketplace;
   index: number;
 }
 
@@ -220,7 +204,7 @@ export const DashboardForm = () => {
   useAutomaticPricingUpdate();
 
   // Fetch products
-  const { data: products = [], isLoading: loadingProducts } = useQuery({
+  const { data: products = [], isLoading: loadingProducts } = useQuery<ProductSelect[]>({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -228,25 +212,27 @@ export const DashboardForm = () => {
         .select("id, name, sku")
         .order("name");
       if (error) throw error;
-      return data as Product[];
+      return data as ProductSelect[];
     },
   });
 
   // Fetch marketplaces
-  const { data: marketplaces = [], isLoading: loadingMarketplaces } = useQuery({
-    queryKey: ["marketplaces"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("marketplaces")
-        .select("id, name")
-        .order("name");
-      if (error) throw error;
-      return data as Marketplace[];
-    },
-  });
+  const { data: marketplaces = [], isLoading: loadingMarketplaces } =
+    useQuery<MarketplaceSelect[]>({
+      queryKey: ["marketplaces"],
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from("marketplaces")
+          .select("id, name")
+          .order("name");
+        if (error) throw error;
+        return data as MarketplaceSelect[];
+      },
+    });
 
   // Fetch saved pricing for selected product and marketplaces
-  const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery<SavedPricingRow[]>({
+  const { data: savedPricings = [], isLoading: loadingSavedPricings } =
+    useQuery<SavedPricingWithMarketplace[]>({
     queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
     queryFn: async () => {
       if (!selectedProductId || selectedMarketplaces.length === 0) return [];
