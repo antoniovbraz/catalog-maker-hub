@@ -838,6 +838,8 @@ export type CompositeTypes<
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
+export type SavedPricingRow = Tables<"saved_pricing">;
+
 export const Constants = {
   public: {
     Enums: {

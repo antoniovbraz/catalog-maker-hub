@@ -504,3 +504,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Considerar modelo único para documentar erros e retries em futuros serviços.
 ---
+---
+Date: 2025-08-12
+TaskRef: "Allow null preco_praticado and adjust DashboardForm"
+
+Learnings:
+- Alias para linhas do Supabase facilita reaproveitar tipagens.
+- Campos numéricos opcionais exigem uso de fallback `??` e condicionais para RPCs.
+
+Difficulties:
+- `pnpm lint` ainda retorna milhares de erros herdados, dificultando validação limpa.
+
+Successes:
+- Type-check, testes e servidor de desenvolvimento executaram sem problemas.
+
+Improvements_Identified_For_Consolidation:
+- Agendar mutirão para resolver backlog de lint e reduzir ruído.
+---
