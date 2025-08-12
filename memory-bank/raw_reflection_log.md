@@ -574,3 +574,21 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Criar helper reutilizável para parsing seguro de campos numéricos.
 ---
+Date: 2025-08-12
+TaskRef: "Unificar componentes de toast e ajustar imports"
+
+Learnings:
+- Reexportar `use-toast` pelo diretório `ui` mantém um único ponto de verdade e preserva o estilo shadcn.
+- Remover wrappers duplicados reduz manutenção e evita divergência de tipos.
+
+Difficulties:
+- `pnpm lint` gera inúmeros avisos e erros de Prettier e import-order, tornando a verificação demorada e barulhenta.
+- Redirecionar `stderr` foi necessário para capturar a saída do lint.
+
+Successes:
+- Imports atualizados para `@/components/ui/toaster` e `@/components/ui/use-toast` sem quebrar testes.
+- Type-check e testes unitários executados com sucesso.
+
+Improvements_Identified_For_Consolidation:
+- Priorizar limpeza do backlog de lint para agilizar validações futuras.
+---
