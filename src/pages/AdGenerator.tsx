@@ -154,15 +154,15 @@ export default function AdGenerator() {
             disabled={!canGenerate || generateMutation.isPending}
             className="bg-gradient-primary hover:opacity-90"
           >
-            <Wand2 className="w-4 h-4 mr-2" />
+            <Wand2 className="mr-2 size-4" />
             {generateMutation.isPending ? "Gerando..." : "Gerar Anúncio"}
           </Button>
         ) : null
       }
     >
       {/* Mode Toggle */}
-      <div className="xl:col-span-12 mb-6">
-        <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+      <div className="mb-6 xl:col-span-12">
+        <div className="flex items-center gap-4 rounded-lg bg-muted/50 p-4">
           <span className="font-medium">Modo de Geração:</span>
           <div className="flex gap-2">
             <Button
@@ -191,14 +191,14 @@ export default function AdGenerator() {
 
       {mode === 'strategic' ? (
         // Modo Estratégico - Chat Interface
-        <div className="xl:col-span-12 space-y-6">
+        <div className="space-y-6 xl:col-span-12">
           {selectedProductId && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Configuração do Chat</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                <div className="mb-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                   <div>
                     <Label htmlFor="chat-product">Produto</Label>
                     <Select value={selectedProductId} onValueChange={setSelectedProductId}>
@@ -251,9 +251,9 @@ export default function AdGenerator() {
         // Modo Rápido - Interface Original
         <>
           {/* Alert Informativo */}
-          <div className="xl:col-span-12 mb-6">
+          <div className="mb-6 xl:col-span-12">
             <Alert>
-              <Info className="w-4 h-4" />
+              <Info className="size-4" />
               <AlertDescription>
                 Modo rápido: Geração direta baseada nos dados do produto e imagens.
               </AlertDescription>
@@ -261,12 +261,12 @@ export default function AdGenerator() {
           </div>
 
           {/* Coluna de Configuração (8 colunas) */}
-          <div className="xl:col-span-8 space-y-6">
+          <div className="space-y-6 xl:col-span-8">
         {/* Card 1: Seleção de Produto */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
+              <Package className="size-5" />
               Selecionar Produto
             </CardTitle>
             <CardDescription>
@@ -285,7 +285,7 @@ export default function AdGenerator() {
                     {products.map((product) => (
                       <SelectItem key={product.id} value={product.id}>
                         <div className="flex items-center gap-2">
-                          <Package className="w-4 h-4 text-muted-foreground" />
+                          <Package className="size-4 text-muted-foreground" />
                           <span>{product.name}</span>
                           {product.sku && (
                             <Badge variant="outline" className="text-xs">
@@ -300,8 +300,8 @@ export default function AdGenerator() {
               </div>
 
               {selectedProduct && (
-                <div className="p-3 bg-muted/30 rounded-md">
-                  <h4 className="font-medium mb-1">{selectedProduct.name}</h4>
+                <div className="rounded-md bg-muted/30 p-3">
+                  <h4 className="mb-1 font-medium">{selectedProduct.name}</h4>
                   {selectedProduct.description && (
                     <p className="text-sm text-muted-foreground">
                       {selectedProduct.description}
@@ -317,7 +317,7 @@ export default function AdGenerator() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Camera className="w-5 h-5" />
+              <Camera className="size-5" />
               Imagens do Produto
               <Badge variant="outline">
                 {images.length} imagem(ns)
@@ -340,8 +340,8 @@ export default function AdGenerator() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
               >
-                <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-2">
+                <Upload className="mx-auto mb-2 size-8 text-muted-foreground" />
+                <p className="mb-2 text-sm text-muted-foreground">
                   Arraste imagens aqui ou clique para selecionar
                 </p>
                 <Input
@@ -355,33 +355,33 @@ export default function AdGenerator() {
                 />
                 <Label
                   htmlFor="image-upload"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-background border rounded-md cursor-pointer hover:bg-muted"
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-background px-4 py-2 text-sm hover:bg-muted"
                 >
-                  <ImageIcon className="w-4 h-4" />
+                  <ImageIcon className="size-4" />
                   Selecionar Imagens
                 </Label>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Máximo 5MB por imagem. Formatos: JPG, PNG, WebP
                 </p>
               </div>
 
               {/* Grid de Imagens - Responsivo sem scroll interno */}
               {images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   {images.map((image: ProductImage) => (
-                    <div key={image.id} className="relative group">
+                    <div key={image.id} className="group relative">
                       <img
                         src={image.image_url}
                         alt="Produto"
-                        className="w-full h-24 object-cover rounded-md border"
+                        className="h-24 w-full rounded-md border object-cover"
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 flex items-center justify-center gap-2 rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                         <Button
                           size="sm"
                           variant="secondary"
                           onClick={() => window.open(image.image_url, '_blank')}
                         >
-                          <Eye className="w-3 h-3" />
+                          <Eye className="size-3" />
                         </Button>
                         <Button
                           size="sm"
@@ -389,12 +389,12 @@ export default function AdGenerator() {
                           onClick={() => deleteMutation.mutate(image.id)}
                           disabled={deleteMutation.isPending}
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="size-3" />
                         </Button>
                       </div>
                       <Badge 
                         variant="secondary" 
-                        className="absolute top-1 left-1 text-xs"
+                        className="absolute left-1 top-1 text-xs"
                       >
                         {image.image_type}
                       </Badge>
@@ -407,12 +407,12 @@ export default function AdGenerator() {
         </Card>
 
         {/* Card 3: Marketplace e Instruções */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Marketplace */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="size-5" />
                 Marketplace
               </CardTitle>
               <CardDescription>
@@ -425,7 +425,7 @@ export default function AdGenerator() {
                   <Button
                     key={option.value}
                     variant={selectedMarketplace === option.value ? "default" : "outline"}
-                    className="h-auto p-3 flex items-center justify-start gap-3"
+                    className="flex h-auto items-center justify-start gap-3 p-3"
                     onClick={() => setSelectedMarketplace(option.value)}
                   >
                     <span className="text-xl">{option.icon}</span>
@@ -440,7 +440,7 @@ export default function AdGenerator() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
+                <Sparkles className="size-5" />
                 Instruções (Opcional)
               </CardTitle>
               <CardDescription>
@@ -455,7 +455,7 @@ export default function AdGenerator() {
                 rows={4}
                 className="resize-none"
               />
-              <div className="mt-2 text-xs text-muted-foreground text-right">
+              <div className="mt-2 text-right text-xs text-muted-foreground">
                 {customPrompt.length}/500 caracteres
               </div>
             </CardContent>
@@ -470,7 +470,7 @@ export default function AdGenerator() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Wand2 className="w-5 h-5" />
+                  <Wand2 className="size-5" />
                   Anúncio Gerado
                 </CardTitle>
                 <CardDescription>
@@ -480,7 +480,7 @@ export default function AdGenerator() {
               <CardContent className="space-y-4">
                 {/* Título */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <Label className="text-sm font-medium">Título</Label>
                     <Button
                       size="sm"
@@ -490,14 +490,14 @@ export default function AdGenerator() {
                       📋
                     </Button>
                   </div>
-                  <div className="p-3 bg-muted/30 rounded-md text-sm">
+                  <div className="rounded-md bg-muted/30 p-3 text-sm">
                     {generatedResult.title}
                   </div>
                 </div>
                 
                 {/* Descrição */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <Label className="text-sm font-medium">Descrição</Label>
                     <Button
                       size="sm"
@@ -507,7 +507,7 @@ export default function AdGenerator() {
                       📋
                     </Button>
                   </div>
-                  <div className="p-3 bg-muted/30 rounded-md text-sm whitespace-pre-wrap max-h-32 overflow-y-auto">
+                  <div className="max-h-32 overflow-y-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-sm">
                     {generatedResult.description}
                   </div>
                 </div>
@@ -515,7 +515,7 @@ export default function AdGenerator() {
                 {/* Palavras-chave */}
                 {generatedResult.keywords && (
                   <div>
-                    <Label className="text-sm font-medium mb-2 block">Palavras-chave</Label>
+                    <Label className="mb-2 block text-sm font-medium">Palavras-chave</Label>
                     <div className="flex flex-wrap gap-1">
                       {generatedResult.keywords.map((keyword: string, index: number) => (
                         <Badge key={index} variant="outline" className="text-xs">
@@ -531,7 +531,7 @@ export default function AdGenerator() {
                 {/* Botões de Ação */}
                 <div className="flex flex-col gap-2">
                   <Button size="sm" className="w-full">
-                    <Eye className="w-3 h-3 mr-2" />
+                    <Eye className="mr-2 size-3" />
                     Visualizar Preview
                   </Button>
                   <div className="grid grid-cols-2 gap-2">
@@ -549,7 +549,7 @@ export default function AdGenerator() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Wand2 className="w-5 h-5" />
+                  <Wand2 className="size-5" />
                   Resultado
                 </CardTitle>
                 <CardDescription>
@@ -557,8 +557,8 @@ export default function AdGenerator() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                <div className="py-8 text-center text-muted-foreground">
+                  <Sparkles className="mx-auto mb-4 size-12 opacity-30" />
                   <p className="text-sm">
                     Configure os campos ao lado e clique em<br />
                     "Gerar Anúncio" para ver o resultado

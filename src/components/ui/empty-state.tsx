@@ -20,17 +20,17 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <Card className="flex flex-col items-center justify-center py-2xl px-md text-center">
-      <div className="rounded-full bg-muted p-md mb-md">
-        {icon || <PackageOpen className="h-8 w-8 text-muted-foreground" />}
+    <Card className="flex flex-col items-center justify-center px-md py-2xl text-center">
+      <div className="mb-md rounded-full bg-muted p-md">
+        {icon || <PackageOpen className="size-8 text-muted-foreground" />}
       </div>
 
-      <Heading variant="h3" className="text-foreground mb-sm">
+      <Heading variant="h3" className="mb-sm text-foreground">
         {title}
       </Heading>
 
       {description && (
-        <Text variant="caption" className="text-muted-foreground mb-lg max-w-sm">
+        <Text variant="caption" className="mb-lg max-w-sm text-muted-foreground">
           {description}
         </Text>
       )}

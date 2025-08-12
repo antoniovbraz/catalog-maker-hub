@@ -79,7 +79,7 @@ function MenuItem({ item, collapsed, isActive }: MenuItemProps) {
         )}
       >
         <Link to={item.path}>
-          <item.icon className="w-5 h-5 shrink-0" />
+          <item.icon className="size-5 shrink-0" />
           {!collapsed && <span className="font-medium">{item.title}</span>}
           {collapsed && <div className="sr-only">{item.title}</div>}
         </Link>
@@ -137,15 +137,15 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
     <SidebarMenuItem>
       <Collapsible open={isOpen} onOpenChange={handleToggle}>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton className="w-full justify-start gap-3 h-11 rounded-lg transition-all duration-200">
-            <Icon className="w-5 h-5 shrink-0" />
+          <SidebarMenuButton className="h-11 w-full justify-start gap-3 rounded-lg transition-all duration-200">
+            <Icon className="size-5 shrink-0" />
             {!collapsed && (
               <>
                 <span className="font-medium">{title}</span>
                 {isOpen ? (
-                  <ChevronUp className="w-4 h-4 ml-auto" />
+                  <ChevronUp className="ml-auto size-4" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 ml-auto" />
+                  <ChevronDown className="ml-auto size-4" />
                 )}
               </>
             )}
@@ -166,7 +166,7 @@ function CollapsibleMenuGroup({ title, icon: Icon, items, collapsed, location }:
                     )}
                   >
                     <Link to={item.path}>
-                      <item.icon className="w-4 h-4 shrink-0" />
+                      <item.icon className="size-4 shrink-0" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuSubButton>
@@ -190,12 +190,12 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0 bg-sidebar">
       <SidebarHeader className="p-lg">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-            <Zap className="w-5 h-5 text-primary" />
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+            <Zap className="size-5 text-primary" />
           </div>
           {!collapsed && (
             <div className="flex-1">
-                <h2 className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                <h2 className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-lg font-bold text-transparent">
                 Peepers Hub
               </h2>
               <p className="text-xs text-sidebar-foreground/70">
@@ -209,7 +209,7 @@ export function AppSidebar() {
       <SidebarContent className="space-y-md">
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
+          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-sidebar-foreground/70">
             {!collapsed ? "Principal" : ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -246,7 +246,7 @@ export function AppSidebar() {
 
         {/* Account & Settings */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
+          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-sidebar-foreground/70">
             {!collapsed ? "Conta" : ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -262,7 +262,7 @@ export function AppSidebar() {
                   )}
                 >
                   <Link to="/subscription">
-                    <Crown className="w-5 h-5 shrink-0" />
+                    <Crown className="size-5 shrink-0" />
                     {!collapsed && <span className="font-medium">Assinaturas</span>}
                     {collapsed && <div className="sr-only">Assinaturas</div>}
                   </Link>
@@ -276,7 +276,7 @@ export function AppSidebar() {
                     "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
-                  <Settings className="w-5 h-5 shrink-0" />
+                  <Settings className="size-5 shrink-0" />
                   {!collapsed && <span className="font-medium">Configurações</span>}
                   {collapsed && <div className="sr-only">Configurações</div>}
                 </SidebarMenuButton>
@@ -288,7 +288,7 @@ export function AppSidebar() {
         {/* Admin Section - Only for Super Admins */}
         {profile?.role === 'super_admin' && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sidebar-foreground/70 text-xs uppercase tracking-wider">
+            <SidebarGroupLabel className="text-xs uppercase tracking-wider text-sidebar-foreground/70">
               {!collapsed ? "Administração" : ""}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -304,7 +304,7 @@ export function AppSidebar() {
                     )}
                   >
                     <Link to="/admin">
-                      <Shield className="w-5 h-5 shrink-0" />
+                      <Shield className="size-5 shrink-0" />
                       {!collapsed && <span className="font-medium">Dashboard Admin</span>}
                       {collapsed && <div className="sr-only">Dashboard Admin</div>}
                     </Link>
@@ -321,7 +321,7 @@ export function AppSidebar() {
                     )}
                   >
                     <Link to="/admin/assistentes-ia">
-                      <Bot className="w-5 h-5 shrink-0" />
+                      <Bot className="size-5 shrink-0" />
                       {!collapsed && <span className="font-medium">Assistentes IA</span>}
                       {collapsed && <div className="sr-only">Assistentes IA</div>}
                     </Link>

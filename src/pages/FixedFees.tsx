@@ -98,7 +98,7 @@ const FixedFees = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Taxa
       </Button>
     </div>
@@ -108,7 +108,7 @@ const FixedFees = () => {
     <ConfigurationPageLayout
       title="Regras de valor fixo"
       description="Configure regras de valor fixo por marketplace com diferentes tipos"
-      icon={<Coins className="w-6 h-6" />}
+      icon={<Coins className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
@@ -122,7 +122,7 @@ const FixedFees = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Coins className="w-5 h-5" />
+              <Coins className="size-5" />
               Taxas Fixas Configuradas
             </CardTitle>
           </CardHeader>
@@ -132,7 +132,7 @@ const FixedFees = () => {
             ) : fixedFeeRules.length === 0 ? (
               <div className="p-4 text-center text-muted-foreground">
                 <p>Nenhuma taxa fixa configurada</p>
-                <p className="text-sm mt-1">Adicione uma nova taxa para começar</p>
+                <p className="mt-1 text-sm">Adicione uma nova taxa para começar</p>
               </div>
             ) : (
               <Table>
@@ -172,7 +172,7 @@ const FixedFees = () => {
                             onClick={() => deleteMutation.mutate(rule.id)}
                             disabled={deleteMutation.isPending}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="size-4" />
                           </Button>
                         </div>
                       </TableCell>

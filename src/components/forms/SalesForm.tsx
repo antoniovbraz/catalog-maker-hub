@@ -92,7 +92,7 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-md">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="product">Produto *</Label>
                 <Select 
@@ -132,7 +132,7 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
                 <Label htmlFor="price_charged">Preço Cobrado (R$) *</Label>
                 <Input
@@ -219,7 +219,7 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
                           variant="outline"
                           onClick={() => handleEdit(sale)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="size-4" />
                         </Button>
                         <Button
                           size="sm"
@@ -227,7 +227,7 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
                           onClick={() => deleteMutation.mutate(sale.id)}
                           disabled={deleteMutation.isPending}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
                     </TableCell>

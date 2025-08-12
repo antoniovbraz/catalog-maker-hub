@@ -52,7 +52,7 @@ export default function AssistantsManagement() {
   const actions: DataAction<Assistant>[] = [
     {
       label: "Editar",
-      icon: <Edit className="h-4 w-4" />,
+      icon: <Edit className="size-4" />,
       onClick: (assistant) => {
         setEditingAssistant(assistant);
         setShowForm(true);
@@ -61,7 +61,7 @@ export default function AssistantsManagement() {
     },
     {
       label: "Excluir",
-      icon: <Trash2 className="h-4 w-4" />,
+      icon: <Trash2 className="size-4" />,
       onClick: (assistant) => setDeletingAssistant(assistant),
       variant: "destructive",
     },
@@ -88,12 +88,12 @@ export default function AssistantsManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Assistentes IA</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="mt-2 text-muted-foreground">
             Gerencie os assistentes IA para cada marketplace
           </p>
         </div>
         <Button onClick={handleCreateNew} className="gap-2">
-          <Plus className="h-4 w-4" />
+          <Plus className="size-4" />
           Novo Assistente
         </Button>
       </div>
@@ -101,7 +101,7 @@ export default function AssistantsManagement() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bot className="h-5 w-5" />
+            <Bot className="size-5" />
             Assistentes Configurados
           </CardTitle>
           <CardDescription>
@@ -118,9 +118,9 @@ export default function AssistantsManagement() {
             searchable
             isLoading={isLoading}
             emptyState={
-              <div className="text-center py-8">
+              <div className="py-8 text-center">
                 <p className="text-muted-foreground">Nenhum assistente configurado ainda</p>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Crie seu primeiro assistente IA para começar a gerar anúncios automaticamente
                 </p>
               </div>

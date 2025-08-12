@@ -18,7 +18,7 @@ export default function Subscription() {
 
   if (plansLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <LoadingSpinner size="lg" text="Carregando planos..." />
       </div>
     );
@@ -26,9 +26,9 @@ export default function Subscription() {
 
   if (!plans?.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <EmptyState
-          icon={<Crown className="h-8 w-8" />}
+          icon={<Crown className="size-8" />}
           title="Nenhum plano disponível"
           description="Os planos de assinatura ainda não foram configurados."
         />
@@ -45,11 +45,11 @@ export default function Subscription() {
 
   const getPlanIcon = (planName: string) => {
     switch (planName) {
-      case 'free': return <Zap className="h-5 w-5" />;
-      case 'basic': return <Star className="h-5 w-5" />;
-      case 'pro': return <Crown className="h-5 w-5" />;
-      case 'enterprise': return <Crown className="h-5 w-5" />;
-      default: return <Zap className="h-5 w-5" />;
+      case 'free': return <Zap className="size-5" />;
+      case 'basic': return <Star className="size-5" />;
+      case 'pro': return <Crown className="size-5" />;
+      case 'enterprise': return <Crown className="size-5" />;
+      default: return <Zap className="size-5" />;
     }
   };
 
@@ -78,16 +78,16 @@ export default function Subscription() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       {/* Header */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-          <Crown className="w-8 h-8 text-primary" />
+      <div className="mb-12 text-center">
+        <div className="mb-4 inline-flex size-16 items-center justify-center rounded-full bg-primary/10">
+          <Crown className="size-8 text-primary" />
         </div>
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-4">
+        <h1 className="mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-4xl font-bold text-transparent">
           Escolha seu Plano
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
           Desbloqueie todo o potencial do Peepers Hub com ferramentas avançadas para seu marketplace
         </p>
       </div>
@@ -116,7 +116,7 @@ export default function Subscription() {
           </CardHeader>
           
           <CardContent className="space-y-md">
-            <h4 className="font-semibold mb-3">Uso do Período Atual</h4>
+            <h4 className="mb-3 font-semibold">Uso do Período Atual</h4>
             
             {/* Products Usage */}
             <div className="space-y-sm">
@@ -152,11 +152,11 @@ export default function Subscription() {
       )}
 
       {/* Billing Cycle Toggle */}
-      <div className="flex justify-center mb-8">
-        <div className="bg-muted p-xs rounded-lg">
+      <div className="mb-8 flex justify-center">
+        <div className="rounded-lg bg-muted p-xs">
           <button
             onClick={() => setBillingCycle('monthly')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               billingCycle === 'monthly' 
                 ? 'bg-background text-foreground shadow-sm' 
                 : 'text-muted-foreground hover:text-foreground'
@@ -166,7 +166,7 @@ export default function Subscription() {
           </button>
           <button
             onClick={() => setBillingCycle('yearly')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               billingCycle === 'yearly' 
                 ? 'bg-background text-foreground shadow-sm' 
                 : 'text-muted-foreground hover:text-foreground'
@@ -179,7 +179,7 @@ export default function Subscription() {
       </div>
 
       {/* Plans Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => {
           const price = billingCycle === 'yearly' ? plan.price_yearly : plan.price_monthly;
           const isCurrent = isCurrentPlan(plan.id);
@@ -188,12 +188,12 @@ export default function Subscription() {
           return (
             <Card 
               key={plan.id}
-              className={`relative ${isRecommended ? 'border-primary shadow-lg scale-105' : ''} ${
+              className={`relative ${isRecommended ? 'scale-105 border-primary shadow-lg' : ''} ${
                 isCurrent ? 'ring-2 ring-primary/50' : ''
               }`}
             >
               {isRecommended && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
                   Recomendado
                 </Badge>
               )}
@@ -205,7 +205,7 @@ export default function Subscription() {
               )}
 
               <CardHeader className="text-center">
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${getPlanColor(plan.name)}`}>
+                <div className={`mb-4 inline-flex size-12 items-center justify-center rounded-full ${getPlanColor(plan.name)}`}>
                   {getPlanIcon(plan.name)}
                 </div>
                 
@@ -226,7 +226,7 @@ export default function Subscription() {
               <CardContent className="space-y-md">
                 {/* Features */}
                 <div className="space-y-sm">
-                  <h4 className="font-semibold text-sm">Recursos inclusos:</h4>
+                  <h4 className="text-sm font-semibold">Recursos inclusos:</h4>
                   <ul className="space-y-xs text-sm">
                     {Object.entries(plan.features || {}).map(([feature, enabled]) => {
                       if (!enabled) return null;
@@ -246,7 +246,7 @@ export default function Subscription() {
                       
                       return (
                         <li key={feature} className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-green-600" />
+                          <Check className="size-4 text-green-600" />
                           {featureLabels[feature] || feature}
                         </li>
                       );
@@ -258,7 +258,7 @@ export default function Subscription() {
 
                 {/* Limits */}
                 <div className="space-y-sm">
-                  <h4 className="font-semibold text-sm">Limites:</h4>
+                  <h4 className="text-sm font-semibold">Limites:</h4>
                   <ul className="space-y-xs text-sm text-muted-foreground">
                     {Object.entries(plan.limits || {}).map(([limit, value]) => {
                       const limitLabels: Record<string, string> = {
@@ -272,7 +272,7 @@ export default function Subscription() {
                         <li key={limit} className="flex justify-between">
                           <span>{limitLabels[limit] || limit}:</span>
                           <span className="font-medium">
-                            {value === -1 ? <Infinity className="h-4 w-4 inline" /> : value.toLocaleString()}
+                            {value === -1 ? <Infinity className="inline size-4" /> : value.toLocaleString()}
                           </span>
                         </li>
                       );
@@ -286,7 +286,7 @@ export default function Subscription() {
                   variant={isRecommended ? 'default' : 'outline'}
                 >
                   {isCurrent ? 'Plano Atual' : 'Escolher Plano'}
-                  {!isCurrent && <ArrowRight className="h-4 w-4 ml-2" />}
+                  {!isCurrent && <ArrowRight className="ml-2 size-4" />}
                 </Button>
               </CardContent>
             </Card>
@@ -296,8 +296,8 @@ export default function Subscription() {
 
       {/* FAQ or Additional Info */}
       <div className="mt-16 text-center">
-        <h3 className="text-2xl font-bold mb-4">Precisa de ajuda para escolher?</h3>
-        <p className="text-muted-foreground mb-6">
+        <h3 className="mb-4 text-2xl font-bold">Precisa de ajuda para escolher?</h3>
+        <p className="mb-6 text-muted-foreground">
           Nossa equipe está pronta para ajudar você a encontrar o plano ideal para seu negócio.
         </p>
         <Button variant="outline" size="lg">

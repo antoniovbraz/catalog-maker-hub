@@ -118,10 +118,10 @@ export function CommissionFormEnhanced({
     }
     
     return (
-      <div className={`text-sm ${color} mt-2 p-2 rounded-md border ${bgColor} flex items-center gap-2`}>
-        <Calculator className="w-4 h-4" />
+      <div className={`text-sm ${color} mt-2 rounded-md border p-2 ${bgColor} flex items-center gap-2`}>
+        <Calculator className="size-4" />
         <span>{label} no preço final</span>
-        <Badge variant="outline" className="text-xs ml-auto">
+        <Badge variant="outline" className="ml-auto text-xs">
           {rate.toFixed(1)}%
         </Badge>
       </div>
@@ -133,7 +133,7 @@ export function CommissionFormEnhanced({
       id: "marketplace",
       title: "Marketplace",
       description: "Selecione o marketplace para esta comissão",
-      icon: <Store className="w-4 h-4" />,
+      icon: <Store className="size-4" />,
       required: true,
       children: (
         <div>
@@ -160,7 +160,7 @@ export function CommissionFormEnhanced({
       id: "category",
       title: "Categoria",
       description: "Categoria específica ou geral para todos os produtos",
-      icon: <Tag className="w-4 h-4" />,
+      icon: <Tag className="size-4" />,
       children: (
         <div>
           <Label htmlFor="category">Categoria</Label>
@@ -185,7 +185,7 @@ export function CommissionFormEnhanced({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             Comissões específicas por categoria têm prioridade sobre a padrão
           </p>
         </div>
@@ -195,13 +195,13 @@ export function CommissionFormEnhanced({
       id: "rate",
       title: "Taxa de Comissão",
       description: "Percentual cobrado pelo marketplace",
-      icon: <Percent className="w-4 h-4" />,
+      icon: <Percent className="size-4" />,
       required: true,
       children: (
         <div>
           <Label htmlFor="rate" className="font-medium">
             Taxa de Comissão (%) *
-            <span className="text-xs text-muted-foreground font-normal ml-2">
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
               Valor em percentual
             </span>
           </Label>
@@ -218,11 +218,11 @@ export function CommissionFormEnhanced({
               className="pr-10"
               required
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
               %
             </div>
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          <div className="mt-1 flex items-center gap-2">
             <p className="text-xs text-muted-foreground">
               💡 Digite apenas o número (exemplo: <strong>14</strong> para 14%)
             </p>

@@ -36,7 +36,7 @@ const Categories = () => {
       header: 'Nome',
       render: (item: CategoryType) => (
         <div className="flex items-center gap-2">
-          <FolderTree className="w-4 h-4 text-muted-foreground" />
+          <FolderTree className="size-4 text-muted-foreground" />
           <span className="font-medium">{item.name}</span>
         </div>
       )
@@ -55,12 +55,12 @@ const Categories = () => {
   const actions = [
     {
       label: 'Editar',
-      icon: <Edit className="w-4 h-4" />,
+      icon: <Edit className="size-4" />,
       onClick: (category: CategoryType) => handleEdit(category)
     },
     {
       label: 'Excluir',
-      icon: <Trash2 className="w-4 h-4" />,
+      icon: <Trash2 className="size-4" />,
       onClick: (category: CategoryType) => deleteMutation.mutate(category.id),
       variant: 'destructive' as const
     }
@@ -74,7 +74,7 @@ const Categories = () => {
   const headerActions = (
     <div className="flex items-center gap-2">
       <Button size="sm" onClick={showForm}>
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 size-4" />
         Nova Categoria
       </Button>
     </div>
@@ -84,7 +84,7 @@ const Categories = () => {
     <ConfigurationPageLayout
       title="Gerenciar Categorias"
       description="Organize seus produtos em categorias para melhor gestão"
-      icon={<FolderTree className="w-6 h-6" />}
+      icon={<FolderTree className="size-6" />}
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
@@ -96,14 +96,14 @@ const Categories = () => {
 
       {/* Lista de categorias sempre visível */}
       <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
-        <Card className="shadow-card border border-border/20">
+        <Card className="border border-border/20 shadow-card">
           <CardHeader className="py-3">
-            <CardTitle className="text-base flex items-center gap-2 font-medium text-muted-foreground">
-              <FolderTree className="w-4 h-4" />
+            <CardTitle className="flex items-center gap-2 text-base font-medium text-muted-foreground">
+              <FolderTree className="size-4" />
               <span>Categorias Cadastradas</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 pb-4 px-6">
+          <CardContent className="px-6 pb-4 pt-0">
             <DataVisualization
               title=""
               data={categories}
@@ -111,7 +111,7 @@ const Categories = () => {
               actions={actions}
               isLoading={isLoading}
               emptyState={
-                <div className="text-center py-8">
+                <div className="py-8 text-center">
                   <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
                   <p className="text-sm text-muted-foreground">
                     Crie sua primeira categoria usando o formulário ao lado

@@ -41,7 +41,7 @@ export function ThemeManager() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Palette className="h-[1.2rem] w-[1.2rem]" />
+          <Palette className="size-[1.2rem]" />
           <span className="sr-only">Alterar tema</span>
         </Button>
       </DropdownMenuTrigger>
@@ -60,14 +60,14 @@ export function ThemeManager() {
           <DropdownMenuItem
             key={themeOption.id}
             onClick={() => setTheme(themeOption.id)}
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex cursor-pointer items-center gap-3"
           >
-            <div className={`w-4 h-4 rounded-sm ${themeOption.preview}`} />
+            <div className={`size-4 rounded-sm ${themeOption.preview}`} />
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{themeOption.name}</span>
                 {theme === themeOption.id && (
-                  <Monitor className="h-3 w-3 text-primary" />
+                  <Monitor className="size-3 text-primary" />
                 )}
               </div>
               <p className="text-xs text-muted-foreground">

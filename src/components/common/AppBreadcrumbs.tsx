@@ -71,7 +71,7 @@ export function AppBreadcrumbs({ items, className }: AppBreadcrumbsProps) {
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link to="/dashboard" className="inline-flex items-center gap-1">
-              <Home className="h-4 w-4" />
+              <Home className="size-4" />
               <span className="sr-only">Dashboard</span>
             </Link>
           </BreadcrumbLink>

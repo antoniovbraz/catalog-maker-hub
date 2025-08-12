@@ -49,18 +49,18 @@ export function SmartForm({
       <CardHeader className="bg-card">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               {title}
               {isEditing && <Badge variant="secondary">{editingLabel}</Badge>}
             </CardTitle>
             {description && (
-              <p className="text-muted-foreground mt-1">{description}</p>
+              <p className="mt-1 text-muted-foreground">{description}</p>
             )}
           </div>
           
           {isDirty && (
             <div className="flex items-center gap-2 text-muted-foreground">
-              <AlertCircle className="w-4 h-4" />
+              <AlertCircle className="size-4" />
               <span className="text-sm">Alterações não salvas</span>
             </div>
           )}
@@ -72,14 +72,14 @@ export function SmartForm({
           {sections.map((section, index) => (
             <div key={section.id} className="space-y-md">
               {/* Section Header */}
-              <div className="flex items-center gap-2 pb-2 border-b border-border">
+              <div className="flex items-center gap-2 border-b border-border pb-2">
                 {section.icon && (
-                  <div className="p-1.5 bg-primary/10 rounded text-primary">
+                  <div className="rounded bg-primary/10 p-1.5 text-primary">
                     {section.icon}
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <h3 className="flex items-center gap-2 font-semibold text-foreground">
                     {section.title}
                     {section.required && (
                       <Badge variant="outline" className="text-xs">
@@ -102,13 +102,13 @@ export function SmartForm({
               
               {/* Divider between sections */}
               {index < sections.length - 1 && (
-                <hr className="border-border my-6" />
+                <hr className="my-6 border-border" />
               )}
             </div>
           ))}
           
           {/* Form Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+          <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
             {onCancel && (
               <Button 
                 type="button" 
@@ -116,7 +116,7 @@ export function SmartForm({
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
-                <X className="w-4 h-4 mr-2" />
+                <X className="mr-2 size-4" />
                 {cancelLabel}
               </Button>
             )}
@@ -126,13 +126,13 @@ export function SmartForm({
               disabled={isSubmitting}
               className="min-w-[120px]"
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="mr-2 size-4" />
               {isSubmitting ? "Salvando..." : submitLabel}
             </Button>
           </div>
           
           {hasRequiredSections && (
-            <p className="text-xs text-muted-foreground text-center pt-2">
+            <p className="pt-2 text-center text-xs text-muted-foreground">
               * Campos obrigatórios devem ser preenchidos
             </p>
           )}

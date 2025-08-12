@@ -90,10 +90,10 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-md backdrop-blur-sm">
       <Card className="w-full max-w-2xl">
-        <CardHeader className="text-center pb-2">
-          <div className="flex items-center justify-between mb-4">
+        <CardHeader className="pb-2 text-center">
+          <div className="mb-4 flex items-center justify-between">
             <Badge variant="outline" className="text-xs">
               {currentStep + 1} de {steps.length}
             </Badge>
@@ -104,11 +104,11 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
           
           <Progress value={progress} className="mb-6" />
           
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-            <step.icon className="w-8 h-8 text-primary" />
+          <div className="mb-4 inline-flex size-16 items-center justify-center rounded-full bg-primary/10">
+            <step.icon className="size-8 text-primary" />
           </div>
           
-          <CardTitle className="text-2xl mb-2">{step.title}</CardTitle>
+          <CardTitle className="mb-2 text-2xl">{step.title}</CardTitle>
           <CardDescription className="text-base">
             {step.description}
           </CardDescription>
@@ -116,11 +116,11 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
 
         <CardContent className="space-y-lg">
           {/* Steps Overview */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {steps.map((s, index) => (
               <div
                 key={s.id}
-                className={`p-3 rounded-lg border text-center transition-all ${
+                className={`rounded-lg border p-3 text-center transition-all ${
                   index === currentStep
                     ? 'border-primary bg-primary/5'
                     : index < currentStep
@@ -128,7 +128,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
                     : 'border-muted'
                 }`}
               >
-                <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full mb-2 ${
+                <div className={`mb-2 inline-flex size-8 items-center justify-center rounded-full ${
                   index === currentStep
                     ? 'bg-primary text-primary-foreground'
                     : index < currentStep
@@ -136,12 +136,12 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
                     : 'bg-muted text-muted-foreground'
                 }`}>
                   {index < currentStep ? (
-                    <Check className="w-4 h-4" />
+                    <Check className="size-4" />
                   ) : (
-                    <s.icon className="w-4 h-4" />
+                    <s.icon className="size-4" />
                   )}
                 </div>
-                <p className="text-xs font-medium truncate">{s.title}</p>
+                <p className="truncate text-xs font-medium">{s.title}</p>
               </div>
             ))}
           </div>
@@ -151,7 +151,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
             <div className="text-center">
               <Button onClick={step.action.onClick} className="gap-2">
                 {step.action.label}
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="size-4" />
               </Button>
             </div>
           )}
@@ -168,7 +168,7 @@ export function OnboardingTour({ onComplete, onSkip }: OnboardingTourProps) {
             
             <Button onClick={nextStep}>
               {currentStep === steps.length - 1 ? 'Finalizar' : 'Próximo'}
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="ml-2 size-4" />
             </Button>
           </div>
         </CardContent>
