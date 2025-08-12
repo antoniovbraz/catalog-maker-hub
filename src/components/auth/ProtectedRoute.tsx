@@ -31,7 +31,7 @@ export function ProtectedRoute({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <LoadingSpinner size="lg" text="Carregando..." />
       </div>
     );
@@ -60,9 +60,9 @@ export function ProtectedRoute({
 
     if (userLevel < requiredLevel) {
       return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-destructive mb-2">
+            <h1 className="mb-2 text-2xl font-bold text-destructive">
               Acesso Negado
             </h1>
             <p className="text-muted-foreground">

@@ -115,19 +115,19 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
       className={`
         group relative bg-gradient-to-br from-card to-card/50
         transition-all duration-300 ease-in-out
-        hover:shadow-elegant hover:border-primary/30
-        hover:scale-[1.02] hover:bg-gradient-to-br hover:from-card hover:to-primary/5
+        hover:scale-[1.02] hover:border-primary/30
+        hover:bg-gradient-to-br hover:from-card hover:to-primary/5 hover:shadow-elegant
         ${isDragging ? 'z-50 rotate-1 scale-105 shadow-elegant' : ''}
       `}
       {...attributes}
     >
         {index === 0 && (
-          <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-in zoom-in-95">
+          <Badge className="absolute -right-2 -top-2 bg-success text-success-foreground animate-in zoom-in-95">
             🏆 Melhor
           </Badge>
         )}
-      <div {...listeners} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-200 touch-none">
-        <GripVertical className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors cursor-grab active:cursor-grabbing" />
+      <div {...listeners} className="absolute right-2 top-2 touch-none opacity-0 transition-all duration-200 group-hover:opacity-100">
+        <GripVertical className="size-4 cursor-grab text-muted-foreground transition-colors hover:text-primary active:cursor-grabbing" />
       </div>
       
       <CardHeader>
@@ -148,9 +148,9 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
                   {result.margem_percentual.toFixed(1)}%
                 </Badge>
                 {result.margem_percentual >= result.margem_desejada ? (
-                  <TrendingUp className="h-3 w-3 text-success" />
+                  <TrendingUp className="size-3 text-success" />
                 ) : (
-                  <TrendingDown className="h-3 w-3 text-warning" />
+                  <TrendingDown className="size-3 text-warning" />
                 )}
               </div>
             </EnhancedTooltip>
@@ -167,7 +167,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Package className="h-3 w-3" />
+              <Package className="size-3" />
               <span>Custo Total</span>
             </div>
             <div className="font-medium">R$ {result.custo_total.toFixed(2)}</div>
@@ -175,15 +175,15 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <DollarSign className="h-3 w-3" />
+              <DollarSign className="size-3" />
               <span>Preço Praticado</span>
             </div>
-            <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
+            <div className="text-lg font-bold">R$ {result.preco_praticado.toFixed(2)}</div>
           </div>
           
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <TrendingUp className="h-3 w-3" />
+              <TrendingUp className="size-3" />
               <span>Margem R$</span>
             </div>
             <div className="font-semibold text-success">R$ {result.margem_unitaria.toFixed(2)}</div>
@@ -191,27 +191,27 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
           
           <div className="space-y-xs">
             <div className="flex items-center gap-1 text-muted-foreground">
-              <Target className="h-3 w-3" />
+              <Target className="size-3" />
               <span>Comissão</span>
             </div>
             <div className="font-medium">{result.comissao.toFixed(2)}%</div>
           </div>
         </div>
         
-        <div className="pt-3 border-t border-border/50">
-          <div className="text-xs font-medium text-foreground mb-2">
+        <div className="border-t border-border/50 pt-3">
+          <div className="mb-2 text-xs font-medium text-foreground">
             Para atingir {result.margem_desejada.toFixed(1)}% de margem:
           </div>
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 p-3 rounded-lg">
+          <div className="rounded-lg border border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-primary font-medium">Preço Sugerido:</span>
+              <span className="font-medium text-primary">Preço Sugerido:</span>
               <span className="font-bold text-primary">R$ {result.preco_sugerido.toFixed(2)}</span>
             </div>
           </div>
         </div>
         
-        <div className="pt-2 border-t border-border/30 text-xs text-muted-foreground space-y-xs">
-          <div className="font-medium text-foreground mb-2">Detalhamento:</div>
+        <div className="space-y-xs border-t border-border/30 pt-2 text-xs text-muted-foreground">
+          <div className="mb-2 font-medium text-foreground">Detalhamento:</div>
           <div className="grid grid-cols-2 gap-x-2 gap-y-1">
             <div>Valor Fixo: R$ {result.valor_fixo.toFixed(2)}</div>
             <div>Frete: R$ {result.frete.toFixed(2)}</div>
@@ -486,11 +486,11 @@ export const DashboardForm = () => {
   return (
     <div className="space-y-lg">
       {/* Controls */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
+              <Package className="size-5" />
               Seleção de Produto
             </CardTitle>
             <CardDescription>
@@ -526,17 +526,17 @@ export const DashboardForm = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
+              <Target className="size-5" />
               Marketplaces
               <Badge variant="secondary">{selectedMarketplaces.length}/6</Badge>
-              {isRecalculating && <RefreshCw className="h-4 w-4 animate-spin text-primary" />}
+              {isRecalculating && <RefreshCw className="size-4 animate-spin text-primary" />}
             </CardTitle>
             <CardDescription>
               Selecione até 6 marketplaces para comparar - os dados serão atualizados automaticamente
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 max-h-40 overflow-y-auto">
+            <div className="max-h-40 space-y-3 overflow-y-auto">
               {loadingMarketplaces ? (
                 <div>Carregando marketplaces...</div>
               ) : (
@@ -572,9 +572,9 @@ export const DashboardForm = () => {
             className="flex items-center gap-2"
           >
             {isRecalculating ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
+              <RefreshCw className="size-4 animate-spin" />
             ) : (
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="size-4" />
             )}
             Atualizar com dados mais recentes
           </Button>
@@ -587,7 +587,7 @@ export const DashboardForm = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ArrowUpDown className="h-5 w-5" />
+              <ArrowUpDown className="size-5" />
               Ordenação
             </CardTitle>
           </CardHeader>
@@ -601,7 +601,7 @@ export const DashboardForm = () => {
               >
                 Margem %
                 {sortBy === "margem_percentual" && (
-                  <ArrowUpDown className="h-3 w-3" />
+                  <ArrowUpDown className="size-3" />
                 )}
               </Button>
               <Button
@@ -612,7 +612,7 @@ export const DashboardForm = () => {
               >
                 Margem R$
                 {sortBy === "margem_unitaria" && (
-                  <ArrowUpDown className="h-3 w-3" />
+                  <ArrowUpDown className="size-3" />
                 )}
               </Button>
               <Button
@@ -623,7 +623,7 @@ export const DashboardForm = () => {
               >
                 Preço
                 {sortBy === "preco_sugerido" && (
-                  <ArrowUpDown className="h-3 w-3" />
+                  <ArrowUpDown className="size-3" />
                 )}
               </Button>
             </div>
@@ -637,17 +637,17 @@ export const DashboardForm = () => {
           <h3 className="text-lg font-semibold">Comparação de Preços</h3>
           
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(selectedMarketplaces.length)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <CardHeader>
-                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-4 w-3/4 rounded bg-muted"></div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-sm">
-                      <div className="h-3 bg-muted rounded"></div>
-                      <div className="h-3 bg-muted rounded w-5/6"></div>
-                      <div className="h-3 bg-muted rounded w-4/6"></div>
+                      <div className="h-3 rounded bg-muted"></div>
+                      <div className="h-3 w-5/6 rounded bg-muted"></div>
+                      <div className="h-3 w-4/6 rounded bg-muted"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -663,7 +663,7 @@ export const DashboardForm = () => {
                 items={cardOrder} 
                 strategy={verticalListSortingStrategy}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {results.map((result, index) => (
                     <SortableCard 
                       key={result.marketplace_id} 
@@ -676,8 +676,8 @@ export const DashboardForm = () => {
             </DndContext>
           ) : (
             <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground mb-2">
+              <CardContent className="py-8 text-center">
+                <p className="mb-2 text-muted-foreground">
                   Nenhuma precificação salva encontrada para os marketplaces selecionados.
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -691,8 +691,8 @@ export const DashboardForm = () => {
 
       {!selectedProductId && (
         <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-muted-foreground mb-2">
+          <CardContent className="py-8 text-center">
+            <p className="mb-2 text-muted-foreground">
               Selecione um produto e marketplaces para ver as precificações salvas
             </p>
             <p className="text-sm text-muted-foreground">

@@ -51,7 +51,7 @@ export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ 
       const productCount = Number(data.productCount || 0);
       
       return (
-        <div className="bg-background border rounded-lg shadow-lg p-3 text-sm">
+        <div className="rounded-lg border bg-background p-3 text-sm shadow-lg">
           <p className="font-medium">{String(label || '')}</p>
           <p>Receita Total: {formatarMoeda(totalRevenue)}</p>
           <p>Receita Média: {formatarMoeda(avgRevenue)}</p>
@@ -64,7 +64,7 @@ export const RevenueByQuadrantChart: React.FC<RevenueByQuadrantChartProps> = ({ 
 
   if (chartData.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-muted-foreground">
+      <div className="flex h-64 items-center justify-center text-muted-foreground">
         Nenhum dado para exibir
       </div>
     );

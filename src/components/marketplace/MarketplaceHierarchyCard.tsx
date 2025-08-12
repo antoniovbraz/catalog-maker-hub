@@ -31,10 +31,10 @@ export const MarketplaceHierarchyCard = ({
       <CardHeader className="bg-muted/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Store className="w-5 h-5 text-primary" />
+            <Store className="size-5 text-primary" />
             <div>
               <CardTitle className="text-lg">{platform.name}</CardTitle>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-1 flex items-center gap-2">
                 <Badge variant="secondary" className="text-xs">
                   Plataforma
                 </Badge>
@@ -53,20 +53,20 @@ export const MarketplaceHierarchyCard = ({
               size="sm"
               onClick={() => onEditPlatform(platform)}
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="size-4" />
             </Button>
             <Button
               variant="destructive"
               size="sm"
               onClick={() => onDeletePlatform(platform.id)}
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="size-4" />
             </Button>
           </div>
         </div>
         
         {platform.description && (
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="mt-2 text-sm text-muted-foreground">
             {platform.description}
           </p>
         )}
@@ -82,7 +82,7 @@ export const MarketplaceHierarchyCard = ({
               onClick={() => onAddModality(platform.id)}
               className="h-8"
             >
-              <Plus className="w-4 h-4 mr-1" />
+              <Plus className="mr-1 size-4" />
               Nova Modalidade
             </Button>
           </div>
@@ -94,10 +94,10 @@ export const MarketplaceHierarchyCard = ({
                 return (
                   <div
                     key={modality.id}
-                    className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                    className="flex items-center justify-between rounded-lg border bg-card p-3 transition-colors hover:bg-accent/50"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="text-muted-foreground text-sm">└</div>
+                      <div className="text-sm text-muted-foreground">└</div>
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{modality.name}</span>
@@ -108,7 +108,7 @@ export const MarketplaceHierarchyCard = ({
                           />
                         </div>
                         {modality.description && (
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="mt-1 text-xs text-muted-foreground">
                             {modality.description}
                           </p>
                         )}
@@ -120,17 +120,17 @@ export const MarketplaceHierarchyCard = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => onEditModality(modality)}
-                        className="h-8 w-8 p-0"
+                        className="size-8 p-0"
                       >
-                        <Settings className="w-3 h-3" />
+                        <Settings className="size-3" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onDeleteModality(modality.id)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        className="size-8 p-0 text-destructive hover:text-destructive"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="size-3" />
                       </Button>
                     </div>
                   </div>
@@ -138,9 +138,9 @@ export const MarketplaceHierarchyCard = ({
               })}
             </div>
           ) : (
-            <div className="text-center py-6 border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/25">
-              <Store className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground mb-3">
+            <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/25 py-6 text-center">
+              <Store className="mx-auto mb-2 size-8 text-muted-foreground" />
+              <p className="mb-3 text-sm text-muted-foreground">
                 Nenhuma modalidade cadastrada para esta plataforma
               </p>
               <Button
@@ -148,7 +148,7 @@ export const MarketplaceHierarchyCard = ({
                 size="sm"
                 onClick={() => onAddModality(platform.id)}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 size-4" />
                 Adicionar Primeira Modalidade
               </Button>
             </div>

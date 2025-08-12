@@ -26,8 +26,8 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <Card className={cn("shadow-card border border-border/20", className)}>
         <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-3">
-            <CardTitle className="text-base flex items-center justify-between font-medium">
+          <CardHeader className="cursor-pointer py-3 transition-colors hover:bg-muted/30">
+            <CardTitle className="flex items-center justify-between text-base font-medium">
               <div className="flex items-center gap-2 text-muted-foreground">
                 {icon}
                 <span>{title}</span>
@@ -35,19 +35,19 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
+                className="size-6 p-0 text-muted-foreground hover:text-foreground"
               >
                 {isOpen ? (
-                  <ChevronUp className="h-3 w-3" />
+                  <ChevronUp className="size-3" />
                 ) : (
-                  <ChevronDown className="h-3 w-3" />
+                  <ChevronDown className="size-3" />
                 )}
               </Button>
             </CardTitle>
           </CardHeader>
         </CollapsibleTrigger>
         <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
-          <CardContent className="pt-0 pb-4 px-6">
+          <CardContent className="px-6 pb-4 pt-0">
             {children}
           </CardContent>
         </CollapsibleContent>

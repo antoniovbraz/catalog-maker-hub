@@ -239,7 +239,7 @@ export const ShippingRuleForm = ({ onCancel }: ShippingRuleFormProps) => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-md">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="product">Produto *</Label>
                 <Select value={formData.product_id} onValueChange={(value) => setFormData(prev => ({ ...prev, product_id: value }))}>
@@ -273,7 +273,7 @@ export const ShippingRuleForm = ({ onCancel }: ShippingRuleFormProps) => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="shipping_cost">Custo do Frete (R$) *</Label>
                 <Input
@@ -347,7 +347,7 @@ export const ShippingRuleForm = ({ onCancel }: ShippingRuleFormProps) => {
                           variant="outline"
                           onClick={() => handleEdit(rule)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="size-4" />
                         </Button>
                         <Button
                           size="sm"
@@ -355,7 +355,7 @@ export const ShippingRuleForm = ({ onCancel }: ShippingRuleFormProps) => {
                           onClick={() => deleteMutation.mutate(rule.id)}
                           disabled={deleteMutation.isPending}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
                     </TableCell>

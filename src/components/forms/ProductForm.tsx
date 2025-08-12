@@ -180,7 +180,7 @@ export const ProductForm = () => {
       header: 'Nome',
       render: (item: ProductWithCategory) => (
         <div className="flex items-center gap-2">
-          <Package className="w-4 h-4 text-muted-foreground" />
+          <Package className="size-4 text-muted-foreground" />
           <div>
             <span className="font-medium">{item.name}</span>
             {item.sku && (
@@ -197,7 +197,7 @@ export const ProductForm = () => {
       header: 'Categoria',
       render: (item: ProductWithCategory) => (
         <div className="flex items-center gap-1">
-          <Tag className="w-3 h-3 text-muted-foreground" />
+          <Tag className="size-3 text-muted-foreground" />
           <span>{item.categories?.name || "Sem categoria"}</span>
         </div>
       )
@@ -223,12 +223,12 @@ export const ProductForm = () => {
   const actions = [
     {
       label: 'Editar',
-      icon: <Edit className="w-4 h-4" />,
+      icon: <Edit className="size-4" />,
       onClick: (product: ProductWithCategory) => handleEdit(product)
     },
     {
       label: 'Excluir',
-      icon: <Trash2 className="w-4 h-4" />,
+      icon: <Trash2 className="size-4" />,
       onClick: (product: ProductWithCategory) => deleteMutation.mutate(product.id),
       variant: 'destructive' as const
     }
@@ -247,10 +247,10 @@ export const ProductForm = () => {
   return (
     <div className="space-y-6">
       {/* Formulário Principal - Layout Coeso */}
-      <Card className="shadow-card border border-border/50">
+      <Card className="border border-border/50 shadow-card">
         <CardHeader className="bg-card">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <Package className="w-6 h-6" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Package className="size-6" />
             {editingId ? "Editar Produto" : "Novo Produto"}
           </CardTitle>
         </CardHeader>
@@ -258,11 +258,11 @@ export const ProductForm = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Informações Básicas */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+              <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
                 Informações Básicas
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                   <Label htmlFor="name" className="text-sm font-medium">
                     Nome *
@@ -279,8 +279,8 @@ export const ProductForm = () => {
                     required
                   />
                   {errors.name && touched.name && (
-                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
-                      <AlertCircle className="w-3 h-3" />
+                    <div className="mt-1 flex items-center gap-1 text-sm text-destructive">
+                      <AlertCircle className="size-3" />
                       {errors.name}
                     </div>
                   )}
@@ -310,11 +310,11 @@ export const ProductForm = () => {
 
             {/* Configuração de Custos */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground border-b border-border pb-2">
+              <h3 className="border-b border-border pb-2 text-lg font-semibold text-foreground">
                 Configuração de Custos
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div>
                   <Label htmlFor="cost_unit" className="text-sm font-medium">
                     Custo Unitário (R$) *
@@ -334,8 +334,8 @@ export const ProductForm = () => {
                     required
                   />
                   {errors.cost_unit && touched.cost_unit && (
-                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
-                      <AlertCircle className="w-3 h-3" />
+                    <div className="mt-1 flex items-center gap-1 text-sm text-destructive">
+                      <AlertCircle className="size-3" />
                       {errors.cost_unit}
                     </div>
                   )}
@@ -376,8 +376,8 @@ export const ProductForm = () => {
                     )}
                   />
                   {errors.tax_rate && touched.tax_rate && (
-                    <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
-                      <AlertCircle className="w-3 h-3" />
+                    <div className="mt-1 flex items-center gap-1 text-sm text-destructive">
+                      <AlertCircle className="size-3" />
                       {errors.tax_rate}
                     </div>
                   )}
@@ -386,7 +386,7 @@ export const ProductForm = () => {
 
               {/* Preview do custo total */}
               {custoTotal > 0 && (
-                <div className="bg-muted/30 p-4 rounded-lg border border-border/30">
+                <div className="rounded-lg border border-border/30 bg-muted/30 p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Custo Total:</span>
                     <span className="text-lg font-bold text-primary">
@@ -400,7 +400,7 @@ export const ProductForm = () => {
             {/* Campos Opcionais */}
             <CollapsibleCard
               title="Campos Opcionais"
-              icon={<Tag className="w-4 h-4" />}
+              icon={<Tag className="size-4" />}
               isOpen={optionalFields.isOpen}
               onToggle={optionalFields.toggle}
             >
@@ -430,13 +430,13 @@ export const ProductForm = () => {
             </CollapsibleCard>
 
             {/* Botões de Ação */}
-            <div className="flex gap-3 pt-4 border-t border-border">
+            <div className="flex gap-3 border-t border-border pt-4">
               <Button
                 type="submit"
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 h-11 bg-gradient-primary hover:opacity-90"
+                className="h-11 flex-1 bg-gradient-primary hover:opacity-90"
               >
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="mr-2 size-4" />
                 {editingId ? "Atualizar Produto" : "Criar Produto"}
               </Button>
               {editingId && (
@@ -446,7 +446,7 @@ export const ProductForm = () => {
                   onClick={resetForm}
                   className="h-11 min-w-[120px]"
                 >
-                  <X className="w-4 h-4 mr-2" />
+                  <X className="mr-2 size-4" />
                   Cancelar
                 </Button>
               )}
@@ -458,7 +458,7 @@ export const ProductForm = () => {
       {/* Lista de Produtos */}
       <CollapsibleCard
         title="Produtos Cadastrados"
-        icon={<Package className="w-4 h-4" />}
+        icon={<Package className="size-4" />}
         isOpen={productsList.isOpen}
         onToggle={productsList.toggle}
       >
@@ -469,7 +469,7 @@ export const ProductForm = () => {
           actions={actions}
           isLoading={isLoading}
           emptyState={
-            <div className="text-center py-8">
+            <div className="py-8 text-center">
               <p className="text-muted-foreground">Nenhum produto cadastrado</p>
               <p className="text-sm text-muted-foreground">
                 Crie seu primeiro produto usando o formulário acima

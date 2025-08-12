@@ -78,23 +78,23 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted">
-      <div className="w-full max-w-md mx-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted">
+      <div className="mx-4 w-full max-w-md">
         {/* Logo and Branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-            <Zap className="w-8 h-8 text-primary" />
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex size-16 items-center justify-center rounded-full bg-primary/10">
+            <Zap className="size-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          <h1 className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-3xl font-bold text-transparent">
             Peepers Hub
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="mt-2 text-muted-foreground">
             Ferramentas inteligentes para marketplaces
           </p>
         </div>
 
-        <Card className="border-0 shadow-2xl bg-card/50 backdrop-blur-sm">
-          <CardHeader className="text-center pb-2">
+        <Card className="border-0 bg-card/50 shadow-2xl backdrop-blur-sm">
+          <CardHeader className="pb-2 text-center">
             <CardTitle className="text-2xl">Bem-vindo!</CardTitle>
             <CardDescription>
               Acesse sua conta ou crie uma nova para começar
@@ -103,7 +103,7 @@ export default function Auth() {
           
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="mb-6 grid w-full grid-cols-2">
                 <TabsTrigger value="login">Entrar</TabsTrigger>
                 <TabsTrigger value="signup">Cadastrar</TabsTrigger>
               </TabsList>
@@ -145,9 +145,9 @@ export default function Auth() {
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          <EyeOff className="size-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
+                          <Eye className="size-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
@@ -227,9 +227,9 @@ export default function Auth() {
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                          <EyeOff className="size-4 text-muted-foreground" />
                         ) : (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
+                          <Eye className="size-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
@@ -265,7 +265,7 @@ export default function Auth() {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-6 text-sm text-muted-foreground">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           <p>© 2024 Peepers Hub. Todos os direitos reservados.</p>
         </div>
       </div>

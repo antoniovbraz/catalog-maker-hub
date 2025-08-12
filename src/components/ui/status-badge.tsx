@@ -19,37 +19,37 @@ const statusConfig: Record<StatusType, {
   className: string;
 }> = {
   active: {
-    icon: <CheckCircle className="w-3 h-3" />,
+    icon: <CheckCircle className="size-3" />,
     label: "Ativo",
     variant: "default",
     className: "bg-success text-success-foreground border-success/20"
   },
   inactive: {
-    icon: <XCircle className="w-3 h-3" />,
+    icon: <XCircle className="size-3" />,
     label: "Inativo",
     variant: "secondary",
     className: "bg-muted text-muted-foreground"
   },
   configured: {
-    icon: <Settings className="w-3 h-3" />,
+    icon: <Settings className="size-3" />,
     label: "Configurado",
     variant: "default",
     className: "bg-primary text-primary-foreground"
   },
   pending: {
-    icon: <Clock className="w-3 h-3" />,
+    icon: <Clock className="size-3" />,
     label: "Pendente",
     variant: "outline",
     className: "bg-warning/10 text-warning border-warning/20"
   },
   error: {
-    icon: <AlertCircle className="w-3 h-3" />,
+    icon: <AlertCircle className="size-3" />,
     label: "Erro",
     variant: "destructive",
     className: "bg-destructive text-destructive-foreground"
   },
   warning: {
-    icon: <AlertCircle className="w-3 h-3" />,
+    icon: <AlertCircle className="size-3" />,
     label: "Atenção",
     variant: "outline",
     className: "bg-warning text-warning-foreground border-warning/20"

@@ -126,7 +126,7 @@ export function MarketplaceFormEnhanced({
       id: "basic",
       title: "Informações Básicas",
       description: "Dados fundamentais do marketplace",
-      icon: <Store className="w-4 h-4" />,
+      icon: <Store className="size-4" />,
       required: true,
       children: (
         <div className="space-y-md">
@@ -184,7 +184,7 @@ export function MarketplaceFormEnhanced({
       id: "connection",
       title: "Conexão e URL",
       description: "Configurações de acesso ao marketplace",
-      icon: <Link className="w-4 h-4" />,
+      icon: <Link className="size-4" />,
       children: (
         <div>
           <Label htmlFor="url">URL do Marketplace</Label>
@@ -195,7 +195,7 @@ export function MarketplaceFormEnhanced({
             onChange={(e) => handleInputChange("url", e.target.value)}
             placeholder="https://exemplo.com.br"
           />
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             URL principal do marketplace para referência
           </p>
         </div>
@@ -205,7 +205,7 @@ export function MarketplaceFormEnhanced({
       id: "hierarchy",
       title: "Plataforma",
       description: "Defina a plataforma pai para modalidades",
-      icon: <Network className="w-4 h-4" />,
+      icon: <Network className="size-4" />,
       children: (
         <div>
           <Label htmlFor="platform">Plataforma (para modalidades)</Label>
@@ -229,7 +229,7 @@ export function MarketplaceFormEnhanced({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             {formData.marketplace_type === "platform" 
               ? "Plataformas não precisam de plataforma pai" 
               : "Modalidades devem ter uma plataforma pai"}
@@ -241,7 +241,7 @@ export function MarketplaceFormEnhanced({
       id: "restrictions",
       title: "Restrições de Categoria",
       description: "Defina quais categorias podem usar esta modalidade",
-      icon: <Tag className="w-4 h-4" />,
+      icon: <Tag className="size-4" />,
       children: (
         <div>
           <Label htmlFor="restrictions">Categorias Permitidas</Label>
@@ -251,7 +251,7 @@ export function MarketplaceFormEnhanced({
             onChange={(e) => handleInputChange("category_restrictions", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
             placeholder="livros, books (deixe vazio para todas as categorias)"
           />
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="mt-1 text-xs text-muted-foreground">
             Separe por vírgula. Deixe vazio para permitir todas as categorias.
             Ex: "livros, books" para modalidades específicas de livros.
           </p>
