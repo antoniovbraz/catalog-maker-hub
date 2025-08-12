@@ -521,3 +521,20 @@ Successes:
 Improvements_Identified_For_Consolidation:
 - Agendar mutirão para resolver backlog de lint e reduzir ruído.
 ---
+Date: 2025-08-12
+TaskRef: "Map SavedPricingRow type for DashboardForm"
+
+Learnings:
+- Tipos estreitos evitam `never[]` ao combinar `useQuery` com dados padrão.
+- Mapear joins do Supabase dentro do `queryFn` simplifica o uso no componente.
+
+Difficulties:
+- `pnpm lint` ainda apresenta milhares de erros herdados, impedindo verificação limpa.
+
+Successes:
+- Tipagem `SavedPricingRow` criada e resultados do Supabase normalizados.
+- `pnpm type-check`, testes e servidor `pnpm dev` executados sem falhas.
+
+Improvements_Identified_For_Consolidation:
+- Planejar migração gradual para remover dependência de joins desnecessários no Supabase.
+---
