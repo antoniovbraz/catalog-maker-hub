@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ profile: null }),
@@ -107,4 +107,3 @@ describe('AppSidebar accessibility', () => {
     expect(screen.getByRole('link', { name: /marketplaces/i })).toHaveFocus();
   });
 });
-
