@@ -76,11 +76,18 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
         const key = `${sale.product_id}-${sale.marketplace_id}`;
         
         if (!groupedData[key]) {
+          const productName = Array.isArray((sale as any).products)
+            ? (sale as any).products[0]?.name
+            : (sale as any).products?.name;
+          const marketplaceName = Array.isArray((sale as any).marketplaces)
+            ? (sale as any).marketplaces[0]?.name
+            : (sale as any).marketplaces?.name;
+
           groupedData[key] = {
             product_id: sale.product_id,
-            product_name: sale.products.name,
+            product_name: productName,
             marketplace_id: sale.marketplace_id,
-            marketplace_name: sale.marketplaces.name,
+            marketplace_name: marketplaceName,
             total_quantity: 0,
             total_revenue: 0,
             avg_margin_percentage: 0,

@@ -25,7 +25,7 @@ describe('CategoriesService', () => {
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockCategories, error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
 
       const result = await categoriesService.getWithProductCount();
 
@@ -47,7 +47,7 @@ describe('CategoriesService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [], error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
 
       const result = await categoriesService.validateName('Nome Único');
 
@@ -60,7 +60,7 @@ describe('CategoriesService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [{ id: 'existing-id' }], error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
 
       const result = await categoriesService.validateName('Nome Existente');
 
@@ -75,7 +75,7 @@ describe('CategoriesService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue(mockQueryAfterEq)
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery);
+      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
 
       const result = await categoriesService.validateName('Nome', 'test-id');
 
