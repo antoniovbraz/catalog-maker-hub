@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,9 +47,19 @@ interface StrategyFormProps {
 }
 
 export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
-  const [margeLimitAlta, setMargeLimitAlta] = useState<number>(10);
-  const [giroLimitAlto, setGiroLimitAlto] = useState<number>(5);
+  const [margeLimitAlta, setMargeLimitAlta] = useState<string>("");
+  const [giroLimitAlto, setGiroLimitAlto] = useState<string>("");
   const [isCalculated, setIsCalculated] = useState<boolean>(false);
+
+  const margeLimitAltaNum = useMemo(() => {
+    const valor = parseFloat(margeLimitAlta);
+    return Number.isNaN(valor) ? 0 : valor;
+  }, [margeLimitAlta]);
+
+  const giroLimitAltoNum = useMemo(() => {
+    const valor = parseFloat(giroLimitAlto);
+    return Number.isNaN(valor) ? 0 : valor;
+  }, [giroLimitAlto]);
 
   // Fetch sales data with product and marketplace info
   const { data: salesData = [], isLoading, refetch } = useQuery({
@@ -130,7 +140,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
 
   // Calculate strategy analysis
   const strategyAnalysis = useMemo(() => {
-    if (!salesData.length || !isCalculated) return { products: [], quadrantCounts: {} as QuadrantCounts };
+    if (!salesData.length || !isCalculated) {
+      return { products: [], quadrantCounts: {} as QuadrantCounts };
+    }
 
     // Calculate total quantity sold across all products
     const totalQuantityOverall = salesData.reduce((sum, item) => sum + item.total_quantity, 0);
@@ -138,9 +150,9 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
     // Calculate giro percentage and classify products
     const products: ProductStrategy[] = salesData.map((item) => {
       const giro_percentage = totalQuantityOverall > 0 ? (item.total_quantity / totalQuantityOverall) * 100 : 0;
-      
-      const isAltaMargem = item.avg_margin_percentage >= margeLimitAlta;
-      const isAltoGiro = giro_percentage >= giroLimitAlto;
+
+      const isAltaMargem = item.avg_margin_percentage >= margeLimitAltaNum;
+      const isAltoGiro = giro_percentage >= giroLimitAltoNum;
 
       let quadrant: ProductStrategy["quadrant"];
       if (isAltaMargem && isAltoGiro) {
@@ -175,7 +187,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
     };
 
     return { products, quadrantCounts };
-  }, [salesData, margeLimitAlta, giroLimitAlto, isCalculated]);
+  }, [salesData, margeLimitAltaNum, giroLimitAltoNum, isCalculated]);
 
   const handleCalculate = () => {
     setIsCalculated(true);
@@ -233,8 +245,8 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 id="margem_limit"
                 type="number"
                 step="0.1"
-                value={margeLimitAlta}
-                onChange={(e) => setMargeLimitAlta(parseFloat(e.target.value) || 0)}
+                value={margeLimitAlta || ""}
+                onChange={(e) => setMargeLimitAlta(e.target.value)}
                 placeholder="Ex: 10"
               />
             </div>
@@ -245,8 +257,8 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
                 id="giro_limit"
                 type="number"
                 step="0.1"
-                value={giroLimitAlto}
-                onChange={(e) => setGiroLimitAlto(parseFloat(e.target.value) || 0)}
+                value={giroLimitAlto || ""}
+                onChange={(e) => setGiroLimitAlto(e.target.value)}
                 placeholder="Ex: 5"
               />
             </div>
@@ -390,10 +402,10 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="bg-gradient-to-br from-card to-card/50">
-              <QuadrantScatterChart 
+              <QuadrantScatterChart
                 data={strategyAnalysis.products}
-                margeLimitAlta={margeLimitAlta}
-                giroLimitAlto={giroLimitAlto}
+                margeLimitAlta={margeLimitAltaNum}
+                giroLimitAlto={giroLimitAltoNum}
               />
             </CardContent>
           </Card>
