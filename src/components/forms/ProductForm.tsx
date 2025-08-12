@@ -110,12 +110,12 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
       return;
     }
     
-    // Converter "none" para null antes de enviar
+    // Normaliza campos opcionais para undefined quando não preenchidos
     const dataToSubmit = {
       ...formData,
-      category_id: formData.category_id === "none" || formData.category_id === "" ? null : formData.category_id,
-      sku: formData.sku || null,
-      description: formData.description || null
+      category_id: formData.category_id || undefined,
+      sku: formData.sku || undefined,
+      description: formData.description || undefined,
     };
     
     if (editingId) {
@@ -162,7 +162,7 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
         name: editingProduct.name,
         description: editingProduct.description || "",
         sku: editingProduct.sku || "",
-        category_id: editingProduct.category_id || "none",
+        category_id: editingProduct.category_id ?? "",
         cost_unit: editingProduct.cost_unit || 0,
         packaging_cost: editingProduct.packaging_cost || 0,
         tax_rate: editingProduct.tax_rate || 0
@@ -236,7 +236,7 @@ export const ProductForm = ({ editingProduct, onCancel }: ProductFormProps = {})
                       <SelectValue placeholder="Selecione uma categoria" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">Nenhuma categoria</SelectItem>
+                      <SelectItem value="">Nenhuma categoria</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
