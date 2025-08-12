@@ -17,6 +17,7 @@ import { PRICING_CONFIG } from "@/lib/config";
 import { useLogger } from "@/utils/logger";
 import { colors } from "@/styles/tokens";
 import { cn } from "@/lib/utils";
+import type { SavedPricingRow } from "@/types/pricing";
 import { 
   DndContext, 
   closestCenter, 
@@ -46,25 +47,6 @@ interface Marketplace {
   name: string;
 }
 
-interface SavedPricing {
-  id: string;
-  product_id: string;
-  marketplace_id: string;
-  taxa_cartao: number;
-  provisao_desconto: number;
-  margem_desejada: number;
-  custo_total: number;
-  valor_fixo: number;
-  frete: number;
-  comissao: number;
-  preco_sugerido: number;
-  margem_unitaria: number;
-  margem_percentual: number;
-  preco_praticado: number;
-  created_at: string;
-  updated_at: string;
-}
-
 type SortOption = "margem_percentual" | "margem_unitaria" | "preco_sugerido";
 
 // Componente para card drag-and-drop individual
@@ -79,7 +61,7 @@ interface SortableCardProps {
     preco_sugerido: number;
     margem_unitaria: number;
     margem_percentual: number;
-    preco_praticado: number;
+    preco_praticado: number | null;
     taxa_cartao: number;
     provisao_desconto: number;
     margem_desejada: number;
@@ -176,7 +158,7 @@ const SortableCard = ({ result, index }: SortableCardProps) => {
               <DollarSign className="h-3 w-3" />
               <span>Preço Praticado</span>
             </div>
-            <div className="font-bold text-lg">R$ {result.preco_praticado.toFixed(2)}</div>
+            <div className="font-bold text-lg">R$ {(result.preco_praticado ?? 0).toFixed(2)}</div>
           </div>
           
           <div className="space-y-xs">
@@ -266,7 +248,7 @@ export const DashboardForm = () => {
   });
 
   // Fetch saved pricing for selected product and marketplaces
-  const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery<SavedPricing[]>({
+  const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery<SavedPricingRow[]>({
     queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
     queryFn: async () => {
       if (!selectedProductId || selectedMarketplaces.length === 0) return [];
@@ -392,6 +374,7 @@ export const DashboardForm = () => {
         const newRealMargins: Record<string, {margem_unitaria_real: number; margem_percentual_real: number}> = {};
       
       for (const pricing of savedPricings) {
+        if (pricing.preco_praticado == null) continue;
         try {
           const { data, error } = await supabase.rpc('calcular_margem_real', {
             p_product_id: pricing.product_id,
@@ -401,13 +384,13 @@ export const DashboardForm = () => {
             p_preco_praticado: pricing.preco_praticado
           });
 
-            if (!error && data && typeof data === 'object') {
-              const result = data as Record<string, number>;
-              newRealMargins[pricing.marketplace_id] = {
-                margem_unitaria_real: result.margem_unitaria_real,
-                margem_percentual_real: result.margem_percentual_real,
-              };
-            }
+          if (!error && data && typeof data === 'object') {
+            const result = data as Record<string, number>;
+            newRealMargins[pricing.marketplace_id] = {
+              margem_unitaria_real: result.margem_unitaria_real,
+              margem_percentual_real: result.margem_percentual_real,
+            };
+          }
         } catch (error) {
           logger.error('Erro ao calcular margem real', error);
         }
@@ -442,8 +425,8 @@ export const DashboardForm = () => {
       };
     })
     .sort((a, b) => {
-      const aValue = a[sortBy];
-      const bValue = b[sortBy];
+      const aValue = a[sortBy] ?? 0;
+      const bValue = b[sortBy] ?? 0;
       const multiplier = sortOrder === "asc" ? 1 : -1;
       return (aValue - bValue) * multiplier;
     });

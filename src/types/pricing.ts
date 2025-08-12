@@ -1,4 +1,5 @@
 import { z } from "zod";
+export type { SavedPricingRow } from "@/integrations/supabase/types";
 
 export interface SavedPricingType {
   id: string;
@@ -12,7 +13,7 @@ export interface SavedPricingType {
   provisao_desconto: number;
   margem_desejada: number;
   preco_sugerido: number;
-  preco_praticado: number;
+  preco_praticado: number | null;
   margem_unitaria: number;
   margem_percentual: number;
   created_at: string;
@@ -45,7 +46,11 @@ export const pricingSchema = z.object({
   taxa_cartao: z.number().min(0, "Taxa do cartão deve ser positiva").max(100, "Taxa não pode exceder 100%").default(0),
   provisao_desconto: z.number().min(0, "Provisão de desconto deve ser positiva").max(100, "Provisão não pode exceder 100%").default(0),
   margem_desejada: z.number().min(0, "Margem desejada deve ser positiva").max(100, "Margem não pode exceder 100%").default(0),
-  preco_praticado: z.number().min(0, "Preço praticado deve ser positivo").default(0),
+  preco_praticado: z
+    .number()
+    .min(0, "Preço praticado deve ser positivo")
+    .nullable()
+    .default(null),
 });
 
 export type PricingFormData = z.infer<typeof pricingSchema>;
