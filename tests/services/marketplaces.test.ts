@@ -45,7 +45,9 @@ describe('MarketplacesService', () => {
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockData, error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await marketplacesService.getHierarchical();
 
@@ -91,7 +93,9 @@ describe('MarketplacesService', () => {
         eq: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockData, error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await marketplacesService.getModalitiesByPlatform('p1', 'cat1');
 
@@ -108,7 +112,9 @@ describe('MarketplacesService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [], error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await marketplacesService.validateName('Nome Único');
 
@@ -121,7 +127,9 @@ describe('MarketplacesService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [{ id: 'existing-id' }], error: null })
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await marketplacesService.validateName('Nome Existente');
 
@@ -136,7 +144,9 @@ describe('MarketplacesService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnValue(mockQueryAfterEq)
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await marketplacesService.validateName('Nome', 'test-id');
 

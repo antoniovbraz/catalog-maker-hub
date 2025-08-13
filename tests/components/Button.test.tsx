@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
-import { Button, buttonVariants, type ButtonProps } from '@/components/ui/button'
+import { Button, type ButtonProps } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 
 describe('Button component', () => {
   const variants: ButtonProps['variant'][] = [

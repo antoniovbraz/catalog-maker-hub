@@ -75,24 +75,22 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
       for (const sale of sales) {
         const key = `${sale.product_id}-${sale.marketplace_id}`;
         
-        if (!groupedData[key]) {
-          const productName = Array.isArray((sale as any).products)
-            ? (sale as any).products[0]?.name
-            : (sale as any).products?.name;
-          const marketplaceName = Array.isArray((sale as any).marketplaces)
-            ? (sale as any).marketplaces[0]?.name
-            : (sale as any).marketplaces?.name;
+          if (!groupedData[key]) {
+            const productField = (sale as { products?: { name: string } | { name: string }[] }).products;
+            const marketplaceField = (sale as { marketplaces?: { name: string } | { name: string }[] }).marketplaces;
+            const productName = Array.isArray(productField) ? productField?.[0]?.name ?? '' : productField?.name ?? '';
+            const marketplaceName = Array.isArray(marketplaceField) ? marketplaceField?.[0]?.name ?? '' : marketplaceField?.name ?? '';
 
-          groupedData[key] = {
-            product_id: sale.product_id,
-            product_name: productName,
-            marketplace_id: sale.marketplace_id,
-            marketplace_name: marketplaceName,
-            total_quantity: 0,
-            total_revenue: 0,
-            avg_margin_percentage: 0,
-          };
-        }
+            groupedData[key] = {
+              product_id: sale.product_id,
+              product_name: productName,
+              marketplace_id: sale.marketplace_id,
+              marketplace_name: marketplaceName,
+              total_quantity: 0,
+              total_revenue: 0,
+              avg_margin_percentage: 0,
+            };
+          }
 
         groupedData[key].total_quantity += sale.quantity;
         groupedData[key].total_revenue += sale.price_charged * sale.quantity;

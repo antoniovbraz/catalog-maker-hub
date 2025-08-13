@@ -36,8 +36,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarHeader,
-  useSidebar,
 } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/ui/use-sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const mainMenuItems = [

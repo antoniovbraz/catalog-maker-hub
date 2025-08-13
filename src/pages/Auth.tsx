@@ -54,6 +54,11 @@ export default function Auth() {
     },
   });
 
+  // Enquanto carrega o perfil, evita redirecionos prematuros
+  if (loading) {
+    return null;
+  }
+
   // Redirect only when profile is ready to avoid redirect loops
   if (user && profile) {
     return <Navigate to="/dashboard" replace />;

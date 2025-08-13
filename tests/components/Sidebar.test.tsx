@@ -7,7 +7,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { useSidebar } from '@/components/ui/use-sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 
 function SidebarState() {

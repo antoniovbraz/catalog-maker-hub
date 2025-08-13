@@ -20,7 +20,9 @@ describe('ProductsService', () => {
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.getAll();
 
@@ -36,7 +38,9 @@ describe('ProductsService', () => {
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: null, error: mockError }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       await expect(productsService.getAll()).rejects.toThrow('Buscar products falhou: Database error');
     });
@@ -75,7 +79,9 @@ describe('ProductsService', () => {
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockProduct, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.getById('test-id');
 
@@ -95,7 +101,9 @@ describe('ProductsService', () => {
           error: { code: 'PGRST116', message: 'Not found' } 
         }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.getById('non-existent-id');
 
@@ -119,7 +127,9 @@ describe('ProductsService', () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockCreatedProduct, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.create(productData);
 
@@ -142,7 +152,9 @@ describe('ProductsService', () => {
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: mockUpdatedProduct, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.update('test-id', updateData);
 
@@ -159,7 +171,9 @@ describe('ProductsService', () => {
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       await expect(productsService.delete('test-id')).resolves.toBeUndefined();
 
@@ -180,7 +194,9 @@ describe('ProductsService', () => {
         eq: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.getByCategory('test-category');
 
@@ -199,7 +215,9 @@ describe('ProductsService', () => {
         ilike: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.searchByName(searchTerm);
 
@@ -217,7 +235,9 @@ describe('ProductsService', () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.validateSKU('UNIQUE-SKU');
 
@@ -233,7 +253,9 @@ describe('ProductsService', () => {
           error: null 
         }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.validateSKU('EXISTING-SKU');
 
