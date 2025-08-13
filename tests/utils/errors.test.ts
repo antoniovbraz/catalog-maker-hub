@@ -48,9 +48,10 @@ describe('logError', () => {
     logError(error);
 
     expect(spy).toHaveBeenCalledTimes(1);
-    const [message, context, data] = spy.mock.calls[0];
+    const [message, context, rawData] = spy.mock.calls[0] as [string, string, any];
     expect(message).toBe('Falha de teste');
     expect(context).toBe('ERROR');
+    const data = rawData as { name: string; stack?: string; timestamp: string };
     expect(data).toMatchObject({
       name: 'Error',
       stack: error.stack,
