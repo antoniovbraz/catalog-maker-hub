@@ -31,7 +31,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function Auth() {
-  const { user, signIn, signUp } = useAuth();
+  const { user, profile, loading, signIn, signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,8 +54,8 @@ export default function Auth() {
     },
   });
 
-  // Redirect if already authenticated
-  if (user) {
+  // Redirect only when profile is ready to avoid redirect loops
+  if (user && profile) {
     return <Navigate to="/dashboard" replace />;
   }
 
