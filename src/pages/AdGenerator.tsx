@@ -2,7 +2,6 @@ import { useState } from "react";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,23 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
-  Upload, 
   Wand2, 
-  Image as ImageIcon, 
-  Trash2, 
-  Eye, 
   Sparkles,
   Info,
   Package,
   ShoppingCart,
-  Camera
+  Eye,
+  Copy,
+  Save
 } from "@/components/ui/icons";
 import { useProducts } from "@/hooks/useProducts";
-import { useProductImages, useUploadProductImage, useDeleteProductImage } from "@/hooks/useProductImages";
 import { useGenerateListing } from "@/hooks/useAdGeneration";
 import { AdChatInterface } from "@/components/forms/AdChatInterface";
-import { MarketplaceDestination, ProductImage } from "@/types/ads";
-import { cn } from "@/lib/utils";
+import { MarketplaceDestination } from "@/types/ads";
 import { useToast } from "@/components/ui/use-toast";
 
 const MARKETPLACE_OPTIONS = [
@@ -46,78 +41,19 @@ export default function AdGenerator() {
     keywords?: string[];
   }
   const [generatedResult, setGeneratedResult] = useState<GeneratedResult | null>(null);
-  const [dragOver, setDragOver] = useState(false);
   const [mode, setMode] = useState<'quick' | 'strategic'>('quick');
 
   const { data: products = [] } = useProducts();
-  const { data: images = [], refetch: refetchImages } = useProductImages(selectedProductId);
-  const uploadMutation = useUploadProductImage();
-  const deleteMutation = useDeleteProductImage();
   const generateMutation = useGenerateListing();
 
   const selectedProduct = products.find(p => p.id === selectedProductId);
-  const imageUrls = images.map(img => img.image_url);
 
-  const handleFileUpload = async (files: FileList | null) => {
-    if (!files || !selectedProductId) return;
-
-    const validFiles = Array.from(files).filter(file => {
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Arquivo inválido",
-          description: `${file.name} não é uma imagem válida.`,
-          variant: "destructive"
-        });
-        return false;
-      }
-      if (file.size > 5 * 1024 * 1024) { // 5MB
-        toast({
-          title: "Arquivo muito grande",
-          description: `${file.name} excede o limite de 5MB.`,
-          variant: "destructive"
-        });
-        return false;
-      }
-      return true;
-    });
-
-    for (const file of validFiles) {
-      try {
-        await uploadMutation.mutateAsync({
-          productId: selectedProductId,
-          file,
-          imageType: 'product',
-          sortOrder: images.length
-        });
-      } catch (error) {
-        console.error('Erro no upload:', error);
-      }
-    }
-    
-    refetchImages();
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    handleFileUpload(e.dataTransfer.files);
-  };
 
   const handleGenerate = async () => {
-    if (!selectedProductId || !selectedMarketplace || imageUrls.length === 0) {
+    if (!selectedProductId || !selectedMarketplace) {
       toast({
         title: "Dados incompletos",
-        description: "Selecione um produto, marketplace e adicione pelo menos uma imagem.",
+        description: "Selecione um produto e marketplace.",
         variant: "destructive"
       });
       return;
@@ -127,7 +63,7 @@ export default function AdGenerator() {
       const result = await generateMutation.mutateAsync({
         product_id: selectedProductId,
         marketplace: selectedMarketplace,
-        image_urls: imageUrls,
+        image_urls: [],
         custom_prompt: customPrompt || undefined
       });
       
@@ -137,7 +73,7 @@ export default function AdGenerator() {
     }
   };
 
-  const canGenerate = selectedProductId && selectedMarketplace && images.length > 0;
+  const canGenerate = selectedProductId && selectedMarketplace;
 
   return (
     <ConfigurationPageLayout
@@ -252,12 +188,12 @@ export default function AdGenerator() {
         <>
           {/* Alert Informativo */}
           <div className="mb-6 xl:col-span-12">
-            <Alert>
-              <Info className="size-4" />
-              <AlertDescription>
-                Modo rápido: Geração direta baseada nos dados do produto e imagens.
-              </AlertDescription>
-            </Alert>
+          <Alert>
+            <Info className="size-4" />
+            <AlertDescription>
+              Modo rápido: Geração direta baseada nos dados do produto.
+            </AlertDescription>
+          </Alert>
           </div>
 
           {/* Coluna de Configuração (8 colunas) */}
@@ -313,100 +249,8 @@ export default function AdGenerator() {
           </CardContent>
         </Card>
 
-        {/* Card 2: Upload de Imagens */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Camera className="size-5" />
-              Imagens do Produto
-              <Badge variant="outline">
-                {images.length} imagem(ns)
-              </Badge>
-            </CardTitle>
-            <CardDescription>
-              Adicione fotos do produto, embalagem e especificações
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Área de Upload */}
-              <div
-                className={cn(
-                  "border-2 border-dashed rounded-lg p-6 text-center transition-colors",
-                  dragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-                  !selectedProductId && "opacity-50 pointer-events-none"
-                )}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <Upload className="mx-auto mb-2 size-8 text-muted-foreground" />
-                <p className="mb-2 text-sm text-muted-foreground">
-                  Arraste imagens aqui ou clique para selecionar
-                </p>
-                <Input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e.target.files)}
-                  className="hidden"
-                  id="image-upload"
-                  disabled={!selectedProductId}
-                />
-                <Label
-                  htmlFor="image-upload"
-                  className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-background px-4 py-2 text-sm hover:bg-muted"
-                >
-                  <ImageIcon className="size-4" />
-                  Selecionar Imagens
-                </Label>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Máximo 5MB por imagem. Formatos: JPG, PNG, WebP
-                </p>
-              </div>
 
-              {/* Grid de Imagens - Responsivo sem scroll interno */}
-              {images.length > 0 && (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                  {images.map((image: ProductImage) => (
-                    <div key={image.id} className="group relative">
-                      <img
-                        src={image.image_url}
-                        alt="Produto"
-                        className="h-24 w-full rounded-md border object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center gap-2 rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => window.open(image.image_url, '_blank')}
-                        >
-                          <Eye className="size-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deleteMutation.mutate(image.id)}
-                          disabled={deleteMutation.isPending}
-                        >
-                          <Trash2 className="size-3" />
-                        </Button>
-                      </div>
-                      <Badge 
-                        variant="secondary" 
-                        className="absolute left-1 top-1 text-xs"
-                      >
-                        {image.image_type}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Card 3: Marketplace e Instruções */}
+        {/* Card 2: Marketplace e Instruções */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Marketplace */}
           <Card>
@@ -482,13 +326,13 @@ export default function AdGenerator() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <Label className="text-sm font-medium">Título</Label>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => navigator.clipboard.writeText(generatedResult.title)}
-                    >
-                      📋
-                    </Button>
+                     <Button
+                       size="sm"
+                       variant="ghost"
+                       onClick={() => navigator.clipboard.writeText(generatedResult.title || "")}
+                     >
+                       <Copy className="size-3" />
+                     </Button>
                   </div>
                   <div className="rounded-md bg-muted/30 p-3 text-sm">
                     {generatedResult.title}
@@ -499,13 +343,13 @@ export default function AdGenerator() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <Label className="text-sm font-medium">Descrição</Label>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => navigator.clipboard.writeText(generatedResult.description)}
-                    >
-                      📋
-                    </Button>
+                     <Button
+                       size="sm"
+                       variant="ghost"
+                       onClick={() => navigator.clipboard.writeText(generatedResult.description)}
+                     >
+                       <Copy className="size-3" />
+                     </Button>
                   </div>
                   <div className="max-h-32 overflow-y-auto whitespace-pre-wrap rounded-md bg-muted/30 p-3 text-sm">
                     {generatedResult.description}
@@ -529,20 +373,18 @@ export default function AdGenerator() {
                 <Separator />
                 
                 {/* Botões de Ação */}
-                <div className="flex flex-col gap-2">
-                  <Button size="sm" className="w-full">
-                    <Eye className="mr-2 size-3" />
-                    Visualizar Preview
-                  </Button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button size="sm" variant="outline">
-                      📋 Copiar Tudo
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      💾 Salvar
-                    </Button>
-                  </div>
-                </div>
+                 <div className="flex flex-col gap-2">
+                   <div className="grid grid-cols-2 gap-2">
+                     <Button size="sm" variant="outline">
+                       <Copy className="mr-2 size-3" />
+                       Copiar Tudo
+                     </Button>
+                     <Button size="sm" variant="outline">
+                       <Save className="mr-2 size-3" />
+                       Salvar
+                     </Button>
+                   </div>
+                 </div>
               </CardContent>
             </Card>
           ) : (

@@ -121,7 +121,7 @@ export class AdsService extends BaseService<ProductImage> {
       logger.info('Iniciando geração de anúncio', 'AdsService', {
         productId: request.product_id,
         marketplace: request.marketplace,
-        imageCount: request.image_urls.length
+        imageCount: request.image_urls?.length || 0
       });
 
       // Buscar assistente configurado para o marketplace
@@ -150,7 +150,7 @@ SKU: ${product.sku || 'Não informado'}
 Preço: R$ ${product.cost_unit}
 
 Marketplace: ${request.marketplace}
-Número de imagens: ${request.image_urls.length}
+Número de imagens: ${request.image_urls?.length || 0}
 Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
       `.trim();
 
@@ -160,7 +160,7 @@ Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
           assistant_id: assistant.assistant_id,
           product_info: productInfo,
           marketplace: request.marketplace,
-          image_urls: request.image_urls,
+          image_urls: request.image_urls || [],
           custom_prompt: request.custom_prompt
         }
       });
@@ -177,7 +177,7 @@ Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
         marketplace_specific_data: {
           generated_at: new Date().toISOString(),
           marketplace: request.marketplace,
-          image_count: request.image_urls.length,
+          image_count: request.image_urls?.length || 0,
           assistant_used: assistant.name
         }
       };

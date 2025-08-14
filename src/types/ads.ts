@@ -16,7 +16,7 @@ export interface ProductImage {
 export interface AdGenerationRequest {
   product_id: string;
   marketplace: MarketplaceDestination;
-  image_urls: string[];
+  image_urls?: string[];
   custom_prompt?: string;
 }
 
@@ -38,7 +38,7 @@ export type ProductImageFormData = z.infer<typeof productImageSchema>;
 export const adGenerationSchema = z.object({
   product_id: z.string().uuid("Product ID deve ser um UUID válido"),
   marketplace: z.enum(['mercado_livre', 'shopee', 'instagram']),
-  image_urls: z.array(z.string().url()).min(1, "Pelo menos uma imagem é obrigatória"),
+  image_urls: z.array(z.string().url()).optional(),
   custom_prompt: z.string().optional(),
 });
 
