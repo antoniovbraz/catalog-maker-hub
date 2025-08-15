@@ -3,8 +3,8 @@ import { Plus, Bot, Edit, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataVisualization } from "@/components/ui/data-visualization";
-import { ConfirmDialog } from "@/components/common/ConfirmDialog";
-import { AssistantForm } from "@/components/forms/AssistantForm";
+import { AssistantModalForm } from "@/components/forms/AssistantModalForm";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { useAssistants, useDeleteAssistant } from "@/hooks/useAssistants";
 import type { Assistant } from "@/types/assistants";
 import type { DataColumn, DataAction } from "@/components/ui/data-visualization";
@@ -13,12 +13,9 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function AssistantsManagement() {
-  const [showForm, setShowForm] = useState(false);
-  const [editingAssistant, setEditingAssistant] = useState<Assistant | null>(null);
-  const [deletingAssistant, setDeletingAssistant] = useState<Assistant | null>(null);
-
   const { data: assistants = [], isLoading } = useAssistants();
   const deleteMutation = useDeleteAssistant();
+  const { showFormModal, showConfirmModal } = useGlobalModal();
 
   const columns: DataColumn<Assistant>[] = [
     {
@@ -53,34 +50,66 @@ export default function AssistantsManagement() {
     {
       label: "Editar",
       icon: <Edit className="size-4" />,
-      onClick: (assistant) => {
-        setEditingAssistant(assistant);
-        setShowForm(true);
-      },
+      onClick: (assistant) => handleEdit(assistant),
       variant: "secondary",
     },
     {
       label: "Excluir",
       icon: <Trash2 className="size-4" />,
-      onClick: (assistant) => setDeletingAssistant(assistant),
+      onClick: (assistant) => handleDelete(assistant),
       variant: "destructive",
     },
   ];
 
   const handleCreateNew = () => {
-    setEditingAssistant(null);
-    setShowForm(true);
+    let submitForm: (() => Promise<void>) | null = null;
+    
+    showFormModal({
+      title: "Novo Assistente IA",
+      description: "Configure um novo assistente para um marketplace específico",
+      content: (
+        <AssistantModalForm 
+          onSuccess={() => {}} 
+          onSubmitForm={(fn) => { submitForm = fn; }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg"
+    });
   };
 
-  const handleFormSuccess = () => {
-    setEditingAssistant(null);
+  const handleEdit = (assistant: Assistant) => {
+    let submitForm: (() => Promise<void>) | null = null;
+    
+    showFormModal({
+      title: "Editar Assistente IA",
+      description: "Modifique as configurações do assistente",
+      content: (
+        <AssistantModalForm 
+          assistant={assistant}
+          onSuccess={() => {}} 
+          onSubmitForm={(fn) => { submitForm = fn; }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg"
+    });
   };
 
-  const handleConfirmDelete = async () => {
-    if (deletingAssistant) {
-      await deleteMutation.mutateAsync(deletingAssistant.id);
-      setDeletingAssistant(null);
-    }
+  const handleDelete = (assistant: Assistant) => {
+    showConfirmModal({
+      title: "Excluir Assistente",
+      description: `Tem certeza que deseja excluir o assistente "${assistant.name}"? Esta ação não pode ser desfeita e o assistente será removido da OpenAI também.`,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(assistant.id);
+      },
+      confirmText: "Excluir",
+      variant: "destructive"
+    });
   };
 
   return (
@@ -128,26 +157,6 @@ export default function AssistantsManagement() {
           />
         </CardContent>
       </Card>
-
-      {/* Modal de criação/edição */}
-      <AssistantForm
-        open={showForm}
-        onOpenChange={setShowForm}
-        assistant={editingAssistant}
-        onSuccess={handleFormSuccess}
-      />
-
-      {/* Dialog de confirmação de exclusão */}
-      <ConfirmDialog
-        open={!!deletingAssistant}
-        onOpenChange={(open) => !open && setDeletingAssistant(null)}
-        title="Excluir Assistente"
-        description={`Tem certeza que deseja excluir o assistente "${deletingAssistant?.name}"? Esta ação não pode ser desfeita e o assistente será removido da OpenAI também.`}
-        confirmText="Excluir"
-        onConfirm={handleConfirmDelete}
-        loading={deleteMutation.isPending}
-        variant="destructive"
-      />
     </div>
   );
 }

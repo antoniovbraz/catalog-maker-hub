@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ModalProvider } from "@/contexts/ModalContext";
+import { GlobalModalRenderer } from "@/components/modals";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SharedLayout } from "@/components/layout/SharedLayout";
 import Dashboard from "./pages/Dashboard";
@@ -32,6 +34,8 @@ const App = () => (
         <Toaster />
         <BrowserRouter>
           <AuthProvider>
+            <ModalProvider>
+              <GlobalModalRenderer />
             <Routes>
             {/* Auth route - now inside AuthProvider context */}
             <Route path="/auth" element={<Auth />} />
@@ -186,7 +190,8 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
+            </ModalProvider>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
