@@ -51,6 +51,10 @@ vi.mock('@/components/ui/use-toast', () => ({
   toast: mockToast,
   useToast: () => ({ toast: mockToast }),
 }));
+vi.mock('@/hooks/use-toast', () => ({
+  toast: mockToast,
+  useToast: () => ({ toast: mockToast }),
+}));
 
 // Mock do React Router
 vi.mock('react-router-dom', async () => {

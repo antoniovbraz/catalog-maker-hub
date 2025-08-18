@@ -4,25 +4,16 @@ import { DataVisualization } from "@/components/ui/data-visualization";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CommissionFormEnhanced } from "@/components/forms/enhanced/CommissionFormEnhanced";
 import { useCommissionsWithDetails, useDeleteCommission } from "@/hooks/useCommissions";
 import { CommissionWithDetails } from "@/types/commissions";
 import { formatarPercentual } from "@/utils/pricing";
-import { useState } from "react";
-import { useFormVisibility } from "@/hooks/useFormVisibility";
-import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
+import { CommissionModalForm } from "@/components/forms/CommissionModalForm";
 
 const Commissions = () => {
   const { data: commissions = [], isLoading } = useCommissionsWithDetails();
   const deleteMutation = useDeleteCommission();
-  const [editingCommission, setEditingCommission] = useState<CommissionWithDetails | null>(null);
-  const { showConfirmModal } = useGlobalModal();
-  
-  const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
-    formStorageKey: 'commissions-form-visible',
-    listStorageKey: 'commissions-list-visible'
-  });
+  const { showFormModal, showConfirmModal } = useGlobalModal();
 
   const totalCommissions = commissions.length;
   const activeCommissions = commissions.filter(c => c.rate > 0).length;
@@ -102,6 +93,50 @@ const Commissions = () => {
     }
   ];
 
+  const handleCreate = () => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: "Nova Comissão",
+      description:
+        "Configure uma nova taxa de comissão para cálculo de preços",
+      content: (
+        <CommissionModalForm
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "md",
+    });
+  };
+
+  const handleEdit = (commission: CommissionWithDetails) => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: "Editar Comissão",
+      description: "Atualize a taxa de comissão",
+      content: (
+        <CommissionModalForm
+          commission={commission}
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "md",
+    });
+  };
+
   const handleDelete = (commission: CommissionWithDetails) => {
     showConfirmModal({
       title: "Excluir Comissão",
@@ -110,7 +145,7 @@ const Commissions = () => {
         await deleteMutation.mutateAsync(commission.id);
       },
       confirmText: "Excluir",
-      variant: "destructive"
+      variant: "destructive",
     });
   };
 
@@ -118,18 +153,15 @@ const Commissions = () => {
     {
       label: "Editar",
       icon: <Calculator className="size-4" />,
-      onClick: (commission: CommissionWithDetails) => {
-        setEditingCommission(commission);
-        showForm();
-      },
-      variant: "outline" as const
+      onClick: (commission: CommissionWithDetails) => handleEdit(commission),
+      variant: "outline" as const,
     },
     {
       label: "Excluir",
       icon: <Percent className="size-4" />,
       onClick: (commission: CommissionWithDetails) => handleDelete(commission),
-      variant: "destructive" as const
-    }
+      variant: "destructive" as const,
+    },
   ];
 
   const breadcrumbs = [
@@ -139,7 +171,7 @@ const Commissions = () => {
 
   const headerActions = (
     <div className="flex items-center gap-2">
-      <Button size="sm" onClick={showForm}>
+      <Button size="sm" onClick={handleCreate}>
         <Plus className="mr-2 size-4" />
         Nova Comissão
       </Button>
@@ -157,52 +189,30 @@ const Commissions = () => {
         breadcrumbs={breadcrumbs}
         actions={headerActions}
     >
-      {/* Form Column */}
-      {isFormVisible && (
-        <div className="space-y-lg xl:col-span-5">
-          <CommissionFormEnhanced
-            editingCommission={editingCommission}
-            onCancelEdit={() => {
-              setEditingCommission(null);
-              hideForm();
-            }}
-          />
-
-          {/* Quick Stats Card */}
-          <div className="rounded-lg border bg-card p-lg">
-            <h3 className="mb-4 font-semibold">Estatísticas Rápidas</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{totalCommissions}</div>
-                <div className="text-sm text-muted-foreground">Total</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-success">{activeCommissions}</div>
-                <div className="text-sm text-muted-foreground">Ativas</div>
-              </div>
+      <div className="space-y-6 xl:col-span-12">
+        <div className="rounded-lg border bg-card p-lg">
+          <h3 className="mb-4 font-semibold">Estatísticas Rápidas</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">{totalCommissions}</div>
+              <div className="text-sm text-muted-foreground">Total</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-success">{activeCommissions}</div>
+              <div className="text-sm text-muted-foreground">Ativas</div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Data Visualization Column */}
-      <div className={isFormVisible ? "xl:col-span-7" : "xl:col-span-12"}>
-        <CollapsibleCard
+        <DataVisualization
           title="Comissões Configuradas"
-          icon={<Percent className="size-4" />}
-          isOpen={isListVisible}
-          onToggle={toggleList}
-        >
-          <DataVisualization
-            title=""
-            description="Visualize todas as comissões por marketplace e categoria"
-            data={commissions}
-            columns={columns}
-            actions={actions}
-            isLoading={isLoading}
-            searchable={true}
-          />
-        </CollapsibleCard>
+          description="Visualize todas as comissões por marketplace e categoria"
+          data={commissions}
+          columns={columns}
+          actions={actions}
+          isLoading={isLoading}
+          searchable={true}
+        />
       </div>
     </ConfigurationPageLayout>
   );
