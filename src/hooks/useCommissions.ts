@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { commissionsService } from "@/services/commissions";
 import { CommissionFormData } from "@/types/commissions";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/utils/logger";
 
 const QUERY_KEYS = {

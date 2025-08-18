@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { adsService } from "@/services/ads";
 import { AdGenerationRequest } from "@/types/ads";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/utils/logger";
 
 export function useGenerateListing() {

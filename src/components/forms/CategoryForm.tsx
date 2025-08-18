@@ -8,7 +8,7 @@ import { FolderOpen, Save, X, AlertCircle } from '@/components/ui/icons';
 import { useCreateCategory, useUpdateCategory } from "@/hooks/useCategories";
 import { CategoryType, CategoryFormData } from "@/types/categories";
 
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";

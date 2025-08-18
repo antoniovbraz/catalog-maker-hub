@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { assistantsService } from '@/services/assistants';
 import type { AssistantFormData } from '@/types/assistants';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useLogger } from '@/utils/logger';
 
 const ASSISTANTS_QUERY_KEY = ['assistants'] as const;

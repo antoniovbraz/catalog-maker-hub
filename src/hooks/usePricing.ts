@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pricingService } from "@/services/pricing";
 import { PricingFormData, PricingCalculationParams } from "@/types/pricing";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export const PRICING_QUERY_KEY = "saved_pricing";
 

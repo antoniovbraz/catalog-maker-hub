@@ -22,7 +22,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useGenerateListing } from "@/hooks/useAdGeneration";
 import { AdChatInterface } from "@/components/forms/AdChatInterface";
 import { MarketplaceDestination } from "@/types/ads";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const MARKETPLACE_OPTIONS = [
   { value: 'mercado_livre', label: 'Mercado Livre', icon: '🛒', color: 'bg-yellow-500' },
