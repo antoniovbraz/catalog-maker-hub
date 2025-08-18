@@ -64,24 +64,24 @@ export function CustomModal({
         )}
       >
         {/* Header */}
-        <DialogHeader className="px-6 py-5 border-b bg-background">
+        <DialogHeader className="border-b bg-background px-6 py-5">
           <DialogTitle className="text-xl font-semibold text-foreground">
             {title}
           </DialogTitle>
           {description && (
-            <DialogDescription className="text-sm text-muted-foreground mt-1">
+            <DialogDescription className="mt-1 text-sm text-muted-foreground">
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
 
         {/* Content */}
-        <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
+        <div className="max-h-[70vh] overflow-y-auto p-6">
           {children}
         </div>
 
         {/* Footer */}
-        <DialogFooter className="px-6 py-4 border-t bg-muted/30 flex justify-end gap-3">
+        <DialogFooter className="flex justify-end gap-3 border-t bg-muted/30 px-6 py-4">
           <Button
             type="button"
             variant="outline"

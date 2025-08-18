@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Plus, Bot, Edit, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

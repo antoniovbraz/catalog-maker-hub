@@ -14,7 +14,6 @@ import {
   Info,
   Package,
   ShoppingCart,
-  Eye,
   Copy,
   Save
 } from "@/components/ui/icons";
