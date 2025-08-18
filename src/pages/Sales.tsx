@@ -1,14 +1,33 @@
 import { SalesForm } from "@/components/forms/SalesForm";
+import { SalesModalForm } from "@/components/forms/SalesModalForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { TrendingUp, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { useFormVisibility } from "@/hooks/useFormVisibility";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 const Sales = () => {
-  const { isFormVisible, showForm, hideForm } = useFormVisibility({
-    formStorageKey: 'sales-form-visible',
-    listStorageKey: 'sales-list-visible'
-  });
+  const { showFormModal } = useGlobalModal();
+
+  const handleCreateNew = () => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: "Registrar Venda",
+      description: "Informe os dados da venda",
+      content: (
+        <SalesModalForm
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg",
+    });
+  };
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
@@ -17,7 +36,7 @@ const Sales = () => {
 
   const headerActions = (
     <div className="flex items-center gap-2">
-      <Button size="sm" onClick={showForm}>
+      <Button size="sm" onClick={handleCreateNew}>
         <Plus className="mr-2 size-4" />
         Nova Venda
       </Button>
@@ -32,11 +51,9 @@ const Sales = () => {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
-      {isFormVisible && (
-        <div className="xl:col-span-8">
-          <SalesForm onCancel={hideForm} />
-        </div>
-      )}
+      <div className="xl:col-span-8">
+        <SalesForm showForm={false} />
+      </div>
     </ConfigurationPageLayout>
   );
 };
