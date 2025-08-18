@@ -59,7 +59,9 @@ describe('ProductsService', () => {
         select: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockProducts, error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.getAllWithCategories();
 
@@ -268,7 +270,9 @@ describe('ProductsService', () => {
         eq: vi.fn().mockReturnThis(),
         neq: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
-      testUtils.mockSupabaseClient.from.mockReturnValue(mockQuery as any);
+      testUtils.mockSupabaseClient.from.mockReturnValue(
+        mockQuery as unknown as import('../types/postgrest').PostgrestQueryMock
+      );
 
       const result = await productsService.validateSKU('SKU-TEST', 'exclude-id');
 

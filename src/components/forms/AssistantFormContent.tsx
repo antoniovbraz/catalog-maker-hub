@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -87,7 +86,7 @@ export function AssistantFormContent({ assistant, onSuccess }: AssistantFormCont
           data: formData,
         });
       } else {
-        await createAssistantMutation.mutateAsync(formData as any);
+        await createAssistantMutation.mutateAsync(formData);
       }
       onSuccess();
     } catch (error) {
@@ -179,7 +178,7 @@ export function AssistantFormContent({ assistant, onSuccess }: AssistantFormCont
             <FormItem>
               <FormLabel>
                 Instruções do Assistente 
-                <span className="text-xs text-muted-foreground ml-2">
+                <span className="ml-2 text-xs text-muted-foreground">
                   ({charCount} caracteres)
                 </span>
               </FormLabel>

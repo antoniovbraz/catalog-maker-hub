@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -79,23 +79,26 @@ export function AssistantModalForm({ assistant, onSuccess, onSubmitForm }: Assis
     }
   }, [assistant, form]);
 
-  const onSubmit = async (formData: AssistantFormData) => {
-    try {
-      if (isEdit) {
-        await updateAssistantMutation.mutateAsync({
-          id: assistant!.id,
-          data: formData,
-        });
-      } else {
-        await createAssistantMutation.mutateAsync(formData as any);
+  const onSubmit = useCallback(
+    async (formData: AssistantFormData) => {
+      try {
+        if (isEdit) {
+          await updateAssistantMutation.mutateAsync({
+            id: assistant!.id,
+            data: formData,
+          });
+        } else {
+          await createAssistantMutation.mutateAsync(formData);
+        }
+        onSuccess();
+      } catch (error) {
+        console.error("Erro ao salvar assistente:", error);
       }
-      onSuccess();
-    } catch (error) {
-      console.error("Erro ao salvar assistente:", error);
-    }
-  };
+    },
+    [assistant, createAssistantMutation, isEdit, onSuccess, updateAssistantMutation]
+  );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     return new Promise<void>((resolve, reject) => {
       form.handleSubmit(
         async (data) => {
@@ -109,12 +112,12 @@ export function AssistantModalForm({ assistant, onSuccess, onSubmitForm }: Assis
         () => reject(new Error("Validação falhou"))
       )();
     });
-  };
+  }, [form, onSubmit]);
 
   // Register submit function with parent modal
   useEffect(() => {
     onSubmitForm(handleSubmit);
-  }, [onSubmitForm]);
+  }, [onSubmitForm, handleSubmit]);
 
   const isLoading = createAssistantMutation.isPending || updateAssistantMutation.isPending;
 
@@ -200,7 +203,7 @@ export function AssistantModalForm({ assistant, onSuccess, onSubmitForm }: Assis
             <FormItem>
               <FormLabel>
                 Instruções do Assistente 
-                <span className="text-xs text-muted-foreground ml-2">
+                <span className="ml-2 text-xs text-muted-foreground">
                   ({charCount} caracteres)
                 </span>
               </FormLabel>

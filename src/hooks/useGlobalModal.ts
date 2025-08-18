@@ -1,4 +1,4 @@
-import { useModal, ModalConfig } from '@/contexts/ModalContext';
+import { useModal } from '@/contexts/ModalContext';
 
 export function useGlobalModal() {
   const { openModal, closeModal, updateModal } = useModal();

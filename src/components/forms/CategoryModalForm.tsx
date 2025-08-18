@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -57,23 +57,26 @@ export function CategoryModalForm({ category, onSuccess, onSubmitForm }: Categor
     }
   }, [category, form]);
 
-  const onSubmit = async (formData: CategoryFormData) => {
-    try {
-      if (isEdit) {
-        await updateCategoryMutation.mutateAsync({
-          id: category!.id,
-          data: formData,
-        });
-      } else {
-        await createCategoryMutation.mutateAsync(formData);
+  const onSubmit = useCallback(
+    async (formData: CategoryFormData) => {
+      try {
+        if (isEdit) {
+          await updateCategoryMutation.mutateAsync({
+            id: category!.id,
+            data: formData,
+          });
+        } else {
+          await createCategoryMutation.mutateAsync(formData);
+        }
+        onSuccess();
+      } catch (error) {
+        console.error("Erro ao salvar categoria:", error);
       }
-      onSuccess();
-    } catch (error) {
-      console.error("Erro ao salvar categoria:", error);
-    }
-  };
+    },
+    [category, createCategoryMutation, isEdit, onSuccess, updateCategoryMutation]
+  );
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     return new Promise<void>((resolve, reject) => {
       form.handleSubmit(
         async (data) => {
@@ -87,12 +90,12 @@ export function CategoryModalForm({ category, onSuccess, onSubmitForm }: Categor
         () => reject(new Error("Validação falhou"))
       )();
     });
-  };
+  }, [form, onSubmit]);
 
   // Register submit function with parent modal
   useEffect(() => {
     onSubmitForm(handleSubmit);
-  }, [onSubmitForm]);
+  }, [onSubmitForm, handleSubmit]);
 
   const isLoading = createCategoryMutation.isPending || updateCategoryMutation.isPending;
 
