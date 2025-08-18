@@ -1,32 +1,67 @@
-import { CategoryForm } from "@/components/forms/CategoryForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { FolderTree, Plus, Edit, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { useCategories, useDeleteCategory } from "@/hooks/useCategories";
 import { CategoryType } from "@/types/categories";
 import { DataVisualization } from "@/components/ui/data-visualization";
-import { useState } from "react";
+import { CategoryModalForm } from "@/components/forms/CategoryModalForm";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 const Categories = () => {
-  const [editingCategory, setEditingCategory] = useState<CategoryType | null>(null);
-  const { isFormVisible, showForm, hideForm } = useFormVisibility({
-    formStorageKey: 'categories-form-visible',
-    listStorageKey: 'categories-list-visible'
-  });
-
   const { data: categories = [], isLoading } = useCategories();
   const deleteMutation = useDeleteCategory();
+  const { showFormModal, showConfirmModal } = useGlobalModal();
 
-  const handleEdit = (category: CategoryType) => {
-    setEditingCategory(category);
-    showForm();
+  const handleCreateNew = () => {
+    let submitForm: (() => Promise<void>) | null = null;
+    
+    showFormModal({
+      title: "Nova Categoria",
+      description: "Crie uma nova categoria para organizar seus produtos",
+      content: (
+        <CategoryModalForm 
+          onSuccess={() => {}} 
+          onSubmitForm={(fn) => { submitForm = fn; }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "md"
+    });
   };
 
-  const handleFormCancel = () => {
-    setEditingCategory(null);
-    hideForm();
+  const handleEdit = (category: CategoryType) => {
+    let submitForm: (() => Promise<void>) | null = null;
+    
+    showFormModal({
+      title: "Editar Categoria",
+      description: "Modifique as informações da categoria",
+      content: (
+        <CategoryModalForm 
+          category={category}
+          onSuccess={() => {}} 
+          onSubmitForm={(fn) => { submitForm = fn; }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "md"
+    });
+  };
+
+  const handleDelete = (category: CategoryType) => {
+    showConfirmModal({
+      title: "Excluir Categoria",
+      description: `Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(category.id);
+      },
+      confirmText: "Excluir",
+      variant: "destructive"
+    });
   };
 
   // Configurar colunas da tabela
@@ -61,7 +96,7 @@ const Categories = () => {
     {
       label: 'Excluir',
       icon: <Trash2 className="size-4" />,
-      onClick: (category: CategoryType) => deleteMutation.mutate(category.id),
+      onClick: (category: CategoryType) => handleDelete(category),
       variant: 'destructive' as const
     }
   ];
@@ -73,7 +108,7 @@ const Categories = () => {
 
   const headerActions = (
     <div className="flex items-center gap-2">
-      <Button size="sm" onClick={showForm}>
+      <Button size="sm" onClick={handleCreateNew}>
         <Plus className="mr-2 size-4" />
         Nova Categoria
       </Button>
@@ -88,14 +123,7 @@ const Categories = () => {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
-      {isFormVisible && (
-        <div className="xl:col-span-6">
-          <CategoryForm onCancel={handleFormCancel} editingCategory={editingCategory} />
-        </div>
-      )}
-
-      {/* Lista de categorias sempre visível */}
-      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
+      <div className="xl:col-span-12">
         <Card className="border border-border/20 shadow-card">
           <CardHeader className="py-3">
             <CardTitle className="flex items-center gap-2 text-base font-medium text-muted-foreground">
@@ -114,7 +142,7 @@ const Categories = () => {
                 <div className="py-8 text-center">
                   <p className="text-muted-foreground">Nenhuma categoria cadastrada</p>
                   <p className="text-sm text-muted-foreground">
-                    Crie sua primeira categoria usando o formulário ao lado
+                    Clique em "Nova Categoria" para criar sua primeira categoria
                   </p>
                 </div>
               }

@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 const FixedFees = () => {
   const { isFormVisible, showForm, hideForm } = useFormVisibility({
@@ -18,6 +19,7 @@ const FixedFees = () => {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { showConfirmModal } = useGlobalModal();
 
   interface FixedFeeRule {
     id: string;
@@ -89,6 +91,19 @@ const FixedFees = () => {
       });
     }
   });
+
+  const handleDelete = (rule: FixedFeeRule) => {
+    const ruleTypeLabel = RULE_TYPES.find(t => t.value === rule.rule_type)?.label;
+    showConfirmModal({
+      title: "Excluir Taxa Fixa",
+      description: `Tem certeza que deseja excluir a taxa fixa "${ruleTypeLabel}" do ${rule.marketplaces?.name}? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(rule.id);
+      },
+      confirmText: "Excluir",
+      variant: "destructive"
+    });
+  };
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
@@ -166,14 +181,14 @@ const FixedFees = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => deleteMutation.mutate(rule.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
+                           <Button
+                             size="sm"
+                             variant="destructive"
+                             onClick={() => handleDelete(rule)}
+                             disabled={deleteMutation.isPending}
+                           >
+                             <Trash2 className="size-4" />
+                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>

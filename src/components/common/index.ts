@@ -1,5 +1,4 @@
 export { LoadingSpinner } from "./LoadingSpinner"
-export { ConfirmDialog } from "./ConfirmDialog"
 export { FormField } from "./FormField"
 export { EnhancedTooltip } from "./EnhancedTooltip"
 export { AppBreadcrumbs } from "./AppBreadcrumbs"

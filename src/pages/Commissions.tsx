@@ -11,11 +11,13 @@ import { formatarPercentual } from "@/utils/pricing";
 import { useState } from "react";
 import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 const Commissions = () => {
   const { data: commissions = [], isLoading } = useCommissionsWithDetails();
   const deleteMutation = useDeleteCommission();
   const [editingCommission, setEditingCommission] = useState<CommissionWithDetails | null>(null);
+  const { showConfirmModal } = useGlobalModal();
   
   const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
     formStorageKey: 'commissions-form-visible',
@@ -100,6 +102,18 @@ const Commissions = () => {
     }
   ];
 
+  const handleDelete = (commission: CommissionWithDetails) => {
+    showConfirmModal({
+      title: "Excluir Comissão",
+      description: `Tem certeza que deseja excluir a comissão do ${commission.marketplaces?.name}${commission.categories ? ` - ${commission.categories.name}` : " (Padrão)"}? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(commission.id);
+      },
+      confirmText: "Excluir",
+      variant: "destructive"
+    });
+  };
+
   const actions = [
     {
       label: "Editar",
@@ -113,7 +127,7 @@ const Commissions = () => {
     {
       label: "Excluir",
       icon: <Percent className="size-4" />,
-      onClick: (commission: CommissionWithDetails) => deleteMutation.mutate(commission.id),
+      onClick: (commission: CommissionWithDetails) => handleDelete(commission),
       variant: "destructive" as const
     }
   ];

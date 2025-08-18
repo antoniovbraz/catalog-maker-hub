@@ -16,9 +16,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 export const ProductForm = () => {
   const { toast } = useToast();
+  const { showConfirmModal } = useGlobalModal();
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
     description: "",
@@ -220,6 +222,18 @@ export const ProductForm = () => {
     }
   ];
 
+  const handleDelete = (product: ProductWithCategory) => {
+    showConfirmModal({
+      title: "Excluir Produto",
+      description: `Tem certeza que deseja excluir o produto "${product.name}"? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(product.id);
+      },
+      confirmText: "Excluir",
+      variant: "destructive"
+    });
+  };
+
   const actions = [
     {
       label: 'Editar',
@@ -229,7 +243,7 @@ export const ProductForm = () => {
     {
       label: 'Excluir',
       icon: <Trash2 className="size-4" />,
-      onClick: (product: ProductWithCategory) => deleteMutation.mutate(product.id),
+      onClick: (product: ProductWithCategory) => handleDelete(product),
       variant: 'destructive' as const
     }
   ];
