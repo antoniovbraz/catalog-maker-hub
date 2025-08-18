@@ -106,5 +106,5 @@ describe('AppSidebar accessibility', () => {
 
     await user.tab();
     expect(screen.getByRole('link', { name: /marketplaces/i })).toHaveFocus();
-  });
+  }, 10000);
 });

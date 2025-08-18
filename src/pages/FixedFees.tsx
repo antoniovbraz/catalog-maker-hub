@@ -1,8 +1,7 @@
-import { FixedFeeRuleForm } from "@/components/forms/FixedFeeRuleForm";
+import { FixedFeeRuleModalForm } from "@/components/forms/FixedFeeRuleModalForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Coins, Plus, Trash2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,14 +11,9 @@ import { handleSupabaseError } from "@/utils/errors";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 const FixedFees = () => {
-  const { isFormVisible, showForm, hideForm } = useFormVisibility({
-    formStorageKey: 'fixed-fees-form-visible',
-    listStorageKey: 'fixed-fees-list-visible'
-  });
-
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { showConfirmModal } = useGlobalModal();
+  const { showConfirmModal, showFormModal } = useGlobalModal();
 
   interface FixedFeeRule {
     id: string;
@@ -110,9 +104,29 @@ const FixedFees = () => {
     { label: "Regras de valor fixo" }
   ];
 
+  const openForm = () => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: "Nova Taxa Fixa",
+      content: (
+        <FixedFeeRuleModalForm
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg",
+    });
+  };
+
   const headerActions = (
     <div className="flex items-center gap-2">
-      <Button size="sm" onClick={showForm}>
+      <Button size="sm" onClick={openForm}>
         <Plus className="mr-2 size-4" />
         Nova Taxa
       </Button>
@@ -127,13 +141,7 @@ const FixedFees = () => {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
-      {isFormVisible && (
-        <div className="xl:col-span-6">
-          <FixedFeeRuleForm onCancel={hideForm} />
-        </div>
-      )}
-
-      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
+      <div className="xl:col-span-12">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
