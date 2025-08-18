@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Edit } from '@/components/ui/icons';
+import { Trash2, Edit } from "@/components/ui/icons";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useSales, useCreateSale, useUpdateSale, useDeleteSale } from "@/hooks/useSales";
@@ -13,12 +13,14 @@ import { useProducts } from "@/hooks/useProducts";
 import { useMarketplaces } from "@/hooks/useMarketplaces";
 import { SaleWithDetails, SaleFormData } from "@/types/sales";
 import { formatarMoeda } from "@/utils/pricing";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 interface SalesFormProps {
   onCancel?: () => void;
+  showForm?: boolean;
 }
 
-export const SalesForm = ({ onCancel }: SalesFormProps) => {
+export const SalesForm = ({ onCancel, showForm = true }: SalesFormProps) => {
   const [formData, setFormData] = useState<SaleFormData>({
     product_id: "",
     marketplace_id: "",
@@ -34,6 +36,7 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
   const createMutation = useCreateSale();
   const updateMutation = useUpdateSale();
   const deleteMutation = useDeleteSale();
+  const { showConfirmModal } = useGlobalModal();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +77,18 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
     setEditingId(sale.id);
   };
 
+  const handleDelete = (sale: SaleWithDetails) => {
+    showConfirmModal({
+      title: "Excluir Venda",
+      description: `Tem certeza que deseja excluir esta venda? Esta ação não pode ser desfeita.`,
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(sale.id);
+      },
+      confirmText: "Excluir",
+      variant: "destructive",
+    });
+  };
+
   // Convert ISO date to datetime-local format for input
   const formatDateForInput = (isoDate: string) => {
     return new Date(isoDate).toISOString().slice(0, 16);
@@ -86,12 +101,13 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
 
   return (
     <div className="space-y-lg">
-      <Card>
-        <CardHeader>
-          <CardTitle>{editingId ? "Editar Venda" : "Nova Venda"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-md">
+      {showForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{editingId ? "Editar Venda" : "Nova Venda"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-md">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label htmlFor="product">Produto *</Label>
@@ -177,9 +193,10 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
                 Cancelar
               </Button>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -214,17 +231,19 @@ export const SalesForm = ({ onCancel }: SalesFormProps) => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(sale)}
-                        >
-                          <Edit className="size-4" />
-                        </Button>
+                        {showForm && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(sale)}
+                          >
+                            <Edit className="size-4" />
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => deleteMutation.mutate(sale.id)}
+                          onClick={() => handleDelete(sale)}
                           disabled={deleteMutation.isPending}
                         >
                           <Trash2 className="size-4" />
