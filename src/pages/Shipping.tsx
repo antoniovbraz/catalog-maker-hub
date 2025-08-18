@@ -1,24 +1,42 @@
 import { ShippingRuleForm } from "@/components/forms/ShippingRuleForm";
+import { ShippingRuleModalForm } from "@/components/forms/ShippingRuleModalForm";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Truck, Plus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { useFormVisibility } from "@/hooks/useFormVisibility";
-import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
 
 const Shipping = () => {
-  const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
-    formStorageKey: 'shipping-form-visible',
-    listStorageKey: 'shipping-list-visible'
-  });
+  const { showFormModal } = useGlobalModal();
+
+  const handleCreateNew = () => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: "Nova Regra de Frete",
+      description: "Crie uma nova regra de frete por produto e marketplace",
+      content: (
+        <ShippingRuleModalForm
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "md",
+    });
+  };
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
-    { label: "Regras de Frete" }
+    { label: "Regras de Frete" },
   ];
 
   const headerActions = (
     <div className="flex items-center gap-2">
-      <Button size="sm" onClick={showForm}>
+      <Button size="sm" onClick={handleCreateNew}>
         <Plus className="mr-2 size-4" />
         Nova Regra
       </Button>
@@ -33,28 +51,12 @@ const Shipping = () => {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
-      {isFormVisible && (
-        <div className="xl:col-span-6">
-          <ShippingRuleForm onCancel={hideForm} />
-        </div>
-      )}
-
-      {/* Lista externa colapsável */}
-      <div className={isFormVisible ? "xl:col-span-6" : "xl:col-span-12"}>
-        <CollapsibleCard
-          title="Regras de Frete Configuradas"
-          icon={<Truck className="size-4" />}
-          isOpen={isListVisible}
-          onToggle={toggleList}
-        >
-          <div className="p-4 text-center text-muted-foreground">
-            <p>Lista de regras de frete será exibida aqui</p>
-            <p className="mt-1 text-sm">Adicione uma nova regra para começar</p>
-          </div>
-        </CollapsibleCard>
+      <div className="xl:col-span-12">
+        <ShippingRuleForm />
       </div>
     </ConfigurationPageLayout>
   );
 };
 
 export default Shipping;
+
