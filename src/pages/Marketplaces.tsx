@@ -1,66 +1,123 @@
 import { Store, Plus, Eye, EyeOff } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
-import { SimpleMarketplaceForm } from "@/components/forms/enhanced/SimpleMarketplaceForm";
 import { MarketplaceHierarchyCard } from "@/components/marketplace/MarketplaceHierarchyCard";
 import { useMarketplacesHierarchical, useDeleteMarketplace } from "@/hooks/useMarketplaces";
 import { MarketplaceType } from "@/types/marketplaces";
-import { useState } from "react";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { useFormVisibility } from "@/hooks/useFormVisibility";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { MarketplaceModalForm } from "@/components/forms/MarketplaceModalForm";
+import { useGlobalModal } from "@/hooks/useGlobalModal";
+import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
 
 const Marketplaces = () => {
   const { data: hierarchicalMarketplaces = [], isLoading } = useMarketplacesHierarchical();
   const deleteMutation = useDeleteMarketplace();
-  const [editingMarketplace, setEditingMarketplace] = useState<MarketplaceType | null>(null);
-  const [creatingModalityForPlatform, setCreatingModalityForPlatform] = useState<string | null>(null);
-  
-  const { isFormVisible, isListVisible, showForm, hideForm, toggleList } = useFormVisibility({
-    formStorageKey: 'marketplaces-form-visible',
-    listStorageKey: 'marketplaces-list-visible'
+  const { showFormModal, showConfirmModal } = useGlobalModal();
+  const { isOpen: isListVisible, toggle: toggleList } = useCollapsibleSection({
+    storageKey: 'marketplaces-list-visible',
+    defaultOpen: true,
   });
 
   // Calculate stats from hierarchical data
   const totalPlatforms = hierarchicalMarketplaces.length;
-  const totalModalities = hierarchicalMarketplaces.reduce((acc, h) => acc + h.children.length, 0);
+  const totalModalities = hierarchicalMarketplaces.reduce(
+    (acc, h) => acc + h.children.length,
+    0
+  );
+
+  const openPlatformForm = (platform?: MarketplaceType) => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: platform ? "Editar Plataforma" : "Nova Plataforma",
+      description: platform
+        ? "Edite as informações da plataforma"
+        : "Crie uma nova plataforma de marketplace",
+      content: (
+        <MarketplaceModalForm
+          marketplace={platform}
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg",
+    });
+  };
+
+  const openModalityForm = (options: {
+    modality?: MarketplaceType;
+    platformId?: string;
+  }) => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: options.modality ? "Editar Modalidade" : "Nova Modalidade",
+      description: options.modality
+        ? "Modifique as informações da modalidade"
+        : "Crie uma nova modalidade para esta plataforma",
+      content: (
+        <MarketplaceModalForm
+          marketplace={options.modality}
+          platformId={options.platformId}
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg",
+    });
+  };
 
   const handleEditPlatform = (platform: MarketplaceType) => {
-    setEditingMarketplace(platform);
-    setCreatingModalityForPlatform(null);
-    showForm();
+    openPlatformForm(platform);
   };
 
   const handleEditModality = (modality: MarketplaceType) => {
-    setEditingMarketplace(modality);
-    setCreatingModalityForPlatform(null);
-    showForm();
+    openModalityForm({ modality });
   };
 
   const handleAddModality = (platformId: string) => {
-    setEditingMarketplace(null);
-    setCreatingModalityForPlatform(platformId);
-    showForm();
+    openModalityForm({ platformId });
   };
 
   const handleCreateNewPlatform = () => {
-    setEditingMarketplace(null);
-    setCreatingModalityForPlatform(null);
-    showForm();
-  };
-
-  const handleCancelEdit = () => {
-    setEditingMarketplace(null);
-    setCreatingModalityForPlatform(null);
-    hideForm();
+    openPlatformForm();
   };
 
   const handleDeletePlatform = (platformId: string) => {
-    deleteMutation.mutate(platformId);
+    showConfirmModal({
+      title: "Excluir Plataforma",
+      description:
+        "Tem certeza que deseja excluir esta plataforma? Esta ação não pode ser desfeita.",
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(platformId);
+      },
+      confirmText: "Excluir",
+      variant: "destructive",
+    });
   };
 
   const handleDeleteModality = (modalityId: string) => {
-    deleteMutation.mutate(modalityId);
+    showConfirmModal({
+      title: "Excluir Modalidade",
+      description:
+        "Tem certeza que deseja excluir esta modalidade? Esta ação não pode ser desfeita.",
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(modalityId);
+      },
+      confirmText: "Excluir",
+      variant: "destructive",
+    });
   };
 
   const breadcrumbs = [
@@ -85,19 +142,7 @@ const Marketplaces = () => {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
-      {/* Form Column */}
-      {isFormVisible && (
-        <div className="space-y-lg xl:col-span-5">
-          <SimpleMarketplaceForm
-            editingMarketplace={editingMarketplace}
-            creatingModalityForPlatform={creatingModalityForPlatform}
-            onCancel={handleCancelEdit}
-          />
-        </div>
-      )}
-
-      {/* Hierarchy Visualization Column */}
-      <div className={isFormVisible ? "xl:col-span-7" : "xl:col-span-12"}>
+      <div className="xl:col-span-12">
         <CollapsibleCard
           title="Plataformas e Modalidades"
           icon={<Store className="size-4" />}
