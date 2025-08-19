@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateAssistant, useUpdateAssistant } from "@/hooks/useAssistants";
-import type { Assistant } from "@/types/assistants";
+import type { Assistant, AssistantFormData } from "@/types/assistants";
 
 const assistantSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
@@ -29,8 +29,6 @@ const assistantSchema = z.object({
   model: z.string().min(1, "Modelo é obrigatório"),
   instructions: z.string().min(10, "Instruções devem ter pelo menos 10 caracteres"),
 });
-
-type AssistantFormData = z.infer<typeof assistantSchema>;
 
 interface AssistantModalFormProps {
   assistant?: Assistant;

@@ -16,21 +16,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true
+    let loadingTimeout: NodeJS.Timeout
+
+    // Timeout de segurança para evitar carregamento infinito
+    const safetyTimeout = setTimeout(() => {
+      if (isMounted && loading) {
+        logger.debug('Safety timeout triggered - forcing loading false')
+        setLoading(false)
+      }
+    }, 5000)
 
     const fetchProfile = async (userId: string) => {
       try {
         logger.debug('Fetching profile for user', { userId })
-        const profileData = await authService.getCurrentProfile()
+        
+        // Timeout para evitar carregamento infinito
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Profile fetch timeout')), 10000);
+        });
+        
+        const profilePromise = authService.getCurrentProfile();
+        
+        const profileData = await Promise.race([profilePromise, timeoutPromise]) as Profile | null;
+        
+        logger.debug('Profile fetch result', { 
+          hasProfile: !!profileData, 
+          profileData: profileData ? { id: profileData.id, role: profileData.role } : null 
+        })
+        
         if (isMounted) {
-          logger.debug('Profile fetched', { hasProfile: !!profileData })
+          logger.debug('Setting profile and loading false', { hasProfile: !!profileData })
           setProfile(profileData)
           setLoading(false)
+          clearTimeout(safetyTimeout)
         }
       } catch (error) {
         logger.error('Error fetching profile', error)
         if (isMounted) {
+          // Se der erro, vamos continuar sem perfil mas não ficar infinito
           setProfile(null)
           setLoading(false)
+          clearTimeout(safetyTimeout)
         }
       }
     }
@@ -53,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setProfile(null)
           setLoading(false)
+          clearTimeout(safetyTimeout)
         }
       }
     )
@@ -60,22 +87,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = async () => {
       try {
         logger.debug('Initializing auth...')
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session }, error } = await supabase.auth.getSession()
         if (!isMounted) return
 
-        logger.debug('Initial session', { hasUser: !!session?.user })
+        logger.debug('Initial session', { 
+          hasUser: !!session?.user,
+          error: error?.message,
+          userId: session?.user?.id 
+        })
+        
+        if (error) {
+          logger.error('Error getting session', error)
+          setLoading(false)
+          clearTimeout(safetyTimeout)
+          return
+        }
+
         setSession(session)
         setUser(session?.user ?? null)
 
         if (session?.user) {
           await fetchProfile(session.user.id)
         } else {
+          logger.debug('No user session, setting loading false')
           setLoading(false)
+          clearTimeout(safetyTimeout)
         }
       } catch (error) {
         logger.error('Error initializing auth', error)
         if (isMounted) {
           setLoading(false)
+          clearTimeout(safetyTimeout)
         }
       }
     }
@@ -84,9 +126,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       isMounted = false
+      clearTimeout(safetyTimeout)
       subscription.unsubscribe()
     }
-  }, [logger])
+  }, [])
 
   const signIn = async (email: string, password: string) => {
     try {

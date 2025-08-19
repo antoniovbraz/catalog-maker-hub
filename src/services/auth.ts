@@ -38,14 +38,31 @@ export class AuthService extends BaseService<Profile> {
   }
 
   async getCurrentProfile(): Promise<Profile | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    logger.debug('Getting user for profile', 'AuthService', { 
+      hasUser: !!user, 
+      userId: user?.id,
+      userError: userError?.message 
+    });
+    
+    if (!user) {
+      logger.debug('No user found in getCurrentProfile', 'AuthService');
+      return null;
+    }
 
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single();
+
+    logger.debug('Profile query result', 'AuthService', { 
+      hasData: !!data, 
+      error: error?.message,
+      errorCode: error?.code,
+      userId: user.id
+    });
 
     if (error) {
       logger.error('Error fetching profile', 'AuthService', error);
