@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -21,6 +21,7 @@ export type Database = {
           id: string
           instructions: string
           marketplace: string
+          mode: string
           model: string
           name: string
           tenant_id: string
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           instructions: string
           marketplace: string
+          mode?: string
           model?: string
           name: string
           tenant_id: string
@@ -43,6 +45,7 @@ export type Database = {
           id?: string
           instructions?: string
           marketplace?: string
+          mode?: string
           model?: string
           name?: string
           tenant_id?: string
@@ -668,29 +671,29 @@ export type Database = {
     Functions: {
       calcular_margem_real: {
         Args: {
-          p_product_id: string
           p_marketplace_id: string
-          p_taxa_cartao: number
-          p_provisao_desconto: number
           p_preco_praticado: number
+          p_product_id: string
+          p_provisao_desconto: number
+          p_taxa_cartao: number
         }
         Returns: Json
       }
       calcular_preco: {
         Args: {
-          p_product_id: string
-          p_marketplace_id: string
-          p_taxa_cartao: number
-          p_provisao_desconto: number
           p_margem_desejada: number
+          p_marketplace_id: string
+          p_product_id: string
+          p_provisao_desconto: number
+          p_taxa_cartao: number
         }
         Returns: Json
       }
       check_usage_limit: {
         Args: {
-          p_user_id: string
-          p_resource_type: string
           p_increment?: number
+          p_resource_type: string
+          p_user_id: string
         }
         Returns: boolean
       }
@@ -704,9 +707,9 @@ export type Database = {
       }
       increment_usage: {
         Args: {
-          p_user_id: string
-          p_resource_type: string
           p_increment?: number
+          p_resource_type: string
+          p_user_id: string
         }
         Returns: undefined
       }
