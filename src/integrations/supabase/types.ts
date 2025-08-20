@@ -713,6 +713,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_security_event: {
+        Args: { p_details?: Json; p_event_type: string; p_user_id?: string }
+        Returns: undefined
+      }
+      validate_tenant_access: {
+        Args: { p_tenant_id: string; p_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       marketplace_type: "platform" | "modality"
