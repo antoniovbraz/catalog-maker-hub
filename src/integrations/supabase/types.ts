@@ -623,6 +623,13 @@ export type Database = {
             foreignKeyName: "subscriptions_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
+            referencedRelation: "public_pricing"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
             referencedRelation: "subscription_plans"
             referencedColumns: ["id"]
           },
@@ -666,7 +673,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_pricing: {
+        Row: {
+          description: string | null
+          display_name: string | null
+          has_advanced_analytics: boolean | null
+          has_basic_analytics: boolean | null
+          has_email_support: boolean | null
+          has_price_pilot: boolean | null
+          has_priority_support: boolean | null
+          id: string | null
+          price_monthly: number | null
+          price_yearly: number | null
+          sort_order: number | null
+        }
+        Insert: {
+          description?: string | null
+          display_name?: string | null
+          has_advanced_analytics?: never
+          has_basic_analytics?: never
+          has_email_support?: never
+          has_price_pilot?: never
+          has_priority_support?: never
+          id?: string | null
+          price_monthly?: number | null
+          price_yearly?: number | null
+          sort_order?: number | null
+        }
+        Update: {
+          description?: string | null
+          display_name?: string | null
+          has_advanced_analytics?: never
+          has_basic_analytics?: never
+          has_email_support?: never
+          has_price_pilot?: never
+          has_priority_support?: never
+          id?: string | null
+          price_monthly?: number | null
+          price_yearly?: number | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calcular_margem_real: {
