@@ -38,3 +38,12 @@ verify_jwt = true
 
 [functions.generate-ad-chat]
 verify_jwt = true
+
+[functions.ml-auth]
+verify_jwt = true
+
+[functions.ml-sync]
+verify_jwt = true
+
+[functions.ml-webhook]
+verify_jwt = false

@@ -225,6 +225,423 @@ export type Database = {
           },
         ]
       }
+      ml_applications: {
+        Row: {
+          app_id: number
+          client_id: string
+          client_secret: string
+          country_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          redirect_uri: string
+          tenant_id: string
+          updated_at: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          app_id: number
+          client_id: string
+          client_secret: string
+          country_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          redirect_uri: string
+          tenant_id: string
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          app_id?: number
+          client_id?: string
+          client_secret?: string
+          country_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          redirect_uri?: string
+          tenant_id?: string
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      ml_auth_tokens: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          expires_at: string
+          id: string
+          refresh_token: string | null
+          scope: string | null
+          tenant_id: string
+          token_type: string | null
+          updated_at: string | null
+          user_id_ml: number | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          refresh_token?: string | null
+          scope?: string | null
+          tenant_id: string
+          token_type?: string | null
+          updated_at?: string | null
+          user_id_ml?: number | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          refresh_token?: string | null
+          scope?: string | null
+          tenant_id?: string
+          token_type?: string | null
+          updated_at?: string | null
+          user_id_ml?: number | null
+        }
+        Relationships: []
+      }
+      ml_category_mapping: {
+        Row: {
+          attributes_template: Json | null
+          category_id: string | null
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          ml_category_id: string
+          ml_category_name: string
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          attributes_template?: Json | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          ml_category_id: string
+          ml_category_name: string
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          attributes_template?: Json | null
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          ml_category_id?: string
+          ml_category_name?: string
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ml_category_mapping_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ml_orders: {
+        Row: {
+          buyer_id: number | null
+          buyer_nickname: string | null
+          created_at: string | null
+          currency_id: string | null
+          date_closed: string | null
+          date_created: string | null
+          date_last_updated: string | null
+          fees: Json | null
+          id: string
+          ml_item_id: string
+          ml_order_id: number
+          order_status: string | null
+          payment_status: string | null
+          product_id: string | null
+          quantity: number
+          shipping_info: Json | null
+          shipping_status: string | null
+          tenant_id: string
+          total_amount: number
+          unit_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          buyer_id?: number | null
+          buyer_nickname?: string | null
+          created_at?: string | null
+          currency_id?: string | null
+          date_closed?: string | null
+          date_created?: string | null
+          date_last_updated?: string | null
+          fees?: Json | null
+          id?: string
+          ml_item_id: string
+          ml_order_id: number
+          order_status?: string | null
+          payment_status?: string | null
+          product_id?: string | null
+          quantity: number
+          shipping_info?: Json | null
+          shipping_status?: string | null
+          tenant_id: string
+          total_amount: number
+          unit_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          buyer_id?: number | null
+          buyer_nickname?: string | null
+          created_at?: string | null
+          currency_id?: string | null
+          date_closed?: string | null
+          date_created?: string | null
+          date_last_updated?: string | null
+          fees?: Json | null
+          id?: string
+          ml_item_id?: string
+          ml_order_id?: number
+          order_status?: string | null
+          payment_status?: string | null
+          product_id?: string | null
+          quantity?: number
+          shipping_info?: Json | null
+          shipping_status?: string | null
+          tenant_id?: string
+          total_amount?: number
+          unit_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ml_orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ml_product_mapping: {
+        Row: {
+          attributes: Json | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          last_sync_at: string | null
+          ml_category_id: string | null
+          ml_condition: string | null
+          ml_currency_id: string | null
+          ml_item_id: string | null
+          ml_listing_type: string | null
+          ml_permalink: string | null
+          ml_price: number | null
+          ml_title: string | null
+          product_id: string
+          sync_direction:
+            | Database["public"]["Enums"]["ml_sync_direction"]
+            | null
+          sync_status: Database["public"]["Enums"]["ml_sync_status"] | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          attributes?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          ml_category_id?: string | null
+          ml_condition?: string | null
+          ml_currency_id?: string | null
+          ml_item_id?: string | null
+          ml_listing_type?: string | null
+          ml_permalink?: string | null
+          ml_price?: number | null
+          ml_title?: string | null
+          product_id: string
+          sync_direction?:
+            | Database["public"]["Enums"]["ml_sync_direction"]
+            | null
+          sync_status?: Database["public"]["Enums"]["ml_sync_status"] | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          attributes?: Json | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          last_sync_at?: string | null
+          ml_category_id?: string | null
+          ml_condition?: string | null
+          ml_currency_id?: string | null
+          ml_item_id?: string | null
+          ml_listing_type?: string | null
+          ml_permalink?: string | null
+          ml_price?: number | null
+          ml_title?: string | null
+          product_id?: string
+          sync_direction?:
+            | Database["public"]["Enums"]["ml_sync_direction"]
+            | null
+          sync_status?: Database["public"]["Enums"]["ml_sync_status"] | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ml_product_mapping_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ml_sync_log: {
+        Row: {
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string
+          error_details: Json | null
+          execution_time_ms: number | null
+          id: string
+          ml_entity_id: string | null
+          operation_type: string
+          request_data: Json | null
+          response_data: Json | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type: string
+          error_details?: Json | null
+          execution_time_ms?: number | null
+          id?: string
+          ml_entity_id?: string | null
+          operation_type: string
+          request_data?: Json | null
+          response_data?: Json | null
+          status: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          error_details?: Json | null
+          execution_time_ms?: number | null
+          id?: string
+          ml_entity_id?: string | null
+          operation_type?: string
+          request_data?: Json | null
+          response_data?: Json | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: []
+      }
+      ml_sync_settings: {
+        Row: {
+          auto_import_orders: boolean | null
+          auto_sync_enabled: boolean | null
+          auto_update_prices: boolean | null
+          auto_update_stock: boolean | null
+          created_at: string | null
+          default_condition: string | null
+          default_listing_type: string | null
+          id: string
+          price_markup_percent: number | null
+          settings: Json | null
+          sync_interval_hours: number | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          auto_import_orders?: boolean | null
+          auto_sync_enabled?: boolean | null
+          auto_update_prices?: boolean | null
+          auto_update_stock?: boolean | null
+          created_at?: string | null
+          default_condition?: string | null
+          default_listing_type?: string | null
+          id?: string
+          price_markup_percent?: number | null
+          settings?: Json | null
+          sync_interval_hours?: number | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          auto_import_orders?: boolean | null
+          auto_sync_enabled?: boolean | null
+          auto_update_prices?: boolean | null
+          auto_update_stock?: boolean | null
+          created_at?: string | null
+          default_condition?: string | null
+          default_listing_type?: string | null
+          id?: string
+          price_markup_percent?: number | null
+          settings?: Json | null
+          sync_interval_hours?: number | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ml_webhook_events: {
+        Row: {
+          application_id: number
+          attempts: number | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          processed_at: string | null
+          raw_payload: Json
+          resource: string
+          tenant_id: string
+          topic: string
+          user_id_ml: number
+        }
+        Insert: {
+          application_id: number
+          attempts?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          raw_payload: Json
+          resource: string
+          tenant_id: string
+          topic: string
+          user_id_ml: number
+        }
+        Update: {
+          application_id?: number
+          attempts?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processed_at?: string | null
+          raw_payload?: Json
+          resource?: string
+          tenant_id?: string
+          topic?: string
+          user_id_ml?: number
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           created_at: string | null
@@ -673,6 +1090,22 @@ export type Database = {
       }
     }
     Views: {
+      ml_integration_status: {
+        Row: {
+          connection_status: string | null
+          error_products: number | null
+          last_order_import: string | null
+          last_product_sync: string | null
+          orders_this_month: number | null
+          pending_products: number | null
+          revenue_this_month: number | null
+          synced_products: number | null
+          tenant_id: string | null
+          total_orders: number | null
+          total_products: number | null
+        }
+        Relationships: []
+      }
       public_pricing: {
         Row: {
           description: string | null
@@ -745,6 +1178,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_old_ml_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_default_ml_settings: {
+        Args: { p_tenant_id: string }
+        Returns: undefined
+      }
       get_admin_dashboard_data: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -772,6 +1213,8 @@ export type Database = {
     }
     Enums: {
       marketplace_type: "platform" | "modality"
+      ml_sync_direction: "to_ml" | "from_ml" | "bidirectional"
+      ml_sync_status: "not_synced" | "syncing" | "synced" | "error" | "conflict"
       user_role: "super_admin" | "admin" | "user"
     }
     CompositeTypes: {
@@ -901,6 +1344,8 @@ export const Constants = {
   public: {
     Enums: {
       marketplace_type: ["platform", "modality"],
+      ml_sync_direction: ["to_ml", "from_ml", "bidirectional"],
+      ml_sync_status: ["not_synced", "syncing", "synced", "error", "conflict"],
       user_role: ["super_admin", "admin", "user"],
     },
   },
