@@ -16,11 +16,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true
-    let loadingTimeout: NodeJS.Timeout
 
     // Timeout de segurança para evitar carregamento infinito
     const safetyTimeout = setTimeout(() => {
-      if (isMounted && loading) {
+      if (isMounted) {
         logger.debug('Safety timeout triggered - forcing loading false')
         setLoading(false)
       }
@@ -129,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout)
       subscription.unsubscribe()
     }
-  }, [])
+  }, [logger])
 
   const signIn = async (email: string, password: string) => {
     try {

@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -113,11 +113,11 @@ serve(async (req) => {
 });
 
 async function processOrderWebhook(
-  supabase: any, 
-  tenantId: string, 
-  resource: string, 
-  accessToken: string, 
-  webhookEventId: string
+  supabase: SupabaseClient,
+  tenantId: string,
+  resource: string,
+  accessToken: string,
+  _webhookEventId: string
 ) {
   console.log('Processing order webhook:', resource);
 
@@ -146,7 +146,7 @@ async function processOrderWebhook(
   for (const item of orderData.order_items) {
     try {
       // Find local product mapping
-      const { data: mapping, error: mappingError } = await supabase
+      const { data: mapping, error: _mappingError } = await supabase
         .from('ml_product_mapping')
         .select('product_id')
         .eq('tenant_id', tenantId)
@@ -230,11 +230,11 @@ async function processOrderWebhook(
 }
 
 async function processItemWebhook(
-  supabase: any, 
-  tenantId: string, 
-  resource: string, 
-  accessToken: string, 
-  webhookEventId: string
+  supabase: SupabaseClient,
+  tenantId: string,
+  resource: string,
+  accessToken: string,
+  _webhookEventId: string
 ) {
   console.log('Processing item webhook:', resource);
 
@@ -298,11 +298,11 @@ async function processItemWebhook(
 }
 
 async function processQuestionWebhook(
-  supabase: any, 
-  tenantId: string, 
-  resource: string, 
-  accessToken: string, 
-  webhookEventId: string
+  supabase: SupabaseClient,
+  tenantId: string,
+  resource: string,
+  accessToken: string,
+  _webhookEventId: string
 ) {
   console.log('Processing question webhook:', resource);
 
