@@ -1,4 +1,26 @@
 # Estratégia de Testes
 
-Diretrizes para criação e execução de testes automatizados no Catalog Maker Hub.
+## Lint
+
+```bash
+npm run lint
+```
+
+## Type Check
+
+```bash
+npm run type-check
+```
+
+## Testes Unitários
+
+```bash
+npm test
+```
+
+## Cobertura de Testes
+
+```bash
+npm run test:coverage
+```
 
