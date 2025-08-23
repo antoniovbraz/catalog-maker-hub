@@ -1,36 +1,41 @@
 # AGENTS
 
-## Convenções de commit
-- Utilize [Conventional Commits](https://www.conventionalcommits.org) com os tipos:
-  - `feat` para novas funcionalidades
-  - `fix` para correções de bugs
-  - `docs` para alterações na documentação
-  - `refactor` para refatorações
-  - `test` para testes
-  - `chore` para tarefas de manutenção
-- As mensagens devem ser escritas em inglês no formato `<type>: short description`.
-- Toda a documentação deve ser escrita em português.
+## Commit conventions
+- Use [Conventional Commits](https://www.conventionalcommits.org) with types:
+  - `feat` for new features
+  - `fix` for bug fixes
+  - `docs` for documentation changes
+  - `refactor` for code refactoring
+  - `test` for tests
+  - `chore` for maintenance tasks
+- Write commit messages in English in the `<type>: short description` format.
 
-## Padrão de nomenclatura
-- Todos os nomes de arquivos, diretórios, variáveis, funções e branches devem estar em inglês.
-- Use `kebab-case` para arquivos e diretórios e `camelCase` ou `PascalCase` para o código, seguindo as convenções do projeto.
+## Naming rules
+- Name files, directories, variables, functions, and branches in English.
+- Use `kebab-case` for files and directories.
+- Use `camelCase` or `PascalCase` for code.
 
-## Formatação de Markdown
-- Utilize títulos com `#` seguidos por uma linha em branco.
-- Limite cada linha a, no máximo, 120 caracteres.
-- Prefira listas não ordenadas com `-` e numeradas com `1.`.
-- Finalize cada arquivo com uma única linha em branco.
-- Use blocos de código cercados por crases com o identificador de linguagem.
+## Markdown style
+- Start headings with `#` followed by a blank line.
+- Limit lines to 120 characters.
+- Use `-` for unordered lists and `1.` for ordered lists.
+- End files with a single blank line.
+- Use fenced code blocks with a language identifier.
 
-## Testes
-- Qualquer alteração de código deve atualizar ou criar testes correspondentes.
-- Sempre execute `npm test` antes de commitar, inclusive para alterações na documentação.
+## Documentation scope
+- Update `README.md` and the `docs/` hierarchy as needed.
+- Follow the structure defined in `docs/README.md`.
+- Use `https://peepers-hub.lovable.app` for all production URLs.
+- Write documentation in Portuguese.
+- Record new environment variables in `.env.example` and relevant docs.
 
-## Atualização de documentação e revisão
-1. Atualize os arquivos de documentação relevantes (`README.md`, diretório `docs/`, etc.), mantendo a hierarquia descrita em `docs/README.md` e utilizando `https://peepers-hub.lovable.app` para todas as URLs de produção.
-2. Documente novas variáveis de ambiente no `.env.example` e nos arquivos de documentação correspondentes.
-3. Execute `npm test` e confirme que os testes continuam passando.
-4. Commite usando o tipo `docs:` e abra um Pull Request.
-5. Solicite revisão de pelo menos um mantenedor.
-6. Revisores são responsáveis por verificar se documentação e testes estão atualizados e se estas diretrizes foram seguidas.
+## QA commands
+- Run `npm test` after every change, including documentation updates.
+
+## Review process
+1. Update documentation and `.env.example` as needed.
+2. Run QA commands and ensure they pass.
+3. Commit using the appropriate type (e.g., `docs:`).
+4. Open a pull request and request review from at least one maintainer.
+5. Reviewers verify that documentation, tests, and these guidelines are followed.
 
