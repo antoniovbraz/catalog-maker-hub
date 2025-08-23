@@ -41,6 +41,8 @@ supabase functions new ml-webhook
 
 ## 📚 Estrutura da Documentação
 
+Todas as novas páginas devem seguir a hierarquia abaixo e utilizar `https://peepers-hub.lovable.app` para URLs de produção.
+
 ### 🔧 [Desenvolvimento](./development/)
 - [Environment Setup](./development/setup.md) - Configuração completa do ambiente
 - [Database Schema](./development/database-schema.md) - Schema detalhado das tabelas

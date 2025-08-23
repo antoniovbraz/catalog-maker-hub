@@ -9,6 +9,7 @@
   - `test` para testes
   - `chore` para tarefas de manutenção
 - As mensagens devem ser escritas em inglês no formato `<type>: short description`.
+- Toda a documentação deve ser escrita em português.
 
 ## Padrão de nomenclatura
 - Todos os nomes de arquivos, diretórios, variáveis, funções e branches devem estar em inglês.
@@ -23,12 +24,13 @@
 
 ## Testes
 - Qualquer alteração de código deve atualizar ou criar testes correspondentes.
-- Sempre execute `npm test` antes de commitar para garantir que todos os testes passam.
+- Sempre execute `npm test` antes de commitar, inclusive para alterações na documentação.
 
 ## Atualização de documentação e revisão
-1. Atualize os arquivos de documentação relevantes (`README.md`, diretório `docs/`, etc.).
-2. Execute `npm test` e confirme que os testes continuam passando.
-3. Commite usando o tipo `docs:` e abra um Pull Request.
-4. Solicite revisão de pelo menos um mantenedor.
-5. Revisores são responsáveis por verificar se documentação e testes estão atualizados e se estas diretrizes foram seguidas.
+1. Atualize os arquivos de documentação relevantes (`README.md`, diretório `docs/`, etc.), mantendo a hierarquia descrita em `docs/README.md` e utilizando `https://peepers-hub.lovable.app` para todas as URLs de produção.
+2. Documente novas variáveis de ambiente no `.env.example` e nos arquivos de documentação correspondentes.
+3. Execute `npm test` e confirme que os testes continuam passando.
+4. Commite usando o tipo `docs:` e abra um Pull Request.
+5. Solicite revisão de pelo menos um mantenedor.
+6. Revisores são responsáveis por verificar se documentação e testes estão atualizados e se estas diretrizes foram seguidas.
 
