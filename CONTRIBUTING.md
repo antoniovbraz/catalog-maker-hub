@@ -41,14 +41,21 @@ Estamos sempre abertos a pull requests! Para contribuições de código, por fav
 4.  **Adicione testes** para suas alterações, se aplicável.
 5.  **Faça o commit** das suas alterações com uma mensagem clara e descritiva:
     ```bash
-    git commit -m "feat: Adiciona nova feature incrível"
+    git commit -m "feat: add amazing new feature"
     ```
-    Nós seguimos o padrão [Conventional Commits](https://www.conventionalcommits.org/).
+    Nós seguimos o padrão [Conventional Commits](https://www.conventionalcommits.org/). As mensagens de commit devem estar em inglês; a documentação deve ser escrita em português.
 6.  **Faça o push** para a sua branch:
     ```bash
     git push origin feature/nova-feature-incrivel
     ```
 7.  **Abra um Pull Request** para a branch `main` do repositório original. Preencha o template do PR com os detalhes da sua contribuição.
+
+### Documentação e Variáveis de Ambiente
+
+- Mantenha a documentação alinhada com a hierarquia descrita em [docs/README.md](./docs/README.md).
+- Utilize sempre `https://peepers-hub.lovable.app` para URLs de produção.
+- Documente novas variáveis de ambiente no arquivo `.env.example` e na documentação relevante.
+- Execute `npm test` mesmo para alterações que afetem apenas a documentação.
 
 ## Guia de Estilo de Código
 
