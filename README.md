@@ -68,7 +68,7 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
 
 Para ativar a integração, siga os passos detalhados em nossa documentação completa:
 
-➡️ **[Guia Completo de Integração com o Mercado Livre](./docs/MERCADO_LIVRE_INTEGRATION.md)**
+➡️ **[Documentação da Integração com o Mercado Livre](./docs/integration/overview.md)**
 
 O guia inclui instruções sobre:
 
