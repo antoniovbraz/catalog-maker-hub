@@ -13,6 +13,9 @@ Documentação completa para integração entre **Catalog Maker Hub** e **API Me
 
 ### 1. Pré-requisitos
 ```bash
+# Instalar dependências
+npm install
+
 # Verificar se o projeto está funcionando
 npm run dev
 

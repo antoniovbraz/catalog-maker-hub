@@ -32,7 +32,7 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
 ### Pré-requisitos
 
 *   Node.js (versão 18 ou superior)
-*   npm, pnpm ou yarn
+*   npm
 *   Uma conta no [Supabase](https://supabase.com/) para o backend.
 *   Uma conta de desenvolvedor no [Mercado Livre](https://developers.mercadolivre.com.br/) para criar sua aplicação de integração.
 
@@ -46,7 +46,7 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
 
 2.  **Instale as dependências:**
     ```bash
-    pnpm install
+    npm install
     ```
 
 3.  **Configure as Variáveis de Ambiente:**
@@ -58,7 +58,7 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
 
 4.  **Execute a aplicação:**
     ```bash
-    pnpm dev
+    npm run dev
     ```
     A aplicação estará disponível em `http://localhost:5173`.
 
