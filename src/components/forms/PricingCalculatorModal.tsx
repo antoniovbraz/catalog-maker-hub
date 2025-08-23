@@ -37,10 +37,9 @@ interface MargemRealResult {
 
 interface PricingCalculatorModalProps {
   onCalculationComplete: (result: PricingResult, margemReal?: MargemRealResult) => void;
-  onClose?: () => void;
 }
 
-export const PricingCalculatorModal = ({ onCalculationComplete, onClose }: PricingCalculatorModalProps) => {
+export const PricingCalculatorModal = ({ onCalculationComplete }: PricingCalculatorModalProps) => {
   const { toast } = useToast();
   const logger = useLogger('PricingCalculatorModal');
   const [formData, setFormData] = useState<PricingFormData>({

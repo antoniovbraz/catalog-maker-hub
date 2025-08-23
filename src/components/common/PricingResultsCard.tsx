@@ -139,13 +139,13 @@ export const PricingResultsCard = ({
                   
                   {/* Indicador de performance da margem */}
                   {pricingResult.margem_percentual > 0 && margemRealResult.margem_percentual_real !== undefined && (
-                    <div className="mt-3 pt-3 border-t border-border">
+                    <div className="mt-3 border-t border-border pt-3">
                       {margemRealResult.margem_percentual_real >= pricingResult.margem_percentual ? (
-                        <div className="text-green-600 dark:text-green-400 font-medium flex items-center gap-2">
+                        <div className="flex items-center gap-2 font-medium text-green-600 dark:text-green-400">
                           ✓ Margem real está acima da desejada
                         </div>
                       ) : (
-                        <div className="text-red-600 dark:text-red-400 font-medium flex items-center gap-2">
+                        <div className="flex items-center gap-2 font-medium text-red-600 dark:text-red-400">
                           ⚠ Margem real está abaixo da desejada
                         </div>
                       )}
