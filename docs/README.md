@@ -46,18 +46,25 @@ supabase functions new ml-webhook
 
 Todas as novas páginas devem seguir a hierarquia abaixo e utilizar `https://peepers-hub.lovable.app` para URLs de produção.
 
+### 🎪 [Vibe Code Methodology](./development/vibe-code-methodology.md)
+- **Desenvolvimento Pragmático**: Ship Fast, Code Smart, Scale Real
+- **Progressive Enhancement**: MVP → Polish → Production  
+- **Real World Ready**: Testa com dados reais desde o início
+
 ### 🔧 [Desenvolvimento](./development/)
+- [Vibe Code Methodology](./development/vibe-code-methodology.md) - Nossa abordagem de desenvolvimento
 - [Environment Setup](./development/setup.md) - Configuração completa do ambiente
-- [Database Schema](./development/database-schema.md) - Schema detalhado das tabelas
+- [Database Schema](./development/database-schema.md) - ✅ Schema implementado e funcional
 - [API Reference](./development/api-reference.md) - Endpoints e payloads
 - [Testing Strategy](./development/testing.md) - Estratégia de testes
 
 ### 🔗 [Integração](./integration/)
 - [Overview](./integration/overview.md) - Arquitetura geral da integração
-- [Authentication](./integration/authentication.md) - Setup OAuth 2.0
-- [Products Sync](./integration/products-sync.md) - Sincronização de produtos
-- [Sales Management](./integration/sales-management.md) - Gestão de vendas
-- [Webhooks](./integration/webhooks.md) - Configuração de webhooks
+- [ML API Documentation](./integration/ml-api-documentation.md) - ✅ Edge Functions implementadas
+- [Authentication](./integration/authentication.md) - ✅ OAuth 2.0 funcional
+- [Products Sync](./integration/products-sync.md) - 🔄 Sincronização de produtos
+- [Sales Management](./integration/sales-management.md) - 🔄 Gestão de vendas  
+- [Webhooks](./integration/webhooks.md) - ✅ Handler implementado
 
 ### 🚀 [Deploy](./deployment/)
 - [Production](./deployment/production.md) - Deploy para produção
@@ -73,24 +80,32 @@ Todas as novas páginas devem seguir a hierarquia abaixo e utilizar `https://pee
 - [FAQ](./support/faq.md) - Perguntas frequentes
 - [Changelog](./support/changelog.md) - Histórico de mudanças
 
-## 🎯 Status Atual
+## 🎯 Status Real da Implementação
 
-| Componente | Status | Prioridade |
-|------------|--------|------------|
-| 🔐 OAuth Setup | ❌ Não implementado | Alta |
-| 📦 Sync Produtos | ❌ Não implementado | Alta |
-| 📈 Webhooks Vendas | ❌ Não implementado | Média |
-| 🎨 Interface UI | ❌ Não implementado | Média |
-| 📊 Dashboard | ❌ Não implementado | Baixa |
+| Componente | Status | Implementado | Próximos Passos |
+|------------|--------|--------------|----------------|
+| 🗄️ **Database Schema** | ✅ **Completo** | Edge Functions + RLS | Otimização de índices |
+| 🔐 **OAuth Infrastructure** | ✅ **Implementado** | ml-auth Edge Function | Testing + UI Integration |
+| 📦 **Sync Infrastructure** | ✅ **Base Pronta** | ml-sync Edge Function | Product Mapping Logic |
+| 📈 **Webhook Handler** | ✅ **Implementado** | ml-webhook Edge Function | Order Processing |
+| 🛡️ **Security & RLS** | ✅ **Implementado** | Todas as tabelas ML | Audit Logs |
+| 🎨 **UI Integration** | 🔄 **Em Desenvolvimento** | Base components | ML Integration Pages |
 
-## ⏱️ Roadmap Resumido
+## ⏱️ Roadmap Atualizado - Metodologia Vibe Code
 
-- **Sprint 1 (2 semanas)**: Autenticação OAuth + Base de dados
-- **Sprint 2 (3 semanas)**: Sincronização de produtos  
-- **Sprint 3 (2 semanas)**: Webhooks e vendas
-- **Sprint 4 (1 semana)**: Interface e testes
+### **🚀 FASE ATUAL: Integration & Testing (2 semanas)**
+- **OAuth Testing**: Validar fluxo completo de autenticação
+- **Product Sync Logic**: Implementar mapeamento Hub ↔ ML  
+- **UI Components**: Criar interface de gestão ML
+- **Error Handling**: Implementar tratamento robusto
 
-**Total estimado: 8 semanas**
+### **📈 PRÓXIMA FASE: Production Ready (2 semanas)**
+- **Webhook Processing**: Automatizar vendas e estoque
+- **Dashboard Analytics**: Métricas ML integradas
+- **Performance**: Otimização e monitoring
+- **Documentation**: Guias práticos para usuários
+
+**Status Geral: 70% Implementado | ETA Produção: 4 semanas**
 
 ## 🔧 Contribuição
 

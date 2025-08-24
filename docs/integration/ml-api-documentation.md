@@ -1,147 +1,283 @@
-# Documentação da API do Mercado Livre - Análise Completa
+# 📚 Mercado Livre API - Documentação Técnica
 
-## Resumo Executivo
-A API do Mercado Livre permite integração completa com a plataforma para gestão de anúncios, pedidos, pagamentos e notificações via webhooks.
+## 🎯 Edge Functions Implementadas
 
-## Processo de Criação de Aplicação
+### 🔐 **ml-auth** - Autenticação OAuth
+**Status**: ✅ **Implementado e Funcional**
 
-### Pré-requisitos
-- Conta do Mercado Livre (preferencialmente pessoa jurídica)
-- Acesso ao DevCenter
-- URLs de redirecionamento com protocolo HTTPS
+#### **Endpoints Disponíveis**
 
-### Passos para Criação
-1. **Acesso ao DevCenter**: Fazer login e acessar "Minhas aplicações"
-2. **Preenchimento de Dados Obrigatórios**:
-   - Nome da aplicação (deve ser único)
-   - Nome curto (para geração de URL)
-   - Descrição (até 150 caracteres)
-   - Logo da empresa
-   - URLs de redirecionamento (protocolo HTTPS obrigatório)
+##### `POST /functions/v1/ml-auth`
+Gerencia autenticação OAuth com Mercado Livre
 
-### Limitações por País
-- Argentina, México, Brasil e Chile: apenas 1 aplicação por conta
-- Necessária validação dos dados do titular da conta
+**Ações Suportadas:**
 
-## Configurações de Segurança
+```typescript
+// 1. Iniciar Autenticação
+{
+  "action": "start",
+  "tenantId": "uuid"
+}
+// Response: { "authUrl": "https://auth.mercadolibre.com.br/..." }
 
-### PKCE (Proof Key for Code Exchange)
-- Validação adicional para gerar tokens
-- Previne ataques de injeção de código e CSRF
-- Uso opcional, mas recomendado
+// 2. Processar Callback
+{
+  "action": "callback", 
+  "code": "TG-xxxxx",
+  "tenantId": "uuid"
+}
+// Response: { "success": true, "user": { ... } }
 
-### Device Grant
-- Fluxo para aplicativos que acessam recursos próprios
-- Não requer interação do usuário final
-- Chamadas recorrentes até finalização da permissão
+// 3. Refresh Token
+{
+  "action": "refresh",
+  "tenantId": "uuid" 
+}
+// Response: { "success": true, "expiresAt": "..." }
 
-## Escopos de Permissão
+// 4. Status da Conexão
+{
+  "action": "status",
+  "tenantId": "uuid"
+}
+// Response: { "connected": true, "expiresAt": "...", "user": { ... } }
+```
 
-### Tipos de Escopo
-1. **Leitura**: Permite métodos GET HTTPS
-2. **Escrita**: Permite métodos PUT, POST e DELETE HTTPS
+**Exemplo de Uso:**
+```typescript
+// services/ml-auth.ts
+export class MLAuthService {
+  static async startAuth(tenantId: string) {
+    const response = await supabase.functions.invoke('ml-auth', {
+      body: { action: 'start', tenantId }
+    });
+    return response.data;
+  }
+  
+  static async getStatus(tenantId: string) {
+    const response = await supabase.functions.invoke('ml-auth', {
+      body: { action: 'status', tenantId }
+    });
+    return response.data;
+  }
+}
+```
 
-### Aplicações por Tipo
-1. **Somente Leitura**: Usuários anônimos ou autenticados consultam dados
-2. **Leitura e Escrita**: Gestão completa de recursos
-3. **Aplicações Completas**: Acesso total às funcionalidades
+---
 
-## Tópicos de Notificação (Webhooks)
+### 📦 **ml-sync** - Sincronização de Produtos  
+**Status**: ✅ **Base Implementada** | **Lógica de Negócio**: 🔄 Em Desenvolvimento
 
-### Principais Tópicos Disponíveis
-- **Orders**: Notificações de pedidos
-- **Messages**: Mensagens entre usuários
-- **Items**: Alterações em anúncios
-- **Catalog**: Mudanças no catálogo
-- **Shipments**: Atualizações de envio
-- **Promotions**: Promoções e ofertas
+#### **Endpoints Disponíveis**
 
-### Configuração de Webhooks
-- Campo obrigatório: "URL de retorno de notificações"
-- URL deve ser válida e configurada para receber notificações
-- Mercado Livre faz solicitações POST para a URL configurada
+##### `POST /functions/v1/ml-sync`
+Sincroniza produtos entre Hub e Mercado Livre
 
-## Principais Endpoints da API
+**Ações Suportadas:**
 
-### Autenticação
-- `/oauth/token`: Geração de tokens de acesso
+```typescript
+// 1. Sincronizar Produto Individual
+{
+  "action": "sync-product",
+  "productId": "uuid",
+  "tenantId": "uuid"
+}
 
-### Usuários
-- `/users/{user_id}`: Informações do usuário
+// 2. Sincronização em Lote  
+{
+  "action": "sync-batch",
+  "productIds": ["uuid1", "uuid2"],
+  "tenantId": "uuid"
+}
 
-### Anúncios (Items)
-- `/items`: CRUD de anúncios
-- `/items/{item_id}`: Detalhes específicos
-- `/items/{item_id}/description`: Gestão de descrições
-- `/categories/{category_id}/attributes`: Atributos por categoria
+// 3. Status de Sincronização
+{
+  "action": "sync-status", 
+  "productId": "uuid",
+  "tenantId": "uuid"
+}
 
-### Pedidos (Orders)
-- `/orders/{order_id}`: Detalhes do pedido
-- `/users/{user_id}/orders/search`: Busca de pedidos
+// 4. Buscar Produtos ML
+{
+  "action": "list-ml-items",
+  "tenantId": "uuid",
+  "limit": 50
+}
+```
 
-### Pagamentos
-- `/mercadopago/payments`: Gestão de pagamentos
+**Fluxo de Sincronização:**
+```mermaid
+graph TD
+    A[Produto Hub] --> B[Validar Dados]
+    B --> C[Mapear Categoria ML]
+    C --> D[Criar/Atualizar Item ML]
+    D --> E[Salvar Mapping]
+    E --> F[Log Resultado]
+    F --> G[Notificar UI]
+```
 
-### Envios
-- `/shipments`: Gestão de envios
+---
 
-### Busca
-- `/sites/{site_id}/search`: Busca de produtos com filtros
+### 📈 **ml-webhook** - Processamento de Vendas
+**Status**: ✅ **Implementado** | **Processamento**: 🔄 Em Desenvolvimento
 
-## Fluxo de Autenticação OAuth
+#### **Webhook Handler**
 
-### Tokens
-- **Access Token**: Usado para chamadas à API (expira em 6 horas)
-- **Refresh Token**: Renovação de access tokens
-- **Client ID** e **Client Secret**: Credenciais da aplicação
+##### `POST /functions/v1/ml-webhook`
+Processa notificações do Mercado Livre (não requer autenticação)
 
-### Processo
-1. Redirecionamento para autorização
-2. Recebimento do código de autorização
-3. Troca do código por tokens
-4. Uso do access token nas chamadas
-5. Renovação via refresh token
+**Tópicos Suportados:**
+- `orders_v2` - Novos pedidos e mudanças de status
+- `items` - Mudanças em anúncios  
+- `payments` - Atualizações de pagamento
+- `questions` - Perguntas sobre produtos
 
-## Gestão de Client Secret
+**Payload Exemplo:**
+```json
+{
+  "resource": "/orders/123456789",
+  "user_id": 987654321,
+  "topic": "orders_v2", 
+  "application_id": 123456,
+  "attempts": 1,
+  "sent": "2025-01-20T15:30:00Z"
+}
+```
 
-### Opções de Renovação
-1. **Renovar Agora**: Renovação imediata
-2. **Programar Renovação**: Agendamento até 7 dias
-3. **Cancelar Renovação**: Cancelamento de renovação programada
+**Processamento:**
+```typescript
+// Fluxo interno do webhook
+export async function processWebhook(payload: WebhookPayload) {
+  // 1. Validar assinatura
+  // 2. Identificar tenant
+  // 3. Buscar dados completos na API ML
+  // 4. Processar conforme tópico
+  // 5. Atualizar dados locais
+  // 6. Log resultado
+}
+```
 
-### Considerações de Segurança
-- Client Secret deve ser mantido em segredo
-- Renovação programada permite preparação dos ambientes
-- Período de transição com 2 secrets válidos
+## 🛠️ Integração Frontend
 
-## Boas Práticas Identificadas
+### **Hooks Recomendados**
 
-### Desenvolvimento
-- Usar ngrok para testes locais de webhooks
-- Marcar todos os escopos inicialmente para acesso amplo
-- Implementar renovação automática de tokens
+```typescript
+// hooks/useMLAuth.ts
+export function useMLAuth() {
+  const { data: profile } = useProfile();
+  
+  return useQuery({
+    queryKey: ['ml-auth', profile?.tenant_id],
+    queryFn: () => MLAuthService.getStatus(profile.tenant_id),
+    enabled: !!profile?.tenant_id,
+    refetchInterval: 5 * 60 * 1000 // 5 minutos
+  });
+}
 
-### Segurança
-- Usar HTTPS obrigatoriamente
-- Implementar validação de webhooks
-- Manter Client Secret seguro
-- Renovar credenciais periodicamente
+// hooks/useMLSync.ts  
+export function useMLSync() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: MLSyncService.syncProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['products']);
+      queryClient.invalidateQueries(['ml-products']);
+      toast.success('Produto sincronizado com ML!');
+    },
+    onError: (error) => {
+      toast.error(`Erro na sincronização: ${error.message}`);
+    }
+  });
+}
+```
 
-### Integração
-- Implementar tratamento de erros robusto
-- Usar refresh tokens para manter autenticação
-- Configurar webhooks para automação
-- Validar dados recebidos via webhooks
+### **Componentes UI**
 
-## Limitações e Considerações
+```typescript
+// components/ml/MLConnectionCard.tsx
+export function MLConnectionCard() {
+  const { data: auth, isLoading } = useMLAuth();
+  const startAuth = useMLAuthStart();
+  
+  if (isLoading) return <MLConnectionSkeleton />;
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Mercado Livre</CardTitle>
+        <MLConnectionBadge status={auth?.connected} />
+      </CardHeader>
+      
+      <CardContent>
+        {auth?.connected ? (
+          <MLConnectedInfo user={auth.user} />
+        ) : (
+          <Button onClick={() => startAuth.mutate()}>
+            Conectar com Mercado Livre
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+```
 
-### Técnicas
-- Access tokens expiram em 6 horas
-- Limite de 1 aplicação em alguns países
-- HTTPS obrigatório para URLs de redirecionamento
+## 🔍 Debugging e Logs
 
-### Funcionais
-- Dependência de conta pessoa jurídica recomendada
-- Validação de dados do titular necessária
-- Configuração adequada de webhooks essencial
+### **Visualizar Logs das Edge Functions**
 
+1. **ML Auth Logs**: Problemas de OAuth
+2. **ML Sync Logs**: Erros de sincronização  
+3. **ML Webhook Logs**: Falhas no processamento
+
+### **Queries de Debug**
+
+```sql
+-- Verificar status das conexões
+SELECT 
+  tenant_id,
+  expires_at,
+  expires_at > now() as is_valid,
+  user_id_ml
+FROM ml_auth_tokens;
+
+-- Logs de sincronização recentes
+SELECT 
+  operation_type,
+  entity_type, 
+  status,
+  error_message,
+  created_at
+FROM ml_sync_log 
+WHERE created_at > now() - interval '1 day'
+ORDER BY created_at DESC;
+
+-- Webhooks não processados
+SELECT 
+  topic,
+  resource, 
+  attempts,
+  created_at
+FROM ml_webhook_events 
+WHERE processed_at IS NULL;
+```
+
+## 🚀 Próximos Passos
+
+### **Em Desenvolvimento**
+- [ ] **Product Mapping Logic**: Mapeamento automático Hub ↔ ML
+- [ ] **Category Sync**: Sincronização de categorias
+- [ ] **Order Processing**: Processamento completo de pedidos  
+- [ ] **Stock Updates**: Atualização automática de estoque
+
+### **Planejado**
+- [ ] **Image Sync**: Sincronização de imagens
+- [ ] **Bulk Operations**: Operações em massa
+- [ ] **Conflict Resolution**: Resolução de conflitos
+- [ ] **Analytics Integration**: Métricas no dashboard
+
+---
+
+> 📖 **Documentação sempre atualizada com implementação real**  
+> 🔗 **Links úteis**: [Supabase Functions](https://supabase.com/dashboard/project/ngkhzbzynkhgezkqykeb/functions) | [ML API Docs](https://developers.mercadolivre.com.br/pt_br/api-docs-pt-br)

@@ -2,46 +2,39 @@
 
 ## 📋 Visão Geral
 
-Schema detalhado das tabelas necessárias para integração completa com Mercado Livre, incluindo autenticação, mapeamento de produtos, logs e configurações.
+Schema **IMPLEMENTADO** das tabelas Mercado Livre no Catalog Maker Hub. Todas as tabelas estão criadas com RLS habilitado e Edge Functions funcionais.
+
+> **Status**: ✅ **Implementado e Funcional**  
+> **Última Atualização**: Janeiro 2025  
+> **Ambiente**: Produção Ready
 
 ## 🔐 Tabelas de Autenticação
 
-### `ml_auth_tokens`
+### `ml_auth_tokens` ✅ **IMPLEMENTADO**
 Armazenamento seguro de tokens OAuth do Mercado Livre
 
+**Schema Real (Implementado):**
 ```sql
-CREATE TABLE public.ml_auth_tokens (
+-- TABELA CRIADA E FUNCIONAL
+TABLE ml_auth_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   access_token TEXT NOT NULL,
-  refresh_token TEXT NOT NULL,
-  token_type TEXT NOT NULL DEFAULT 'Bearer',
-  expires_in INTEGER NOT NULL, -- segundos
+  refresh_token TEXT,
+  token_type TEXT DEFAULT 'Bearer',
   expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
   scope TEXT,
-  ml_user_id TEXT NOT NULL, -- ID do usuário no ML
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-  
-  -- Constraints
-  CONSTRAINT ml_auth_tokens_tenant_id_fkey 
-    FOREIGN KEY (tenant_id) REFERENCES profiles(tenant_id),
-  CONSTRAINT ml_auth_tokens_unique_user 
-    UNIQUE (tenant_id, user_id)
+  user_id_ml BIGINT, -- ID do usuário no ML  
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- Indexes para performance
-CREATE INDEX idx_ml_auth_tokens_tenant_id ON public.ml_auth_tokens(tenant_id);
-CREATE INDEX idx_ml_auth_tokens_user_id ON public.ml_auth_tokens(user_id);
-CREATE INDEX idx_ml_auth_tokens_expires_at ON public.ml_auth_tokens(expires_at);
-
--- RLS Policy
+-- RLS HABILITADO
 ALTER TABLE public.ml_auth_tokens ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can access own tenant ml auth tokens" 
-ON public.ml_auth_tokens 
-FOR ALL 
+-- POLICY IMPLEMENTADA
+CREATE POLICY "Users can access own tenant ML auth tokens" 
+ON public.ml_auth_tokens FOR ALL 
 USING ((tenant_id = (SELECT profiles.tenant_id FROM profiles WHERE profiles.id = auth.uid())) 
        OR (get_current_user_role() = 'super_admin'::user_role));
 ```

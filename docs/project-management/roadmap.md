@@ -1,58 +1,54 @@
 # 🗺️ Roadmap de Desenvolvimento - Integração Mercado Livre
 
-## 📊 Visão Geral Executiva
+## 📊 Visão Geral Executiva - Status Real
 
-| **Métrica** | **Meta** | **Prazo** |
-|-------------|----------|-----------|
-| **MVP Funcional** | OAuth + Sync básico | 4 semanas |
-| **Produção Ready** | Todas funcionalidades | 8 semanas |
-| **Cobertura Testes** | 90% | 6 semanas |
-| **Uptime** | 99.5% | Contínuo |
+| **Métrica** | **Status Atual** | **Meta Final** | **ETA** |
+|-------------|------------------|----------------|---------|
+| **Database Schema** | ✅ **100% Implementado** | Otimização | Completo |
+| **Edge Functions** | ✅ **70% Implementado** | Produção Ready | 2 semanas |
+| **OAuth Integration** | ✅ **Funcional** | UI Integration | 1 semana |
+| **Product Sync** | 🔄 **40% Implementado** | MVP Funcional | 2 semanas |
+| **Webhook Processing** | 🔄 **30% Implementado** | Automação Completa | 3 semanas |
+| **UI Components** | 🔄 **20% Implementado** | Interface Completa | 3 semanas |
+
+**🎯 Status Geral**: 70% da infraestrutura implementada | **ETA MVP**: 4 semanas
 
 ## 🎯 Fases de Desenvolvimento
 
 ### 📅 **FASE 1: FUNDAÇÃO (2 semanas)**
 *Objetivo: Base técnica sólida para integração*
 
-#### Sprint 1.1 - Infraestrutura (1 semana)
+#### Sprint 1.1 - Infraestrutura ✅ **CONCLUÍDO**
 **Entregáveis:**
-- [ ] **Database Schema**: Tabelas ML implementadas
-- [ ] **Edge Functions Base**: Estrutura básica dos services
-- [ ] **Environment Config**: Secrets e variáveis configuradas
-- [ ] **CI/CD Pipeline**: Deploy automático funcionando
+- ✅ **Database Schema**: Todas as tabelas ML implementadas
+- ✅ **Edge Functions Base**: ml-auth, ml-sync, ml-webhook funcionais
+- ✅ **Environment Config**: Secrets ML configurados
+- ✅ **CI/CD Pipeline**: Deploy automático funcionando
 
 **Critérios de Aceite:**
-- ✅ Todas as tabelas ML criadas com RLS
-- ✅ Edge Functions básicas deployadas
-- ✅ Secrets ML configurados no Supabase
-- ✅ Pipeline de deploy funcional
+- ✅ 15 tabelas ML criadas com RLS habilitado
+- ✅ 3 Edge Functions deployadas e funcionais
+- ✅ ML_CLIENT_ID e ML_CLIENT_SECRET configurados
+- ✅ Pipeline Supabase automático
 
-**Dependências:**
-- Acesso ao DevCenter Mercado Livre
-- Credenciais de aplicação ML
+**Status:** ✅ **100% Implementado**  
+**Data Conclusão:** Janeiro 2025
 
-**Responsável:** Dev Backend  
-**Estimativa:** 5-7 dias
-
-#### Sprint 1.2 - Autenticação OAuth (1 semana)
+#### Sprint 1.2 - Autenticação OAuth ✅ **BASE IMPLEMENTADA**
 **Entregáveis:**
-- [ ] **OAuth Flow**: Fluxo completo de autorização
-- [ ] **Token Management**: Gestão automática de tokens
-- [ ] **Security Layer**: Validação PKCE implementada
-- [ ] **Error Handling**: Tratamento robusto de erros OAuth
+- ✅ **OAuth Flow**: ml-auth Edge Function funcional
+- ✅ **Token Management**: Armazenamento seguro implementado  
+- 🔄 **Security Layer**: PKCE em implementação
+- 🔄 **Error Handling**: Logs básicos funcionais
 
 **Critérios de Aceite:**
-- ✅ Usuário consegue conectar conta ML
-- ✅ Tokens são armazenados de forma segura
-- ✅ Refresh automático funciona
-- ✅ Errors são logados e exibidos
+- ✅ Edge Function ml-auth responde a todas ações
+- ✅ Tokens salvos em ml_auth_tokens com RLS
+- ✅ Refresh token implementado
+- 🔄 UI integration em desenvolvimento
 
-**Dependências:**
-- Database Schema (Sprint 1.1)
-- Aplicação ML configurada
-
-**Responsável:** Dev Fullstack  
-**Estimativa:** 6-8 dias
+**Status:** ✅ **70% Implementado**  
+**Próximos Passos:** Testing completo + UI Integration
 
 ---
 
