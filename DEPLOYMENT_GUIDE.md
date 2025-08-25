@@ -169,3 +169,9 @@ Se usando domínio personalizado, configure:
 - Otimize queries se necessário
 - Configure cache quando apropriado
 
+## 8. Checklist Pós-Deploy
+
+- [ ] Domínio configurado e servindo o frontend via HTTPS
+- [ ] Logs do Supabase e do provedor de hospedagem sem erros
+- [ ] Smoke tests executados (login, sincronização com ML e webhooks)
+
