@@ -17,3 +17,14 @@ A integração do Catalog Maker Hub com o Mercado Livre centraliza o gerenciamen
 4. Selecionar os escopos `read`, `write` e `offline_access`.
 5. Registrar a URL de webhooks: `https://peepers-hub.lovable.app/api/webhooks/mercadolivre` com tópicos `items`, `orders_v2`, `payments` e `questions`.
 
+## Variáveis de Ambiente
+
+A integração requer as seguintes variáveis:
+
+- `VITE_ML_CLIENT_ID`: ID da aplicação para uso no frontend.
+- `ML_APP_ID` e `ML_CLIENT_SECRET`: credenciais da aplicação utilizadas nas Edge Functions.
+- `ML_REDIRECT_URL`: URL de redirecionamento configurada no DevCenter.
+- `ML_WEBHOOK_SECRET`: segredo utilizado para validar webhooks.
+
+As variáveis `ML_APP_ID`, `ML_CLIENT_SECRET`, `ML_REDIRECT_URL` e `ML_WEBHOOK_SECRET` devem ser definidas em `supabase/.env` e carregadas como secrets com `supabase secrets set --env-file supabase/.env`.
+
