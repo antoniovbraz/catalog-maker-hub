@@ -1,4 +1,4 @@
-import { Store, Plus, Eye, EyeOff } from '@/components/ui/icons';
+import { Store, Plus, Eye, EyeOff, ExternalLink } from '@/components/ui/icons';
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
 import { MarketplaceHierarchyCard } from "@/components/marketplace/MarketplaceHierarchyCard";
@@ -9,6 +9,8 @@ import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { MarketplaceModalForm } from "@/components/forms/MarketplaceModalForm";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { useCollapsibleSection } from "@/hooks/useCollapsibleSection";
+import { MLConnectionCard } from "@/components/ml/MLConnectionCard";
+import { Link } from "react-router-dom";
 
 const Marketplaces = () => {
   const { data: hierarchicalMarketplaces = [], isLoading } = useMarketplacesHierarchical();
@@ -142,6 +144,27 @@ const Marketplaces = () => {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
+      {/* ML Integration Section */}
+      <div className="xl:col-span-12 mb-6">
+        <div className="rounded-lg border bg-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">Integração Mercado Livre</h3>
+              <p className="text-sm text-muted-foreground">
+                Conecte sua conta para sincronizar produtos automaticamente
+              </p>
+            </div>
+            <Link to="/integrations/mercado-livre">
+              <Button variant="outline">
+                <ExternalLink className="mr-2 size-4" />
+                Gerenciar Integração
+              </Button>
+            </Link>
+          </div>
+          <MLConnectionCard />
+        </div>
+      </div>
+
       <div className="xl:col-span-12">
         <CollapsibleCard
           title="Plataformas e Modalidades"

@@ -24,6 +24,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AssistantsManagement from "./pages/admin/AssistantsManagement";
 import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
+import MLIntegration from "./pages/MLIntegration";
 
 const queryClient = new QueryClient();
 
@@ -148,6 +149,16 @@ const App = () => (
                 <ProtectedRoute>
                   <SharedLayout>
                     <AdGenerator />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/integrations/mercado-livre" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <MLIntegration />
                   </SharedLayout>
                 </ProtectedRoute>
               } 

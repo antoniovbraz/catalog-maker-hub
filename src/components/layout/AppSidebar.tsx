@@ -16,7 +16,8 @@ import {
   Activity,
   ChevronDown,
   ChevronUp,
-  Bot
+  Bot,
+  ExternalLink
 } from '@/components/ui/icons';
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +52,7 @@ const configMenuItems = [
   { id: "shipping", title: "Frete", icon: Truck, path: "/shipping" },
   { id: "commissions", title: "Comissões", icon: Percent, path: "/commissions" },
   { id: "fixed-fees", title: "Taxas Fixas", icon: DollarSign, path: "/fixed-fees" },
+  { id: "ml-integration", title: "Mercado Livre", icon: ExternalLink, path: "/integrations/mercado-livre" },
 ];
 
 const operationsMenuItems = [
