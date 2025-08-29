@@ -41,18 +41,33 @@ serve(async (req) => {
       throw new Error('Invalid authorization token');
     }
 
-    // Get user's tenant_id
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('tenant_id')
-      .eq('id', user.id)
-      .single();
+    // Get user's tenant_id using RPC to bypass RLS
+    console.log('Getting tenant_id for user:', user.id);
+    
+    let tenantId: string;
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    if (profileError || !profile) {
-      throw new Error('User profile not found');
+      if (profileError) {
+        console.error('Profile query error:', profileError);
+        throw new Error(`Profile access error: ${profileError.message}`);
+      }
+
+      if (!profile) {
+        console.error('No profile found for user:', user.id);
+        throw new Error('User profile not found');
+      }
+
+      tenantId = profile.tenant_id;
+      console.log('Successfully retrieved tenant_id:', tenantId);
+    } catch (error) {
+      console.error('Error getting tenant_id:', error);
+      throw new Error(`Failed to get user tenant: ${error.message}`);
     }
-
-    const tenantId = profile.tenant_id;
     const body: AuthRequest = await req.json();
 
     switch (body.action) {
