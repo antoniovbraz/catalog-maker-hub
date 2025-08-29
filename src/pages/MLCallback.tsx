@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMLAuthCallback } from "@/hooks/useMLAuth";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -14,6 +14,8 @@ export default function MLCallback() {
   const state = searchParams.get('state');
   const error = searchParams.get('error');
 
+  const hasMutatedRef = useRef(false);
+
   useEffect(() => {
     if (error) {
       console.error('OAuth Error:', error);
@@ -22,18 +24,21 @@ export default function MLCallback() {
     }
 
     if (code && state) {
-      callbackMutation.mutate(code, {
-        onSuccess: () => {
-          navigate('/integrations/mercado-livre?success=connected');
-        },
-        onError: () => {
-          navigate('/integrations/mercado-livre?error=connection_failed');
-        }
-      });
+      if (!hasMutatedRef.current) {
+        hasMutatedRef.current = true;
+        callbackMutation.mutate(code, {
+          onSuccess: () => {
+            navigate('/integrations/mercado-livre?success=connected');
+          },
+          onError: () => {
+            navigate('/integrations/mercado-livre?error=connection_failed');
+          }
+        });
+      }
     } else {
       navigate('/integrations/mercado-livre?error=invalid_callback');
     }
-  }, [code, state, error, callbackMutation, navigate]);
+  }, [code, state, error, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (error) {
     return (
