@@ -27,47 +27,48 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    const errorResponse = (message: string, status: number) =>
+      new Response(JSON.stringify({ error: message }), {
+        status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+
     // Get authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('Authorization header required');
+      return errorResponse('Authorization header required', 401);
     }
 
     // Verify JWT and get user
     const jwt = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
-    
+
     if (userError || !user) {
-      throw new Error('Invalid authorization token');
+      return errorResponse('Invalid authorization token', 401);
     }
 
     // Get user's tenant_id using RPC to bypass RLS
     console.log('Getting tenant_id for user:', user.id);
-    
-    let tenantId: string;
-    try {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('tenant_id')
-        .eq('id', user.id)
-        .maybeSingle();
 
-      if (profileError) {
-        console.error('Profile query error:', profileError);
-        throw new Error(`Profile access error: ${profileError.message}`);
-      }
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('tenant_id')
+      .eq('id', user.id)
+      .maybeSingle();
 
-      if (!profile) {
-        console.error('No profile found for user:', user.id);
-        throw new Error('User profile not found');
-      }
-
-      tenantId = profile.tenant_id;
-      console.log('Successfully retrieved tenant_id:', tenantId);
-    } catch (error) {
-      console.error('Error getting tenant_id:', error);
-      throw new Error(`Failed to get user tenant: ${error.message}`);
+    if (profileError) {
+      console.error('Profile query error:', profileError);
+      return errorResponse(`Profile access error: ${profileError.message}`, 500);
     }
+
+    if (!profile) {
+      console.error('No profile found for user:', user.id);
+      return errorResponse('User profile not found', 404);
+    }
+
+    const tenantId = profile.tenant_id;
+    console.log('Successfully retrieved tenant_id:', tenantId);
+
     const body: AuthRequest = await req.json();
 
     switch (body.action) {
@@ -90,12 +91,12 @@ serve(async (req) => {
 
       case 'handle_callback': {
         if (!body.code || !body.state) {
-          throw new Error('Missing authorization code or state');
+          return errorResponse('Missing authorization code or state', 400);
         }
 
         // Verify state contains tenant_id
         if (!body.state.startsWith(tenantId)) {
-          throw new Error('Invalid state parameter');
+          return errorResponse('Invalid state parameter', 400);
         }
 
         // Exchange code for access token
@@ -194,11 +195,11 @@ serve(async (req) => {
           .single();
 
         if (tokenError || !currentToken) {
-          throw new Error('No authentication token found');
+          return errorResponse('No authentication token found', 404);
         }
 
         if (!currentToken.refresh_token) {
-          throw new Error('No refresh token available');
+          return errorResponse('No refresh token available', 400);
         }
 
         // Refresh the token
@@ -282,7 +283,7 @@ serve(async (req) => {
       }
 
       default:
-        throw new Error('Invalid action');
+        return errorResponse('Invalid action', 400);
     }
 
   } catch (error) {
