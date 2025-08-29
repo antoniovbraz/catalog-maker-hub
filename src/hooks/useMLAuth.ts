@@ -24,6 +24,14 @@ export function useMLAuth() {
       return data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 0,
+    onError: (error: Error) => {
+      toast({
+        title: "Erro na verificação",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 }
 
