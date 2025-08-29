@@ -37,13 +37,13 @@ export function useMLAuth() {
 
 export function useMLAuthStart() {
   return useMutation({
-    mutationFn: async (): Promise<{ auth_url: string }> => {
-      const { data, error } = await supabase.functions.invoke('ml-auth', {
-        body: { action: 'start_auth' }
-      });
-
-      if (error) throw error;
-      return data;
+    mutationFn: async (): Promise<{ auth_url: string; state: string }> => {
+      const response = await fetch("/api/ml/start", { method: "POST" });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Failed to start auth");
+      }
+      return response.json();
     },
     onSuccess: (data) => {
       // Redirect to ML OAuth

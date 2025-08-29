@@ -59,7 +59,7 @@ export function useMLSyncProducts() {
 
       return data.map(item => ({
         id: item.product_id,
-        name: (item.products as any)?.name || 'Produto',
+        name: (item.products as { name?: string } | null)?.name || 'Produto',
         ml_item_id: item.ml_item_id,
         sync_status: item.sync_status as MLSyncProduct['sync_status'],
         last_sync_at: item.last_sync_at,

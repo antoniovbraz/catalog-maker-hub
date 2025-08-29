@@ -80,6 +80,7 @@ export function MLSyncStatus() {
         <div className="grid grid-cols-2 gap-4">
           {stats.map((stat) => (
             <div key={stat.label} className="flex items-center space-x-3 rounded-lg border p-3">
+              {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
               <div className={`rounded-full p-2 ${stat.color.replace('text-', 'bg-')}/10`}>
                 <stat.icon className={`size-4 ${stat.color}`} />
               </div>
