@@ -25,6 +25,7 @@ import AssistantsManagement from "./pages/admin/AssistantsManagement";
 import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
 import MLIntegration from "./pages/MLIntegration";
+import MLCallback from "./pages/MLCallback";
 
 const queryClient = new QueryClient();
 
@@ -160,6 +161,14 @@ const App = () => (
                   <SharedLayout>
                     <MLIntegration />
                   </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/integrations/mercado-livre/callback" 
+              element={
+                <ProtectedRoute>
+                  <MLCallback />
                 </ProtectedRoute>
               } 
             />

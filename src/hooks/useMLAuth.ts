@@ -56,10 +56,15 @@ export function useMLAuthCallback() {
 
   return useMutation({
     mutationFn: async (code: string): Promise<void> => {
+      // Get current URL parameters to extract state
+      const urlParams = new URLSearchParams(window.location.search);
+      const state = urlParams.get('state');
+
       const { error } = await supabase.functions.invoke('ml-auth', {
         body: { 
           action: 'handle_callback',
-          code
+          code,
+          state
         }
       });
 

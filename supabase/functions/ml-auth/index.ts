@@ -58,7 +58,7 @@ serve(async (req) => {
     switch (body.action) {
       case 'start_auth': {
         // Generate OAuth URL for Mercado Livre
-        const redirectUri = `${req.url.replace('/functions/v1/ml-auth', '')}/api/ml/callback`;
+        const redirectUri = Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
         const state = `${tenantId}_${Date.now()}`;
         
         const authUrl = new URL('https://auth.mercadolivre.com.br/authorization');
@@ -95,7 +95,7 @@ serve(async (req) => {
             client_id: mlClientId,
             client_secret: mlClientSecret,
             code: body.code,
-            redirect_uri: `${req.url.replace('/functions/v1/ml-auth', '')}/api/ml/callback`,
+            redirect_uri: Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback',
           }),
         });
 

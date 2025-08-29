@@ -4,9 +4,49 @@ import { MLSyncStatus } from "@/components/ml/MLSyncStatus";
 import { MLProductList } from "@/components/ml/MLProductList";
 import { ExternalLink } from "@/components/ui/icons";
 import { useMLAuth } from "@/hooks/useMLAuth";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const MLIntegration = () => {
   const { data: authStatus } = useMLAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle callback success/error messages
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const error = searchParams.get('error');
+
+    if (success === 'connected') {
+      toast({
+        title: "Sucesso!",
+        description: "Conta do Mercado Livre conectada com sucesso!",
+      });
+      setSearchParams({}); // Clear URL parameters
+    }
+
+    if (error) {
+      let errorMessage = "Erro ao conectar com o Mercado Livre";
+      switch (error) {
+        case 'oauth_failed':
+          errorMessage = "Falha na autorização OAuth";
+          break;
+        case 'connection_failed':
+          errorMessage = "Falha na conexão com o Mercado Livre";
+          break;
+        case 'invalid_callback':
+          errorMessage = "Parâmetros de callback inválidos";
+          break;
+      }
+      
+      toast({
+        title: "Erro na Conexão",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setSearchParams({}); // Clear URL parameters
+    }
+  }, [searchParams, setSearchParams]);
 
   const breadcrumbs = [
     { label: "Configurações", href: "/dashboard" },
