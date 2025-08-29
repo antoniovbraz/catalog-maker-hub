@@ -128,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout)
       subscription.unsubscribe()
     }
-  }, [])
+  }, [logger])
 
   const signIn = async (email: string, password: string) => {
     try {
