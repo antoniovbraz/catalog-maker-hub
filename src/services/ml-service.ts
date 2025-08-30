@@ -29,6 +29,11 @@ export interface MLSyncProduct {
   error_message?: string | null;
 }
 
+export interface MLBatchSyncResult {
+  successful: number;
+  failed: number;
+}
+
 export interface MLAuthStatus {
   isConnected: boolean;
   user_id_ml?: number;
@@ -181,7 +186,7 @@ export class MLService {
     }
   }
 
-  static async syncBatch(productIds: string[]): Promise<{ successful: number; failed: number; }> {
+  static async syncBatch(productIds: string[]): Promise<MLBatchSyncResult> {
     const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
       body: { action: 'sync_batch', product_ids: productIds }
     });
@@ -190,7 +195,10 @@ export class MLService {
       throw new Error(error.message || 'Failed to sync products in batch');
     }
 
-    return { successful: productIds.length, failed: 0 };
+    return {
+      successful: data?.successful ?? 0,
+      failed: data?.failed ?? 0
+    };
   }
 
   static async importFromML(): Promise<{ imported: number; items: any[] }> {
