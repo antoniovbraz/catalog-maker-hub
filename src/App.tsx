@@ -3,8 +3,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts/AuthProvider";
 import { ModalProvider } from "@/contexts/ModalContext";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { GlobalModalRenderer } from "@/components/modals";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SharedLayout } from "@/components/layout/SharedLayout";
@@ -30,23 +31,29 @@ import MLCallback from "./pages/MLCallback";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutos
-      retry: 1, // Reduzir retries
-      refetchOnWindowFocus: false, // Não revalidar no foco
-      refetchOnMount: false, // Não revalidar no mount se já tem dados
+      staleTime: 10 * 60 * 1000, // 10 minutos para evitar requests excessivos
+      retry: false, // Completamente desabilitar retry automático
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false, // Desabilitar polling automático
+    },
+    mutations: {
+      retry: false, // Também desabilitar retry em mutations
     },
   },
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <AuthProvider>
-            <ModalProvider>
-              <GlobalModalRenderer />
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <AuthProvider>
+              <ModalProvider>
+                <GlobalModalRenderer />
             <Routes>
             {/* Auth route - now inside AuthProvider context */}
             <Route path="/auth" element={<Auth />} />
@@ -219,12 +226,13 @@ const App = () => (
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-            </ModalProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+              </ModalProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

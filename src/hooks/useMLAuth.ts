@@ -15,37 +15,66 @@ export const ML_AUTH_QUERY_KEY = "ml-auth";
 
 export function useMLAuth() {
   const errorShownRef = useRef(false);
+  const lastErrorTime = useRef(0);
+  const errorCount = useRef(0);
   
   const query = useQuery({
     queryKey: [ML_AUTH_QUERY_KEY],
     queryFn: async (): Promise<MLAuthStatus> => {
+      // Circuit breaker: Se muitos erros consecutivos, parar tentativas
+      if (errorCount.current > 3) {
+        const timeSinceLastError = Date.now() - lastErrorTime.current;
+        if (timeSinceLastError < 60000) { // 1 minuto de cooldown
+          throw new Error('Muitas tentativas falhas. Aguarde antes de tentar novamente.');
+        } else {
+          errorCount.current = 0; // Reset após cooldown
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('ml-auth', {
         body: { action: 'get_status' }
       });
 
-      if (error) throw error;
+      if (error) {
+        errorCount.current++;
+        lastErrorTime.current = Date.now();
+        throw error;
+      }
+      
+      // Reset error count em caso de sucesso
+      errorCount.current = 0;
       return data;
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes - aumentar staleTime
-    retry: false, // Desabilitar retry automático
-    refetchOnWindowFocus: false, // Não revalidar no foco
-    refetchOnMount: false, // Não revalidar no mount se já tem dados
+    staleTime: 15 * 60 * 1000, // 15 minutos - aumentar ainda mais
+    retry: false, // Completamente desabilitar retry automático
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false, // Não tentar reconectar automaticamente
+    enabled: errorCount.current <= 3, // Desabilitar query se muitos erros
   });
 
-  // Handle errors with useEffect to prevent render loops
+  // Handle errors with debounce e circuit breaker
   useEffect(() => {
     if (query.error && !errorShownRef.current) {
-      errorShownRef.current = true;
-      toast({
-        title: "Erro na verificação ML",
-        description: query.error.message,
-        variant: "destructive",
-      });
+      const now = Date.now();
       
-      // Reset after some time to allow new errors
-      setTimeout(() => {
-        errorShownRef.current = false;
-      }, 30000);
+      // Debounce: Só mostrar erro se passou tempo suficiente
+      if (now - lastErrorTime.current > 5000) {
+        errorShownRef.current = true;
+        
+        toast({
+          title: "Erro na verificação ML",
+          description: errorCount.current > 3 
+            ? "Muitas tentativas falhas. Sistema em pausa." 
+            : query.error.message,
+          variant: "destructive",
+        });
+        
+        // Reset após tempo maior para evitar spam
+        setTimeout(() => {
+          errorShownRef.current = false;
+        }, 60000); // 1 minuto
+      }
     }
   }, [query.error]);
 
