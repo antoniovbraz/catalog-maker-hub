@@ -162,3 +162,44 @@ export function useMLImportProducts() {
     },
   });
 }
+
+export function useMLCreateAd() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { 
+      product_id: string;
+      title: string;
+      description: string;
+      price: number;
+      available_quantity: number;
+      listing_type: string;
+      condition: string;
+      category_id?: string;
+    }): Promise<void> => {
+      const { error } = await supabase.functions.invoke('ml-sync', {
+        body: { 
+          action: 'create_ad',
+          ...data
+        }
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ML_SYNC_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: "Anúncio Criado",
+        description: "Anúncio foi criado no Mercado Livre com sucesso",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao Criar Anúncio",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}

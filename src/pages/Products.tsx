@@ -11,6 +11,7 @@ import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useMLImportProducts } from "@/hooks/useMLSync";
+import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
@@ -124,11 +125,89 @@ export default function Products() {
     });
   };
 
+  const handleAdvertiseOnML = (product: ProductWithCategory) => {
+    let submitForm: (() => Promise<void>) | null = null;
+
+    showFormModal({
+      title: "Anunciar no Mercado Livre",
+      description: `Criar anúncio para "${product.name}"`,
+      content: (
+        <MLAdvertiseModal
+          product={product}
+          onSuccess={() => {}}
+          onSubmitForm={(fn) => {
+            submitForm = fn;
+          }}
+        />
+      ),
+      onSave: async () => {
+        if (submitForm) await submitForm();
+      },
+      size: "lg",
+    });
+  };
+
+  const getActionsForProduct = (product: ProductWithCategory): DataAction<ProductWithCategory>[] => {
+    const baseActions: DataAction<ProductWithCategory>[] = [
+      {
+        label: "Editar",
+        icon: <Edit className="size-4" />,
+        onClick: (product) => handleEdit(product),
+      }
+    ];
+
+    // Ações condicionais baseadas na origem
+    if (product.source === 'manual') {
+      baseActions.push({
+        label: "Anunciar no ML",
+        icon: <Tag className="size-4" />,
+        onClick: (product) => handleAdvertiseOnML(product),
+        variant: "default",
+      });
+    } else if (product.source === 'mercado_livre') {
+      baseActions.push({
+        label: "Ver no ML",
+        icon: <Package className="size-4" />,
+        onClick: (product) => {
+          // TODO: Abrir link do ML
+          console.log('View on ML:', product);
+        },
+        variant: "outline",
+      });
+    }
+
+    baseActions.push({
+      label: "Excluir",
+      icon: <Trash2 className="size-4" />,
+      onClick: (product) => handleDelete(product),
+      variant: "destructive",
+    });
+
+    return baseActions;
+  };
+
   const actions: DataAction<ProductWithCategory>[] = [
     {
       label: "Editar",
       icon: <Edit className="size-4" />,
       onClick: (product) => handleEdit(product),
+    },
+    {
+      label: "Anunciar no ML",
+      icon: <Tag className="size-4" />,
+      onClick: (product) => handleAdvertiseOnML(product),
+      variant: "default",
+      disabled: (product) => product.source !== 'manual',
+    },
+    {
+      label: "Ver no ML",
+      icon: <Package className="size-4" />,
+      onClick: (product) => {
+        // TODO: Abrir link do ML
+        console.log('View on ML:', product);
+      },
+      variant: "outline",
+      disabled: (product) => product.source !== 'mercado_livre',
     },
     {
       label: "Excluir",
