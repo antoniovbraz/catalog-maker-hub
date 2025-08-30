@@ -351,6 +351,50 @@ export type Database = {
         }
         Relationships: []
       }
+      ml_categories: {
+        Row: {
+          auto_mapped: boolean | null
+          created_at: string | null
+          id: string
+          local_category_id: string | null
+          ml_category_id: string
+          ml_category_name: string
+          ml_path_from_root: Json | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          auto_mapped?: boolean | null
+          created_at?: string | null
+          id?: string
+          local_category_id?: string | null
+          ml_category_id: string
+          ml_category_name: string
+          ml_path_from_root?: Json | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          auto_mapped?: boolean | null
+          created_at?: string | null
+          id?: string
+          local_category_id?: string | null
+          ml_category_id?: string
+          ml_category_name?: string
+          ml_path_from_root?: Json | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ml_categories_local_category_id_fkey"
+            columns: ["local_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ml_category_mapping: {
         Row: {
           attributes_template: Json | null
@@ -767,11 +811,21 @@ export type Database = {
       }
       products: {
         Row: {
+          brand: string | null
           category_id: string | null
           cost_unit: number
           created_at: string
           description: string | null
+          dimensions: Json | null
           id: string
+          ml_attributes: Json | null
+          ml_available_quantity: number | null
+          ml_pictures: Json | null
+          ml_seller_sku: string | null
+          ml_sold_quantity: number | null
+          ml_stock_quantity: number | null
+          ml_variation_id: string | null
+          model: string | null
           name: string
           packaging_cost: number | null
           sku: string | null
@@ -779,13 +833,25 @@ export type Database = {
           tax_rate: number | null
           tenant_id: string | null
           updated_at: string
+          warranty: string | null
+          weight: number | null
         }
         Insert: {
+          brand?: string | null
           category_id?: string | null
           cost_unit: number
           created_at?: string
           description?: string | null
+          dimensions?: Json | null
           id?: string
+          ml_attributes?: Json | null
+          ml_available_quantity?: number | null
+          ml_pictures?: Json | null
+          ml_seller_sku?: string | null
+          ml_sold_quantity?: number | null
+          ml_stock_quantity?: number | null
+          ml_variation_id?: string | null
+          model?: string | null
           name: string
           packaging_cost?: number | null
           sku?: string | null
@@ -793,13 +859,25 @@ export type Database = {
           tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
+          warranty?: string | null
+          weight?: number | null
         }
         Update: {
+          brand?: string | null
           category_id?: string | null
           cost_unit?: number
           created_at?: string
           description?: string | null
+          dimensions?: Json | null
           id?: string
+          ml_attributes?: Json | null
+          ml_available_quantity?: number | null
+          ml_pictures?: Json | null
+          ml_seller_sku?: string | null
+          ml_sold_quantity?: number | null
+          ml_stock_quantity?: number | null
+          ml_variation_id?: string | null
+          model?: string | null
           name?: string
           packaging_cost?: number | null
           sku?: string | null
@@ -807,6 +885,8 @@ export type Database = {
           tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
+          warranty?: string | null
+          weight?: number | null
         }
         Relationships: [
           {

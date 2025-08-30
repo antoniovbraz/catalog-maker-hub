@@ -12,6 +12,19 @@ export interface ProductType {
   source: 'manual' | 'mercado_livre' | 'shopee';
   created_at: string;
   updated_at: string;
+  // Novos campos ML
+  ml_stock_quantity?: number;
+  ml_attributes?: any;
+  dimensions?: any;
+  weight?: number;
+  warranty?: string;
+  brand?: string;
+  model?: string;
+  ml_seller_sku?: string;
+  ml_available_quantity?: number;
+  ml_sold_quantity?: number;
+  ml_variation_id?: string;
+  ml_pictures?: any[];
 }
 
 export interface ProductWithCategory extends ProductType {

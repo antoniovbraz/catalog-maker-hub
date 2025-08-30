@@ -232,35 +232,153 @@ serve(async (req) => {
               continue;
             }
 
-            // Extract category ID if available
-            let categoryId = null;
+            // Get item description separately
+            let fullDescription = '';
+            try {
+              const descResponse = await fetch(`https://api.mercadolibre.com/items/${itemId}/description`, {
+                headers: { 'Authorization': `Bearer ${authToken.access_token}` },
+              });
+              if (descResponse.ok) {
+                const descData = await descResponse.json();
+                fullDescription = descData.plain_text || descData.text || '';
+              }
+            } catch (error) {
+              console.log(`Could not fetch description for ${itemId}:`, error);
+            }
+
+            // Get category details
+            let categoryName = '';
+            let categoryPath = [];
             if (itemDetail.category_id) {
-              // Try to find matching local category (simplified - you might want more sophisticated mapping)
-              const { data: category } = await supabase
-                .from('categories')
-                .select('id')
-                .eq('tenant_id', tenantId)
-                .ilike('name', `%${itemDetail.category_id}%`)
-                .maybeSingle();
-              
-              if (category) {
-                categoryId = category.id;
+              try {
+                const catResponse = await fetch(`https://api.mercadolibre.com/categories/${itemDetail.category_id}`, {
+                  headers: { 'Authorization': `Bearer ${authToken.access_token}` },
+                });
+                if (catResponse.ok) {
+                  const catData = await catResponse.json();
+                  categoryName = catData.name;
+                  categoryPath = catData.path_from_root || [];
+                }
+              } catch (error) {
+                console.log(`Could not fetch category for ${itemDetail.category_id}:`, error);
               }
             }
 
-            // Create local product
+            // Process and create ML category mapping
+            let categoryId = null;
+            if (itemDetail.category_id && categoryName) {
+              // Save/update ML category mapping
+              const { data: mlCategory, error: mlCatError } = await supabase
+                .from('ml_categories')
+                .upsert({
+                  tenant_id: tenantId,
+                  ml_category_id: itemDetail.category_id,
+                  ml_category_name: categoryName,
+                  ml_path_from_root: categoryPath,
+                  auto_mapped: true
+                })
+                .select()
+                .single();
+
+              if (!mlCatError && mlCategory) {
+                // Try to find/create matching local category
+                let localCategory = await supabase
+                  .from('categories')
+                  .select('id')
+                  .eq('tenant_id', tenantId)
+                  .ilike('name', `%${categoryName}%`)
+                  .maybeSingle();
+
+                // If no match found, create new local category
+                if (!localCategory.data) {
+                  const { data: newCategory } = await supabase
+                    .from('categories')
+                    .insert({
+                      tenant_id: tenantId,
+                      name: categoryName,
+                      description: `Categoria auto-criada do ML: ${itemDetail.category_id}`
+                    })
+                    .select()
+                    .single();
+                  
+                  if (newCategory) {
+                    categoryId = newCategory.id;
+                    
+                    // Update ML category mapping with local category
+                    await supabase
+                      .from('ml_categories')
+                      .update({ local_category_id: categoryId })
+                      .eq('id', mlCategory.id);
+                  }
+                } else {
+                  categoryId = localCategory.data.id;
+                  
+                  // Update ML category mapping with local category
+                  await supabase
+                    .from('ml_categories')
+                    .update({ local_category_id: categoryId })
+                    .eq('id', mlCategory.id);
+                }
+              }
+            }
+
+            // Extract attributes and specific product data
+            const attributes = itemDetail.attributes || [];
+            const brand = attributes.find(attr => attr.id === 'BRAND')?.value_name || '';
+            const model = attributes.find(attr => attr.id === 'MODEL')?.value_name || '';
+            
+            // Extract dimensions
+            const dimensions = {};
+            const width = attributes.find(attr => attr.id === 'WIDTH')?.value_name;
+            const height = attributes.find(attr => attr.id === 'HEIGHT')?.value_name;  
+            const depth = attributes.find(attr => attr.id === 'DEPTH')?.value_name;
+            const length = attributes.find(attr => attr.id === 'LENGTH')?.value_name;
+            
+            if (width) dimensions.width = width;
+            if (height) dimensions.height = height;
+            if (depth) dimensions.depth = depth;
+            if (length) dimensions.length = length;
+
+            // Extract weight
+            const weightAttr = attributes.find(attr => attr.id === 'WEIGHT');
+            const weight = weightAttr ? parseFloat(weightAttr.value_name) || 0 : 0;
+
+            // Extract warranty
+            const warrantyAttr = attributes.find(attr => attr.id === 'WARRANTY');
+            const warranty = warrantyAttr ? warrantyAttr.value_name : '';
+
+            // Extract SKU from multiple sources
+            let sku = itemDetail.seller_custom_field || 
+                     itemDetail.seller_sku || 
+                     attributes.find(attr => attr.id === 'SELLER_SKU')?.value_name ||
+                     `ML-${itemId}`;
+
+            // Create local product with all data
             const { data: newProduct, error: productError } = await supabase
               .from('products')
               .insert({
                 tenant_id: tenantId,
                 name: itemDetail.title,
-                description: itemDetail.descriptions?.[0]?.plain_text || null,
-                sku: itemDetail.seller_custom_field || null,
+                description: fullDescription || itemDetail.description || '',
+                sku: sku,
                 category_id: categoryId,
                 cost_unit: itemDetail.price * 0.7, // Estimate 70% of sale price as cost
                 packaging_cost: 0,
                 tax_rate: 0,
-                source: 'mercado_livre'
+                source: 'mercado_livre',
+                // New ML-specific fields
+                ml_stock_quantity: itemDetail.available_quantity || 0,
+                ml_attributes: attributes,
+                dimensions: dimensions,
+                weight: weight,
+                warranty: warranty,
+                brand: brand,
+                model: model,
+                ml_seller_sku: itemDetail.seller_sku || '',
+                ml_available_quantity: itemDetail.available_quantity || 0,
+                ml_sold_quantity: itemDetail.sold_quantity || 0,
+                ml_variation_id: itemDetail.variation_id || null,
+                ml_pictures: itemDetail.pictures || []
               })
               .select()
               .single();
@@ -301,6 +419,32 @@ serve(async (req) => {
             }
 
             console.log(`Created mapping for ML item ${itemId}`);
+
+            // Save product images
+            if (itemDetail.pictures && itemDetail.pictures.length > 0) {
+              try {
+                const imageInserts = itemDetail.pictures.map((picture, index) => ({
+                  tenant_id: tenantId,
+                  product_id: newProduct.id,
+                  image_url: picture.secure_url || picture.url,
+                  sort_order: index,
+                  image_type: 'product'
+                }));
+
+                const { error: imageError } = await supabase
+                  .from('product_images')
+                  .insert(imageInserts);
+
+                if (imageError) {
+                  console.error(`Failed to save images for item ${itemId}:`, imageError);
+                } else {
+                  console.log(`Saved ${itemDetail.pictures.length} images for item ${itemId}`);
+                }
+              } catch (imageError) {
+                console.error(`Error saving images for item ${itemId}:`, imageError);
+              }
+            }
+
             importedCount++;
 
           } catch (error) {
