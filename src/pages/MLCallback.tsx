@@ -19,7 +19,7 @@ export default function MLCallback() {
   useEffect(() => {
     if (error) {
       console.error('OAuth Error:', error);
-      navigate('/integrations/mercado-livre?error=oauth_failed');
+      navigate(`/integrations/mercado-livre?error=${encodeURIComponent(error)}`);
       return;
     }
 
@@ -30,8 +30,8 @@ export default function MLCallback() {
           onSuccess: () => {
             navigate('/integrations/mercado-livre?success=connected');
           },
-          onError: () => {
-            navigate('/integrations/mercado-livre?error=connection_failed');
+          onError: (err: Error) => {
+            navigate(`/integrations/mercado-livre?error=${encodeURIComponent(err.message)}`);
           }
         });
       }
@@ -42,12 +42,12 @@ export default function MLCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center space-y-4 p-6">
             <AlertCircle className="size-12 text-destructive" />
             <div className="text-center">
-              <h2 className="text-lg font-semibold text-foreground mb-2">
+              <h2 className="mb-2 text-lg font-semibold text-foreground">
                 Erro na Conexão
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -62,12 +62,12 @@ export default function MLCallback() {
 
   if (callbackMutation.isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center space-y-4 p-6">
             <CheckCircle2 className="size-12 text-success" />
             <div className="text-center">
-              <h2 className="text-lg font-semibold text-foreground mb-2">
+              <h2 className="mb-2 text-lg font-semibold text-foreground">
                 Conexão Realizada!
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -81,12 +81,12 @@ export default function MLCallback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col items-center space-y-4 p-6">
           <LoadingSpinner size="lg" />
           <div className="text-center">
-            <h2 className="text-lg font-semibold text-foreground mb-2">
+            <h2 className="mb-2 text-lg font-semibold text-foreground">
               Conectando...
             </h2>
             <p className="text-sm text-muted-foreground">

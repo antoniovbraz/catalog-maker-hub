@@ -39,11 +39,13 @@ export function useMLAuthStart() {
   return useMutation({
     mutationFn: async (): Promise<{ auth_url: string; state: string }> => {
       const response = await fetch("/api/ml/start", { method: "POST" });
+      const data = await response.json().catch(() => null);
+
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || "Failed to start auth");
+        throw new Error(data?.error || data?.message || "Failed to start auth");
       }
-      return response.json();
+
+      return data;
     },
     onSuccess: (data) => {
       // Redirect to ML OAuth
@@ -74,11 +76,12 @@ export function useMLAuthCallback() {
         headers: { 'Content-Type': 'application/json' }
       });
 
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || 'Failed to handle callback');
+        throw new Error(data?.error || data?.message || 'Failed to handle callback');
       }
     },
+    retry: 0,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ML_AUTH_QUERY_KEY] });
       toast({
