@@ -28,6 +28,7 @@ import AdGenerator from "./pages/AdGenerator";
 import MLIntegration from "./pages/MLIntegration";
 import MLCallback from "./pages/MLCallback";
 import MLDashboard from "./pages/MLDashboard";
+import { MLDashboardModern } from "./components/ml/MLDashboardModern";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -194,6 +195,16 @@ const App = () => (
             />
             <Route 
               path="/ml-dashboard" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <MLDashboardModern />
+                  </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ml-dashboard-legacy" 
               element={
                 <ProtectedRoute>
                   <SharedLayout>
