@@ -1,15 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ExternalLink, RefreshCw, AlertCircle, CheckCircle2 } from "@/components/ui/icons";
+import { Loader2, ExternalLink, RefreshCw, AlertCircle, CheckCircle2, Unlink } from "@/components/ui/icons";
 import { useMLAuth, useMLAuthStart, useMLAuthRefresh } from "@/hooks/useMLAuth";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { useMLAuthDisconnect } from "@/hooks/useMLAuthDisconnect";
+import { useState } from "react";
 
 export function MLConnectionCard() {
   const { data: authStatus, isLoading, refetch } = useMLAuth();
   const startAuthMutation = useMLAuthStart();
   const refreshMutation = useMLAuthRefresh();
+  const disconnectMutation = useMLAuthDisconnect();
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
 
   const handleConnect = () => {
     startAuthMutation.mutate();
@@ -17,6 +19,11 @@ export function MLConnectionCard() {
 
   const handleRefresh = () => {
     refreshMutation.mutate();
+  };
+
+  const handleDisconnect = () => {
+    disconnectMutation.mutate();
+    setShowDisconnectConfirm(false);
   };
 
   const getStatusIcon = () => {
@@ -27,8 +34,8 @@ export function MLConnectionCard() {
 
   const getStatusBadge = () => {
     if (isLoading) return <Badge variant="secondary">Verificando...</Badge>;
-    if (authStatus?.connected) return <Badge className="bg-success text-success-foreground">Conectado</Badge>;
-    return <Badge variant="destructive">Desconectado</Badge>;
+    if (authStatus?.connected) return <Badge className="bg-success text-success-foreground">🟢 Conectado</Badge>;
+    return <Badge variant="destructive">🔴 Desconectado</Badge>;
   };
 
   const isTokenExpired = authStatus?.expires_at ? 
@@ -54,46 +61,62 @@ export function MLConnectionCard() {
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Nome da Loja:</span>
-              <span className="font-semibold">{authStatus.ml_nickname || authStatus.user_id_ml}</span>
+              <span className="font-semibold">
+                {authStatus.ml_nickname || 
+                 (authStatus.user_id_ml ? `Loja #${authStatus.user_id_ml}` : 'Carregando...')}
+              </span>
             </div>
             
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Token expira em:</span>
-              <span className={isTokenExpired ? "text-destructive" : "text-foreground"}>
-                {authStatus.expires_at ? 
-                  formatDistanceToNow(new Date(authStatus.expires_at), { 
-                    addSuffix: true, 
-                    locale: ptBR 
-                  }) : 'N/A'
-                }
+              <span className="text-muted-foreground">Status do Sistema:</span>
+              <span className="text-success font-medium">
+                🔄 Renovação Automática Ativa
               </span>
             </div>
 
-            <div className="flex gap-2 pt-2">
-              {isTokenExpired && (
-                <Button 
-                  onClick={handleRefresh}
-                  disabled={refreshMutation.isPending}
-                  variant="outline"
-                  size="sm"
-                >
-                  {refreshMutation.isPending ? (
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="mr-2 size-4" />
-                  )}
-                  Renovar Token
-                </Button>
-              )}
-              
+            <div className="flex gap-2 pt-4">
               <Button 
                 onClick={() => refetch()}
-                variant="ghost"
+                variant="outline"
                 size="sm"
+                className="flex-1"
               >
                 <RefreshCw className="mr-2 size-4" />
                 Verificar Status
               </Button>
+              
+              {!showDisconnectConfirm ? (
+                <Button 
+                  onClick={() => setShowDisconnectConfirm(true)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Unlink className="mr-2 size-4" />
+                  Desconectar
+                </Button>
+              ) : (
+                <div className="flex gap-1">
+                  <Button 
+                    onClick={handleDisconnect}
+                    disabled={disconnectMutation.isPending}
+                    variant="destructive"
+                    size="sm"
+                  >
+                    {disconnectMutation.isPending ? (
+                      <Loader2 className="mr-1 size-3 animate-spin" />
+                    ) : null}
+                    Confirmar
+                  </Button>
+                  <Button 
+                    onClick={() => setShowDisconnectConfirm(false)}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         ) : (

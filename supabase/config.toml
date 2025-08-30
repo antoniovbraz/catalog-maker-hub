@@ -45,5 +45,8 @@ verify_jwt = true
 [functions.ml-sync]
 verify_jwt = true
 
+[functions.ml-token-renewal]
+verify_jwt = false
+
 [functions.ml-webhook]
 verify_jwt = false

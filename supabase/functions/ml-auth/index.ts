@@ -453,15 +453,73 @@ serve(async (req) => {
         const isExpired = new Date(token.expires_at) <= new Date();
         const status = isExpired ? 'expired' : 'connected';
 
+        // Auto-recuperação de nickname se estiver NULL
+        let nickname = token.ml_nickname;
+        if (!nickname && token.access_token && !isExpired) {
+          try {
+            console.log('Auto-recuperando ml_nickname para tenant:', tenantId);
+            
+            const mlUserResponse = await fetch('https://api.mercadolibre.com/users/me', {
+              headers: {
+                'Authorization': `Bearer ${token.access_token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (mlUserResponse.ok) {
+              const mlUser = await mlUserResponse.json();
+              nickname = mlUser.nickname;
+              
+              // Atualizar no banco
+              await supabase
+                .from('ml_auth_tokens')
+                .update({ ml_nickname: nickname })
+                .eq('tenant_id', tenantId);
+                
+              console.log('Nickname recuperado e atualizado:', nickname);
+            }
+          } catch (error) {
+            console.error('Erro na auto-recuperação do nickname:', error);
+          }
+        }
+
         return new Response(
           JSON.stringify({ 
             connected: !isExpired,
             status,
             expires_at: token.expires_at,
             user_id_ml: token.user_id_ml,
-            ml_nickname: token.ml_nickname,
+            ml_nickname: nickname,
             scope: token.scope
           }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      case 'disconnect': {
+        // Desconectar/remover tokens do ML
+        console.log('Disconnecting ML for tenant:', tenantId);
+
+        const { error: deleteError } = await supabase
+          .from('ml_auth_tokens')
+          .delete()
+          .eq('tenant_id', tenantId);
+
+        if (deleteError) {
+          return errorResponse('Failed to disconnect', 500);
+        }
+
+        // Log da desconexão
+        await supabase.from('ml_sync_log').insert({
+          tenant_id: tenantId,
+          operation_type: 'disconnect',
+          entity_type: 'auth',
+          status: 'success',
+          response_data: { disconnected_at: new Date().toISOString() }
+        });
+
+        return new Response(
+          JSON.stringify({ success: true }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
