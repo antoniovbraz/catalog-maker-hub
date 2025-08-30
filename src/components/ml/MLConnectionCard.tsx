@@ -102,9 +102,11 @@ export function MLConnectionCard() {
               Conecte sua conta do Mercado Livre para sincronizar produtos e gerenciar vendas automaticamente.
             </p>
             
-            {authStatus?.error && (
+            {(authStatus?.error || startAuthMutation.error) && (
               <div className="rounded-md bg-destructive/10 p-3">
-                <p className="text-sm text-destructive">{authStatus.error}</p>
+                <p className="text-sm text-destructive">
+                  {authStatus?.error || (startAuthMutation.error as Error).message}
+                </p>
               </div>
             )}
             
