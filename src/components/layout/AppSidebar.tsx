@@ -53,6 +53,7 @@ const configMenuItems = [
   { id: "commissions", title: "Comissões", icon: Percent, path: "/commissions" },
   { id: "fixed-fees", title: "Taxas Fixas", icon: DollarSign, path: "/fixed-fees" },
   { id: "ml-integration", title: "Mercado Livre", icon: ExternalLink, path: "/integrations/mercado-livre" },
+  { id: "ml-dashboard", title: "ML Dashboard", icon: Activity, path: "/ml-dashboard" },
 ];
 
 const operationsMenuItems = [

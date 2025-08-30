@@ -27,6 +27,7 @@ import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
 import MLIntegration from "./pages/MLIntegration";
 import MLCallback from "./pages/MLCallback";
+import MLDashboard from "./pages/MLDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -188,6 +189,16 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MLCallback />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ml-dashboard" 
+              element={
+                <ProtectedRoute>
+                  <SharedLayout>
+                    <MLDashboard />
+                  </SharedLayout>
                 </ProtectedRoute>
               } 
             />
