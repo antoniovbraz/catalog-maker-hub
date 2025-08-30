@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 export interface MLAuthStatus {
   connected: boolean;
   user_id_ml?: number;
+  ml_nickname?: string;
   access_token?: string;
   expires_at?: string;
   error?: string;

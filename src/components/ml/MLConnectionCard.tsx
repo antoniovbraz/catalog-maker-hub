@@ -53,8 +53,8 @@ export function MLConnectionCard() {
         {authStatus?.connected ? (
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">ID do Usuário ML:</span>
-              <span className="font-mono">{authStatus.user_id_ml}</span>
+              <span className="text-muted-foreground">Nome da Loja:</span>
+              <span className="font-semibold">{authStatus.ml_nickname || authStatus.user_id_ml}</span>
             </div>
             
             <div className="flex items-center justify-between text-sm">

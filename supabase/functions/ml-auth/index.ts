@@ -283,6 +283,7 @@ serve(async (req) => {
               expires_at: expiresAt.toISOString(),
               scope: tokenData.scope,
               user_id_ml: mlUser.id,
+              ml_nickname: mlUser.nickname,
             }, {
               onConflict: 'tenant_id',
             });
@@ -458,6 +459,7 @@ serve(async (req) => {
             status,
             expires_at: token.expires_at,
             user_id_ml: token.user_id_ml,
+            ml_nickname: token.ml_nickname,
             scope: token.scope
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

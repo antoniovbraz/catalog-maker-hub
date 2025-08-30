@@ -273,6 +273,7 @@ export type Database = {
           created_at: string | null
           expires_at: string
           id: string
+          ml_nickname: string | null
           refresh_token: string | null
           scope: string | null
           tenant_id: string
@@ -285,6 +286,7 @@ export type Database = {
           created_at?: string | null
           expires_at: string
           id?: string
+          ml_nickname?: string | null
           refresh_token?: string | null
           scope?: string | null
           tenant_id: string
@@ -297,6 +299,7 @@ export type Database = {
           created_at?: string | null
           expires_at?: string
           id?: string
+          ml_nickname?: string | null
           refresh_token?: string | null
           scope?: string | null
           tenant_id?: string
