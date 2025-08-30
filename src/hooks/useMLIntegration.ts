@@ -1,7 +1,7 @@
 // Hook centralizado para integração ML - implementa princípios SOLID e DRY
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
-import { MLService, MLAuthStatus, MLSyncStatus, MLSyncProduct, MLPerformanceMetrics, MLAdvancedSettings } from '@/services/ml-service';
+import { MLService, MLAuthStatus, MLSyncStatus, MLSyncProduct, MLPerformanceMetrics, MLAdvancedSettings, MLBatchSyncResult } from '@/services/ml-service';
 
 // Chaves de query centralizadas
 export const ML_QUERY_KEYS = {
@@ -198,18 +198,18 @@ export function useMLSync() {
     },
   });
 
-  const syncBatch = useMutation({
+  const syncBatch = useMutation<MLBatchSyncResult, Error, string[]>({
     mutationFn: MLService.syncBatch,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
-      
+
       if (data?.successful && data.successful > 0) {
         toast({
           title: "Sincronização em Lote",
           description: `${data.successful} produtos sincronizados com sucesso.`,
         });
       }
-      
+
       if (data?.failed && data.failed > 0) {
         toast({
           title: "Alguns Erros na Sincronização",
