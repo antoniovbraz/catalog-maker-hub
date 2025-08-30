@@ -12,14 +12,17 @@ import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
+import { useMLResync } from "@/hooks/useMLResync";
 import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 import { MLConflictModal } from "@/components/forms/MLConflictModal";
 import type { MLSyncProduct } from "@/services/ml-service";
+import { Link } from "react-router-dom";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
   const { data: mlProducts = [] } = useMLProducts();
   const { importFromML } = useMLSync();
+  const { resyncProduct } = useMLResync();
   const deleteMutation = useDeleteProduct();
   const { showFormModal, showConfirmModal } = useGlobalModal();
 
@@ -27,19 +30,34 @@ export default function Products() {
     {
       key: "name",
       header: "Nome",
-      render: (item) => (
-        <div className="flex items-center gap-2">
-          <Package className="size-4 text-muted-foreground" />
-          <div>
-            <span className="font-medium">{item.name}</span>
-            {item.sku && (
-              <Badge variant="outline" className="ml-2 text-xs">
-                {item.sku}
-              </Badge>
-            )}
+      render: (item) => {
+        const mlProduct = mlProducts.find(ml => ml.id === item.id);
+        const hasIncompleteData = item.source === 'mercado_livre' && (!item.description || !item.sku || !item.brand);
+        
+        return (
+          <div className="flex items-center gap-2">
+            <Package className="size-4 text-muted-foreground" />
+            <div className="flex items-center gap-2">
+              <Link 
+                to={`/products/${item.id}`}
+                className="font-medium hover:text-primary transition-colors cursor-pointer"
+              >
+                {item.name}
+              </Link>
+              {hasIncompleteData && (
+                <Badge variant="outline" className="text-orange-600 border-orange-300">
+                  Dados Incompletos
+                </Badge>
+              )}
+              {item.sku && (
+                <Badge variant="outline" className="text-xs">
+                  {item.sku}
+                </Badge>
+              )}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: "source",
@@ -199,6 +217,9 @@ export default function Products() {
   };
 
   const getActionsForProduct = (product: ProductWithCategory): DataAction<ProductWithCategory>[] => {
+    const mlProduct = mlProducts.find(ml => ml.id === product.id);
+    const hasIncompleteData = product.source === 'mercado_livre' && (!product.description || !product.sku || !product.brand);
+    
     const baseActions: DataAction<ProductWithCategory>[] = [
       {
         label: "Editar",
@@ -206,6 +227,17 @@ export default function Products() {
         onClick: (product) => handleEdit(product),
       }
     ];
+
+    // Ação de re-sincronização para produtos ML com dados incompletos
+    if (hasIncompleteData) {
+      baseActions.push({
+        label: "Re-sincronizar",
+        icon: <Package className="size-4" />,
+        onClick: (product) => resyncProduct.mutate({ productId: product.id }),
+        variant: "outline",
+        disabled: () => resyncProduct.isPending,
+      });
+    }
 
     // Ações condicionais baseadas na origem
     if (product.source === 'manual') {
@@ -215,15 +247,12 @@ export default function Products() {
         onClick: (product) => handleAdvertiseOnML(product),
         variant: "default",
       });
-    } else if (product.source === 'mercado_livre') {
-      const mlProduct = (mlProducts || []).find(ml => ml.id === product.id);
+    } else if (product.source === 'mercado_livre' && mlProduct?.ml_item_id) {
       baseActions.push({
         label: "Ver no ML",
         icon: <ExternalLink className="size-4" />,
-        onClick: (product) => {
-          if (mlProduct?.ml_item_id) {
-            window.open(`https://www.mercadolivre.com.br/MLB-${mlProduct.ml_item_id}`, '_blank');
-          }
+        onClick: () => {
+          window.open(`https://www.mercadolivre.com.br/MLB-${mlProduct.ml_item_id}`, '_blank');
         },
         variant: "outline",
       });

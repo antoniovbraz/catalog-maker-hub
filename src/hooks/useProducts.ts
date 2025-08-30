@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { productsService } from "@/services/products";
-import { ProductFormData } from "@/types/products";
+import { ProductFormData, ProductWithCategory } from "@/types/products";
 import { toast } from "@/hooks/use-toast";
 
 export const PRODUCTS_QUERY_KEY = "products";
@@ -22,10 +23,26 @@ export function useProductsWithCategories() {
 }
 
 export function useProduct(id: string) {
-  return useQuery({
+  return useQuery<ProductWithCategory>({
     queryKey: [PRODUCTS_QUERY_KEY, id],
-    queryFn: () => productsService.getById(id),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          categories:category_id (
+            id,
+            name
+          )
+        `)
+        .eq('id', id)
+        .single();
+      
+      if (error) throw new Error(error.message);
+      return data;
+    },
     enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 

@@ -14,6 +14,7 @@ import Strategy from "./pages/Strategy";
 import Marketplaces from "./pages/Marketplaces";
 import Categories from "./pages/Categories";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import Shipping from "./pages/Shipping";
 import Commissions from "./pages/Commissions";
 import FixedFees from "./pages/FixedFees";
@@ -112,6 +113,14 @@ const App = () => (
                   <SharedLayout>
                     <Products />
                   </SharedLayout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/products/:id" 
+              element={
+                <ProtectedRoute>
+                  <ProductDetail />
                 </ProtectedRoute>
               } 
             />
