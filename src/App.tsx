@@ -27,7 +27,16 @@ import AdGenerator from "./pages/AdGenerator";
 import MLIntegration from "./pages/MLIntegration";
 import MLCallback from "./pages/MLCallback";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      retry: 1, // Reduzir retries
+      refetchOnWindowFocus: false, // Não revalidar no foco
+      refetchOnMount: false, // Não revalidar no mount se já tem dados
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logger.debug('Safety timeout triggered - forcing loading false')
         setLoading(false)
       }
-    }, 5000)
+    }, 3000) // Reduzir para 3 segundos
 
     const fetchProfile = async (userId: string) => {
       try {
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         // Timeout para evitar carregamento infinito
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Profile fetch timeout')), 10000);
+          setTimeout(() => reject(new Error('Profile fetch timeout')), 5000); // Reduzir para 5 segundos
         });
         
         const profilePromise = authService.getCurrentProfile();
@@ -70,11 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
 
         if (session?.user) {
-          setTimeout(() => {
-            if (isMounted) {
-              fetchProfile(session.user.id)
-            }
-          }, 0)
+          // Remover setTimeout desnecessário que pode causar loops
+          fetchProfile(session.user.id)
         } else {
           setProfile(null)
           setLoading(false)

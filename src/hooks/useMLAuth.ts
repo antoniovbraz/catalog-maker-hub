@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
@@ -13,6 +14,8 @@ export interface MLAuthStatus {
 export const ML_AUTH_QUERY_KEY = "ml-auth";
 
 export function useMLAuth() {
+  const errorShownRef = useRef(false);
+  
   const query = useQuery({
     queryKey: [ML_AUTH_QUERY_KEY],
     queryFn: async (): Promise<MLAuthStatus> => {
@@ -23,18 +26,28 @@ export function useMLAuth() {
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 0,
+    staleTime: 10 * 60 * 1000, // 10 minutes - aumentar staleTime
+    retry: false, // Desabilitar retry automático
+    refetchOnWindowFocus: false, // Não revalidar no foco
+    refetchOnMount: false, // Não revalidar no mount se já tem dados
   });
 
-  // Handle errors without onError callback (React Query v5)
-  if (query.error) {
-    toast({
-      title: "Erro na verificação",
-      description: query.error.message,
-      variant: "destructive",
-    });
-  }
+  // Handle errors with useEffect to prevent render loops
+  useEffect(() => {
+    if (query.error && !errorShownRef.current) {
+      errorShownRef.current = true;
+      toast({
+        title: "Erro na verificação ML",
+        description: query.error.message,
+        variant: "destructive",
+      });
+      
+      // Reset after some time to allow new errors
+      setTimeout(() => {
+        errorShownRef.current = false;
+      }, 30000);
+    }
+  }, [query.error]);
 
   return query;
 }
