@@ -203,7 +203,7 @@ export class MLService {
     }
 
     return { 
-      imported: data?.items?.length || 0,
+      imported: data?.imported || 0,
       items: data?.items || [] 
     };
   }

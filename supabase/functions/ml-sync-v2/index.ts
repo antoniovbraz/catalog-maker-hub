@@ -173,6 +173,8 @@ serve(async (req) => {
       }
 
       case 'import_from_ml': {
+        console.log('Starting ML import for tenant:', tenantId);
+        
         // Get ML user items
         const itemsResponse = await fetch(`https://api.mercadolibre.com/users/${authToken.user_id_ml}/items/search`, {
           headers: {
@@ -187,23 +189,153 @@ serve(async (req) => {
         }
 
         const itemsData = await itemsResponse.json();
+        const itemIds = itemsData.results || [];
         
-        // Log import attempt
+        console.log(`Found ${itemIds.length} ML items to import`);
+
+        let importedCount = 0;
+        let skippedCount = 0;
+        const errors = [];
+
+        // Process each item and save to local database
+        for (const itemId of itemIds) {
+          try {
+            console.log(`Processing item: ${itemId}`);
+            
+            // Get detailed item info from ML
+            const itemDetailResponse = await fetch(`https://api.mercadolibre.com/items/${itemId}`, {
+              headers: {
+                'Authorization': `Bearer ${authToken.access_token}`,
+              },
+            });
+
+            if (!itemDetailResponse.ok) {
+              console.error(`Failed to get details for item ${itemId}`);
+              errors.push(`Failed to get details for item ${itemId}`);
+              continue;
+            }
+
+            const itemDetail = await itemDetailResponse.json();
+            console.log(`Got details for item ${itemId}:`, itemDetail.title);
+
+            // Check if product already exists (by ML item ID)
+            const { data: existingMapping } = await supabase
+              .from('ml_product_mapping')
+              .select('*')
+              .eq('tenant_id', tenantId)
+              .eq('ml_item_id', itemId)
+              .maybeSingle();
+
+            if (existingMapping) {
+              console.log(`Item ${itemId} already exists, skipping`);
+              skippedCount++;
+              continue;
+            }
+
+            // Extract category ID if available
+            let categoryId = null;
+            if (itemDetail.category_id) {
+              // Try to find matching local category (simplified - you might want more sophisticated mapping)
+              const { data: category } = await supabase
+                .from('categories')
+                .select('id')
+                .eq('tenant_id', tenantId)
+                .ilike('name', `%${itemDetail.category_id}%`)
+                .maybeSingle();
+              
+              if (category) {
+                categoryId = category.id;
+              }
+            }
+
+            // Create local product
+            const { data: newProduct, error: productError } = await supabase
+              .from('products')
+              .insert({
+                tenant_id: tenantId,
+                name: itemDetail.title,
+                description: itemDetail.descriptions?.[0]?.plain_text || null,
+                sku: itemDetail.seller_custom_field || null,
+                category_id: categoryId,
+                cost_unit: itemDetail.price * 0.7, // Estimate 70% of sale price as cost
+                packaging_cost: 0,
+                tax_rate: 0,
+                source: 'mercado_livre'
+              })
+              .select()
+              .single();
+
+            if (productError) {
+              console.error(`Failed to create product for item ${itemId}:`, productError);
+              errors.push(`Failed to create product for item ${itemId}: ${productError.message}`);
+              continue;
+            }
+
+            console.log(`Created product ${newProduct.id} for ML item ${itemId}`);
+
+            // Create ML product mapping
+            const { error: mappingError } = await supabase
+              .from('ml_product_mapping')
+              .insert({
+                tenant_id: tenantId,
+                product_id: newProduct.id,
+                ml_item_id: itemId,
+                ml_title: itemDetail.title,
+                ml_permalink: itemDetail.permalink,
+                ml_price: itemDetail.price,
+                ml_currency_id: itemDetail.currency_id || 'BRL',
+                ml_listing_type: itemDetail.listing_type_id || 'gold_special',
+                ml_condition: itemDetail.condition || 'new',
+                ml_category_id: itemDetail.category_id,
+                sync_status: 'synced',
+                sync_direction: 'from_ml',
+                last_sync_at: new Date().toISOString()
+              });
+
+            if (mappingError) {
+              console.error(`Failed to create mapping for item ${itemId}:`, mappingError);
+              // Delete the created product since mapping failed
+              await supabase.from('products').delete().eq('id', newProduct.id);
+              errors.push(`Failed to create mapping for item ${itemId}: ${mappingError.message}`);
+              continue;
+            }
+
+            console.log(`Created mapping for ML item ${itemId}`);
+            importedCount++;
+
+          } catch (error) {
+            console.error(`Error processing item ${itemId}:`, error);
+            errors.push(`Error processing item ${itemId}: ${error.message}`);
+          }
+        }
+
+        // Log import results
         await supabase
           .from('ml_sync_log')
           .insert({
             tenant_id: tenantId,
             operation_type: 'import_from_ml',
             entity_type: 'items',
-            status: 'success',
-            response_data: { items_count: itemsData.results?.length || 0 }
+            status: errors.length > 0 ? 'partial_success' : 'success',
+            response_data: { 
+              total_found: itemIds.length,
+              imported: importedCount,
+              skipped: skippedCount,
+              errors: errors.length
+            },
+            error_details: errors.length > 0 ? { errors } : null
           });
+
+        console.log(`Import completed: ${importedCount} imported, ${skippedCount} skipped, ${errors.length} errors`);
 
         return new Response(
           JSON.stringify({ 
             success: true, 
-            items: itemsData.results || [],
-            total: itemsData.paging?.total || 0
+            imported: importedCount,
+            skipped: skippedCount,
+            total_found: itemIds.length,
+            errors: errors,
+            message: `Successfully imported ${importedCount} products from Mercado Livre`
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
