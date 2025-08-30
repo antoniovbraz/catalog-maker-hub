@@ -112,9 +112,9 @@ export function MLAdvertiseModal({ product, onSuccess, onSubmitForm }: MLAdverti
 
     setIsLoading(true);
     try {
-      // Implementar criação de anúncio no ML
-      const { useMLCreateAd } = await import("@/hooks/useMLSync");
-      // TODO: Implementar integração real
+      // Usar novo hook de sync
+      const { useMLSync } = await import("@/hooks/useMLIntegration");
+      // TODO: Implementar integração real com createAd
       console.log('Creating ML ad:', { product_id: product.id, ...formData });
       onSuccess();
     } catch (error) {
