@@ -8,11 +8,11 @@ Este projeto utiliza **Vitest** e **Testing Library** para garantir a qualidade 
 # Executar todos os testes
 npm run test
 
-# Executar testes com interface gráfica
-npm run test:ui
-
 # Executar testes em modo watch (desenvolvimento)
 npm run test:watch
+
+# Executar testes com interface gráfica
+npm run test:ui
 
 # Executar testes com relatório de cobertura
 npm run test:coverage
