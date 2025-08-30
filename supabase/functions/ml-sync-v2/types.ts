@@ -35,6 +35,7 @@ export interface ActionContext {
   authToken: any;
   mlClientId: string;
   mlToken: string;
+  jwt: string;
 }
 
 export const corsHeaders = {

@@ -87,6 +87,7 @@ serve(async (req) => {
       authToken,
       mlClientId,
       mlToken: authToken.access_token,
+      jwt,
     };
 
     const handler = actions[body.action];
