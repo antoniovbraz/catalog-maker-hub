@@ -2,9 +2,10 @@ import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
-// Limpa após cada teste
+// Limpa e reseta mocks após cada teste
 afterEach(() => {
   cleanup();
+  testUtils.resetAllMocks();
 });
 
 // Mock do Supabase Client
@@ -135,10 +136,12 @@ export const testUtils = {
 
   // Reseta todos os mocks
   resetAllMocks: () => {
-    vi.clearAllMocks();
-    mockSupabaseClient.from.mockClear();
-    mockSupabaseClient.rpc.mockClear();
-    mockToast.mockClear();
-    Object.values(mockQueryClient).forEach(fn => fn.mockClear());
+    vi.resetAllMocks();
+    mockSupabaseClient.from.mockReset();
+    mockSupabaseClient.rpc.mockReset();
+    Object.values(mockSupabaseClient.auth).forEach(fn => fn.mockReset());
+    Object.values(mockSupabaseClient.storage).forEach(fn => fn.mockReset());
+    mockToast.mockReset();
+    Object.values(mockQueryClient).forEach(fn => fn.mockReset());
   },
 };
