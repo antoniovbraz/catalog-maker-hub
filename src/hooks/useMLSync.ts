@@ -26,7 +26,7 @@ export function useMLSyncStatus() {
     queryKey: [ML_SYNC_QUERY_KEY, 'status'],
     queryFn: async (): Promise<MLSyncStatus> => {
       const { data, error } = await supabase.functions.invoke('ml-sync', {
-        body: { action: 'sync-status' }
+        body: { action: 'get_sync_status' }
       });
 
       if (error) throw error;
@@ -77,7 +77,7 @@ export function useMLSyncProduct() {
     mutationFn: async (productId: string): Promise<void> => {
       const { error } = await supabase.functions.invoke('ml-sync', {
         body: { 
-          action: 'sync-product',
+          action: 'sync_product',
           product_id: productId
         }
       });
@@ -108,7 +108,7 @@ export function useMLSyncBatch() {
     mutationFn: async (productIds: string[]): Promise<void> => {
       const { error } = await supabase.functions.invoke('ml-sync', {
         body: { 
-          action: 'sync-batch',
+          action: 'sync_batch',
           product_ids: productIds
         }
       });
