@@ -31,15 +31,18 @@ import MLCallback from "./pages/MLCallback";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10 * 60 * 1000, // 10 minutos para evitar requests excessivos
+      staleTime: 15 * 60 * 1000, // CRÍTICO: 15 minutos para evitar requests excessivos
       retry: false, // Completamente desabilitar retry automático
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
       refetchInterval: false, // Desabilitar polling automático
+      enabled: true, // IMPORTANTE: Garantir que queries são habilitadas por padrão
+      gcTime: 30 * 60 * 1000, // 30 minutos de cache para evitar re-requests
     },
     mutations: {
       retry: false, // Também desabilitar retry em mutations
+      gcTime: 5 * 60 * 1000, // 5 minutos de cache para mutations
     },
   },
 });

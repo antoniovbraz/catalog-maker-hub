@@ -17,13 +17,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true
 
-    // CORREÇÃO: Reduzir timeout de segurança para apenas 2 segundos
+    // CORREÇÃO: Timeout de segurança mais agressivo - apenas 1 segundo
     const safetyTimeout = setTimeout(() => {
       if (isMounted) {
         logger.debug('Safety timeout triggered - forcing loading false')
         setLoading(false)
       }
-    }, 2000) // Apenas 2 segundos
+    }, 1000) // CRÍTICO: Apenas 1 segundo para forçar saída do loading
 
     const fetchProfile = async (userId: string) => {
       try {
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout)
       subscription.unsubscribe()
     }
-  }, [logger])
+  }, []) // CORREÇÃO CRÍTICA: Remover [logger] para evitar loop infinito
 
   const signIn = async (email: string, password: string) => {
     try {
