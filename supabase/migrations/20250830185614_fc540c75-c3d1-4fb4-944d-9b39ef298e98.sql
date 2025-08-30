@@ -1,0 +1,203 @@
+-- Fase 1: Corrigir problemas críticos do banco (corrigido)
+
+-- 1. Primeiro, vamos verificar e corrigir os valores do enum ml_sync_status
+ALTER TYPE ml_sync_status ADD VALUE IF NOT EXISTS 'pending';
+
+-- 2. Criar função get_ml_advanced_settings que está faltando (causando erro 404)
+CREATE OR REPLACE FUNCTION public.get_ml_advanced_settings()
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_tenant_id uuid;
+  v_settings jsonb;
+BEGIN
+  -- Obter tenant_id do usuário atual
+  SELECT profiles.tenant_id INTO v_tenant_id
+  FROM public.profiles
+  WHERE profiles.id = auth.uid();
+  
+  IF v_tenant_id IS NULL THEN
+    RAISE EXCEPTION 'Tenant não encontrado para o usuário';
+  END IF;
+  
+  -- Buscar configurações avançadas, criar padrão se não existir
+  SELECT row_to_json(mas.*)::jsonb INTO v_settings
+  FROM public.ml_advanced_settings mas
+  WHERE mas.tenant_id = v_tenant_id;
+  
+  -- Se não existir, criar configuração padrão
+  IF v_settings IS NULL THEN
+    INSERT INTO public.ml_advanced_settings (
+      tenant_id,
+      feature_flags,
+      rate_limits,
+      auto_recovery_enabled,
+      advanced_monitoring,
+      multi_account_enabled,
+      backup_schedule,
+      security_level
+    ) VALUES (
+      v_tenant_id,
+      '{"auto_sync": true, "batch_sync": true, "webhook_processing": true}'::jsonb,
+      '{"default": 30, "sync_order": 100, "sync_product": 60, "token_refresh": 5}'::jsonb,
+      true,
+      false,
+      false,
+      'daily',
+      'standard'
+    ) RETURNING row_to_json(ml_advanced_settings.*)::jsonb INTO v_settings;
+  END IF;
+  
+  RETURN v_settings;
+END;
+$function$;
+
+-- 3. Corrigir função get_ml_performance_metrics (causando erro 400)
+DROP FUNCTION IF EXISTS public.get_ml_performance_metrics(integer);
+
+CREATE OR REPLACE FUNCTION public.get_ml_performance_metrics(p_days integer DEFAULT 7)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_tenant_id uuid;
+  v_result jsonb;
+  v_total_ops bigint;
+  v_successful_ops bigint;
+  v_failed_ops bigint;
+  v_avg_response_time numeric;
+  v_operations_by_type jsonb;
+BEGIN
+  -- Obter tenant_id do usuário atual
+  SELECT profiles.tenant_id INTO v_tenant_id
+  FROM public.profiles
+  WHERE profiles.id = auth.uid();
+  
+  IF v_tenant_id IS NULL AND get_current_user_role() != 'super_admin'::user_role THEN
+    RAISE EXCEPTION 'Acesso negado';
+  END IF;
+  
+  -- Calcular métricas separadamente para evitar problemas de agregação
+  SELECT COUNT(*) INTO v_total_ops
+  FROM public.ml_sync_log
+  WHERE created_at > now() - (p_days || ' days')::interval
+  AND (get_current_user_role() = 'super_admin'::user_role OR tenant_id = v_tenant_id);
+  
+  SELECT COUNT(*) INTO v_successful_ops
+  FROM public.ml_sync_log
+  WHERE created_at > now() - (p_days || ' days')::interval
+  AND status = 'success'
+  AND (get_current_user_role() = 'super_admin'::user_role OR tenant_id = v_tenant_id);
+  
+  SELECT COUNT(*) INTO v_failed_ops
+  FROM public.ml_sync_log
+  WHERE created_at > now() - (p_days || ' days')::interval
+  AND status = 'error'
+  AND (get_current_user_role() = 'super_admin'::user_role OR tenant_id = v_tenant_id);
+  
+  SELECT COALESCE(AVG(execution_time_ms), 0) INTO v_avg_response_time
+  FROM public.ml_sync_log
+  WHERE created_at > now() - (p_days || ' days')::interval
+  AND execution_time_ms IS NOT NULL
+  AND (get_current_user_role() = 'super_admin'::user_role OR tenant_id = v_tenant_id);
+  
+  -- Calcular operações por tipo
+  SELECT COALESCE(
+    jsonb_object_agg(operation_type, operation_count),
+    '{}'::jsonb
+  ) INTO v_operations_by_type
+  FROM (
+    SELECT 
+      operation_type,
+      COUNT(*) as operation_count
+    FROM public.ml_sync_log
+    WHERE created_at > now() - (p_days || ' days')::interval
+    AND operation_type IS NOT NULL
+    AND (get_current_user_role() = 'super_admin'::user_role OR tenant_id = v_tenant_id)
+    GROUP BY operation_type
+  ) subq;
+  
+  -- Construir resultado final
+  v_result := jsonb_build_object(
+    'total_operations', v_total_ops,
+    'successful_operations', v_successful_ops,
+    'failed_operations', v_failed_ops,
+    'average_response_time', ROUND(v_avg_response_time, 2),
+    'success_rate', 
+      CASE 
+        WHEN v_total_ops > 0 THEN 
+          ROUND((v_successful_ops::numeric / v_total_ops) * 100, 2)
+        ELSE 0 
+      END,
+    'operations_by_type', v_operations_by_type
+  );
+  
+  RETURN v_result;
+END;
+$function$;
+
+-- 4. Criar função update_ml_advanced_settings que está faltando
+CREATE OR REPLACE FUNCTION public.update_ml_advanced_settings(p_settings jsonb)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_tenant_id uuid;
+  v_updated_settings jsonb;
+BEGIN
+  -- Obter tenant_id do usuário atual
+  SELECT profiles.tenant_id INTO v_tenant_id
+  FROM public.profiles
+  WHERE profiles.id = auth.uid();
+  
+  IF v_tenant_id IS NULL THEN
+    RAISE EXCEPTION 'Tenant não encontrado para o usuário';
+  END IF;
+  
+  -- Atualizar configurações
+  UPDATE public.ml_advanced_settings 
+  SET
+    feature_flags = COALESCE(p_settings->>'feature_flags', feature_flags::text)::jsonb,
+    rate_limits = COALESCE(p_settings->>'rate_limits', rate_limits::text)::jsonb,
+    auto_recovery_enabled = COALESCE((p_settings->>'auto_recovery_enabled')::boolean, auto_recovery_enabled),
+    advanced_monitoring = COALESCE((p_settings->>'advanced_monitoring')::boolean, advanced_monitoring),
+    multi_account_enabled = COALESCE((p_settings->>'multi_account_enabled')::boolean, multi_account_enabled),
+    backup_schedule = COALESCE(p_settings->>'backup_schedule', backup_schedule),
+    security_level = COALESCE(p_settings->>'security_level', security_level),
+    updated_at = now()
+  WHERE tenant_id = v_tenant_id
+  RETURNING row_to_json(ml_advanced_settings.*)::jsonb INTO v_updated_settings;
+  
+  -- Se não existir, criar
+  IF v_updated_settings IS NULL THEN
+    INSERT INTO public.ml_advanced_settings (
+      tenant_id,
+      feature_flags,
+      rate_limits,
+      auto_recovery_enabled,
+      advanced_monitoring,
+      multi_account_enabled,
+      backup_schedule,
+      security_level
+    ) VALUES (
+      v_tenant_id,
+      COALESCE(p_settings->'feature_flags', '{"auto_sync": true, "batch_sync": true, "webhook_processing": true}'::jsonb),
+      COALESCE(p_settings->'rate_limits', '{"default": 30, "sync_order": 100, "sync_product": 60, "token_refresh": 5}'::jsonb),
+      COALESCE((p_settings->>'auto_recovery_enabled')::boolean, true),
+      COALESCE((p_settings->>'advanced_monitoring')::boolean, false),
+      COALESCE((p_settings->>'multi_account_enabled')::boolean, false),
+      COALESCE(p_settings->>'backup_schedule', 'daily'),
+      COALESCE(p_settings->>'security_level', 'standard')
+    ) RETURNING row_to_json(ml_advanced_settings.*)::jsonb INTO v_updated_settings;
+  END IF;
+  
+  RETURN v_updated_settings;
+END;
+$function$;

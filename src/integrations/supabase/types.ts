@@ -1299,6 +1299,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      get_ml_advanced_settings: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_ml_integration_health: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1350,6 +1354,10 @@ export type Database = {
         }
         Returns: string
       }
+      update_ml_advanced_settings: {
+        Args: { p_settings: Json }
+        Returns: Json
+      }
       validate_tenant_access: {
         Args: { p_tenant_id: string; p_user_id: string }
         Returns: boolean
@@ -1358,7 +1366,13 @@ export type Database = {
     Enums: {
       marketplace_type: "platform" | "modality"
       ml_sync_direction: "to_ml" | "from_ml" | "bidirectional"
-      ml_sync_status: "not_synced" | "syncing" | "synced" | "error" | "conflict"
+      ml_sync_status:
+        | "not_synced"
+        | "syncing"
+        | "synced"
+        | "error"
+        | "conflict"
+        | "pending"
       user_role: "super_admin" | "admin" | "user"
     }
     CompositeTypes: {
@@ -1489,7 +1503,14 @@ export const Constants = {
     Enums: {
       marketplace_type: ["platform", "modality"],
       ml_sync_direction: ["to_ml", "from_ml", "bidirectional"],
-      ml_sync_status: ["not_synced", "syncing", "synced", "error", "conflict"],
+      ml_sync_status: [
+        "not_synced",
+        "syncing",
+        "synced",
+        "error",
+        "conflict",
+        "pending",
+      ],
       user_role: ["super_admin", "admin", "user"],
     },
   },
