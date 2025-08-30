@@ -95,7 +95,15 @@ serve(async (req) => {
     const tenantId = profile.tenant_id;
     console.log('Successfully retrieved tenant_id:', tenantId);
 
-    const body: AuthRequest = await req.json();
+    // Tentar ler body JSON, mas permitir se estiver vazio
+    let body: AuthRequest;
+    try {
+      const bodyText = await req.text();
+      body = bodyText ? JSON.parse(bodyText) : { action: 'get_status' };
+    } catch (error) {
+      console.error('Error parsing request body:', error);
+      body = { action: 'get_status' };
+    }
 
     switch (body.action) {
       case 'start_auth': {

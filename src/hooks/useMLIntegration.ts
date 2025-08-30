@@ -202,14 +202,14 @@ export function useMLSync() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
       
-      if (data.successful > 0) {
+      if (data?.successful && data.successful > 0) {
         toast({
           title: "Sincronização em Lote",
           description: `${data.successful} produtos sincronizados com sucesso.`,
         });
       }
       
-      if (data.failed > 0) {
+      if (data?.failed && data.failed > 0) {
         toast({
           title: "Alguns Erros na Sincronização",
           description: `${data.failed} produtos falharam na sincronização.`,
@@ -234,7 +234,7 @@ export function useMLSync() {
       
       toast({
         title: "Importação Concluída",
-        description: `${data.imported} produtos importados do Mercado Livre.`,
+        description: `${data?.imported || 0} produtos importados do Mercado Livre.`,
       });
     },
     onError: (error: Error) => {
@@ -247,8 +247,8 @@ export function useMLSync() {
   });
 
   const linkProduct = useMutation({
-    mutationFn: ({ productId, mlItemId }: { productId: string; mlItemId: string }) =>
-      MLService.linkProduct(productId, mlItemId),
+      mutationFn: ({ productId, mlItemId }: { productId: string; mlItemId: string }) =>
+        MLService.linkProduct(productId, mlItemId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
       toast({
@@ -266,13 +266,13 @@ export function useMLSync() {
   });
 
   const createAd = useMutation({
-    mutationFn: ({ productId, adData }: { productId: string; adData: any }) =>
-      MLService.createAd(productId, adData),
+    mutationFn: ({ adData }: { adData: any }) =>
+      MLService.createAd(adData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
       toast({
         title: "Anúncio Criado",
-        description: `Anúncio "${data.title}" criado com sucesso no ML.`,
+        description: `Anúncio "${data?.title || 'criado'}" criado com sucesso no ML.`,
       });
     },
     onError: (error: Error) => {
