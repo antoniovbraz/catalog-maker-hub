@@ -1240,6 +1240,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      get_tenant_by_ml_user_id: {
+        Args: { p_user_id_ml: number }
+        Returns: string
+      }
       increment_usage: {
         Args: {
           p_increment?: number

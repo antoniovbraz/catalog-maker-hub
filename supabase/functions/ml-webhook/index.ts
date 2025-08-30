@@ -30,19 +30,27 @@ serve(async (req) => {
       throw new Error('Invalid webhook payload');
     }
 
-    // Find tenant by ML user_id
+    // Find tenant by ML user_id usando função otimizada
+    const { data: tenantId, error: tenantError } = await supabase
+      .rpc('get_tenant_by_ml_user_id', { p_user_id_ml: user_id });
+
+    if (tenantError || !tenantId) {
+      console.log(`No tenant found for ML user_id: ${user_id}`);
+      return new Response('OK', { status: 200 });
+    }
+
+    // Buscar access_token separadamente
     const { data: authToken, error: authError } = await supabase
       .from('ml_auth_tokens')
-      .select('tenant_id, access_token')
+      .select('access_token')
+      .eq('tenant_id', tenantId)
       .eq('user_id_ml', user_id)
       .single();
 
     if (authError || !authToken) {
-      console.log('No tenant found for ML user_id:', user_id);
+      console.log(`No valid token found for tenant: ${tenantId}`);
       return new Response('OK', { status: 200 });
     }
-
-    const tenantId = authToken.tenant_id;
 
     // Store webhook event
     const { data: webhookEvent, error: webhookError } = await supabase
@@ -67,6 +75,7 @@ serve(async (req) => {
     try {
       switch (topic) {
         case 'orders':
+        case 'orders_v2':
           await processOrderWebhook(supabase, tenantId, resource, authToken.access_token, webhookEvent.id);
           break;
         case 'items':
@@ -74,6 +83,12 @@ serve(async (req) => {
           break;
         case 'questions':
           await processQuestionWebhook(supabase, tenantId, resource, authToken.access_token, webhookEvent.id);
+          break;
+        case 'payments':
+        case 'shipments':
+        case 'stock-locations':
+        case 'fbm_stock_operations':
+          console.log(`Received ${topic} webhook for tenant ${tenantId} - logged for future processing`);
           break;
         default:
           console.log('Unhandled webhook topic:', topic);
