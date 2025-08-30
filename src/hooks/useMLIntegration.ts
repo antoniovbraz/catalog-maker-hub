@@ -8,6 +8,7 @@ export const ML_QUERY_KEYS = {
   auth: ['ml', 'auth'] as const,
   syncStatus: ['ml', 'sync', 'status'] as const,
   syncProducts: ['ml', 'sync', 'products'] as const,
+  products: ['ml', 'products'] as const,
   performanceMetrics: (days: number) => ['ml', 'performance', days] as const,
   advancedSettings: ['ml', 'settings', 'advanced'] as const,
   integrationHealth: ['ml', 'health'] as const,
@@ -230,6 +231,7 @@ export function useMLSync() {
     mutationFn: MLService.importFromML,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products });
       queryClient.invalidateQueries({ queryKey: ['products'] }); // Invalidar produtos também
       
       toast({

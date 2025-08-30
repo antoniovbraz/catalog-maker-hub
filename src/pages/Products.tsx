@@ -11,13 +11,14 @@ import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
+import { useMLProducts } from "@/hooks/useMLProducts";
 import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 import { MLConflictModal } from "@/components/forms/MLConflictModal";
 import type { MLSyncProduct } from "@/services/ml-service";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
-  const { sync } = useMLIntegration();
+  const { data: mlProducts = [] } = useMLProducts();
   const { importFromML } = useMLSync();
   const deleteMutation = useDeleteProduct();
   const { showFormModal, showConfirmModal } = useGlobalModal();
@@ -44,7 +45,7 @@ export default function Products() {
       key: "source",
       header: "Origem",
       render: (item) => {
-        const mlProduct = sync.products?.find(ml => ml.id === item.id);
+        const mlProduct = (mlProducts || []).find(ml => ml.id === item.id);
         return (
           <ProductSourceBadge 
             source={item.source} 
@@ -139,10 +140,10 @@ export default function Products() {
 
   const checkForConflicts = async (product: ProductWithCategory): Promise<MLSyncProduct[]> => {
     // Simular verificação de conflitos
-    const existingProducts = sync.products?.filter(ml => 
+    const existingProducts = (mlProducts || []).filter(ml => 
       ml.name.toLowerCase().includes(product.name.toLowerCase()) ||
       (product.sku && ml.name.toLowerCase().includes(product.sku.toLowerCase()))
-    ) || [];
+    );
 
     return existingProducts;
   };
@@ -215,7 +216,7 @@ export default function Products() {
         variant: "default",
       });
     } else if (product.source === 'mercado_livre') {
-      const mlProduct = sync.products?.find(ml => ml.id === product.id);
+      const mlProduct = (mlProducts || []).find(ml => ml.id === product.id);
       baseActions.push({
         label: "Ver no ML",
         icon: <ExternalLink className="size-4" />,

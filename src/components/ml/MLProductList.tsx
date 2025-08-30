@@ -4,17 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
-import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
+import { useMLSync } from "@/hooks/useMLIntegration";
+import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 
 export function MLProductList() {
-  const { sync, syncStatusQuery } = useMLIntegration();
+  const { data: products = [], isLoading } = useMLProducts();
   const { syncProduct, syncBatch } = useMLSync();
-  const products = sync?.products || [];
-  const isLoading = syncStatusQuery.isLoading;
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -28,7 +27,7 @@ export function MLProductList() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedProducts(products.map(p => p.id));
+      setSelectedProducts((products || []).map(p => p.id));
     } else {
       setSelectedProducts([]);
     }
@@ -100,7 +99,7 @@ export function MLProductList() {
       </CardHeader>
       
       <CardContent>
-        {products.length === 0 ? (
+        {(products || []).length === 0 ? (
           <div className="text-center py-8">
             <Package className="mx-auto mb-4 size-12 text-muted-foreground" />
             <h4 className="mb-2 text-lg font-medium">Nenhum produto encontrado</h4>
@@ -114,10 +113,10 @@ export function MLProductList() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">
-                    <Checkbox
-                      checked={selectedProducts.length === products.length}
-                      onCheckedChange={handleSelectAll}
-                    />
+                  <Checkbox
+                    checked={selectedProducts.length === (products || []).length}
+                    onCheckedChange={handleSelectAll}
+                  />
                   </TableHead>
                   <TableHead>Produto</TableHead>
                   <TableHead>Status</TableHead>
@@ -127,7 +126,7 @@ export function MLProductList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {(products || []).map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
                       <Checkbox

@@ -159,6 +159,18 @@ export class MLService {
     };
   }
 
+  static async getMLProducts(): Promise<MLSyncProduct[]> {
+    const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
+      body: { action: 'get_products' }
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Failed to get ML products');
+    }
+
+    return data?.products || [];
+  }
+
   static async syncProduct(productId: string): Promise<void> {
     const { error } = await supabase.functions.invoke('ml-sync-v2', {
       body: { action: 'sync_product', product_id: productId }
