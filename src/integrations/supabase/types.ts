@@ -1135,6 +1135,42 @@ export type Database = {
       }
     }
     Views: {
+      ml_integration_health: {
+        Row: {
+          connected_at: string | null
+          expires_at: string | null
+          failed_renewals_24h: number | null
+          health_status: string | null
+          hours_until_expiry: number | null
+          ml_nickname: string | null
+          successful_renewals_24h: number | null
+          tenant_id: string | null
+          user_id_ml: number | null
+        }
+        Insert: {
+          connected_at?: string | null
+          expires_at?: string | null
+          failed_renewals_24h?: never
+          health_status?: never
+          hours_until_expiry?: never
+          ml_nickname?: string | null
+          successful_renewals_24h?: never
+          tenant_id?: string | null
+          user_id_ml?: number | null
+        }
+        Update: {
+          connected_at?: string | null
+          expires_at?: string | null
+          failed_renewals_24h?: never
+          health_status?: never
+          hours_until_expiry?: never
+          ml_nickname?: string | null
+          successful_renewals_24h?: never
+          tenant_id?: string | null
+          user_id_ml?: number | null
+        }
+        Relationships: []
+      }
       ml_integration_status: {
         Row: {
           connection_status: string | null

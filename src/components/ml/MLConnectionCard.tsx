@@ -38,9 +38,6 @@ export function MLConnectionCard() {
     return <Badge variant="destructive">🔴 Desconectado</Badge>;
   };
 
-  const isTokenExpired = authStatus?.expires_at ? 
-    new Date(authStatus.expires_at) < new Date() : false;
-
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">

@@ -2,6 +2,8 @@ import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLa
 import { MLConnectionCard } from "@/components/ml/MLConnectionCard";
 import { MLSyncStatus } from "@/components/ml/MLSyncStatus";
 import { MLProductList } from "@/components/ml/MLProductList";
+import { MLHealthStatus } from "@/components/ml/MLHealthStatus";
+import { MLNotificationCenter } from "@/components/ml/MLNotificationCenter";
 import { ExternalLink } from "@/components/ui/icons";
 import { useMLAuth } from "@/hooks/useMLAuth";
 import { useMLCleanup } from "@/hooks/useMLCleanup";
@@ -73,9 +75,19 @@ const MLIntegration = () => {
         <MLConnectionCard />
       </div>
 
-      {/* Show sync components only if connected */}
+      {/* Show enhanced status and monitoring components only if connected */}
       {authStatus?.connected && (
         <>
+          {/* Health Status */}
+          <div className="col-span-12 lg:col-span-6 xl:col-span-4">
+            <MLHealthStatus />
+          </div>
+
+          {/* Notification Center */}
+          <div className="col-span-12 lg:col-span-6 xl:col-span-4">
+            <MLNotificationCenter />
+          </div>
+
           {/* Sync Status Overview */}
           <div className="col-span-12 lg:col-span-6 xl:col-span-4">
             <MLSyncStatus />
