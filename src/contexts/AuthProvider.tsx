@@ -17,26 +17,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true
 
-    // Timeout de segurança para evitar carregamento infinito
+    // CORREÇÃO: Reduzir timeout de segurança para apenas 2 segundos
     const safetyTimeout = setTimeout(() => {
       if (isMounted) {
         logger.debug('Safety timeout triggered - forcing loading false')
         setLoading(false)
       }
-    }, 3000) // Reduzir para 3 segundos
+    }, 2000) // Apenas 2 segundos
 
     const fetchProfile = async (userId: string) => {
       try {
         logger.debug('Fetching profile for user', { userId })
         
-        // Timeout para evitar carregamento infinito
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Profile fetch timeout')), 5000); // Reduzir para 5 segundos
-        });
-        
-        const profilePromise = authService.getCurrentProfile();
-        
-        const profileData = await Promise.race([profilePromise, timeoutPromise]) as Profile | null;
+        // CORREÇÃO CRÍTICA: Simplificar busca de perfil sem timeouts que causam problemas
+        const profileData = await authService.getCurrentProfile();
         
         logger.debug('Profile fetch result', { 
           hasProfile: !!profileData, 
@@ -52,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         logger.error('Error fetching profile', error)
         if (isMounted) {
+          // IMPORTANTE: Não mostrar toast de erro aqui para evitar spam
           // Se der erro, vamos continuar sem perfil mas não ficar infinito
           setProfile(null)
           setLoading(false)
@@ -70,8 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
 
         if (session?.user) {
-          // Remover setTimeout desnecessário que pode causar loops
-          fetchProfile(session.user.id)
+          // CORREÇÃO: Não bloquear o auth state change com fetchProfile
+          fetchProfile(session.user.id).catch(err => {
+            logger.error('Profile fetch failed in auth change', err)
+            setLoading(false)
+            clearTimeout(safetyTimeout)
+          })
         } else {
           setProfile(null)
           setLoading(false)
@@ -83,6 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initializeAuth = async () => {
       try {
         logger.debug('Initializing auth...')
+        
+        // CORREÇÃO CRÍTICA: Usar getSession sem await excessivo
         const { data: { session }, error } = await supabase.auth.getSession()
         if (!isMounted) return
 
@@ -103,7 +104,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
 
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          // IMPORTANTE: Não usar await aqui para evitar bloquear a inicialização
+          fetchProfile(session.user.id).catch(err => {
+            logger.error('Profile fetch failed during init', err)
+            setLoading(false)
+            clearTimeout(safetyTimeout)
+          })
         } else {
           logger.debug('No user session, setting loading false')
           setLoading(false)

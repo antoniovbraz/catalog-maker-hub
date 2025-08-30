@@ -32,13 +32,11 @@ export abstract class BaseService<T = Record<string, unknown>> {
     return data as T;
   }
 
+  // CORREÇÃO CRÍTICA: Remover addTenantId automático que causava dependência circular
   async create(data: Partial<T>): Promise<T> {
-    // Adicionar tenant_id automaticamente se a tabela suporta
-    const dataWithTenant = await this.addTenantId(data);
-    
     const { data: result, error } = await supabase
       .from(this.tableName)
-      .insert(dataWithTenant as Partial<T>)
+      .insert(data as Partial<T>)
       .select()
       .single();
 
@@ -46,37 +44,18 @@ export abstract class BaseService<T = Record<string, unknown>> {
     return result as T;
   }
 
-  protected async addTenantId(data: Partial<T>): Promise<Partial<T>> {
-    // CORREÇÃO CRÍTICA: Remover dependência circular que causa loop infinito
-    // Não tentar buscar tenant_id automaticamente para evitar circular dependency
-    // O tenant_id deve ser passado explicitamente quando necessário
+  // MÉTODO OPCIONAL: Usar apenas quando tenant_id é explicitamente fornecido
+  async createWithTenant(data: Partial<T>, tenantId: string): Promise<T> {
+    const dataWithTenant = { ...data, tenant_id: tenantId } as Partial<T>;
     
-    // Temporariamente desabilitado para quebrar o loop infinito
-    // const tablesWithTenant = [
-    //   'products',
-    //   'categories', 
-    //   'marketplaces',
-    //   'sales',
-    //   'saved_pricing',
-    //   'commissions',
-    //   'marketplace_fixed_fee_rules',
-    //   'shipping_rules',
-    //   'product_images',
-    // ];
+    const { data: result, error } = await supabase
+      .from(this.tableName)
+      .insert(dataWithTenant)
+      .select()
+      .single();
 
-    // if (tablesWithTenant.includes(this.tableName)) {
-    //   try {
-    //     const { authService } = await import('./auth');
-    //     const tenantId = await authService.getCurrentTenantId();
-    //     if (tenantId) {
-    //       return { ...data, tenant_id: tenantId } as Partial<T>;
-    //     }
-    //   } catch {
-    //     // ignore tenant errors in non-auth contexts
-    //   }
-    // }
-
-    return data;
+    if (error) this.handleError(error, `Criar ${this.tableName} com tenant`);
+    return result as T;
   }
 
   async update(id: string, data: Partial<T>): Promise<T> {
@@ -101,6 +80,8 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   protected handleError(error: PostgrestError, operation: string): never {
+    // CORREÇÃO: Log do erro mas não throw automático para evitar cascata de erros
+    console.error(`${operation} falhou:`, error.message);
     throw new Error(`${operation} falhou: ${error.message}`);
   }
 }
