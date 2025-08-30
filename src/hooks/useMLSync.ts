@@ -203,3 +203,38 @@ export function useMLCreateAd() {
     },
   });
 }
+
+export function useMLLinkProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { 
+      product_id: string;
+      ml_item_id: string;
+    }): Promise<void> => {
+      const { error } = await supabase.functions.invoke('ml-sync', {
+        body: { 
+          action: 'link_product',
+          ...data
+        }
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ML_SYNC_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: "Produto Vinculado",
+        description: "Produto foi vinculado ao anúncio do Mercado Livre",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao Vincular Produto",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}

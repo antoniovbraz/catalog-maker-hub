@@ -1,4 +1,4 @@
-import { Package, Plus, Edit, Trash2, Tag, Download } from "@/components/ui/icons";
+import { Package, Plus, Edit, Trash2, Tag, Download, ExternalLink } from "@/components/ui/icons";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
 import { DataVisualization } from "@/components/ui/data-visualization";
@@ -10,11 +10,13 @@ import type { ProductWithCategory } from "@/types/products";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
-import { useMLImportProducts } from "@/hooks/useMLSync";
+import { useMLImportProducts, useMLSyncProducts } from "@/hooks/useMLSync";
 import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
+import { MLConflictModal } from "@/components/forms/MLConflictModal";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
+  const { data: mlProducts = [] } = useMLSyncProducts();
   const deleteMutation = useDeleteProduct();
   const { mutate: importFromML, isPending: isImporting } = useMLImportProducts();
   const { showFormModal, showConfirmModal } = useGlobalModal();
@@ -40,7 +42,16 @@ export default function Products() {
     {
       key: "source",
       header: "Origem",
-      render: (item) => <ProductSourceBadge source={item.source} />,
+      render: (item) => {
+        const mlProduct = mlProducts.find(ml => ml.id === item.id);
+        return (
+          <ProductSourceBadge 
+            source={item.source} 
+            mlStatus={mlProduct?.sync_status}
+            mlItemId={mlProduct?.ml_item_id}
+          />
+        );
+      },
     },
     {
       key: "categories.name",
@@ -125,26 +136,64 @@ export default function Products() {
     });
   };
 
-  const handleAdvertiseOnML = (product: ProductWithCategory) => {
-    let submitForm: (() => Promise<void>) | null = null;
+  const checkForConflicts = async (product: ProductWithCategory) => {
+    // Simular verificação de conflitos
+    const existingProducts = mlProducts.filter(ml => 
+      ml.name.toLowerCase().includes(product.name.toLowerCase()) ||
+      (product.sku && ml.name.toLowerCase().includes(product.sku.toLowerCase()))
+    );
 
-    showFormModal({
-      title: "Anunciar no Mercado Livre",
-      description: `Criar anúncio para "${product.name}"`,
-      content: (
-        <MLAdvertiseModal
-          product={product}
-          onSuccess={() => {}}
-          onSubmitForm={(fn) => {
-            submitForm = fn;
-          }}
-        />
-      ),
-      onSave: async () => {
-        if (submitForm) await submitForm();
-      },
-      size: "lg",
-    });
+    return existingProducts;
+  };
+
+  const handleAdvertiseOnML = async (product: ProductWithCategory) => {
+    // Verificar conflitos primeiro
+    const conflicts = await checkForConflicts(product);
+    
+    if (conflicts.length > 0) {
+      // Mostrar modal de conflitos
+      let submitForm: (() => Promise<void>) | null = null;
+
+      showFormModal({
+        title: "Produto Similares Encontrados",
+        description: `Encontramos produtos similares no Mercado Livre. Como deseja proceder?`,
+        content: (
+          <MLConflictModal
+            product={product}
+            conflicts={conflicts}
+            onSuccess={() => {}}
+            onSubmitForm={(fn) => {
+              submitForm = fn;
+            }}
+          />
+        ),
+        onSave: async () => {
+          if (submitForm) await submitForm();
+        },
+        size: "lg",
+      });
+    } else {
+      // Prosseguir com criação normal
+      let submitForm: (() => Promise<void>) | null = null;
+
+      showFormModal({
+        title: "Anunciar no Mercado Livre",
+        description: `Criar anúncio para "${product.name}"`,
+        content: (
+          <MLAdvertiseModal
+            product={product}
+            onSuccess={() => {}}
+            onSubmitForm={(fn) => {
+              submitForm = fn;
+            }}
+          />
+        ),
+        onSave: async () => {
+          if (submitForm) await submitForm();
+        },
+        size: "lg",
+      });
+    }
   };
 
   const getActionsForProduct = (product: ProductWithCategory): DataAction<ProductWithCategory>[] => {
@@ -165,12 +214,14 @@ export default function Products() {
         variant: "default",
       });
     } else if (product.source === 'mercado_livre') {
+      const mlProduct = mlProducts.find(ml => ml.id === product.id);
       baseActions.push({
         label: "Ver no ML",
-        icon: <Package className="size-4" />,
+        icon: <ExternalLink className="size-4" />,
         onClick: (product) => {
-          // TODO: Abrir link do ML
-          console.log('View on ML:', product);
+          if (mlProduct?.ml_item_id) {
+            window.open(`https://www.mercadolivre.com.br/MLB-${mlProduct.ml_item_id}`, '_blank');
+          }
         },
         variant: "outline",
       });
