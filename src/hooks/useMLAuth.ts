@@ -68,15 +68,16 @@ export function useMLAuthCallback() {
       const urlParams = new URLSearchParams(window.location.search);
       const state = urlParams.get('state');
 
-      const { error } = await supabase.functions.invoke('ml-auth', {
-        body: { 
-          action: 'handle_callback',
-          code,
-          state
-        }
+      const response = await fetch('/api/ml/callback', {
+        method: 'POST',
+        body: JSON.stringify({ code, state }),
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || 'Failed to handle callback');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ML_AUTH_QUERY_KEY] });
