@@ -57,6 +57,12 @@ export default defineConfig({
 ## Comandos de Teste
 
 ```bash
+# Verificação de lint
+npm run lint
+
+# Correção automática de lint
+npm run lint:fix
+
 # Executar todos os testes
 npm test
 

@@ -52,6 +52,7 @@ Execute todas as verificações antes de abrir um pull request:
 
 ```bash
 npm run lint
+npm run lint:fix
 npm run type-check
 npm test
 npm run test:coverage

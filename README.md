@@ -62,6 +62,15 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
     ```
     A aplicação estará disponível em `http://localhost:5173`.
 
+### Qualidade de Código
+
+Execute as verificações de lint para manter o código padronizado:
+
+```bash
+npm run lint       # verifica problemas
+npm run lint:fix   # corrige automaticamente
+```
+
 ---
 
 ## ⚙️ Configurando a Integração com o Mercado Livre
