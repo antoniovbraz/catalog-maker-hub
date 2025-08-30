@@ -430,6 +430,39 @@ export type Database = {
           },
         ]
       }
+      ml_pkce_storage: {
+        Row: {
+          code_challenge: string
+          code_challenge_method: string
+          code_verifier: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          state: string
+          tenant_id: string
+        }
+        Insert: {
+          code_challenge: string
+          code_challenge_method?: string
+          code_verifier: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          state: string
+          tenant_id: string
+        }
+        Update: {
+          code_challenge?: string
+          code_challenge_method?: string
+          code_verifier?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          state?: string
+          tenant_id?: string
+        }
+        Relationships: []
+      }
       ml_product_mapping: {
         Row: {
           attributes: Json | null
@@ -518,7 +551,10 @@ export type Database = {
           ml_entity_id: string | null
           operation_type: string
           request_data: Json | null
+          request_url: string | null
           response_data: Json | null
+          response_headers: Json | null
+          response_status: number | null
           status: string
           tenant_id: string
         }
@@ -532,7 +568,10 @@ export type Database = {
           ml_entity_id?: string | null
           operation_type: string
           request_data?: Json | null
+          request_url?: string | null
           response_data?: Json | null
+          response_headers?: Json | null
+          response_status?: number | null
           status: string
           tenant_id: string
         }
@@ -546,7 +585,10 @@ export type Database = {
           ml_entity_id?: string | null
           operation_type?: string
           request_data?: Json | null
+          request_url?: string | null
           response_data?: Json | null
+          response_headers?: Json | null
+          response_status?: number | null
           status?: string
           tenant_id?: string
         }
@@ -1177,6 +1219,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: boolean
+      }
+      cleanup_expired_pkce: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       cleanup_old_ml_logs: {
         Args: Record<PropertyKey, never>

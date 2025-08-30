@@ -13,6 +13,32 @@ interface AuthRequest {
   tenant_id?: string;
 }
 
+// PKCE Helper Functions - Compatível com Deno
+async function generateRandomString(length: number): Promise<string> {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  const values = crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(values, x => charset[x % charset.length]).join('');
+}
+
+async function sha256(plain: string): Promise<ArrayBuffer> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plain);
+  return await crypto.subtle.digest('SHA-256', data);
+}
+
+function base64URLEncode(buffer: ArrayBuffer): string {
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: string }> {
+  const codeVerifier = await generateRandomString(128);
+  const challengeBuffer = await sha256(codeVerifier);
+  const codeChallenge = base64URLEncode(challengeBuffer);
+  
+  return { codeVerifier, codeChallenge };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -73,117 +99,246 @@ serve(async (req) => {
 
     switch (body.action) {
       case 'start_auth': {
-        // Generate OAuth URL for Mercado Livre
-        const redirectUri = Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
-        const state = `${tenantId}_${Date.now()}`;
-        
-        const authUrl = new URL('https://auth.mercadolivre.com.br/authorization');
-        authUrl.searchParams.set('response_type', 'code');
-        authUrl.searchParams.set('client_id', mlClientId);
-        authUrl.searchParams.set('redirect_uri', redirectUri);
-        authUrl.searchParams.set('state', state);
-        
-        return new Response(
-          JSON.stringify({ auth_url: authUrl.toString(), state }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        try {
+          // Limpar PKCE expirados antes de criar novo
+          await supabase.rpc('cleanup_expired_pkce');
+          
+          // Gerar PKCE
+          const { codeVerifier, codeChallenge } = await generatePKCE();
+          const redirectUri = Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
+          const state = `${tenantId}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+          
+          // Armazenar PKCE na base de dados
+          const { error: pkceError } = await supabase
+            .from('ml_pkce_storage')
+            .insert({
+              tenant_id: tenantId,
+              state,
+              code_verifier: codeVerifier,
+              code_challenge: codeChallenge,
+              code_challenge_method: 'S256'
+            });
+
+          if (pkceError) {
+            console.error('PKCE Storage Error:', pkceError);
+            throw new Error('Failed to store PKCE data');
+          }
+          
+          // Gerar URL OAuth com PKCE
+          const authUrl = new URL('https://auth.mercadolivre.com.br/authorization');
+          authUrl.searchParams.set('response_type', 'code');
+          authUrl.searchParams.set('client_id', mlClientId);
+          authUrl.searchParams.set('redirect_uri', redirectUri);
+          authUrl.searchParams.set('state', state);
+          authUrl.searchParams.set('code_challenge', codeChallenge);
+          authUrl.searchParams.set('code_challenge_method', 'S256');
+          
+          console.log('Generated OAuth URL with PKCE:', authUrl.toString());
+          
+          // Log da operação
+          await supabase
+            .from('ml_sync_log')
+            .insert({
+              tenant_id: tenantId,
+              operation_type: 'start_auth',
+              entity_type: 'auth',
+              status: 'success',
+              request_data: { state, has_pkce: true },
+              request_url: authUrl.toString()
+            });
+          
+          return new Response(
+            JSON.stringify({ auth_url: authUrl.toString(), state }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        } catch (error) {
+          console.error('Start Auth Error:', error);
+          
+          // Log do erro
+          await supabase
+            .from('ml_sync_log')
+            .insert({
+              tenant_id: tenantId,
+              operation_type: 'start_auth',
+              entity_type: 'auth',
+              status: 'error',
+              error_details: { message: error.message, stack: error.stack }
+            });
+            
+          throw error;
+        }
       }
 
       case 'handle_callback': {
-        if (!body.code || !body.state) {
-          return errorResponse('Missing authorization code or state', 400);
-        }
+        try {
+          if (!body.code || !body.state) {
+            return errorResponse('Missing authorization code or state', 400);
+          }
 
-        // Verify state contains tenant_id
-        if (!body.state.startsWith(tenantId)) {
-          return errorResponse('Invalid state parameter', 400);
-        }
+          // Verificar state contém tenant_id
+          if (!body.state.startsWith(tenantId)) {
+            return errorResponse('Invalid state parameter', 400);
+          }
 
-        // Exchange code for access token
-        const tokenResponse = await fetch('https://api.mercadolibre.com/oauth/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json',
-          },
-          body: new URLSearchParams({
+          // Buscar PKCE data
+          const { data: pkceData, error: pkceError } = await supabase
+            .from('ml_pkce_storage')
+            .select('*')
+            .eq('state', body.state)
+            .eq('tenant_id', tenantId)
+            .single();
+
+          if (pkceError || !pkceData) {
+            console.error('PKCE Data Error:', pkceError);
+            throw new Error('PKCE verification failed - invalid or expired state');
+          }
+
+          // Verificar se não expirou
+          if (new Date(pkceData.expires_at) <= new Date()) {
+            throw new Error('PKCE data expired');
+          }
+
+          console.log('Using PKCE code_verifier for token exchange');
+          
+          // Trocar código por token com PKCE
+          const tokenParams = new URLSearchParams({
             grant_type: 'authorization_code',
             client_id: mlClientId,
             client_secret: mlClientSecret,
             code: body.code,
             redirect_uri: Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback',
-          }),
-        });
-
-        if (!tokenResponse.ok) {
-          const errorText = await tokenResponse.text();
-          console.error('ML Token Exchange Error:', errorText);
-          throw new Error('Failed to exchange authorization code');
-        }
-
-        const tokenData = await tokenResponse.json();
-
-        // Get user info from ML
-        const userResponse = await fetch('https://api.mercadolibre.com/users/me', {
-          headers: {
-            'Authorization': `Bearer ${tokenData.access_token}`,
-          },
-        });
-
-        if (!userResponse.ok) {
-          throw new Error('Failed to get user info from Mercado Livre');
-        }
-
-        const mlUser = await userResponse.json();
-
-        // Calculate expiration time
-        const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
-
-        // Store token in database
-        const { error: insertError } = await supabase
-          .from('ml_auth_tokens')
-          .upsert({
-            tenant_id: tenantId,
-            access_token: tokenData.access_token,
-            refresh_token: tokenData.refresh_token,
-            token_type: tokenData.token_type || 'Bearer',
-            expires_at: expiresAt.toISOString(),
-            scope: tokenData.scope,
-            user_id_ml: mlUser.id,
-          }, {
-            onConflict: 'tenant_id',
+            code_verifier: pkceData.code_verifier, // CRÍTICO: Incluir code_verifier
           });
 
-        if (insertError) {
-          console.error('Database Insert Error:', insertError);
-          throw new Error('Failed to store authentication token');
-        }
-
-        // Create default sync settings
-        await supabase.rpc('create_default_ml_settings', { p_tenant_id: tenantId });
-
-        // Log successful authentication
-        await supabase
-          .from('ml_sync_log')
-          .insert({
-            tenant_id: tenantId,
-            operation_type: 'auth_success',
-            entity_type: 'auth',
-            status: 'success',
-            response_data: { user_id_ml: mlUser.id, scope: tokenData.scope },
+          const tokenResponse = await fetch('https://api.mercadolibre.com/oauth/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json',
+            },
+            body: tokenParams,
           });
 
-        return new Response(
-          JSON.stringify({ 
-            success: true, 
-            user_info: { 
-              id: mlUser.id, 
-              nickname: mlUser.nickname,
-              email: mlUser.email 
-            } 
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+          const tokenResponseText = await tokenResponse.text();
+          console.log('ML Token Response Status:', tokenResponse.status);
+          console.log('ML Token Response Body:', tokenResponseText);
+
+          if (!tokenResponse.ok) {
+            console.error('ML Token Exchange Error:', tokenResponseText);
+            
+            // Log detalhado do erro
+            await supabase
+              .from('ml_sync_log')
+              .insert({
+                tenant_id: tenantId,
+                operation_type: 'handle_callback',
+                entity_type: 'auth',
+                status: 'error',
+                request_data: { code: body.code, state: body.state, has_pkce: true },
+                response_data: { error: tokenResponseText, status: tokenResponse.status },
+                response_status: tokenResponse.status,
+                request_url: 'https://api.mercadolibre.com/oauth/token'
+              });
+              
+            throw new Error(`Failed to exchange authorization code: ${tokenResponseText}`);
+          }
+
+          const tokenData = JSON.parse(tokenResponseText);
+
+          // Limpar PKCE data após uso bem-sucedido
+          await supabase
+            .from('ml_pkce_storage')
+            .delete()
+            .eq('state', body.state);
+
+          console.log('Token exchange successful, fetching user info...');
+
+          // Obter informações do usuário ML
+          const userResponse = await fetch('https://api.mercadolibre.com/users/me', {
+            headers: {
+              'Authorization': `Bearer ${tokenData.access_token}`,
+            },
+          });
+
+          if (!userResponse.ok) {
+            const userErrorText = await userResponse.text();
+            console.error('ML User Info Error:', userErrorText);
+            throw new Error(`Failed to get user info from Mercado Livre: ${userErrorText}`);
+          }
+
+          const mlUser = await userResponse.json();
+          console.log('ML User Info:', { id: mlUser.id, nickname: mlUser.nickname });
+
+          // Calcular tempo de expiração
+          const expiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
+
+          // Armazenar token na base de dados
+          const { error: insertError } = await supabase
+            .from('ml_auth_tokens')
+            .upsert({
+              tenant_id: tenantId,
+              access_token: tokenData.access_token,
+              refresh_token: tokenData.refresh_token,
+              token_type: tokenData.token_type || 'Bearer',
+              expires_at: expiresAt.toISOString(),
+              scope: tokenData.scope,
+              user_id_ml: mlUser.id,
+            }, {
+              onConflict: 'tenant_id',
+            });
+
+          if (insertError) {
+            console.error('Database Insert Error:', insertError);
+            throw new Error('Failed to store authentication token');
+          }
+
+          // Criar configurações padrão de sincronização
+          await supabase.rpc('create_default_ml_settings', { p_tenant_id: tenantId });
+
+          // Log de autenticação bem-sucedida
+          await supabase
+            .from('ml_sync_log')
+            .insert({
+              tenant_id: tenantId,
+              operation_type: 'auth_success',
+              entity_type: 'auth',
+              status: 'success',
+              response_data: { user_id_ml: mlUser.id, scope: tokenData.scope },
+              request_url: 'https://api.mercadolibre.com/users/me',
+              response_status: userResponse.status
+            });
+
+          console.log('ML Auth completed successfully for tenant:', tenantId);
+
+          return new Response(
+            JSON.stringify({ 
+              success: true, 
+              user_info: { 
+                id: mlUser.id, 
+                nickname: mlUser.nickname,
+                email: mlUser.email 
+              } 
+            }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+
+        } catch (error) {
+          console.error('Handle Callback Error:', error);
+          
+          // Log detalhado do erro
+          await supabase
+            .from('ml_sync_log')
+            .insert({
+              tenant_id: tenantId,
+              operation_type: 'handle_callback',
+              entity_type: 'auth',
+              status: 'error',
+              error_details: { message: error.message, stack: error.stack },
+              request_data: { code: body.code, state: body.state }
+            });
+            
+          throw error;
+        }
       }
 
       case 'refresh_token': {
@@ -220,7 +375,21 @@ serve(async (req) => {
         if (!refreshResponse.ok) {
           const errorText = await refreshResponse.text();
           console.error('ML Token Refresh Error:', errorText);
-          throw new Error('Failed to refresh token');
+          
+          // Log detalhado do erro de refresh
+          await supabase
+            .from('ml_sync_log')
+            .insert({
+              tenant_id: tenantId,
+              operation_type: 'refresh_token',
+              entity_type: 'auth',
+              status: 'error',
+              error_details: { message: errorText, status: refreshResponse.status },
+              request_url: 'https://api.mercadolibre.com/oauth/token',
+              response_status: refreshResponse.status
+            });
+            
+          throw new Error(`Failed to refresh token: ${errorText}`);
         }
 
         const newTokenData = await refreshResponse.json();
@@ -242,6 +411,19 @@ serve(async (req) => {
           console.error('Database Update Error:', updateError);
           throw new Error('Failed to update authentication token');
         }
+
+        // Log de refresh bem-sucedido
+        await supabase
+          .from('ml_sync_log')
+          .insert({
+            tenant_id: tenantId,
+            operation_type: 'refresh_token',
+            entity_type: 'auth',
+            status: 'success',
+            response_data: { expires_at: newExpiresAt.toISOString() },
+            request_url: 'https://api.mercadolibre.com/oauth/token',
+            response_status: refreshResponse.status
+          });
 
         return new Response(
           JSON.stringify({ success: true, expires_at: newExpiresAt.toISOString() }),

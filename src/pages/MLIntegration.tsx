@@ -4,6 +4,7 @@ import { MLSyncStatus } from "@/components/ml/MLSyncStatus";
 import { MLProductList } from "@/components/ml/MLProductList";
 import { ExternalLink } from "@/components/ui/icons";
 import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLCleanup } from "@/hooks/useMLCleanup";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -11,6 +12,9 @@ import { toast } from "@/hooks/use-toast";
 const MLIntegration = () => {
   const { data: authStatus } = useMLAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Ativar limpeza automática de dados temporários ML
+  useMLCleanup();
 
   // Handle callback success/error messages
   useEffect(() => {
@@ -26,17 +30,21 @@ const MLIntegration = () => {
     }
 
     if (error) {
-      let errorMessage = "Erro ao conectar com o Mercado Livre";
-      switch (error) {
-        case 'oauth_failed':
-          errorMessage = "Falha na autorização OAuth";
-          break;
-        case 'connection_failed':
-          errorMessage = "Falha na conexão com o Mercado Livre";
-          break;
-        case 'invalid_callback':
-          errorMessage = "Parâmetros de callback inválidos";
-          break;
+      let errorMessage = decodeURIComponent(error);
+      
+      // Tratar erros específicos conhecidos
+      if (error.includes('oauth_failed')) {
+        errorMessage = "Falha na autorização OAuth";
+      } else if (error.includes('connection_failed')) {
+        errorMessage = "Falha na conexão com o Mercado Livre";
+      } else if (error.includes('invalid_callback')) {
+        errorMessage = "Parâmetros de callback inválidos";
+      } else if (error.includes('PKCE')) {
+        errorMessage = "Erro na validação de segurança. Tente novamente.";
+      } else if (error.includes('code_verifier')) {
+        errorMessage = "Erro técnico na autenticação. Reconecte sua conta.";
+      } else if (error.includes('expired')) {
+        errorMessage = "Sessão de autenticação expirada. Tente conectar novamente.";
       }
       
       toast({
