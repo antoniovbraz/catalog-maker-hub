@@ -2,7 +2,7 @@ import { ActionContext, SyncProductRequest, errorResponse, corsHeaders } from '.
 
 export async function syncProduct(
   req: SyncProductRequest,
-  { supabase, tenantId }: ActionContext
+  { supabase, tenantId, jwt }: ActionContext
 ): Promise<Response> {
   if (!req.product_id) {
     return errorResponse('Product ID required', 400);
@@ -21,10 +21,12 @@ export async function syncProduct(
   const startTime = Date.now();
   try {
     const { data: syncData, error: syncError } = await supabase.functions.invoke('ml-sync', {
-      body: { action: 'sync_product', product_id: req.product_id }
+      body: { action: 'sync_product', product_id: req.product_id },
+      headers: { Authorization: `Bearer ${jwt}` }
     });
 
-    const status = syncError || !syncData?.success ? 'error' : 'success';
+    const status =
+      syncError || syncData?.error || !syncData?.success ? 'error' : 'success';
 
     await supabase.from('ml_sync_log').insert({
       tenant_id: tenantId,
