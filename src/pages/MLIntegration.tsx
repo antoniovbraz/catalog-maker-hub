@@ -6,6 +6,7 @@ import { MLHealthStatus } from "@/components/ml/MLHealthStatus";
 import { MLNotificationCenter } from "@/components/ml/MLNotificationCenter";
 import { MLAnalyticsCard } from "@/components/ml/MLAnalyticsCard";
 import { MLMultiAccountManager } from "@/components/ml/MLMultiAccountManager";
+import { MLSystemOverview } from "@/components/ml/MLSystemOverview";
 import { ExternalLink } from "@/components/ui/icons";
 import { useMLAuth } from "@/hooks/useMLAuth";
 import { useMLCleanup } from "@/hooks/useMLCleanup";
@@ -80,7 +81,12 @@ const MLIntegration = () => {
       {/* Show enhanced status and monitoring components only if connected */}
       {authStatus?.connected && (
         <>
-          {/* Row 1: Health, Notifications, Sync Status */}
+          {/* Row 1: System Overview spans full width */}
+          <div className="col-span-12">
+            <MLSystemOverview />
+          </div>
+
+          {/* Row 2: Health, Notifications, Sync Status */}
           <div className="col-span-12 lg:col-span-6 xl:col-span-4">
             <MLHealthStatus />
           </div>
@@ -93,7 +99,7 @@ const MLIntegration = () => {
             <MLSyncStatus />
           </div>
 
-          {/* Row 2: Analytics and Advanced Management */}
+          {/* Row 3: Analytics and Advanced Management */}
           <div className="col-span-12 lg:col-span-6 xl:col-span-6">
             <MLAnalyticsCard />
           </div>
@@ -102,7 +108,7 @@ const MLIntegration = () => {
             <MLMultiAccountManager />
           </div>
 
-          {/* Row 3: Product List */}
+          {/* Row 4: Product List */}
           <div className="col-span-12">
             <MLProductList />
           </div>

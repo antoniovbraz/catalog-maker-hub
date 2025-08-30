@@ -225,6 +225,48 @@ export type Database = {
           },
         ]
       }
+      ml_advanced_settings: {
+        Row: {
+          advanced_monitoring: boolean | null
+          auto_recovery_enabled: boolean | null
+          backup_schedule: string | null
+          created_at: string | null
+          feature_flags: Json | null
+          id: string
+          multi_account_enabled: boolean | null
+          rate_limits: Json | null
+          security_level: string | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          advanced_monitoring?: boolean | null
+          auto_recovery_enabled?: boolean | null
+          backup_schedule?: string | null
+          created_at?: string | null
+          feature_flags?: Json | null
+          id?: string
+          multi_account_enabled?: boolean | null
+          rate_limits?: Json | null
+          security_level?: string | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          advanced_monitoring?: boolean | null
+          auto_recovery_enabled?: boolean | null
+          backup_schedule?: string | null
+          created_at?: string | null
+          feature_flags?: Json | null
+          id?: string
+          multi_account_enabled?: boolean | null
+          rate_limits?: Json | null
+          security_level?: string | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       ml_applications: {
         Row: {
           app_id: number
