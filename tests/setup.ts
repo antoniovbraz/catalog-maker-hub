@@ -136,12 +136,12 @@ export const testUtils = {
 
   // Reseta todos os mocks
   resetAllMocks: () => {
-    vi.resetAllMocks();
-    mockSupabaseClient.from.mockReset();
-    mockSupabaseClient.rpc.mockReset();
-    Object.values(mockSupabaseClient.auth).forEach(fn => fn.mockReset());
-    Object.values(mockSupabaseClient.storage).forEach(fn => fn.mockReset());
-    mockToast.mockReset();
-    Object.values(mockQueryClient).forEach(fn => fn.mockReset());
+    vi.clearAllMocks();
+    mockSupabaseClient.from.mockClear();
+    mockSupabaseClient.rpc.mockClear();
+    Object.values(mockSupabaseClient.auth).forEach(fn => fn.mockClear());
+    Object.values(mockSupabaseClient.storage).forEach(fn => fn.mockClear());
+    mockToast.mockClear();
+    Object.values(mockQueryClient).forEach(fn => fn.mockClear());
   },
 };
