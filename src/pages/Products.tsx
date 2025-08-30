@@ -10,15 +10,16 @@ import type { ProductWithCategory } from "@/types/products";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
-import { useMLImportProducts, useMLSyncProducts } from "@/hooks/useMLSync";
+import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
 import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 import { MLConflictModal } from "@/components/forms/MLConflictModal";
+import type { MLSyncProduct } from "@/services/ml-service";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
-  const { data: mlProducts = [] } = useMLSyncProducts();
+  const { sync } = useMLIntegration();
+  const { importFromML } = useMLSync();
   const deleteMutation = useDeleteProduct();
-  const { mutate: importFromML, isPending: isImporting } = useMLImportProducts();
   const { showFormModal, showConfirmModal } = useGlobalModal();
 
   const columns: DataColumn<ProductWithCategory>[] = [
@@ -43,7 +44,7 @@ export default function Products() {
       key: "source",
       header: "Origem",
       render: (item) => {
-        const mlProduct = mlProducts.find(ml => ml.id === item.id);
+        const mlProduct = sync.products?.find(ml => ml.id === item.id);
         return (
           <ProductSourceBadge 
             source={item.source} 
@@ -136,12 +137,12 @@ export default function Products() {
     });
   };
 
-  const checkForConflicts = async (product: ProductWithCategory) => {
+  const checkForConflicts = async (product: ProductWithCategory): Promise<MLSyncProduct[]> => {
     // Simular verificação de conflitos
-    const existingProducts = mlProducts.filter(ml => 
+    const existingProducts = sync.products?.filter(ml => 
       ml.name.toLowerCase().includes(product.name.toLowerCase()) ||
       (product.sku && ml.name.toLowerCase().includes(product.sku.toLowerCase()))
-    );
+    ) || [];
 
     return existingProducts;
   };
@@ -214,7 +215,7 @@ export default function Products() {
         variant: "default",
       });
     } else if (product.source === 'mercado_livre') {
-      const mlProduct = mlProducts.find(ml => ml.id === product.id);
+      const mlProduct = sync.products?.find(ml => ml.id === product.id);
       baseActions.push({
         label: "Ver no ML",
         icon: <ExternalLink className="size-4" />,
@@ -275,9 +276,9 @@ export default function Products() {
 
   const headerActions = (
     <div className="flex gap-2">
-      <Button size="sm" variant="outline" onClick={() => importFromML()} disabled={isImporting}>
+      <Button size="sm" variant="outline" onClick={() => importFromML.mutate()} disabled={importFromML.isPending}>
         <Download className="mr-2 size-4" />
-        {isImporting ? 'Importando...' : 'Importar do ML'}
+        {importFromML.isPending ? 'Importando...' : 'Importar do ML'}
       </Button>
       <Button size="sm" onClick={handleCreateNew}>
         <Plus className="mr-2 size-4" />

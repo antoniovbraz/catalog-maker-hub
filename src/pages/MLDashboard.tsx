@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import type { DataColumn, DataAction } from "@/components/ui/data-visualization";
-import { useMLSyncProducts, useMLSyncBatch } from "@/hooks/useMLSync";
+import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
 import { useProductsWithCategories } from "@/hooks/useProducts";
 import { formatarMoeda } from "@/utils/pricing";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
@@ -16,9 +16,11 @@ import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 import { MLSyncSettingsModal } from "@/components/forms/MLSyncSettingsModal";
 
 export default function MLDashboard() {
-  const { data: mlProducts = [], isLoading: isLoadingML } = useMLSyncProducts();
+  const { sync, syncStatusQuery } = useMLIntegration();
+  const { syncBatch } = useMLSync();
   const { data: allProducts = [], isLoading: isLoadingProducts } = useProductsWithCategories();
-  const { mutate: syncBatch, isPending: isSyncing } = useMLSyncBatch();
+  const mlProducts = sync?.products || [];
+  const isLoadingML = syncStatusQuery.isLoading;
   const { showFormModal } = useGlobalModal();
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -162,7 +164,7 @@ export default function MLDashboard() {
     {
       label: "Sincronizar",
       icon: <RotateCcw className="size-4" />,
-      onClick: (item) => syncBatch([item.id]),
+      onClick: (item) => syncBatch.mutate([item.id]),
       variant: "outline",
     },
   ];

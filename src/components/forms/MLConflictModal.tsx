@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Package, AlertTriangle } from "lucide-react";
 import type { ProductWithCategory } from "@/types/products";
-import type { MLSyncProduct } from "@/hooks/useMLSync";
+import type { MLSyncProduct } from "@/services/ml-service";
 
 interface MLConflictModalProps {
   product: ProductWithCategory;

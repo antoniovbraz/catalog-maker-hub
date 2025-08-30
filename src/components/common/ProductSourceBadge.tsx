@@ -4,7 +4,7 @@ import { ShoppingCart, Store, Package, ExternalLink, CheckCircle2, AlertCircle }
 
 interface ProductSourceBadgeProps {
   source: 'manual' | 'mercado_livre' | 'shopee';
-  mlStatus?: 'not_synced' | 'syncing' | 'synced' | 'error';
+  mlStatus?: 'not_synced' | 'syncing' | 'synced' | 'error' | 'pending';
   mlItemId?: string;
   className?: string;
 }
@@ -36,6 +36,7 @@ export function ProductSourceBadge({ source, mlStatus, mlItemId, className }: Pr
     syncing: { icon: Package, color: 'text-blue-500' },
     synced: { icon: CheckCircle2, color: 'text-green-500' },
     error: { icon: AlertCircle, color: 'text-red-500' },
+    pending: { icon: Package, color: 'text-amber-500' },
   };
 
   const config = sourceConfig[source];

@@ -4,16 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
-import { useMLSyncProducts, useMLSyncProduct, useMLSyncBatch } from "@/hooks/useMLSync";
+import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 
 export function MLProductList() {
-  const { data: products = [], isLoading } = useMLSyncProducts();
-  const syncProductMutation = useMLSyncProduct();
-  const syncBatchMutation = useMLSyncBatch();
+  const { sync, syncStatusQuery } = useMLIntegration();
+  const { syncProduct, syncBatch } = useMLSync();
+  const products = sync?.products || [];
+  const isLoading = syncStatusQuery.isLoading;
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -34,12 +35,12 @@ export function MLProductList() {
   };
 
   const handleSyncProduct = (productId: string) => {
-    syncProductMutation.mutate(productId);
+    syncProduct.mutate(productId);
   };
 
   const handleSyncBatch = () => {
     if (selectedProducts.length > 0) {
-      syncBatchMutation.mutate(selectedProducts);
+      syncBatch.mutate(selectedProducts);
       setSelectedProducts([]);
     }
   };
@@ -84,10 +85,10 @@ export function MLProductList() {
           {selectedProducts.length > 0 && (
             <Button 
               onClick={handleSyncBatch}
-              disabled={syncBatchMutation.isPending}
+              disabled={syncBatch.isPending}
               size="sm"
             >
-              {syncBatchMutation.isPending ? (
+              {syncBatch.isPending ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               ) : (
                 <Play className="mr-2 size-4" />
@@ -178,9 +179,9 @@ export function MLProductList() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleSyncProduct(product.id)}
-                        disabled={syncProductMutation.isPending}
+                        disabled={syncProduct.isPending}
                       >
-                        {syncProductMutation.isPending ? (
+                        {syncProduct.isPending ? (
                           <Loader2 className="size-4 animate-spin" />
                         ) : (
                           <RefreshCw className="size-4" />

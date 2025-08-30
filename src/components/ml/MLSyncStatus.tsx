@@ -2,13 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, Package, CheckCircle2, AlertTriangle, Clock } from "@/components/ui/icons";
-import { useMLSyncStatus } from "@/hooks/useMLSync";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function MLSyncStatus() {
-  const { data: syncStatus, isLoading } = useMLSyncStatus();
+  const { sync, syncStatusQuery } = useMLIntegration();
+  const syncStatus = sync?.status_counts;
+  const isLoading = syncStatusQuery.isLoading;
 
   if (isLoading) {
     return (
@@ -24,31 +26,31 @@ export function MLSyncStatus() {
     return null;
   }
 
-  const syncProgress = syncStatus.total_products > 0 ? 
-    (syncStatus.synced_products / syncStatus.total_products) * 100 : 0;
+  const syncProgress = syncStatus && syncStatus.total > 0 ? 
+    (syncStatus.synced / syncStatus.total) * 100 : 0;
 
   const stats = [
     {
       label: "Total de Produtos",
-      value: syncStatus.total_products,
+      value: syncStatus?.total || 0,
       icon: Package,
       color: "text-foreground"
     },
     {
       label: "Sincronizados",
-      value: syncStatus.synced_products,
+      value: syncStatus?.synced || 0,
       icon: CheckCircle2,
       color: "text-success"
     },
     {
       label: "Pendentes",
-      value: syncStatus.pending_products,
+      value: syncStatus?.pending || 0,
       icon: Clock,
       color: "text-warning"
     },
     {
       label: "Com Erro",
-      value: syncStatus.error_products,
+      value: syncStatus?.error || 0,
       icon: AlertTriangle,
       color: "text-destructive"
     }
@@ -93,14 +95,19 @@ export function MLSyncStatus() {
         </div>
 
         {/* Last Sync */}
-        {syncStatus.last_sync_at && (
+        {sync?.products && sync.products.length > 0 && (
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Última sincronização:</span>
             <Badge variant="outline">
-              {formatDistanceToNow(new Date(syncStatus.last_sync_at), { 
-                addSuffix: true, 
-                locale: ptBR 
-              })}
+              {sync.products.some(p => p.last_sync_at) ? 
+                formatDistanceToNow(new Date(
+                  sync.products
+                    .filter(p => p.last_sync_at)
+                    .sort((a, b) => new Date(b.last_sync_at!).getTime() - new Date(a.last_sync_at!).getTime())[0]
+                    .last_sync_at!
+                ), { addSuffix: true, locale: ptBR }) : 
+                'Nunca'
+              }
             </Badge>
           </div>
         )}
