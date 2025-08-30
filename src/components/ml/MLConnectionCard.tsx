@@ -2,13 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ExternalLink, RefreshCw, AlertCircle, CheckCircle2, Unlink } from "@/components/ui/icons";
-import { useMLIntegration, useMLAuth } from "@/hooks/useMLIntegration";
-import { useMLAuthDisconnect } from "@/hooks/useMLAuthDisconnect";
+import { useMLIntegration, useMLAuth, useMLAuthDisconnect } from "@/hooks/useMLIntegration";
 import { useState } from "react";
 
 export function MLConnectionCard() {
   const { auth, authQuery } = useMLIntegration();
-  const { startAuth, refreshToken } = useMLAuth();
+  const { startAuth } = useMLAuth();
   const disconnectMutation = useMLAuthDisconnect();
   const authStatus = auth;
   const isLoading = authQuery.isLoading;
@@ -17,10 +16,6 @@ export function MLConnectionCard() {
 
   const handleConnect = () => {
     startAuth.mutate();
-  };
-
-  const handleRefresh = () => {
-    refreshToken.mutate();
   };
 
   const handleDisconnect = () => {
@@ -68,7 +63,7 @@ export function MLConnectionCard() {
             
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Status do Sistema:</span>
-              <span className="text-success font-medium">
+                <span className="font-medium text-success">
                 🔄 Renovação Automática Ativa
               </span>
             </div>

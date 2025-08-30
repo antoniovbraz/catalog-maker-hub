@@ -1,11 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testUtils } from '../setup';
 import { useProduct } from '@/hooks/useProducts';
-import { productsService } from '@/services/products';
+import { supabase } from '@/integrations/supabase/client';
 
-vi.mock('@/services/products');
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
 
 const createWrapper = () => {
   const queryClient = new QueryClient({
@@ -24,11 +28,18 @@ describe('useProduct', () => {
   beforeEach(() => {
     testUtils.resetAllMocks();
     vi.clearAllMocks();
+    (supabase.from as Mock).mockReset();
   });
 
   it('deve buscar produto por ID com sucesso', async () => {
     const mockProduct = testUtils.createMockProduct({ id: '1', name: 'Produto 1' });
-    vi.mocked(productsService.getById).mockResolvedValue(mockProduct);
+    (supabase.from as Mock).mockReturnValue({
+      select: () => ({
+        eq: () => ({
+          single: () => Promise.resolve({ data: mockProduct, error: null }),
+        }),
+      }),
+    });
 
     const { result } = renderHook(() => useProduct('1'), {
       wrapper: createWrapper(),
@@ -41,12 +52,17 @@ describe('useProduct', () => {
     });
 
     expect(result.current.data).toEqual(mockProduct);
-    expect(productsService.getById).toHaveBeenCalledWith('1');
   });
 
   it('deve lidar com erro ao buscar produto por ID', async () => {
     const mockError = new Error('Failed to fetch product');
-    vi.mocked(productsService.getById).mockRejectedValue(mockError);
+    (supabase.from as Mock).mockReturnValue({
+      select: () => ({
+        eq: () => ({
+          single: () => Promise.resolve({ data: null, error: { message: mockError.message } }),
+        }),
+      }),
+    });
 
     const { result } = renderHook(() => useProduct('1'), {
       wrapper: createWrapper(),

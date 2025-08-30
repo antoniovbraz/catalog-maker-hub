@@ -162,33 +162,18 @@ export async function processWebhook(payload: WebhookPayload) {
 ### **Hooks Recomendados**
 
 ```typescript
-// hooks/useMLAuth.ts
-export function useMLAuth() {
-  const { data: profile } = useProfile();
-  
-  return useQuery({
-    queryKey: ['ml-auth', profile?.tenant_id],
-    queryFn: () => MLAuthService.getStatus(profile.tenant_id),
-    enabled: !!profile?.tenant_id,
-    refetchInterval: 5 * 60 * 1000 // 5 minutos
-  });
+// hooks/useMLIntegration.ts
+import { useMLIntegration, useMLAuth, useMLSync } from '@/hooks/useMLIntegration';
+
+// Consulta status de autenticação
+export function useMLAuthStatus() {
+  const { authQuery } = useMLIntegration();
+  return authQuery;
 }
 
-// hooks/useMLSync.ts  
-export function useMLSync() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: MLSyncService.syncProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['products']);
-      queryClient.invalidateQueries(['ml-products']);
-      toast.success('Produto sincronizado com ML!');
-    },
-    onError: (error) => {
-      toast.error(`Erro na sincronização: ${error.message}`);
-    }
-  });
+// Sincronização de produtos
+export function useMLProductSync() {
+  return useMLSync();
 }
 ```
 
@@ -197,16 +182,16 @@ export function useMLSync() {
 ```typescript
 // components/ml/MLConnectionCard.tsx
 export function MLConnectionCard() {
-  const { data: auth, isLoading } = useMLAuth();
-  const startAuth = useMLAuthStart();
-  
-  if (isLoading) return <MLConnectionSkeleton />;
-  
+  const { auth, authQuery } = useMLIntegration();
+  const { startAuth } = useMLAuth();
+
+  if (authQuery.isLoading) return <MLConnectionSkeleton />;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Mercado Livre</CardTitle>
-        <MLConnectionBadge status={auth?.connected} />
+        <MLConnectionBadge status={auth?.isConnected} />
       </CardHeader>
       
       <CardContent>

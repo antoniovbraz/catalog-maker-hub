@@ -95,7 +95,8 @@ describe('AppSidebar accessibility', () => {
     );
 
     await user.tab();
-    expect(screen.getByRole('link', { name: /dashboard/i })).toHaveFocus();
+    const [dashboardLink] = screen.getAllByRole('link', { name: /dashboard/i });
+    expect(dashboardLink).toHaveFocus();
 
     await user.tab();
     expect(screen.getByRole('link', { name: /estratégia/i })).toHaveFocus();

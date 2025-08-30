@@ -135,7 +135,7 @@ describe('MLAuthService', () => {
 // tests/hooks/useMLAuth.test.ts
 import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
-import { useMLAuth } from '@/hooks/useMLAuth'
+import { useMLAuth } from '@/hooks/useMLIntegration'
 
 const mockSupabase = {
   from: vi.fn(() => ({
@@ -153,10 +153,9 @@ describe('useMLAuth', () => {
     const { result } = renderHook(() => useMLAuth())
 
     await act(async () => {
-      await result.current.handleOAuthCallback('auth_code_123')
+      await result.current.handleCallback.mutate({ code: 'auth_code_123', state: 'state_456' })
     })
 
-    expect(result.current.isAuthenticated).toBe(true)
     expect(mockSupabase.from).toHaveBeenCalledWith('ml_auth_tokens')
   })
 })
