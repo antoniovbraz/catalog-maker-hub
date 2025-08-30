@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell, CheckCircle, AlertTriangle, Info } from "@/components/ui/icons";
-import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 
 interface Notification {
   id: string;
@@ -12,12 +12,13 @@ interface Notification {
 }
 
 export function MLNotificationCenter() {
-  const { data: authStatus } = useMLAuth();
+  const { auth } = useMLIntegration();
+  const authStatus = auth;
 
   const getNotifications = (): Notification[] => {
     const notifications: Notification[] = [];
 
-    if (!authStatus?.connected) {
+    if (!authStatus?.isConnected) {
       notifications.push({
         id: 'disconnected',
         type: 'error',

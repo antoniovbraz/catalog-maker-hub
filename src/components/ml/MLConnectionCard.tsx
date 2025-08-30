@@ -2,23 +2,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ExternalLink, RefreshCw, AlertCircle, CheckCircle2, Unlink } from "@/components/ui/icons";
-import { useMLAuth, useMLAuthStart, useMLAuthRefresh } from "@/hooks/useMLAuth";
+import { useMLIntegration, useMLAuth } from "@/hooks/useMLIntegration";
 import { useMLAuthDisconnect } from "@/hooks/useMLAuthDisconnect";
 import { useState } from "react";
 
 export function MLConnectionCard() {
-  const { data: authStatus, isLoading, refetch } = useMLAuth();
-  const startAuthMutation = useMLAuthStart();
-  const refreshMutation = useMLAuthRefresh();
+  const { auth, authQuery } = useMLIntegration();
+  const { startAuth, refreshToken } = useMLAuth();
   const disconnectMutation = useMLAuthDisconnect();
+  const authStatus = auth;
+  const isLoading = authQuery.isLoading;
+  const refetch = authQuery.refetch;
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
 
   const handleConnect = () => {
-    startAuthMutation.mutate();
+    startAuth.mutate();
   };
 
   const handleRefresh = () => {
-    refreshMutation.mutate();
+    refreshToken.mutate();
   };
 
   const handleDisconnect = () => {
@@ -28,13 +30,13 @@ export function MLConnectionCard() {
 
   const getStatusIcon = () => {
     if (isLoading) return <Loader2 className="size-5 animate-spin" />;
-    if (authStatus?.connected) return <CheckCircle2 className="size-5 text-success" />;
+    if (authStatus?.isConnected) return <CheckCircle2 className="size-5 text-success" />;
     return <AlertCircle className="size-5 text-warning" />;
   };
 
   const getStatusBadge = () => {
     if (isLoading) return <Badge variant="secondary">Verificando...</Badge>;
-    if (authStatus?.connected) return <Badge className="bg-success text-success-foreground">🟢 Conectado</Badge>;
+    if (authStatus?.isConnected) return <Badge className="bg-success text-success-foreground">🟢 Conectado</Badge>;
     return <Badge variant="destructive">🔴 Desconectado</Badge>;
   };
 
@@ -54,7 +56,7 @@ export function MLConnectionCard() {
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {authStatus?.connected ? (
+        {authStatus?.isConnected ? (
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Nome da Loja:</span>
@@ -122,20 +124,20 @@ export function MLConnectionCard() {
               Conecte sua conta do Mercado Livre para sincronizar produtos e gerenciar vendas automaticamente.
             </p>
             
-            {(authStatus?.error || startAuthMutation.error) && (
+            {(authStatus?.error || startAuth.error) && (
               <div className="rounded-md bg-destructive/10 p-3">
                 <p className="text-sm text-destructive">
-                  {authStatus?.error || (startAuthMutation.error as Error).message}
+                  {authStatus?.error || (startAuth.error as Error)?.message}
                 </p>
               </div>
             )}
             
             <Button 
               onClick={handleConnect}
-              disabled={startAuthMutation.isPending}
+              disabled={startAuth.isPending}
               className="w-full"
             >
-              {startAuthMutation.isPending ? (
+              {startAuth.isPending ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               ) : (
                 <ExternalLink className="mr-2 size-4" />

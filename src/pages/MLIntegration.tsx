@@ -8,14 +8,15 @@ import { MLAnalyticsCard } from "@/components/ml/MLAnalyticsCard";
 import { MLMultiAccountManager } from "@/components/ml/MLMultiAccountManager";
 import { MLSystemOverview } from "@/components/ml/MLSystemOverview";
 import { ExternalLink } from "@/components/ui/icons";
-import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLCleanup } from "@/hooks/useMLCleanup";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 const MLIntegration = () => {
-  const { data: authStatus } = useMLAuth();
+  const { auth } = useMLIntegration();
+  const authStatus = auth;
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Ativar limpeza automática de dados temporários ML
@@ -79,7 +80,7 @@ const MLIntegration = () => {
       </div>
 
       {/* Show enhanced status and monitoring components only if connected */}
-      {authStatus?.connected && (
+      {authStatus?.isConnected && (
         <>
           {/* Row 1: System Overview spans full width */}
           <div className="col-span-12">
@@ -116,7 +117,7 @@ const MLIntegration = () => {
       )}
 
       {/* Help Section */}
-      {!authStatus?.connected && (
+      {!authStatus?.isConnected && (
         <div className="col-span-12 xl:col-span-8 xl:col-start-3">
           <div className="rounded-lg border border-dashed border-muted-foreground/25 p-6">
             <h3 className="mb-2 font-semibold">Como conectar ao Mercado Livre</h3>

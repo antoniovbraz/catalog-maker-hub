@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useMLAuthCallback } from "@/hooks/useMLAuth";
+import { useMLAuth } from "@/hooks/useMLIntegration";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, CheckCircle2 } from "@/components/ui/icons";
@@ -8,7 +8,8 @@ import { AlertCircle, CheckCircle2 } from "@/components/ui/icons";
 export default function MLCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const callbackMutation = useMLAuthCallback();
+  const { handleCallback } = useMLAuth();
+  const callbackMutation = handleCallback;
 
   const code = searchParams.get('code');
   const state = searchParams.get('state');
@@ -34,7 +35,7 @@ export default function MLCallback() {
       
       if (!hasMutatedRef.current) {
         hasMutatedRef.current = true;
-        callbackMutation.mutate(code, {
+        callbackMutation.mutate({ code, state }, {
           onSuccess: () => {
             console.log('ML callback successful, redirecting...');
             navigate('/integrations/mercado-livre?success=connected');

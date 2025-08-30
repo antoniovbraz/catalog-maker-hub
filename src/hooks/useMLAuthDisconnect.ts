@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { ML_AUTH_QUERY_KEY } from "./useMLAuth";
+import { ML_QUERY_KEYS } from "./useMLIntegration";
 
 export function useMLAuthDisconnect() {
   const queryClient = useQueryClient();
@@ -22,7 +22,7 @@ export function useMLAuthDisconnect() {
       console.log('ML disconnected successfully');
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ML_AUTH_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.auth });
       toast({
         title: "Desconectado",
         description: "Sua conta do Mercado Livre foi desconectada com sucesso.",

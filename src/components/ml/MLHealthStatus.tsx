@@ -1,19 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wifi, Activity, TrendingUp, Clock } from "@/components/ui/icons";
-import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export function MLHealthStatus() {
-  const { data: authStatus, isLoading } = useMLAuth();
+  const { auth, authQuery } = useMLIntegration();
+  const authStatus = auth;
+  const isLoading = authQuery.isLoading;
 
-  if (isLoading || !authStatus?.connected) {
+  if (isLoading || !authStatus?.isConnected) {
     return null;
   }
 
   const getHealthScore = () => {
-    if (!authStatus.connected) return 0;
+    if (!authStatus.isConnected) return 0;
     
     const expiresAt = new Date(authStatus.expires_at || '');
     const now = new Date();

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Settings, Store, UserCheck, RefreshCw, Shield, Zap } from "@/components/ui/icons";
-import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useState } from "react";
 
 interface MLAccount {
@@ -15,7 +15,8 @@ interface MLAccount {
 }
 
 export function MLMultiAccountManager() {
-  const { data: authStatus } = useMLAuth();
+  const { auth } = useMLIntegration();
+  const authStatus = auth;
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
 
   // Simulação de múltiplas contas (futura implementação)
@@ -24,7 +25,7 @@ export function MLMultiAccountManager() {
       id: '1',
       nickname: authStatus?.ml_nickname || 'Loja Principal',
       user_id_ml: authStatus?.user_id_ml || 0,
-      status: authStatus?.connected ? 'active' : 'inactive',
+      status: authStatus?.isConnected ? 'active' : 'inactive',
       lastSync: new Date()
     }
   ];

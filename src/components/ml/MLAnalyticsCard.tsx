@@ -4,14 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Download, Shield, Clock, Users, Database } from "@/components/ui/icons";
 import { useMLPerformanceMetrics, useMLBackup } from "@/hooks/useMLAdvanced";
-import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 
 export function MLAnalyticsCard() {
-  const { data: authStatus } = useMLAuth();
-  const { data: metrics, isLoading } = useMLPerformanceMetrics(7);
+  const { auth, authQuery } = useMLIntegration();
+  const authStatus = auth;
+  const authLoading = authQuery.isLoading;
+  const { data: metrics, isLoading: metricsLoading } = useMLPerformanceMetrics(7);
   const backupMutation = useMLBackup();
 
-  if (!authStatus?.connected || isLoading) {
+  if (!authStatus?.isConnected || authLoading) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -23,7 +25,7 @@ export function MLAnalyticsCard() {
         </CardHeader>
         <CardContent>
           <div className="text-center text-muted-foreground py-8">
-            {!authStatus?.connected ? "Conecte-se ao ML para ver analytics" : "Carregando métricas..."}
+            {!authStatus?.isConnected ? "Conecte-se ao ML para ver analytics" : "Carregando métricas..."}
           </div>
         </CardContent>
       </Card>

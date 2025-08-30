@@ -12,14 +12,15 @@ import {
   Zap,
   Eye
 } from "@/components/ui/icons";
-import { useMLAuth } from "@/hooks/useMLAuth";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLAdvancedSettings } from "@/hooks/useMLAdvancedSettings";
 
 export function MLSystemOverview() {
-  const { data: authStatus } = useMLAuth();
+  const { auth } = useMLIntegration();
+  const authStatus = auth;
   const { data: settings } = useMLAdvancedSettings();
 
-  if (!authStatus?.connected) {
+  if (!authStatus?.isConnected) {
     return (
       <Card className="w-full">
         <CardHeader>

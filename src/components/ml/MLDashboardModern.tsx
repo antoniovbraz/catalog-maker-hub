@@ -30,7 +30,7 @@ import {
 // Use new centralized ML service
 import { 
   useMLIntegration, 
-  useMLAuth, 
+  useMLAuth,
   useMLSync, 
   useMLSettings,
   useMLConnectionStatus,
