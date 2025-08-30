@@ -84,28 +84,29 @@ export class MLAuthService {
 
 ### **Hook Pattern**
 ```typescript
-// hooks/useMLAuth.ts  
-export function useMLAuth() {
-  return useQuery({
-    queryKey: ['ml-auth'],
-    queryFn: MLAuthService.getStatus,
-    refetchInterval: 5 * 60 * 1000 // 5 min
-  });
+// hooks/useMLIntegration.ts
+import { useMLIntegration } from '@/hooks/useMLIntegration';
+
+export function useMLAuthStatus() {
+  const { authQuery } = useMLIntegration();
+  return authQuery;
 }
 ```
 
 ### **Component Pattern**
 ```typescript
 // components/ml/MLConnectionStatus.tsx
+import { useMLIntegration } from '@/hooks/useMLIntegration';
+
 export function MLConnectionStatus() {
-  const { data: status, isLoading } = useMLAuth();
-  
-  if (isLoading) return <Skeleton />;
-  
+  const { auth, authQuery } = useMLIntegration();
+
+  if (authQuery.isLoading) return <Skeleton />;
+
   return (
     <Card>
-      <ConnectionStatusBadge status={status?.connection} />
-      <MLConnectionActions status={status} />
+      <ConnectionStatusBadge status={auth?.isConnected} />
+      <MLConnectionActions status={auth} />
     </Card>
   );
 }
