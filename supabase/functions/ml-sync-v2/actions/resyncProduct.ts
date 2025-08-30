@@ -1,0 +1,233 @@
+import { ActionContext, ResyncProductRequest, errorResponse, corsHeaders } from '../types.ts';
+
+export async function resyncProduct(
+  req: ResyncProductRequest,
+  { supabase, tenantId, mlToken }: ActionContext
+): Promise<Response> {
+  console.log('Re-syncing product:', req.productId);
+
+  if (!req.productId) {
+    return errorResponse('Product ID is required', 400);
+  }
+
+  try {
+    const { data: productMapping, error: mappingError } = await supabase
+      .from('ml_product_mapping')
+      .select('*, products(*)')
+      .eq('tenant_id', tenantId)
+      .eq('product_id', req.productId)
+      .single();
+
+    if (mappingError || !productMapping?.ml_item_id) {
+      console.error('Product mapping not found:', mappingError);
+      return errorResponse('Produto não possui mapeamento ML válido', 404);
+    }
+
+    const itemResponse = await fetch(
+      `https://api.mercadolibre.com/items/${productMapping.ml_item_id}`,
+      { headers: { Authorization: `Bearer ${mlToken}` } }
+    );
+
+    if (!itemResponse.ok) {
+      throw new Error(`ML API error: ${itemResponse.status}`);
+    }
+
+    const itemData = await itemResponse.json();
+    console.log('Got item details for re-sync:', itemData.id, itemData.title);
+
+    let description = '';
+    try {
+      const descResponse = await fetch(
+        `https://api.mercadolibre.com/items/${itemData.id}/description`,
+        { headers: { Authorization: `Bearer ${mlToken}` } }
+      );
+      if (descResponse.ok) {
+        const descData = await descResponse.json();
+        description = descData.plain_text || '';
+      }
+    } catch (e) {
+      console.warn('Could not fetch description:', e);
+    }
+
+    let categoryData = null as any;
+    if (itemData.category_id) {
+      try {
+        const catResponse = await fetch(
+          `https://api.mercadolibre.com/categories/${itemData.category_id}`,
+          { headers: { Authorization: `Bearer ${mlToken}` } }
+        );
+        if (catResponse.ok) {
+          categoryData = await catResponse.json();
+        }
+      } catch (e) {
+        console.warn('Could not fetch category:', e);
+      }
+    }
+
+    const brand =
+      itemData.attributes?.find((attr: any) => attr.id === 'BRAND')?.value_name || '';
+    const model =
+      itemData.attributes?.find((attr: any) => attr.id === 'MODEL')?.value_name || '';
+    const warranty =
+      itemData.attributes?.find((attr: any) => attr.id === 'WARRANTY')?.value_name || '';
+
+    const dimensions = {
+      length:
+        itemData.attributes?.find((attr: any) => attr.id === 'LENGTH')?.value_name ||
+        null,
+      width:
+        itemData.attributes?.find((attr: any) => attr.id === 'WIDTH')?.value_name ||
+        null,
+      height:
+        itemData.attributes?.find((attr: any) => attr.id === 'HEIGHT')?.value_name ||
+        null,
+    } as Record<string, any>;
+
+    const weight = parseFloat(
+      itemData.attributes?.find((attr: any) => attr.id === 'WEIGHT')?.value_name || '0'
+    );
+
+    let skuToUse = itemData.seller_sku || '';
+    if (!skuToUse && itemData.variations?.length > 0) {
+      skuToUse =
+        itemData.variations[0].seller_sku || itemData.variations[0].id || '';
+    }
+    if (!skuToUse) {
+      skuToUse = itemData.id;
+    }
+
+    const { error: updateError } = await supabase
+      .from('products')
+      .update({
+        description: description,
+        sku: skuToUse,
+        brand: brand,
+        model: model,
+        warranty: warranty,
+        weight: weight,
+        dimensions: dimensions,
+        ml_attributes: itemData.attributes || {},
+        ml_seller_sku: itemData.seller_sku,
+        ml_available_quantity: itemData.available_quantity || 0,
+        ml_sold_quantity: itemData.sold_quantity || 0,
+        ml_variation_id:
+          itemData.variations?.length > 0 ? itemData.variations[0].id : null,
+        ml_pictures: itemData.pictures || [],
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', req.productId)
+      .eq('tenant_id', tenantId);
+
+    if (updateError) {
+      console.error('Error updating product:', updateError);
+      throw new Error('Erro ao atualizar produto');
+    }
+
+    if (categoryData) {
+      await supabase
+        .from('ml_product_mapping')
+        .update({
+          ml_category_id: categoryData.id,
+          last_sync_at: new Date().toISOString(),
+          sync_status: 'synced',
+          error_message: null,
+        })
+        .eq('product_id', req.productId)
+        .eq('tenant_id', tenantId);
+
+      await supabase
+        .from('ml_categories')
+        .upsert(
+          {
+            tenant_id: tenantId,
+            ml_category_id: categoryData.id,
+            ml_category_name: categoryData.name,
+            ml_path_from_root: categoryData.path_from_root || [],
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'tenant_id,ml_category_id' }
+        );
+    }
+
+    if (itemData.pictures?.length > 0) {
+      for (let i = 0; i < Math.min(itemData.pictures.length, 10); i++) {
+        const picture = itemData.pictures[i];
+        await supabase
+          .from('product_images')
+          .upsert(
+            {
+              tenant_id: tenantId,
+              product_id: req.productId,
+              image_url: picture.url || picture.secure_url,
+              sort_order: i,
+              image_type: 'ml_sync',
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'tenant_id,product_id,image_url' }
+          );
+      }
+    }
+
+    await supabase
+      .from('ml_sync_log')
+      .insert({
+        tenant_id: tenantId,
+        operation_type: 'resync_product',
+        entity_type: 'product',
+        entity_id: req.productId,
+        ml_entity_id: itemData.id,
+        status: 'success',
+        request_data: { productId: req.productId },
+        response_data: {
+          title: itemData.title,
+          category: categoryData?.name,
+          attributes_count: itemData.attributes?.length || 0,
+          pictures_count: itemData.pictures?.length || 0,
+        },
+      });
+
+    console.log('Product re-sync completed successfully');
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Produto re-sincronizado com sucesso',
+        data: {
+          title: itemData.title,
+          category: categoryData?.name,
+          updated_fields: [
+            'description',
+            'sku',
+            'brand',
+            'model',
+            'warranty',
+            'dimensions',
+            'attributes',
+          ],
+        },
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error in resync_product:', error);
+
+    await supabase
+      .from('ml_sync_log')
+      .insert({
+        tenant_id: tenantId,
+        operation_type: 'resync_product',
+        entity_type: 'product',
+        entity_id: req.productId,
+        status: 'error',
+        error_details: { message: (error as Error).message, stack: (error as Error).stack },
+      });
+
+    return new Response(
+      JSON.stringify({ error: 'Erro na re-sincronização: ' + (error as Error).message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    );
+  }
+}
