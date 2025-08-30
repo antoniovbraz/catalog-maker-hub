@@ -1135,42 +1135,6 @@ export type Database = {
       }
     }
     Views: {
-      ml_integration_health: {
-        Row: {
-          connected_at: string | null
-          expires_at: string | null
-          failed_renewals_24h: number | null
-          health_status: string | null
-          hours_until_expiry: number | null
-          ml_nickname: string | null
-          successful_renewals_24h: number | null
-          tenant_id: string | null
-          user_id_ml: number | null
-        }
-        Insert: {
-          connected_at?: string | null
-          expires_at?: string | null
-          failed_renewals_24h?: never
-          health_status?: never
-          hours_until_expiry?: never
-          ml_nickname?: string | null
-          successful_renewals_24h?: never
-          tenant_id?: string | null
-          user_id_ml?: number | null
-        }
-        Update: {
-          connected_at?: string | null
-          expires_at?: string | null
-          failed_renewals_24h?: never
-          health_status?: never
-          hours_until_expiry?: never
-          ml_nickname?: string | null
-          successful_renewals_24h?: never
-          tenant_id?: string | null
-          user_id_ml?: number | null
-        }
-        Relationships: []
-      }
       ml_integration_status: {
         Row: {
           connection_status: string | null
@@ -1231,6 +1195,10 @@ export type Database = {
       }
     }
     Functions: {
+      backup_ml_configuration: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       calcular_margem_real: {
         Args: {
           p_marketplace_id: string
@@ -1250,6 +1218,10 @@ export type Database = {
           p_taxa_cartao: number
         }
         Returns: Json
+      }
+      check_ml_rate_limit: {
+        Args: { p_operation_type: string }
+        Returns: boolean
       }
       check_usage_limit: {
         Args: {
@@ -1278,6 +1250,24 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      get_ml_integration_health: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          connected_at: string
+          expires_at: string
+          failed_renewals_24h: number
+          health_status: string
+          hours_until_expiry: number
+          ml_nickname: string
+          successful_renewals_24h: number
+          tenant_id: string
+          user_id_ml: number
+        }[]
+      }
+      get_ml_performance_metrics: {
+        Args: { p_days?: number }
+        Returns: Json
       }
       get_tenant_by_ml_user_id: {
         Args: { p_user_id_ml: number }
