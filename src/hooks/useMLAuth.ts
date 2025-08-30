@@ -13,7 +13,7 @@ export interface MLAuthStatus {
 export const ML_AUTH_QUERY_KEY = "ml-auth";
 
 export function useMLAuth() {
-  return useQuery({
+  const query = useQuery({
     queryKey: [ML_AUTH_QUERY_KEY],
     queryFn: async (): Promise<MLAuthStatus> => {
       const { data, error } = await supabase.functions.invoke('ml-auth', {
@@ -25,24 +25,29 @@ export function useMLAuth() {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 0,
-    onError: (error: Error) => {
-      toast({
-        title: "Erro na verificação",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
   });
+
+  // Handle errors without onError callback (React Query v5)
+  if (query.error) {
+    toast({
+      title: "Erro na verificação",
+      description: query.error.message,
+      variant: "destructive",
+    });
+  }
+
+  return query;
 }
 
 export function useMLAuthStart() {
   return useMutation({
     mutationFn: async (): Promise<{ auth_url: string; state: string }> => {
-      const response = await fetch("/api/ml/start", { method: "POST" });
-      const data = await response.json().catch(() => null);
+      const { data, error } = await supabase.functions.invoke('ml-auth', {
+        body: { action: 'start_auth' }
+      });
 
-      if (!response.ok) {
-        throw new Error(data?.error || data?.message || "Failed to start auth");
+      if (error) {
+        throw new Error(error.message || "Failed to start auth");
       }
 
       return data;
@@ -70,15 +75,12 @@ export function useMLAuthCallback() {
       const urlParams = new URLSearchParams(window.location.search);
       const state = urlParams.get('state');
 
-      const response = await fetch('/api/ml/callback', {
-        method: 'POST',
-        body: JSON.stringify({ code, state }),
-        headers: { 'Content-Type': 'application/json' }
+      const { error } = await supabase.functions.invoke('ml-auth', {
+        body: { action: 'handle_callback', code, state }
       });
 
-      const data = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new Error(data?.error || data?.message || 'Failed to handle callback');
+      if (error) {
+        throw new Error(error.message || 'Failed to handle callback');
       }
     },
     retry: 0,
