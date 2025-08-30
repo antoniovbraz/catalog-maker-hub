@@ -356,6 +356,7 @@ export type Database = {
           attributes_template: Json | null
           category_id: string | null
           created_at: string | null
+          description: string | null
           id: string
           is_default: boolean | null
           ml_category_id: string
@@ -367,6 +368,7 @@ export type Database = {
           attributes_template?: Json | null
           category_id?: string | null
           created_at?: string | null
+          description?: string | null
           id?: string
           is_default?: boolean | null
           ml_category_id: string
@@ -378,6 +380,7 @@ export type Database = {
           attributes_template?: Json | null
           category_id?: string | null
           created_at?: string | null
+          description?: string | null
           id?: string
           is_default?: boolean | null
           ml_category_id?: string
@@ -1314,6 +1317,14 @@ export type Database = {
         Args: { p_days?: number }
         Returns: Json
       }
+      get_popular_ml_categories: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          ml_category_id: string
+          ml_category_name: string
+          usage_count: number
+        }[]
+      }
       get_tenant_by_ml_user_id: {
         Args: { p_user_id_ml: number }
         Returns: string
@@ -1329,6 +1340,15 @@ export type Database = {
       log_security_event: {
         Args: { p_details?: Json; p_event_type: string; p_user_id?: string }
         Returns: undefined
+      }
+      sync_ml_category_mapping: {
+        Args: {
+          p_category_id?: string
+          p_ml_category_id: string
+          p_ml_category_name: string
+          p_tenant_id: string
+        }
+        Returns: string
       }
       validate_tenant_access: {
         Args: { p_tenant_id: string; p_user_id: string }
