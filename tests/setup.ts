@@ -98,6 +98,7 @@ export const testUtils = {
     cost_unit: 100,
     packaging_cost: 10,
     tax_rate: 18,
+    source: 'manual' as const,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     ...overrides,

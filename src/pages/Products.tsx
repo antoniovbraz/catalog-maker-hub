@@ -1,4 +1,4 @@
-import { Package, Plus, Edit, Trash2, Tag } from "@/components/ui/icons";
+import { Package, Plus, Edit, Trash2, Tag, Download } from "@/components/ui/icons";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
 import { DataVisualization } from "@/components/ui/data-visualization";
@@ -9,10 +9,13 @@ import { useProductsWithCategories, useDeleteProduct } from "@/hooks/useProducts
 import type { ProductWithCategory } from "@/types/products";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
+import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
+import { useMLImportProducts } from "@/hooks/useMLSync";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
   const deleteMutation = useDeleteProduct();
+  const { mutate: importFromML, isPending: isImporting } = useMLImportProducts();
   const { showFormModal, showConfirmModal } = useGlobalModal();
 
   const columns: DataColumn<ProductWithCategory>[] = [
@@ -32,6 +35,11 @@ export default function Products() {
           </div>
         </div>
       ),
+    },
+    {
+      key: "source",
+      header: "Origem",
+      render: (item) => <ProductSourceBadge source={item.source} />,
     },
     {
       key: "categories.name",
@@ -136,10 +144,16 @@ export default function Products() {
   ];
 
   const headerActions = (
-    <Button size="sm" onClick={handleCreateNew}>
-      <Plus className="mr-2 size-4" />
-      Novo Produto
-    </Button>
+    <div className="flex gap-2">
+      <Button size="sm" variant="outline" onClick={() => importFromML()} disabled={isImporting}>
+        <Download className="mr-2 size-4" />
+        {isImporting ? 'Importando...' : 'Importar do ML'}
+      </Button>
+      <Button size="sm" onClick={handleCreateNew}>
+        <Plus className="mr-2 size-4" />
+        Novo Produto
+      </Button>
+    </div>
   );
 
   return (

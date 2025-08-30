@@ -772,6 +772,7 @@ export type Database = {
           name: string
           packaging_cost: number | null
           sku: string | null
+          source: string
           tax_rate: number | null
           tenant_id: string | null
           updated_at: string
@@ -785,6 +786,7 @@ export type Database = {
           name: string
           packaging_cost?: number | null
           sku?: string | null
+          source?: string
           tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
@@ -798,6 +800,7 @@ export type Database = {
           name?: string
           packaging_cost?: number | null
           sku?: string | null
+          source?: string
           tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string

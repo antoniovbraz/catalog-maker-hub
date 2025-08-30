@@ -9,6 +9,7 @@ export interface ProductType {
   cost_unit: number;
   packaging_cost: number;
   tax_rate: number;
+  source: 'manual' | 'mercado_livre' | 'shopee';
   created_at: string;
   updated_at: string;
 }
@@ -28,6 +29,7 @@ export const productSchema = z.object({
   cost_unit: z.number().min(0, "Custo unitário deve ser positivo"),
   packaging_cost: z.number().min(0, "Custo de embalagem deve ser positivo").default(0),
   tax_rate: z.number().min(0, "Taxa de imposto deve ser positiva").max(100, "Taxa não pode exceder 100%").default(0),
+  source: z.enum(['manual', 'mercado_livre', 'shopee']).default('manual'),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;

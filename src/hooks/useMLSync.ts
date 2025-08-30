@@ -131,3 +131,34 @@ export function useMLSyncBatch() {
     },
   });
 }
+
+export function useMLImportProducts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (): Promise<void> => {
+      const { error } = await supabase.functions.invoke('ml-sync', {
+        body: { 
+          action: 'import_from_ml'
+        }
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ML_SYNC_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({
+        title: "Importação Iniciada",
+        description: "Produtos do Mercado Livre estão sendo importados",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro na Importação",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}

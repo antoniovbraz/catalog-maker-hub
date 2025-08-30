@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 interface SyncRequest {
-  action: 'sync_product' | 'sync_batch' | 'get_sync_status';
+  action: 'sync_product' | 'sync_batch' | 'get_sync_status' | 'import_from_ml';
   product_id?: string;
   product_ids?: string[];
   force_update?: boolean;
@@ -105,6 +105,14 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ results }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      case 'import_from_ml': {
+        const result = await importProductsFromML(supabase, tenantId, authToken.access_token);
+        return new Response(
+          JSON.stringify(result),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -330,6 +338,192 @@ async function syncSingleProduct(
         status: 'error',
         error_details: { message: error.message },
         execution_time_ms: Date.now() - startTime,
+      });
+
+    throw error;
+  }
+}
+
+async function importProductsFromML(
+  supabase: SupabaseClient,
+  tenantId: string,
+  accessToken: string
+) {
+  console.log('Starting ML product import for tenant:', tenantId);
+  
+  try {
+    // Buscar produtos do usuário no ML
+    const mlResponse = await fetch('https://api.mercadolibre.com/users/me/items/search?status=active', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!mlResponse.ok) {
+      throw new Error(`ML API error: ${mlResponse.status}`);
+    }
+
+    const mlData = await mlResponse.json();
+    console.log('Found ML products:', mlData.results?.length || 0);
+
+    if (!mlData.results || mlData.results.length === 0) {
+      return { success: true, message: 'Nenhum produto encontrado no Mercado Livre', imported: 0 };
+    }
+
+    let imported = 0;
+    let errors = 0;
+
+    // Processar cada produto do ML
+    for (const mlItemId of mlData.results) {
+      try {
+        // Buscar detalhes do produto
+        const itemResponse = await fetch(`https://api.mercadolibre.com/items/${mlItemId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!itemResponse.ok) {
+          console.error(`Error fetching item ${mlItemId}:`, itemResponse.status);
+          errors++;
+          continue;
+        }
+
+        const itemData = await itemResponse.json();
+        
+        // Verificar se já existe mapping para este item
+        const { data: existingMapping } = await supabase
+          .from('ml_product_mapping')
+          .select('product_id, products(*)')
+          .eq('tenant_id', tenantId)
+          .eq('ml_item_id', mlItemId)
+          .maybeSingle();
+
+        if (existingMapping) {
+          console.log(`Product ${mlItemId} already mapped, skipping`);
+          continue;
+        }
+
+        // Verificar se já existe produto com mesmo título/SKU
+        const { data: existingProduct } = await supabase
+          .from('products')
+          .select('id')
+          .eq('tenant_id', tenantId)
+          .or(`name.eq.${itemData.title},sku.eq.${itemData.seller_custom_field || mlItemId}`)
+          .maybeSingle();
+
+        let productId;
+
+        if (existingProduct) {
+          // Atualizar produto existente
+          productId = existingProduct.id;
+          const { error: updateError } = await supabase
+            .from('products')
+            .update({
+              source: 'mercado_livre',
+              cost_unit: itemData.price * 0.7, // Estimativa de custo (70% do preço)
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', productId);
+
+          if (updateError) {
+            console.error('Error updating product:', updateError);
+            errors++;
+            continue;
+          }
+        } else {
+          // Criar novo produto
+          const { data: newProduct, error: createError } = await supabase
+            .from('products')
+            .insert({
+              tenant_id: tenantId,
+              name: itemData.title,
+              description: itemData.description?.plain_text || null,
+              sku: itemData.seller_custom_field || mlItemId,
+              cost_unit: itemData.price * 0.7, // Estimativa de custo (70% do preço)
+              packaging_cost: 0,
+              tax_rate: 0,
+              source: 'mercado_livre'
+            })
+            .select('id')
+            .single();
+
+          if (createError) {
+            console.error('Error creating product:', createError);
+            errors++;
+            continue;
+          }
+
+          productId = newProduct.id;
+        }
+
+        // Criar ou atualizar mapping
+        const { error: mappingError } = await supabase
+          .from('ml_product_mapping')
+          .upsert({
+            tenant_id: tenantId,
+            product_id: productId,
+            ml_item_id: mlItemId,
+            ml_title: itemData.title,
+            ml_price: itemData.price,
+            ml_category_id: itemData.category_id,
+            ml_condition: itemData.condition,
+            ml_listing_type: itemData.listing_type_id,
+            ml_permalink: itemData.permalink,
+            sync_status: 'synced',
+            sync_direction: 'from_ml',
+            last_sync_at: new Date().toISOString()
+          }, {
+            onConflict: 'tenant_id,product_id'
+          });
+
+        if (mappingError) {
+          console.error('Error creating mapping:', mappingError);
+          errors++;
+          continue;
+        }
+
+        imported++;
+
+        // Log da importação
+        await supabase
+          .from('ml_sync_log')
+          .insert({
+            tenant_id: tenantId,
+            entity_id: productId,
+            entity_type: 'product',
+            operation_type: 'import_from_ml',
+            status: 'success',
+            ml_entity_id: mlItemId,
+            response_data: { imported_product: itemData.title }
+          });
+
+      } catch (error) {
+        console.error(`Error processing item ${mlItemId}:`, error);
+        errors++;
+      }
+    }
+
+    return {
+      success: true,
+      imported,
+      errors,
+      message: `Importados ${imported} produtos. ${errors} erros.`
+    };
+
+  } catch (error) {
+    console.error('Error in importProductsFromML:', error);
+    
+    await supabase
+      .from('ml_sync_log')
+      .insert({
+        tenant_id: tenantId,
+        entity_type: 'system',
+        operation_type: 'import_from_ml',
+        status: 'error',
+        error_details: { error: error.message }
       });
 
     throw error;
