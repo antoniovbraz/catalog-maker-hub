@@ -75,21 +75,27 @@ describe('MarketplaceHierarchyCard', () => {
       />
     );
 
-    const buttons = screen.getAllByRole('button');
-
-    await user.click(buttons[0]);
+    await user.click(
+      screen.getByRole('button', { name: /Editar plataforma/i })
+    );
     expect(onEditPlatform).toHaveBeenCalledWith(hierarchy.parent);
 
-    await user.click(buttons[1]);
+    await user.click(
+      screen.getByRole('button', { name: /Excluir plataforma/i })
+    );
     expect(onDeletePlatform).toHaveBeenCalledWith('platform-1');
 
     await user.click(screen.getByRole('button', { name: /Nova Modalidade/i }));
     expect(onAddModality).toHaveBeenCalledWith('platform-1');
 
-    await user.click(buttons[3]);
+    await user.click(
+      screen.getByRole('button', { name: /Editar Modalidade A/i })
+    );
     expect(onEditModality).toHaveBeenCalledWith(hierarchy.children[0]);
 
-    await user.click(buttons[4]);
+    await user.click(
+      screen.getByRole('button', { name: /Excluir Modalidade A/i })
+    );
     expect(onDeleteModality).toHaveBeenCalledWith('mod-1');
   });
 
