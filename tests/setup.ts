@@ -137,6 +137,7 @@ export const testUtils = {
     vi.clearAllMocks();
     mockSupabaseClient.from.mockClear();
     mockSupabaseClient.rpc.mockClear();
+    mockSupabaseClient.functions.invoke.mockClear();
     Object.values(mockSupabaseClient.auth).forEach(fn => fn.mockClear());
     Object.values(mockSupabaseClient.storage).forEach(fn => fn.mockClear());
     mockToast.mockClear();
