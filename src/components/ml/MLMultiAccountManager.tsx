@@ -62,7 +62,7 @@ export function MLMultiAccountManager() {
       <CardContent className="space-y-6">
         {/* Account Management */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium flex items-center space-x-2">
+          <h4 className="flex items-center space-x-2 text-sm font-medium">
             <Store className="size-4" />
             <span>Contas Conectadas</span>
           </h4>
@@ -70,7 +70,7 @@ export function MLMultiAccountManager() {
           {mockAccounts.map((account) => (
             <div 
               key={account.id}
-              className="flex items-center justify-between p-3 border rounded-lg"
+              className="flex items-center justify-between rounded-lg border p-3"
             >
               <div className="flex items-center space-x-3">
                 {getStatusIcon(account.status)}
@@ -96,7 +96,7 @@ export function MLMultiAccountManager() {
 
         {/* Advanced Features */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium flex items-center space-x-2">
+          <h4 className="flex items-center space-x-2 text-sm font-medium">
             <Zap className="size-4" />
             <span>Recursos Premium</span>
           </h4>
@@ -108,7 +108,7 @@ export function MLMultiAccountManager() {
             </Button>
             
             <Button variant="outline" size="sm" className="justify-start" disabled>
-              <Store className="size-4 mr-2" />
+              <Store className="mr-2 size-4" />
               Multi-Loja
             </Button>
             
@@ -144,12 +144,12 @@ export function MLMultiAccountManager() {
         </div>
 
         {/* Premium Notice */}
-        <div className="p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
-          <div className="flex items-center space-x-2 mb-2">
+        <div className="rounded-lg border border-primary/20 bg-gradient-to-r from-primary/10 to-secondary/10 p-4">
+          <div className="mb-2 flex items-center space-x-2">
             <Zap className="size-4 text-primary" />
             <h4 className="font-medium text-primary">Recursos Premium</h4>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">
+          <p className="mb-3 text-xs text-muted-foreground">
             Funcionalidades avançadas como multi-conta, backup automático e sincronização 
             inteligente estão disponíveis nos planos pagos.
           </p>

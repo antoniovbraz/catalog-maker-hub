@@ -40,12 +40,12 @@ export default function Products() {
             <div className="flex items-center gap-2">
               <Link 
                 to={`/products/${item.id}`}
-                className="font-medium hover:text-primary transition-colors cursor-pointer"
+                className="cursor-pointer font-medium transition-colors hover:text-primary"
               >
                 {item.name}
               </Link>
               {hasIncompleteData && (
-                <Badge variant="outline" className="text-orange-600 border-orange-300">
+                <Badge variant="outline" className="border-orange-300 text-orange-600">
                   Dados Incompletos
                 </Badge>
               )}

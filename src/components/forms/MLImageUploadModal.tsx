@@ -178,7 +178,7 @@ export function MLImageUploadModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Upload de Imagens - {productName}</DialogTitle>
           <DialogDescription>
@@ -198,12 +198,12 @@ export function MLImageUploadModal({
             )}
           >
             <input {...getInputProps()} />
-            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <ImageIcon className="mx-auto mb-4 size-12 text-muted-foreground" />
             {isDragActive ? (
               <p>Solte as imagens aqui...</p>
             ) : (
               <div>
-                <p className="text-lg font-medium mb-2">
+                <p className="mb-2 text-lg font-medium">
                   Arraste imagens aqui ou clique para selecionar
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -218,24 +218,24 @@ export function MLImageUploadModal({
             <div className="space-y-4">
               <h3 className="font-medium">Imagens selecionadas ({images.length})</h3>
               
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 {images.map((image, index) => (
-                  <div key={index} className="relative group">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                  <div key={index} className="group relative">
+                    <div className="aspect-square overflow-hidden rounded-lg bg-muted">
                       <img
                         src={image.preview}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="size-full object-cover"
                       />
                     </div>
                     
                     {/* Status overlay */}
-                    <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/50">
                       {image.uploading && <LoadingSpinner size="sm" />}
-                      {image.uploaded && <Check className="h-6 w-6 text-green-500" />}
+                      {image.uploaded && <Check className="size-6 text-green-500" />}
                       {image.error && (
-                        <div className="text-red-500 text-center p-2">
-                          <X className="h-6 w-6 mx-auto mb-1" />
+                        <div className="p-2 text-center text-red-500">
+                          <X className="mx-auto mb-1 size-6" />
                           <p className="text-xs">{image.error}</p>
                         </div>
                       )}
@@ -246,10 +246,10 @@ export function MLImageUploadModal({
                       <Button
                         size="sm"
                         variant="destructive"
-                        className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute right-2 top-2 size-6 p-0 opacity-0 transition-opacity group-hover:opacity-100"
                         onClick={() => removeImage(index)}
                       >
-                        <X className="h-3 w-3" />
+                        <X className="size-3" />
                       </Button>
                     )}
                   </div>
@@ -291,7 +291,7 @@ export function MLImageUploadModal({
                   </>
                 ) : (
                   <>
-                    <Upload className="h-4 w-4 mr-2" />
+                    <Upload className="mr-2 size-4" />
                     Upload ({images.length})
                   </>
                 )}
@@ -301,7 +301,7 @@ export function MLImageUploadModal({
 
           {/* Status resumo */}
           {hasErrors && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+            <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4">
               <p className="text-sm text-destructive">
                 Alguns uploads falharam. Verifique as imagens marcadas com erro.
               </p>

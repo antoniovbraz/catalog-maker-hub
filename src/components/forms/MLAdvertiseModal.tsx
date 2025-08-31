@@ -318,7 +318,7 @@ export function MLAdvertiseModal({ product, onSuccess, onSubmitForm }: MLAdverti
       {/* Informações de Custo */}
       {formData.price > 0 && (
         <div className="rounded-lg border border-border/30 bg-muted/10 p-4">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3 flex items-center gap-2">
             <Info className="size-4 text-primary" />
             <span className="text-sm font-medium">Resumo Financeiro</span>
           </div>

@@ -31,8 +31,8 @@ export function MLSystemOverview() {
           <CardDescription>Status completo da integração ML</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground py-8">
-            <Globe className="size-12 mx-auto mb-4 opacity-30" />
+          <div className="py-8 text-center text-muted-foreground">
+            <Globe className="mx-auto mb-4 size-12 opacity-30" />
             <p>Conecte-se ao Mercado Livre para ver o status do sistema</p>
           </div>
         </CardContent>
@@ -63,7 +63,7 @@ export function MLSystemOverview() {
       name: "Backup Automático",
       status: settings?.backup_schedule ? "active" : "inactive",
       description: `Agendado ${settings?.backup_schedule || 'diariamente'}`,
-      icon: <TrendingUp className="size-4 text-info" />
+      icon: <TrendingUp className="text-info size-4" />
     }
   ];
 
@@ -118,7 +118,7 @@ export function MLSystemOverview() {
             {systemFeatures.map((feature) => (
               <div 
                 key={feature.name}
-                className="flex items-center justify-between p-3 border rounded-lg bg-card/50"
+                className="flex items-center justify-between rounded-lg border bg-card/50 p-3"
               >
                 <div className="flex items-center space-x-3">
                   {feature.icon}
@@ -139,12 +139,12 @@ export function MLSystemOverview() {
         </div>
 
         {/* System Status Summary */}
-        <div className="p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg border border-primary/10">
+        <div className="rounded-lg border border-primary/10 bg-gradient-to-r from-primary/5 to-secondary/5 p-4">
           <div className="flex items-start space-x-3">
-            <Zap className="size-5 text-primary mt-0.5" />
+            <Zap className="mt-0.5 size-5 text-primary" />
             <div className="flex-1">
-              <h4 className="font-medium text-primary mb-1">Sistema Enterprise Ativo</h4>
-              <p className="text-sm text-muted-foreground mb-3">
+              <h4 className="mb-1 font-medium text-primary">Sistema Enterprise Ativo</h4>
+              <p className="mb-3 text-sm text-muted-foreground">
                 Todos os sistemas críticos estão operacionais. Renovação automática, 
                 monitoramento de segurança e backup estão protegendo sua integração 24/7.
               </p>

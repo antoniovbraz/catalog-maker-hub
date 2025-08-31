@@ -30,7 +30,7 @@ export default function ProductDetail() {
 
   if (productLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -38,7 +38,7 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <Package className="size-12 text-muted-foreground" />
         <div className="text-center">
           <h2 className="text-lg font-semibold">Produto não encontrado</h2>
@@ -84,9 +84,9 @@ export default function ProductDetail() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-6xl">
+    <div className="container mx-auto max-w-6xl px-4 py-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
@@ -97,7 +97,7 @@ export default function ProductDetail() {
             Voltar
           </Button>
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-2xl font-bold">
               <Package className="size-6" />
               {product.name}
             </h1>
@@ -144,7 +144,7 @@ export default function ProductDetail() {
               <RefreshCw className="size-4" />
               <span className="font-medium">Dados Incompletos</span>
             </div>
-            <p className="text-sm text-orange-600 mt-1">
+            <p className="mt-1 text-sm text-orange-600">
               Este produto foi importado do Mercado Livre mas alguns dados não foram capturados. 
               Clique em "Re-sincronizar" para atualizar as informações.
             </p>
@@ -152,9 +152,9 @@ export default function ProductDetail() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Coluna Principal */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Informações Básicas */}
           <Card>
             <CardHeader>
@@ -178,7 +178,7 @@ export default function ProductDetail() {
               {product.description && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Descrição</label>
-                  <p className="text-sm leading-relaxed mt-1">{product.description}</p>
+                  <p className="mt-1 text-sm leading-relaxed">{product.description}</p>
                 </div>
               )}
 
@@ -238,10 +238,10 @@ export default function ProductDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                   {product.weight && (
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                      <label className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
                         <Weight className="size-3" />
                         Peso
                       </label>
@@ -278,13 +278,13 @@ export default function ProductDetail() {
                 <CardTitle>Imagens do Produto</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {productImages.map((image, index) => (
-                    <div key={index} className="aspect-square rounded-lg overflow-hidden border">
+                    <div key={index} className="aspect-square overflow-hidden rounded-lg border">
                       <img 
                         src={image.image_url} 
                         alt={`${product.name} - Imagem ${index + 1}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                        className="size-full cursor-pointer object-cover transition-transform hover:scale-105"
                         onClick={() => window.open(image.image_url, '_blank')}
                       />
                     </div>
@@ -317,7 +317,7 @@ export default function ProductDetail() {
               {product.categories && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Categoria</label>
-                  <p className="flex items-center gap-1 mt-1">
+                  <p className="mt-1 flex items-center gap-1">
                     <Tag className="size-3" />
                     {product.categories.name}
                   </p>
@@ -343,7 +343,7 @@ export default function ProductDetail() {
           {mlProduct && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
                   <Box className="size-5" />
                   Mercado Livre
                 </CardTitle>
@@ -369,7 +369,7 @@ export default function ProductDetail() {
 
                 {mlProduct.last_sync_at && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                    <label className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
                       <Calendar className="size-3" />
                       Última Sincronização
                     </label>

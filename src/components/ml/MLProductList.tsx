@@ -100,7 +100,7 @@ export function MLProductList() {
       
       <CardContent>
         {(products || []).length === 0 ? (
-          <div className="text-center py-8">
+          <div className="py-8 text-center">
             <Package className="mx-auto mb-4 size-12 text-muted-foreground" />
             <h4 className="mb-2 text-lg font-medium">Nenhum produto encontrado</h4>
             <p className="text-muted-foreground">

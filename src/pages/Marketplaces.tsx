@@ -145,7 +145,7 @@ const Marketplaces = () => {
       actions={headerActions}
     >
       {/* ML Integration Section */}
-      <div className="xl:col-span-12 mb-6">
+      <div className="mb-6 xl:col-span-12">
         <div className="rounded-lg border bg-card p-6">
           <div className="mb-4 flex items-center justify-between">
             <div>

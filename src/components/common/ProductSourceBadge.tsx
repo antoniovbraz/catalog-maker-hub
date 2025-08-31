@@ -48,7 +48,7 @@ export function ProductSourceBadge({ source, mlStatus, mlItemId, className }: Pr
         variant={config.variant}
         className={`${config.className} ${className}`}
       >
-        <Icon className="w-3 h-3 mr-1" />
+        <Icon className="mr-1 size-3" />
         {config.label}
       </Badge>
       
@@ -63,7 +63,7 @@ export function ProductSourceBadge({ source, mlStatus, mlItemId, className }: Pr
               className="text-green-500 hover:text-green-600"
               title="Ver no Mercado Livre"
             >
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="size-3" />
             </a>
           )}
            {mlStatus !== 'synced' && (
@@ -86,7 +86,7 @@ export function ProductSourceBadge({ source, mlStatus, mlItemId, className }: Pr
           className="text-yellow-600 hover:text-yellow-700"
           title="Ver no Mercado Livre"
         >
-          <ExternalLink className="w-3 h-3" />
+          <ExternalLink className="size-3" />
         </a>
       )}
     </div>

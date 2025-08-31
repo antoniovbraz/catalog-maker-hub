@@ -118,7 +118,7 @@ export async function importFromML(
           .single();
 
         if (!mlCatError && mlCategory) {
-          let localCategory = await supabase
+          const localCategory = await supabase
             .from('categories')
             .select('id')
             .eq('tenant_id', tenantId)
@@ -173,7 +173,7 @@ export async function importFromML(
       const warrantyAttr = attributes.find((attr: any) => attr.id === 'WARRANTY');
       const warranty = warrantyAttr ? warrantyAttr.value_name : '';
 
-      let sku =
+      const sku =
         itemDetail.seller_custom_field ||
         itemDetail.seller_sku ||
         attributes.find((attr: any) => attr.id === 'SELLER_SKU')?.value_name ||

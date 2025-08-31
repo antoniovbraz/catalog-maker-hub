@@ -111,7 +111,7 @@ export function MLNotificationCenter() {
         {notifications.map((notification) => (
           <div 
             key={notification.id}
-            className="flex items-start space-x-3 p-3 rounded-lg bg-card/50 border"
+            className="flex items-start space-x-3 rounded-lg border bg-card/50 p-3"
           >
             {getNotificationIcon(notification.type)}
             <div className="flex-1 space-y-1">
@@ -125,8 +125,8 @@ export function MLNotificationCenter() {
         ))}
         
         {notifications.length === 0 && (
-          <div className="text-center text-muted-foreground py-4">
-            <Bell className="size-8 mx-auto mb-2 opacity-50" />
+          <div className="py-4 text-center text-muted-foreground">
+            <Bell className="mx-auto mb-2 size-8 opacity-50" />
             <p className="text-sm">Nenhuma notificação</p>
           </div>
         )}

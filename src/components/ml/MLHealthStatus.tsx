@@ -64,7 +64,7 @@ export function MLHealthStatus() {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Saúde da Conexão:</span>
           <div className="flex items-center space-x-2">
-            <div className="w-16 bg-muted rounded-full h-2">
+            <div className="h-2 w-16 rounded-full bg-muted">
               <div 
                 className={`h-2 rounded-full transition-all duration-300 ${
                   healthScore >= 80 ? 'bg-success' :
@@ -96,7 +96,7 @@ export function MLHealthStatus() {
         </div>
 
         {healthScore < 60 && (
-          <div className="p-3 bg-warning/10 rounded-md">
+          <div className="rounded-md bg-warning/10 p-3">
             <p className="text-sm text-warning">
               {healthScore < 40 
                 ? "⚠️ Token será renovado automaticamente em breve"

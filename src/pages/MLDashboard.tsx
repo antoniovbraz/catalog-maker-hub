@@ -207,7 +207,7 @@ export default function MLDashboard() {
       actions={headerActions}
     >
       {/* Cards de Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total de Produtos</CardTitle>
@@ -222,7 +222,7 @@ export default function MLDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <TrendingUp className="size-4 text-green-500" />
               Sincronizados
             </CardTitle>
@@ -237,7 +237,7 @@ export default function MLDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <AlertTriangle className="size-4 text-amber-500" />
               Pendentes
             </CardTitle>
@@ -252,7 +252,7 @@ export default function MLDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <AlertTriangle className="size-4 text-red-500" />
               Erros
             </CardTitle>

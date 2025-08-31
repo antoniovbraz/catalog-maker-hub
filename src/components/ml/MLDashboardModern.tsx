@@ -95,7 +95,7 @@ export function MLDashboardModern() {
   // Loading states
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <LoadingSpinner size="lg" />
         <span className="ml-3 text-muted-foreground">Carregando integração ML...</span>
       </div>
@@ -117,7 +117,7 @@ export function MLDashboardModern() {
     
     return (
       <Badge className={`${config.color} flex items-center gap-1`}>
-        <Icon className="h-3 w-3" />
+        <Icon className="size-3" />
         {config.label}
       </Badge>
     );
@@ -140,8 +140,8 @@ export function MLDashboardModern() {
     return (
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
+          <CardTitle className="flex items-center gap-2 text-sm font-medium">
+            <BarChart3 className="size-4" />
             Score de Saúde
           </CardTitle>
         </CardHeader>
@@ -149,7 +149,7 @@ export function MLDashboardModern() {
           <div className={`text-2xl font-bold ${getScoreColor(healthLevel)}`}>
             {healthScore}%
           </div>
-          <p className="text-xs text-muted-foreground capitalize">
+          <p className="text-xs capitalize text-muted-foreground">
             {healthLevel === 'excellent' && 'Excelente'}
             {healthLevel === 'good' && 'Boa'}
             {healthLevel === 'fair' && 'Regular'}
@@ -162,12 +162,12 @@ export function MLDashboardModern() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto max-w-6xl px-4 py-8">
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Dashboard Mercado Livre</h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="mt-2 text-muted-foreground">
               Gerencie sua integração com o Mercado Livre
             </p>
           </div>
@@ -179,7 +179,7 @@ export function MLDashboardModern() {
               onClick={invalidateAllQueries}
               disabled={isLoading}
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className="mr-2 size-4" />
               Atualizar
             </Button>
           </div>
@@ -189,8 +189,8 @@ export function MLDashboardModern() {
       {/* Connection Status Alert */}
       {!isConnected ? (
         <Alert className="mb-6 border-warning bg-warning/10">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="flex items-center justify-between w-full">
+          <AlertCircle className="size-4" />
+          <AlertDescription className="flex w-full items-center justify-between">
             <span>Sua conta do Mercado Livre não está conectada.</span>
             <Button size="sm" onClick={handleConnect} disabled={startAuth.isPending}>
               {startAuth.isPending ? <LoadingSpinner size="sm" /> : "Conectar Agora"}
@@ -199,8 +199,8 @@ export function MLDashboardModern() {
         </Alert>
       ) : isExpiringSoon ? (
         <Alert className="mb-6 border-warning bg-warning/10">
-          <Clock className="h-4 w-4" />
-          <AlertDescription className="flex items-center justify-between w-full">
+          <Clock className="size-4" />
+          <AlertDescription className="flex w-full items-center justify-between">
             <span>Sua sessão do ML expira em breve. Renove para manter a sincronização.</span>
             <Button size="sm" onClick={handleRefreshToken} disabled={refreshToken.isPending}>
               {refreshToken.isPending ? <LoadingSpinner size="sm" /> : "Renovar Token"}
@@ -212,10 +212,10 @@ export function MLDashboardModern() {
       {/* Health Recommendations */}
       {recommendations.length > 0 && (
         <Alert className="mb-6">
-          <Activity className="h-4 w-4" />
+          <Activity className="size-4" />
           <AlertDescription>
-            <div className="font-semibold mb-2">Recomendações para melhorar a integração:</div>
-            <ul className="list-disc list-inside space-y-1">
+            <div className="mb-2 font-semibold">Recomendações para melhorar a integração:</div>
+            <ul className="list-inside list-disc space-y-1">
               {recommendations.map((rec, index) => (
                 <li key={index} className="text-sm">{rec}</li>
               ))}
@@ -225,12 +225,12 @@ export function MLDashboardModern() {
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Connection Status */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Shield className="h-4 w-4" />
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+              <Shield className="size-4" />
               Status da Conexão
             </CardTitle>
           </CardHeader>
@@ -238,18 +238,18 @@ export function MLDashboardModern() {
             <div className="flex items-center gap-2">
               {isConnected ? (
                 <>
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <CheckCircle2 className="size-5 text-green-500" />
                   <span className="font-medium text-green-600">Conectado</span>
                 </>
               ) : (
                 <>
-                  <AlertCircle className="h-5 w-5 text-red-500" />
+                  <AlertCircle className="size-5 text-red-500" />
                   <span className="font-medium text-red-600">Desconectado</span>
                 </>
               )}
             </div>
             {userInfo.nickname && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="mt-1 text-xs text-muted-foreground">
                 {userInfo.nickname} (ID: {userInfo.id})
               </p>
             )}
@@ -259,8 +259,8 @@ export function MLDashboardModern() {
         {/* Sync Status */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Package className="h-4 w-4" />
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+              <Package className="size-4" />
               Produtos
             </CardTitle>
           </CardHeader>
@@ -278,8 +278,8 @@ export function MLDashboardModern() {
         {/* Performance */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+              <TrendingUp className="size-4" />
               Taxa de Sucesso
             </CardTitle>
           </CardHeader>
@@ -307,7 +307,7 @@ export function MLDashboardModern() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Quick Actions */}
             <Card>
               <CardHeader>
@@ -323,7 +323,7 @@ export function MLDashboardModern() {
                   className="w-full justify-start"
                   variant="outline"
                 >
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="mr-2 size-4" />
                   {importFromML.isPending ? "Importando..." : "Importar Produtos do ML"}
                 </Button>
                 
@@ -333,7 +333,7 @@ export function MLDashboardModern() {
                   className="w-full justify-start"
                   variant="outline"
                 >
-                  <Shield className="h-4 w-4 mr-2" />
+                  <Shield className="mr-2 size-4" />
                   {backupConfiguration.isPending ? "Criando..." : "Backup das Configurações"}
                 </Button>
 
@@ -344,7 +344,7 @@ export function MLDashboardModern() {
                     className="w-full justify-start"
                     variant="destructive"
                   >
-                    <AlertCircle className="h-4 w-4 mr-2" />
+                    <AlertCircle className="mr-2 size-4" />
                     {disconnect.isPending ? "Desconectando..." : "Desconectar Conta"}
                   </Button>
                 )}
@@ -363,7 +363,7 @@ export function MLDashboardModern() {
                 {performance?.operations_by_type ? (
                   <div className="space-y-2">
                     {Object.entries(performance.operations_by_type).map(([type, count]) => (
-                      <div key={type} className="flex justify-between items-center">
+                      <div key={type} className="flex items-center justify-between">
                         <span className="text-sm capitalize">{type.replace('_', ' ')}</span>
                         <Badge variant="outline">{count}</Badge>
                       </div>
@@ -391,7 +391,7 @@ export function MLDashboardModern() {
               {sync?.products ? (
                 <div className="space-y-4">
                   {sync.products.map((product) => (
-                    <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={product.id} className="flex items-center justify-between rounded-lg border p-3">
                       <div>
                         <p className="font-medium">{product.name}</p>
                         <p className="text-sm text-muted-foreground">{product.sku}</p>
@@ -409,7 +409,7 @@ export function MLDashboardModern() {
                         {product.ml_permalink && (
                           <Button size="sm" variant="outline" asChild>
                             <a href={product.ml_permalink} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-3 w-3" />
+                              <ExternalLink className="size-3" />
                             </a>
                           </Button>
                         )}
@@ -427,7 +427,7 @@ export function MLDashboardModern() {
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Métricas de Performance</CardTitle>
@@ -516,7 +516,7 @@ export function MLDashboardModern() {
               {settings ? (
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-medium mb-2">Feature Flags</h4>
+                    <h4 className="mb-2 font-medium">Feature Flags</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       {Object.entries(settings.feature_flags).map(([key, value]) => (
                         <div key={key} className="flex justify-between">
@@ -532,7 +532,7 @@ export function MLDashboardModern() {
                   <Separator />
                   
                   <div>
-                    <h4 className="font-medium mb-2">Rate Limits</h4>
+                    <h4 className="mb-2 font-medium">Rate Limits</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       {Object.entries(settings.rate_limits).map(([key, value]) => (
                         <div key={key} className="flex justify-between">

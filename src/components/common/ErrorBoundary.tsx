@@ -79,10 +79,10 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="max-w-md w-full">
+        <div className="flex min-h-screen items-center justify-center p-4">
+          <div className="w-full max-w-md">
             <Alert variant="destructive" className="mb-4">
-              <AlertTriangle className="h-4 w-4" />
+              <AlertTriangle className="size-4" />
               <AlertTitle>Erro na Aplicação</AlertTitle>
               <AlertDescription>
                 {this.state.errorCount > 2 
@@ -113,7 +113,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mt-4 p-4 bg-gray-100 rounded text-sm">
+              <details className="mt-4 rounded bg-gray-100 p-4 text-sm">
                 <summary className="cursor-pointer font-medium">
                   Detalhes do Erro (Desenvolvimento)
                 </summary>

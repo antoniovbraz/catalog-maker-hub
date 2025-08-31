@@ -24,7 +24,7 @@ export function MLAnalyticsCard() {
           <CardDescription>Métricas detalhadas da integração</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground py-8">
+          <div className="py-8 text-center text-muted-foreground">
             {!authStatus?.isConnected ? "Conecte-se ao ML para ver analytics" : "Carregando métricas..."}
           </div>
         </CardContent>
@@ -89,7 +89,7 @@ export function MLAnalyticsCard() {
 
         {/* Operations Summary */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-3 bg-success/10 rounded-md">
+          <div className="rounded-md bg-success/10 p-3">
             <div className="flex items-center space-x-2">
               <Users className="size-4 text-success" />
               <span className="text-sm text-muted-foreground">Sucessos</span>
@@ -99,7 +99,7 @@ export function MLAnalyticsCard() {
             </p>
           </div>
           
-          <div className="p-3 bg-destructive/10 rounded-md">
+          <div className="rounded-md bg-destructive/10 p-3">
             <div className="flex items-center space-x-2">
               <Database className="size-4 text-destructive" />
               <span className="text-sm text-muted-foreground">Falhas</span>
@@ -126,7 +126,7 @@ export function MLAnalyticsCard() {
         )}
 
         {/* Total Operations */}
-        <div className="pt-2 border-t">
+        <div className="border-t pt-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Total de Operações</span>
             <span className="font-semibold">{metrics?.total_operations || 0}</span>

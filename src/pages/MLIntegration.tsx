@@ -121,7 +121,7 @@ const MLIntegration = () => {
         <div className="col-span-12 xl:col-span-8 xl:col-start-3">
           <div className="rounded-lg border border-dashed border-muted-foreground/25 p-6">
             <h3 className="mb-2 font-semibold">Como conectar ao Mercado Livre</h3>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+            <ol className="list-inside list-decimal space-y-1 text-sm text-muted-foreground">
               <li>Clique em "Conectar com Mercado Livre" acima</li>
               <li>Você será redirecionado para a página de autorização do ML</li>
               <li>Faça login com sua conta do Mercado Livre</li>

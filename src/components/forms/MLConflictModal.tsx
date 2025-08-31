@@ -39,11 +39,11 @@ export function MLConflictModal({ product, conflicts, onSuccess, onSubmitForm }:
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start gap-3 p-4 border rounded-lg bg-amber-50 border-amber-200">
-        <AlertTriangle className="size-5 text-amber-600 mt-0.5" />
+      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+        <AlertTriangle className="mt-0.5 size-5 text-amber-600" />
         <div>
           <h4 className="font-medium text-amber-800">Produtos Similares Encontrados</h4>
-          <p className="text-sm text-amber-700 mt-1">
+          <p className="mt-1 text-sm text-amber-700">
             Encontramos {conflicts.length} produto(s) no Mercado Livre que podem ser relacionados ao produto "{product.name}".
           </p>
         </div>
@@ -139,9 +139,9 @@ export function MLConflictModal({ product, conflicts, onSuccess, onSubmitForm }:
         </RadioGroup>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
         <div className="flex items-start gap-2">
-          <Package className="size-4 text-blue-600 mt-0.5" />
+          <Package className="mt-0.5 size-4 text-blue-600" />
           <div className="text-sm text-blue-700">
             <strong>Dica:</strong> Vincular produtos evita duplicação e mantém histórico de vendas. 
             Criar novo anúncio pode gerar confusão para compradores se os produtos forem idênticos.
