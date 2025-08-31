@@ -214,6 +214,33 @@ export class MLService {
     };
   }
 
+  static async resyncProduct(productId: string): Promise<void> {
+    const { error } = await supabase.functions.invoke('ml-sync-v2', {
+      body: { action: 'resync_product', product_id: productId }
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Failed to re-sync product');
+    }
+  }
+
+  static async resyncBatch(productIds: string[]): Promise<MLBatchSyncResult> {
+    let successful = 0;
+    let failed = 0;
+
+    for (const id of productIds) {
+      try {
+        await MLService.resyncProduct(id);
+        successful++;
+      } catch (err) {
+        console.error('Failed to re-sync product:', id, err);
+        failed++;
+      }
+    }
+
+    return { successful, failed };
+  }
+
   static async importFromML(): Promise<{ imported: number; items: any[] }> {
     const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
       body: { action: 'import_from_ml' }

@@ -11,14 +11,14 @@ interface ResyncBatchParams {
   productIds: string[];
 }
 
-export function useMLResync() {
+export function useMLProductResync() {
   const queryClient = useQueryClient();
 
   const resyncProduct = useMutation({
     mutationFn: async (params: ResyncProductParams) => {
       console.log('Re-syncing product:', params.productId);
       
-      return await MLService.syncProduct(params.productId);
+      return await MLService.resyncProduct(params.productId);
     },
     onSuccess: (data, variables) => {
       // Invalidar caches relevantes
@@ -46,7 +46,7 @@ export function useMLResync() {
     mutationFn: async (params: ResyncBatchParams) => {
       console.log('Re-syncing batch:', params.productIds.length, 'products');
       
-      return await MLService.syncBatch(params.productIds);
+      return await MLService.resyncBatch(params.productIds);
     },
     onSuccess: (data) => {
       // Invalidar caches relevantes

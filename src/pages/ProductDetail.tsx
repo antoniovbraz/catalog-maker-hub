@@ -9,7 +9,7 @@ import { formatarMoeda } from "@/utils/pricing";
 import { useProduct } from "@/hooks/useProducts";
 import type { ProductWithCategory } from "@/types/products";
 import { useMLProducts } from "@/hooks/useMLProducts";
-import { useMLResync } from "@/hooks/useMLResync";
+import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { useProductImages } from "@/hooks/useProductImages";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
@@ -26,7 +26,7 @@ export default function ProductDetail() {
   const product = productData as ProductWithCategory;
   const { data: mlProducts = [] } = useMLProducts();
   const { data: productImages = [] } = useProductImages(id!);
-  const { resyncProduct } = useMLResync();
+  const { resyncProduct } = useMLProductResync();
 
   if (productLoading) {
     return (
