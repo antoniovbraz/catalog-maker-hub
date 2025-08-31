@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { callMLFunction } from '@/utils/ml/ml-api';
 
 // ==================== TIPOS ====================
 
@@ -77,18 +78,7 @@ export class MLService {
 
   static async getAuthStatus(): Promise<MLAuthStatus> {
     try {
-      const { data, error } = await supabase.functions.invoke('ml-auth', {
-        body: { action: 'get_status' }
-      });
-
-      if (error) {
-        console.error('ML Auth Status Error:', error);
-        return { 
-          isConnected: false, 
-          error: error.message || 'Failed to check auth status' 
-        };
-      }
-
+      const data = await callMLFunction('ml-auth', 'get_status', {}, {});
       return {
         isConnected: data?.connected || false,
         user_id_ml: data?.user_id_ml,
@@ -97,65 +87,64 @@ export class MLService {
       };
     } catch (error) {
       console.error('ML Auth Status Exception:', error);
-      return { 
-        isConnected: false, 
-        error: 'Network error while checking auth status' 
+      const message = error instanceof Error ? error.message : 'Failed to check auth status';
+      if (message.toLowerCase().includes('network')) {
+        return {
+          isConnected: false,
+          error: 'Network error while checking auth status'
+        };
+      }
+      return {
+        isConnected: false,
+        error: message || 'Failed to check auth status'
       };
     }
   }
 
   static async startAuth(): Promise<{ auth_url: string; state: string }> {
-    const { data, error } = await supabase.functions.invoke('ml-auth', {
-      body: { action: 'start_auth' }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to start ML authentication');
+    try {
+      return await callMLFunction('ml-auth', 'start_auth', {}, {});
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message || 'Failed to start ML authentication' : 'Failed to start ML authentication'
+      );
     }
-
-    return data;
   }
 
   static async handleCallback(code: string, state: string): Promise<void> {
-    const { error } = await supabase.functions.invoke('ml-auth', {
-      body: { action: 'handle_callback', code, state }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to process ML callback');
+    try {
+      await callMLFunction('ml-auth', 'handle_callback', { code, state }, {});
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message || 'Failed to process ML callback' : 'Failed to process ML callback'
+      );
     }
   }
 
   static async refreshToken(): Promise<void> {
-    const { error } = await supabase.functions.invoke('ml-auth', {
-      body: { action: 'refresh_token' }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to refresh ML token');
+    try {
+      await callMLFunction('ml-auth', 'refresh_token', {}, {});
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message || 'Failed to refresh ML token' : 'Failed to refresh ML token'
+      );
     }
   }
 
   static async disconnect(): Promise<void> {
-    const { error } = await supabase.functions.invoke('ml-auth', {
-      body: { action: 'disconnect' }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to disconnect ML account');
+    try {
+      await callMLFunction('ml-auth', 'disconnect', {}, {});
+    } catch (error) {
+      throw new Error(
+        error instanceof Error ? error.message || 'Failed to disconnect ML account' : 'Failed to disconnect ML account'
+      );
     }
   }
 
   // ====== SINCRONIZAÇÃO ======
 
   static async getSyncStatus(): Promise<MLSyncStatus> {
-    const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'get_status' }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to get sync status');
-    }
+    const data = await callMLFunction('ml-sync-v2', 'get_status', {}, {});
 
     return {
       total_products: data?.total_products || 0,
@@ -178,35 +167,17 @@ export class MLService {
   }
 
   static async getMLProducts(): Promise<MLSyncProduct[]> {
-    const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'get_products' }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to get ML products');
-    }
+    const data = await callMLFunction('ml-sync-v2', 'get_products', {}, {});
 
     return data?.products || [];
   }
 
   static async syncProduct(productId: string): Promise<void> {
-    const { error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'sync_product', product_id: productId }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to sync product');
-    }
+    await callMLFunction('ml-sync-v2', 'sync_product', { product_id: productId }, {});
   }
 
   static async syncBatch(productIds: string[]): Promise<MLBatchSyncResult> {
-    const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'sync_batch', product_ids: productIds }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to sync products in batch');
-    }
+    const data = await callMLFunction('ml-sync-v2', 'sync_batch', { product_ids: productIds }, {});
 
     return {
       successful: data?.successful ?? 0,
@@ -215,13 +186,7 @@ export class MLService {
   }
 
   static async resyncProduct(productId: string): Promise<void> {
-    const { error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'resync_product', productId }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to re-sync product');
-    }
+    await callMLFunction('ml-sync-v2', 'resync_product', { productId }, {});
   }
 
   static async resyncBatch(productIds: string[]): Promise<MLBatchSyncResult> {
@@ -241,39 +206,21 @@ export class MLService {
     return { successful, failed };
   }
 
-  static async importFromML(): Promise<{ imported: number; items: any[] }> {
-    const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'import_from_ml' }
-    });
+  static async importFromML(): Promise<{ imported: number; items: unknown[] }> {
+    const data = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {});
 
-    if (error) {
-      throw new Error(error.message || 'Failed to import from ML');
-    }
-
-    return { 
+    return {
       imported: data?.imported || 0,
-      items: data?.items || [] 
+      items: data?.items || []
     };
   }
 
   static async linkProduct(productId: string, mlItemId: string): Promise<void> {
-    const { error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'link_product', product_id: productId, ml_item_id: mlItemId }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to link product');
-    }
+    await callMLFunction('ml-sync-v2', 'link_product', { product_id: productId, ml_item_id: mlItemId }, {});
   }
 
-  static async createAd(adData: any): Promise<{ title: string; success: boolean }> {
-    const { error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'create_ad', ad_data: adData }
-    });
-
-    if (error) {
-      throw new Error(error.message || 'Failed to create ad');
-    }
+  static async createAd(adData: Record<string, unknown>): Promise<{ title: string; success: boolean }> {
+    await callMLFunction('ml-sync-v2', 'create_ad', { ad_data: adData }, {});
 
     return { title: adData.title || 'Anúncio criado', success: true };
   }
@@ -316,7 +263,7 @@ export class MLService {
     return data;
   }
 
-  static async getIntegrationHealth(): Promise<any> {
+  static async getIntegrationHealth(): Promise<unknown> {
     const { data, error } = await supabase.rpc('get_ml_integration_health');
 
     if (error) {
@@ -328,7 +275,7 @@ export class MLService {
 
   // ====== MANUTENÇÃO ======
 
-  static async backupConfiguration(): Promise<any> {
+  static async backupConfiguration(): Promise<unknown> {
     const { data, error } = await supabase.rpc('backup_ml_configuration');
 
     if (error) {

@@ -13,6 +13,7 @@ const callHistory = new Map<string, number[]>();
 export interface MLCallOptions {
   skipRateCheck?: boolean;
   timeout?: number;
+  headers?: Record<string, string>;
 }
 
 /**
@@ -51,11 +52,12 @@ function recordCall(operation: string): void {
  * Chama uma função ML com rate limiting e error handling melhorado
  */
 export async function callMLFunction(
-  action: string, 
-  params: Record<string, any>, 
+  functionName: string,
+  action: string,
+  params: Record<string, unknown>,
   options: MLCallOptions = {}
-): Promise<any> {
-  const { skipRateCheck = false, timeout = 30000 } = options;
+): Promise<unknown> {
+  const { skipRateCheck = false, timeout = 30000, headers } = options;
   
   // Verificar rate limit se não for para pular
   if (!skipRateCheck && !canMakeCall(action)) {
@@ -71,11 +73,20 @@ export async function callMLFunction(
       setTimeout(() => reject(new Error(`Timeout após ${timeout}ms`)), timeout);
     });
     
-    const callPromise = supabase.functions.invoke('ml-sync-v2', {
-      body: { action, ...params }
+    const { data: session } = await supabase.auth.getSession();
+    const authHeader = session.session?.access_token
+      ? { Authorization: `Bearer ${session.session.access_token}` }
+      : {};
+
+    const callPromise = supabase.functions.invoke(functionName, {
+      body: { action, ...params },
+      headers: { ...authHeader, ...headers },
     });
     
-    const { data, error } = await Promise.race([callPromise, timeoutPromise]) as any;
+    const { data, error } = await Promise.race([callPromise, timeoutPromise]) as {
+      data: unknown;
+      error: { message?: string } | null;
+    };
     
     if (error) {
       console.error(`[ML API] Error in ${action}:`, error);
@@ -97,7 +108,7 @@ export async function callMLFunction(
     // Melhorar a mensagem de erro
     let errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
     
-    if (errorMessage.includes('timeout')) {
+    if (errorMessage.toLowerCase().includes('timeout')) {
       errorMessage = `Operação ${action} demorou muito para responder`;
     } else if (errorMessage.includes('network')) {
       errorMessage = `Erro de conexão durante ${action}`;

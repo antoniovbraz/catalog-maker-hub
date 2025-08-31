@@ -8,6 +8,10 @@ describe('ML API Utils', () => {
     clearCallHistory();
     vi.clearAllTimers();
     vi.useFakeTimers();
+    testUtils.mockSupabaseClient.auth.getSession.mockResolvedValue({
+      data: { session: { access_token: 'test-token' } },
+      error: null,
+    });
   });
 
   afterEach(() => {
@@ -21,11 +25,12 @@ describe('ML API Utils', () => {
         error: null
       });
 
-      const result = await callMLFunction('sync_product', { productId: '123' });
+      const result = await callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' });
 
       expect(result).toEqual({ success: true });
       expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
-        body: { action: 'sync_product', productId: '123' }
+        body: { action: 'sync_product', productId: '123' },
+        headers: { Authorization: 'Bearer test-token' }
       });
     });
 
@@ -37,11 +42,11 @@ describe('ML API Utils', () => {
 
       // Fazer 60 chamadas (limite para sync_product)
       for (let i = 0; i < 60; i++) {
-        await callMLFunction('sync_product', { productId: `${i}` });
+        await callMLFunction('ml-sync-v2', 'sync_product', { productId: `${i}` });
       }
 
       // A 61ª chamada deve falhar por rate limit
-      await expect(callMLFunction('sync_product', { productId: '61' })).rejects.toThrow('Rate limit excedido');
+      await expect(callMLFunction('ml-sync-v2', 'sync_product', { productId: '61' })).rejects.toThrow('Rate limit excedido');
     });
 
     it('deve pular rate limiting quando especificado', async () => {
@@ -52,11 +57,11 @@ describe('ML API Utils', () => {
 
       // Fazer 60 chamadas para esgotar rate limit
       for (let i = 0; i < 60; i++) {
-        await callMLFunction('sync_product', { productId: `${i}` });
+        await callMLFunction('ml-sync-v2', 'sync_product', { productId: `${i}` });
       }
 
       // Esta deve passar por usar skipRateCheck
-      const result = await callMLFunction('sync_product', { productId: '61' }, { skipRateCheck: true });
+      const result = await callMLFunction('ml-sync-v2', 'sync_product', { productId: '61' }, { skipRateCheck: true });
       expect(result).toEqual({ success: true });
     });
 
@@ -65,9 +70,9 @@ describe('ML API Utils', () => {
         new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 2000))
       );
 
-      await expect(
-        callMLFunction('sync_product', { productId: '123' }, { timeout: 1000 })
-      ).rejects.toThrow('Timeout após 1000ms');
+      const promise = callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' }, { timeout: 1000 });
+      await vi.advanceTimersByTimeAsync(1000);
+      await expect(promise).rejects.toThrow('Operação sync_product demorou muito para responder');
     });
 
     it('deve tratar erros do Supabase', async () => {
@@ -76,7 +81,7 @@ describe('ML API Utils', () => {
         error: { message: 'Database error' }
       });
 
-      await expect(callMLFunction('sync_product', { productId: '123' })).rejects.toThrow('Database error');
+      await expect(callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' })).rejects.toThrow('Database error');
     });
 
     it('deve melhorar mensagens de erro conhecidas', async () => {
@@ -85,7 +90,7 @@ describe('ML API Utils', () => {
         error: { message: 'unauthorized token' }
       });
 
-      await expect(callMLFunction('sync_product', { productId: '123' })).rejects.toThrow('Token do Mercado Livre expirado ou inválido');
+      await expect(callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' })).rejects.toThrow('Token do Mercado Livre expirado ou inválido');
     });
   });
 
@@ -94,7 +99,9 @@ describe('ML API Utils', () => {
       const processor = vi.fn().mockResolvedValue('success');
       const items = ['1', '2', '3', '4', '5'];
 
-      const results = await processInBatches(items, processor, 'test_operation', 2, 0);
+      const promise = processInBatches(items, processor, 'test_operation', 2, 0);
+      await vi.runAllTimersAsync();
+      const results = await promise;
 
       expect(results).toHaveLength(5);
       expect(results.every(r => r.status === 'fulfilled')).toBe(true);
@@ -152,8 +159,8 @@ describe('ML API Utils', () => {
         error: null
       });
 
-      await callMLFunction('sync_product', { productId: '1' });
-      await callMLFunction('sync_product', { productId: '2' });
+      await callMLFunction('ml-sync-v2', 'sync_product', { productId: '1' });
+      await callMLFunction('ml-sync-v2', 'sync_product', { productId: '2' });
 
       const stats = getRateLimitStats();
       expect(stats.sync_product).toBeDefined();
@@ -167,7 +174,7 @@ describe('ML API Utils', () => {
         error: null
       });
 
-      await callMLFunction('sync_product', { productId: '1' });
+      await callMLFunction('ml-sync-v2', 'sync_product', { productId: '1' });
 
       // Avançar tempo além da janela (60 segundos)
       vi.advanceTimersByTime(65 * 1000);
@@ -182,7 +189,7 @@ describe('ML API Utils', () => {
       testUtils.mockSupabaseClient.functions.invoke.mockRejectedValue(new Error('Network error'));
 
       try {
-        await callMLFunction('sync_product', { productId: '1' });
+        await callMLFunction('ml-sync-v2', 'sync_product', { productId: '1' });
       } catch (error) {
         // Expected error
       }
@@ -192,13 +199,13 @@ describe('ML API Utils', () => {
     });
 
     it('deve melhorar mensagens de erro de timeout', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() => 
+      testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() =>
         new Promise(() => {}) // Never resolves
       );
 
-      await expect(
-        callMLFunction('sync_product', { productId: '123' }, { timeout: 100 })
-      ).rejects.toThrow('Operação sync_product demorou muito para responder');
+      const promise = callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' }, { timeout: 100 });
+      await vi.advanceTimersByTimeAsync(100);
+      await expect(promise).rejects.toThrow('Operação sync_product demorou muito para responder');
     });
   });
 });
