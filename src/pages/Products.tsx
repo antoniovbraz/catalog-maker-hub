@@ -12,7 +12,7 @@ import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useMLIntegration, useMLSync } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
-import { useMLResync } from "@/hooks/useMLResync";
+import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 import { MLConflictModal } from "@/components/forms/MLConflictModal";
 import type { MLSyncProduct } from "@/services/ml-service";
@@ -22,7 +22,7 @@ export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
   const { data: mlProducts = [] } = useMLProducts();
   const { importFromML } = useMLSync();
-  const { resyncProduct } = useMLResync();
+  const { resyncProduct } = useMLProductResync();
   const deleteMutation = useDeleteProduct();
   const { showFormModal, showConfirmModal } = useGlobalModal();
 

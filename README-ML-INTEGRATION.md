@@ -28,7 +28,7 @@ src/
 │   ├── useMLIntegration.ts             # Hook principal
 │   ├── useMLAuth.ts                    # Autenticação
 │   ├── useMLSync.ts                    # Sincronização
-│   └── useMLResync.ts                  # Re-sincronização
+│   └── useMLProductResync.ts           # Re-sincronização
 ├── services/ml-service.ts              # Serviço principal
 ├── utils/ml/ml-api.ts                  # Rate limiting e utilitários
 └── types/                              # Tipos TypeScript
