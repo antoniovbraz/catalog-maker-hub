@@ -58,7 +58,7 @@ Utilize [Conventional Commits](https://www.conventionalcommits.org) com tipos es
 **Exemplos Específicos:**
 ```bash
 feat: implement ml-auth OAuth flow
-fix: resolve token refresh in ml-sync
+fix: resolve token refresh in ml-sync-v2
 docs: update ml integration API reference
 refactor: optimize ml-webhook processing
 test: add unit tests for MLAuthService
@@ -78,7 +78,7 @@ src/
 
 supabase/functions/
 ├── ml-auth/             # Edge Function auth
-├── ml-sync/             # Edge Function sync  
+├── ml-sync-v2/          # Edge Function sync
 └── ml-webhook/          # Edge Function webhook
 ```
 

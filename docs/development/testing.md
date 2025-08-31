@@ -209,11 +209,11 @@ describe('ML Pricing Utils', () => {
 ### Edge Functions
 
 ```typescript
-// tests/edge-functions/ml-sync.test.ts
+// tests/edge-functions/ml-sync-v2.test.ts
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
 describe('ML Sync Edge Function', () => {
-  const FUNCTION_URL = 'http://localhost:54321/functions/v1/ml-sync'
+  const FUNCTION_URL = 'http://localhost:54321/functions/v1/ml-sync-v2'
   
   it('should sync product to ML successfully', async () => {
     const response = await fetch(FUNCTION_URL, {
@@ -449,7 +449,7 @@ export const mockMLAPI = () => {
 ### Load Testing
 
 ```typescript
-// tests/performance/ml-sync-load.test.ts
+// tests/performance/ml-sync-v2-load.test.ts
 import { describe, it, expect } from 'vitest'
 
 describe('ML Sync Performance', () => {

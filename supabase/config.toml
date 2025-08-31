@@ -42,9 +42,6 @@ verify_jwt = true
 [functions.ml-auth]
 verify_jwt = true
 
-[functions.ml-sync]
-verify_jwt = true
-
 [functions.ml-sync-v2]
 verify_jwt = true
 

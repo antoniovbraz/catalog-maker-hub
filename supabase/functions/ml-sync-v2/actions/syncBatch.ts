@@ -1,21 +1,38 @@
 import { ActionContext, SyncBatchRequest, errorResponse, corsHeaders } from '../types.ts';
+import { syncSingleProduct } from './syncProduct.ts';
 
 export async function syncBatch(
   req: SyncBatchRequest,
-  { supabase, tenantId, jwt }: ActionContext
+  { supabase, tenantId, mlToken }: ActionContext
 ): Promise<Response> {
   if (!req.product_ids || !Array.isArray(req.product_ids)) {
     return errorResponse('Product IDs array required', 400);
   }
 
-  const startTime = Date.now();
-  try {
-    const { data: syncData, error: syncError } = await supabase.functions.invoke('ml-sync', {
-      body: { action: 'sync_batch', product_ids: req.product_ids },
-      headers: { Authorization: `Bearer ${jwt}` }
-    });
+    const startTime = Date.now();
+    try {
+      const results: Array<{ product_id: string; success: boolean; [key: string]: unknown }> = [];
+    for (const productId of req.product_ids) {
+      try {
+        const result = await syncSingleProduct(
+          supabase,
+          tenantId,
+          productId,
+          mlToken,
+          req.force_update
+        );
+        results.push({ product_id: productId, ...result });
+      } catch (error) {
+        results.push({
+          product_id: productId,
+          success: false,
+          error: (error as Error).message,
+        });
+      }
+    }
 
-    const status = syncError || !syncData || syncData?.error ? 'error' : 'success';
+    const errors = results.filter((r) => !r.success).length;
+    const status = errors > 0 ? 'error' : 'success';
 
     await supabase.from('ml_sync_log').insert({
       tenant_id: tenantId,
@@ -23,17 +40,12 @@ export async function syncBatch(
       entity_type: 'batch',
       status,
       request_data: { product_count: req.product_ids.length },
-      response_data: syncData,
-      error_details: syncError ? { message: syncError.message } : undefined,
-      execution_time_ms: Date.now() - startTime
+      response_data: { results },
+      execution_time_ms: Date.now() - startTime,
     });
 
-    if (status === 'error') {
-      return errorResponse(syncError?.message || syncData?.error || 'ML batch sync failed', 500);
-    }
-
-    return new Response(JSON.stringify(syncData), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ results }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     await supabase.from('ml_sync_log').insert({
@@ -43,7 +55,7 @@ export async function syncBatch(
       status: 'error',
       request_data: { product_count: req.product_ids.length },
       error_details: { message: (error as Error).message },
-      execution_time_ms: Date.now() - startTime
+      execution_time_ms: Date.now() - startTime,
     });
 
     return errorResponse('Internal error: ' + (error as Error).message, 500);

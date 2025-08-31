@@ -40,7 +40,7 @@ supabase secrets set \
 ```bash
 # Deploy de todas as Edge Functions
 supabase functions deploy ml-auth
-supabase functions deploy ml-sync  
+supabase functions deploy ml-sync-v2
 supabase functions deploy ml-webhook
 
 # Verificar deploy
@@ -275,7 +275,7 @@ npx lighthouse https://peepers-hub.lovable.app --output=json
 if [ $HEALTH_CHECK_FAIL ]; then
   echo "Health check failed, rolling back..."
   supabase functions deploy ml-auth --version previous
-  supabase functions deploy ml-sync --version previous
+  supabase functions deploy ml-sync-v2 --version previous
   supabase functions deploy ml-webhook --version previous
 fi
 ```

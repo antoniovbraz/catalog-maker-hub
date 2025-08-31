@@ -65,12 +65,12 @@ export class MLAuthService {
 
 ---
 
-### 📦 **ml-sync** - Sincronização de Produtos  
+### 📦 **ml-sync-v2** - Sincronização de Produtos
 **Status**: ✅ **Base Implementada** | **Lógica de Negócio**: 🔄 Em Desenvolvimento
 
 #### **Endpoints Disponíveis**
 
-##### `POST /functions/v1/ml-sync`
+##### `POST /functions/v1/ml-sync-v2`
 Sincroniza produtos entre Hub e Mercado Livre
 
 **Ações Suportadas:**

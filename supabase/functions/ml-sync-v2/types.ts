@@ -11,11 +11,22 @@ export type SyncAction =
   | 'resync_product';
 
 export interface GetStatusRequest { action: 'get_status'; }
-export interface SyncProductRequest { action: 'sync_product'; product_id: string; }
-export interface SyncBatchRequest { action: 'sync_batch'; product_ids: string[]; }
+export interface SyncProductRequest {
+  action: 'sync_product';
+  product_id: string;
+  force_update?: boolean;
+}
+export interface SyncBatchRequest {
+  action: 'sync_batch';
+  product_ids: string[];
+  force_update?: boolean;
+}
 export interface ImportFromMLRequest { action: 'import_from_ml'; }
 export interface LinkProductRequest { action: 'link_product'; product_id: string; ml_item_id: string; }
-export interface CreateAdRequest { action: 'create_ad'; ad_data: any; }
+export interface CreateAdRequest {
+  action: 'create_ad';
+  ad_data: Record<string, unknown>;
+}
 export interface GetProductsRequest { action: 'get_products'; }
 export interface ResyncProductRequest { action: 'resync_product'; productId: string; }
 
@@ -32,7 +43,7 @@ export type SyncRequest =
 export interface ActionContext {
   supabase: SupabaseClient;
   tenantId: string;
-  authToken: any;
+  authToken: Record<string, unknown>;
   mlClientId: string;
   mlToken: string;
   jwt: string;

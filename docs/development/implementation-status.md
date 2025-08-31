@@ -37,7 +37,7 @@ Documentação atualizada refletindo o status **REAL** da implementação da int
 ✅ status - Verificar conexão
 ```
 
-#### **ml-sync** ✅ **Base Pronta**
+#### **ml-sync-v2** ✅ **Base Pronta**
 ```typescript
 // Estrutura implementada:
 ✅ Endpoint configurado
@@ -76,7 +76,7 @@ USING ((tenant_id = (SELECT profiles.tenant_id FROM profiles WHERE profiles.id =
 ### 📦 **Product Sync Logic - 40% Implementado**
 ```typescript
 // Implementado:
-✅ Estrutura base ml-sync Edge Function
+✅ Estrutura base ml-sync-v2 Edge Function
 ✅ Validação de entrada
 ✅ Error handling básico
 
@@ -170,7 +170,7 @@ SELECT * FROM ml_auth_tokens; -- Retorna apenas dados do tenant atual
 ✅ Response format correto
 🔄 OAuth flow completo (precisa ML credentials)
 
-# ml-sync: Estrutura testada
+# ml-sync-v2: Estrutura testada
 ✅ Endpoint responde
 ✅ Error handling básico
 🔄 Business logic (em desenvolvimento)

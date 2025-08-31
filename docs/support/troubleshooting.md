@@ -285,7 +285,7 @@ const syncProductsBatch = async (productIds: string[]) => {
   
   for (const batch of batches) {
     await Promise.allSettled(
-      batch.map(id => syncSingleProduct(id))
+      batch.map(id => syncProduct(id))
     );
     
     // Aguardar entre batches para respeitar rate limit
