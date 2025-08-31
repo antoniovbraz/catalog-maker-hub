@@ -10,7 +10,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'json-summary'],
       exclude: [
         'node_modules/',
         'tests/',
@@ -21,11 +21,33 @@ export default defineConfig({
         'src/components/ui/**', // shadcn components
       ],
       thresholds: {
-        global: {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+        'src/services/**': {
+          branches: 90,
+          functions: 90,
+          lines: 90,
+          statements: 90,
+        },
+        'src/utils/**': {
+          branches: 90,
+          functions: 90,
+          lines: 90,
+          statements: 90,
+        },
+        'src/hooks/**': {
           branches: 80,
           functions: 80,
           lines: 80,
           statements: 80,
+        },
+        'src/components/**': {
+          branches: 70,
+          functions: 70,
+          lines: 70,
+          statements: 70,
         },
       },
     },
