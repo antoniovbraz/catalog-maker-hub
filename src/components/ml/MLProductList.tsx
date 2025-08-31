@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
 import { useMLSync } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
+import { toast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -34,6 +35,27 @@ export function MLProductList() {
   };
 
   const handleSyncProduct = (productId: string) => {
+    const product = (products || []).find(p => p.id === productId);
+    if (!product) return;
+
+    const missingFields: string[] = [];
+    if (!product.name) missingFields.push('nome');
+    if (!product.sku) missingFields.push('SKU');
+    if (!product.description) missingFields.push('descrição');
+    if (product.cost_unit == null || product.cost_unit <= 0) {
+      missingFields.push('custo unitário');
+    }
+    if (!product.image_url) missingFields.push('imagem');
+
+    if (missingFields.length > 0) {
+      toast({
+        title: 'Campos obrigatórios ausentes',
+        description: `Preencha: ${missingFields.join(', ')}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     syncProduct.mutate(productId);
   };
 
