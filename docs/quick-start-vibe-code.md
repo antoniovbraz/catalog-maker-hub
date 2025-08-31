@@ -10,7 +10,7 @@ npm install
 npm run dev
 
 # ✅ Database: 15 tabelas ML implementadas
-# ✅ Edge Functions: ml-auth, ml-sync, ml-webhook funcionais  
+# ✅ Edge Functions: ml-auth, ml-sync-v2, ml-webhook funcionais
 # ✅ RLS: Segurança habilitada
 # ✅ Types: Auto-gerados pelo Supabase
 ```
@@ -70,7 +70,7 @@ export async function syncProductToML(productId: string) {
   const mlItem = mapProductToMLItem(product);
   
   // 3. Enviar para ML via Edge Function
-  const result = await supabase.functions.invoke('ml-sync', {
+  const result = await supabase.functions.invoke('ml-sync-v2', {
     body: { action: 'sync-product', productId, mlItem }
   });
   
@@ -112,7 +112,7 @@ export async function syncProductToML(productId: string) {
 ```bash
 # Logs em tempo real
 # https://supabase.com/dashboard/project/ngkhzbzynkhgezkqykeb/functions/ml-auth/logs
-# https://supabase.com/dashboard/project/ngkhzbzynkhgezkqykeb/functions/ml-sync/logs  
+# https://supabase.com/dashboard/project/ngkhzbzynkhgezkqykeb/functions/ml-sync-v2/logs
 # https://supabase.com/dashboard/project/ngkhzbzynkhgezkqykeb/functions/ml-webhook/logs
 ```
 
@@ -144,7 +144,7 @@ export function useMLDebug() {
   };
   
   const testSync = async () => {
-    const result = await supabase.functions.invoke('ml-sync', {
+    const result = await supabase.functions.invoke('ml-sync-v2', {
       body: { action: 'sync-status', productId: 'test', tenantId: 'test' }
     });
     console.log('Sync Test:', result);

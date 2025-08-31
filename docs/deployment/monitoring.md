@@ -50,7 +50,7 @@ const functionMetrics = {
     errorRate: '<1%',
     invocations: 'per hour'
   },
-  'ml-sync': {
+  'ml-sync-v2': {
     averageResponseTime: '<5s',
     errorRate: '<2%',
     invocations: 'per sync operation'
@@ -115,7 +115,7 @@ export const logger = {
     sync: (operation: string, productId: string, result: any) =>
       console.log(JSON.stringify({
         timestamp: new Date().toISOString(),
-        service: 'ml-sync',
+        service: 'ml-sync-v2',
         operation,
         productId,
         result,
@@ -362,7 +362,7 @@ export const rumCollector = {
 }
 
 // Uso:
-const interaction = rumCollector.userInteraction('ml-sync', 'sync-button')
+const interaction = rumCollector.userInteraction('ml-sync-v2', 'sync-button')
 try {
   await syncProduct(productId)
   interaction.track('success')

@@ -21,7 +21,7 @@
 #### Sprint 1.1 - Infraestrutura ✅ **CONCLUÍDO**
 **Entregáveis:**
 - ✅ **Database Schema**: Todas as tabelas ML implementadas
-- ✅ **Edge Functions Base**: ml-auth, ml-sync, ml-webhook funcionais
+- ✅ **Edge Functions Base**: ml-auth, ml-sync-v2, ml-webhook funcionais
 - ✅ **Environment Config**: Secrets ML configurados
 - ✅ **CI/CD Pipeline**: Deploy automático funcionando
 
