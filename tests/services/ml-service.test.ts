@@ -1,8 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-vi.mock('@/utils/ml/ml-api', () => ({
-  callMLFunction: vi.fn(),
-}));
+vi.mock('@/utils/ml/ml-api', async () => {
+  const actual = await vi.importActual<typeof import('@/utils/ml/ml-api')>('@/utils/ml/ml-api');
+  return {
+    ...actual,
+    callMLFunction: vi.fn(),
+  };
+});
 
 import { callMLFunction } from '@/utils/ml/ml-api';
 import { MLService, MLPerformanceMetrics } from '@/services/ml-service';
@@ -220,6 +224,19 @@ describe('MLService', () => {
       vi.mocked(callMLFunction).mockRejectedValue(new Error('Function error'));
 
       await expect(MLService.syncProduct('test')).rejects.toThrow('Function error');
+    });
+
+    it('deve propagar detalhes de erro das edge functions', async () => {
+      const actual = await vi.importActual<typeof import('@/utils/ml/ml-api')>('@/utils/ml/ml-api');
+      vi.mocked(callMLFunction).mockImplementation(actual.callMLFunction);
+
+      testUtils.mockSupabaseClient.auth.getSession.mockResolvedValue({ data: { session: null } });
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: null,
+        error: { message: 'Outer', details: { message: 'Detalhe da edge' } }
+      });
+
+      await expect(MLService.syncProduct('test')).rejects.toThrow('Detalhe da edge');
     });
   });
 });
