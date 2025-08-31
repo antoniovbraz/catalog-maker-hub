@@ -71,8 +71,11 @@ describe('ML API Utils', () => {
       );
 
       const promise = callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' }, { timeout: 1000 });
+      const handled = promise.catch(err => err);
       await vi.advanceTimersByTimeAsync(1000);
-      await expect(promise).rejects.toThrow('Operação sync_product demorou muito para responder');
+      const error = await handled;
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toBe('Operação sync_product demorou muito para responder');
     });
 
     it('deve tratar erros do Supabase', async () => {
@@ -204,8 +207,11 @@ describe('ML API Utils', () => {
       );
 
       const promise = callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' }, { timeout: 100 });
+      const handled = promise.catch(err => err);
       await vi.advanceTimersByTimeAsync(100);
-      await expect(promise).rejects.toThrow('Operação sync_product demorou muito para responder');
+      const error = await handled;
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toBe('Operação sync_product demorou muito para responder');
     });
   });
 });
