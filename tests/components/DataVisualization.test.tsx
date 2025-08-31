@@ -1,22 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testUtils } from '../setup';
+import { createWrapper } from '../utils/query-wrapper';
 import { DataVisualization } from '@/components/ui/data-visualization';
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
+const { wrapper, queryClient } = createWrapper();
 
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+afterEach(() => {
+  queryClient.clear();
+  queryClient.removeQueries();
+});
 
 describe('Componente DataVisualization', () => {
   beforeEach(() => {
@@ -39,7 +33,7 @@ describe('Componente DataVisualization', () => {
         title="Teste"
         data={mockData}
         columns={mockColumns}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     expect(screen.getByText('Nome')).toBeInTheDocument();
@@ -57,7 +51,7 @@ describe('Componente DataVisualization', () => {
         data={[]}
         columns={mockColumns}
         isLoading={true}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     expect(screen.getByText('Carregando...')).toBeInTheDocument();
@@ -75,7 +69,7 @@ describe('Componente DataVisualization', () => {
             <p>Adicione um item para começar</p>
           </div>
         )}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     expect(screen.getByText('Nenhum item encontrado')).toBeInTheDocument();
@@ -92,7 +86,7 @@ describe('Componente DataVisualization', () => {
         data={mockData}
         columns={mockColumns}
         actions={[{ label: 'Editar', onClick: mockAction }]}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     const row = screen.getByRole('row', { name: /Item 1/i });
@@ -116,7 +110,7 @@ describe('Componente DataVisualization', () => {
         title="Aninhado"
         data={nestedData}
         columns={nestedColumns}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     expect(screen.getByText('João')).toBeInTheDocument();
@@ -131,7 +125,7 @@ describe('Componente DataVisualization', () => {
         title="Busca"
         data={mockData}
         columns={mockColumns}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     const input = screen.getByPlaceholderText('Buscar...');
@@ -158,7 +152,7 @@ describe('Componente DataVisualization', () => {
         title="Ordenação"
         data={data}
         columns={columns}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     const header = screen.getByText('Nome');
@@ -193,7 +187,7 @@ describe('Componente DataVisualization', () => {
         data={data}
         columns={mockColumns}
         itemsPerPage={1}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     expect(screen.getByText('Item 1')).toBeInTheDocument();
@@ -222,7 +216,7 @@ describe('Componente DataVisualization', () => {
         columns={mockColumns}
         onViewModeChange={mockChange}
         viewMode="table"
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     const gridButton = screen.getByRole('button', { name: /modo grade/i });
@@ -248,7 +242,7 @@ describe('Componente DataVisualization', () => {
           { label: 'Excluir', onClick: vi.fn() },
           { label: 'Ver', onClick: extraAction }
         ]}
-      />, { wrapper: createWrapper() }
+      />, { wrapper }
     );
 
     const row = screen.getByRole('row', { name: /Item 1/i });

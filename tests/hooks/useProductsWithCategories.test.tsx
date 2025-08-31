@@ -1,24 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testUtils } from '../setup';
+import { createWrapper } from '../utils/query-wrapper';
 import { useProductsWithCategories } from '@/hooks/useProducts';
 import { productsService } from '@/services/products';
 
 vi.mock('@/services/products');
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
+const { wrapper, queryClient } = createWrapper();
 
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+afterEach(() => {
+  queryClient.clear();
+  queryClient.removeQueries();
+});
 
 describe('useProductsWithCategories', () => {
   beforeEach(() => {
@@ -41,7 +35,7 @@ describe('useProductsWithCategories', () => {
     vi.mocked(productsService.getAllWithCategories).mockResolvedValue(mockProducts);
 
     const { result } = renderHook(() => useProductsWithCategories(), {
-      wrapper: createWrapper(),
+      wrapper,
     });
 
     expect(result.current.isLoading).toBe(true);
@@ -59,7 +53,7 @@ describe('useProductsWithCategories', () => {
     vi.mocked(productsService.getAllWithCategories).mockRejectedValue(mockError);
 
     const { result } = renderHook(() => useProductsWithCategories(), {
-      wrapper: createWrapper(),
+      wrapper,
     });
 
     await waitFor(() => {
