@@ -1,29 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testUtils } from '../setup';
 import { toast } from '../mocks/toast';
+import { createWrapper } from '../utils/query-wrapper';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
 import { productsService } from '@/services/products';
 
 // Mock do service
 vi.mock('@/services/products');
 
-// Wrapper para React Query
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
-  
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
-};
+const { wrapper, queryClient } = createWrapper();
+
+afterEach(() => {
+  queryClient.clear();
+  queryClient.removeQueries();
+});
 
 describe('useProducts hooks', () => {
   beforeEach(() => {
@@ -41,7 +32,7 @@ describe('useProducts hooks', () => {
       vi.mocked(productsService.getAll).mockResolvedValue(mockProducts);
 
       const { result } = renderHook(() => useProducts(), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       expect(result.current.isLoading).toBe(true);
@@ -59,7 +50,7 @@ describe('useProducts hooks', () => {
       vi.mocked(productsService.getAll).mockRejectedValue(mockError);
 
       const { result } = renderHook(() => useProducts(), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       await waitFor(() => {
@@ -83,7 +74,7 @@ describe('useProducts hooks', () => {
       vi.mocked(productsService.create).mockResolvedValue(newProduct);
 
       const { result } = renderHook(() => useCreateProduct(), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       await result.current.mutateAsync(productData);
@@ -108,7 +99,7 @@ describe('useProducts hooks', () => {
       vi.mocked(productsService.create).mockRejectedValue(mockError);
 
       const { result } = renderHook(() => useCreateProduct(), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       await expect(result.current.mutateAsync(productData)).rejects.toThrow(mockError);
@@ -130,7 +121,7 @@ describe('useProducts hooks', () => {
       vi.mocked(productsService.update).mockResolvedValue(updatedProduct);
 
       const { result } = renderHook(() => useUpdateProduct(), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       await result.current.mutateAsync({ id: 'test-id', data: updateData });
@@ -143,7 +134,7 @@ describe('useProducts hooks', () => {
       vi.mocked(productsService.delete).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useDeleteProduct(), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       await result.current.mutateAsync('test-id');

@@ -97,9 +97,12 @@ describe('useProducts', () => {
     // Mock do service
     vi.mocked(productsService.getAll).mockResolvedValue(mockData);
 
+    // Configura wrapper do React Query
+    const { wrapper } = createWrapper();
+
     // Render do hook
     const { result } = renderHook(() => useProducts(), {
-      wrapper: createWrapper(),
+      wrapper,
     });
 
     // Aguardar resultado

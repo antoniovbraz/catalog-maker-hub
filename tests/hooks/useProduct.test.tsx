@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testUtils } from '../setup';
+import { createWrapper } from '../utils/query-wrapper';
 import { useProduct } from '@/hooks/useProducts';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -11,18 +11,12 @@ vi.mock('@/integrations/supabase/client', () => ({
   },
 }));
 
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
+const { wrapper, queryClient } = createWrapper();
 
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
+afterEach(() => {
+  queryClient.clear();
+  queryClient.removeQueries();
+});
 
 describe('useProduct', () => {
   beforeEach(() => {
@@ -42,7 +36,7 @@ describe('useProduct', () => {
     });
 
     const { result } = renderHook(() => useProduct('1'), {
-      wrapper: createWrapper(),
+      wrapper,
     });
 
     expect(result.current.isLoading).toBe(true);
@@ -65,7 +59,7 @@ describe('useProduct', () => {
     });
 
     const { result } = renderHook(() => useProduct('1'), {
-      wrapper: createWrapper(),
+      wrapper,
     });
 
     await waitFor(() => {
