@@ -216,7 +216,7 @@ export class MLService {
 
   static async resyncProduct(productId: string): Promise<void> {
     const { error } = await supabase.functions.invoke('ml-sync-v2', {
-      body: { action: 'resync_product', product_id: productId }
+      body: { action: 'resync_product', productId }
     });
 
     if (error) {

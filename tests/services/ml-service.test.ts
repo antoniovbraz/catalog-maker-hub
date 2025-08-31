@@ -67,9 +67,9 @@ describe('MLService', () => {
     });
 
     it('deve sincronizar em lote', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({ 
-        data: { successful: 3, failed: 1 }, 
-        error: null 
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { successful: 3, failed: 1 },
+        error: null
       });
 
       const result = await MLService.syncBatch(['p1', 'p2', 'p3', 'p4']);
@@ -81,10 +81,23 @@ describe('MLService', () => {
       });
     });
 
+    it('deve re-sincronizar produto', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: null,
+        error: null
+      });
+
+      await MLService.resyncProduct('product-123');
+
+      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
+        body: { action: 'resync_product', productId: 'product-123' }
+      });
+    });
+
     it('deve importar do ML', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({ 
-        data: { imported: 5, items: [] }, 
-        error: null 
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { imported: 5, items: [] },
+        error: null
       });
 
       const result = await MLService.importFromML();
