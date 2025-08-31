@@ -78,12 +78,18 @@ export async function callMLFunction(
       ? { Authorization: `Bearer ${session.session.access_token}` }
       : {};
 
-    const callPromise = supabase.functions.invoke(functionName, {
-      body: { action, ...params },
-      headers: { ...authHeader, ...headers },
-    });
-    
-    const { data, error } = await Promise.race([callPromise, timeoutPromise]) as {
+    const callPromise = supabase.functions
+      .invoke(functionName, {
+        body: { action, ...params },
+        headers: { ...authHeader, ...headers },
+      })
+      // Evita rejeições não tratadas quando o timeout ocorre primeiro
+      .catch((err: { message?: string }) => ({ data: null, error: err }));
+
+    const { data, error } = (await Promise.race([
+      callPromise,
+      timeoutPromise,
+    ])) as {
       data: unknown;
       error: { message?: string } | null;
     };
