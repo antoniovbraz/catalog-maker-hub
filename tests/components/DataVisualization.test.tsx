@@ -95,7 +95,8 @@ describe('Componente DataVisualization', () => {
       />, { wrapper: createWrapper() }
     );
 
-    const button = screen.getAllByRole('button')[0];
+    const row = screen.getByRole('row', { name: /Item 1/i });
+    const button = within(row).getByRole('button', { name: /Editar/i });
     await user.click(button);
     expect(mockAction).toHaveBeenCalledWith(mockData[0]);
   });
@@ -163,12 +164,18 @@ describe('Componente DataVisualization', () => {
     const header = screen.getByText('Nome');
     await user.click(header);
 
-    let rows = screen.getAllByRole('row');
-    expect(within(rows[1]).getByText('Alpha')).toBeInTheDocument();
+    let alphaRow = screen.getByRole('row', { name: /Alpha/i });
+    let betaRow = screen.getByRole('row', { name: /Beta/i });
+    expect(
+      alphaRow.compareDocumentPosition(betaRow) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
 
     await user.click(header);
-    rows = screen.getAllByRole('row');
-    expect(within(rows[1]).getByText('Beta')).toBeInTheDocument();
+    betaRow = screen.getByRole('row', { name: /Beta/i });
+    alphaRow = screen.getByRole('row', { name: /Alpha/i });
+    expect(
+      betaRow.compareDocumentPosition(alphaRow) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
   });
 
   it('deve paginar os resultados', async () => {
@@ -218,11 +225,12 @@ describe('Componente DataVisualization', () => {
       />, { wrapper: createWrapper() }
     );
 
-    const buttons = screen.getAllByRole('button');
-    await user.click(buttons[1]);
+    const gridButton = screen.getByRole('button', { name: /modo grade/i });
+    await user.click(gridButton);
     expect(mockChange).toHaveBeenCalledWith('grid');
 
-    await user.click(buttons[0]);
+    const tableButton = screen.getByRole('button', { name: /modo tabela/i });
+    await user.click(tableButton);
     expect(mockChange).toHaveBeenCalledWith('table');
   });
 
@@ -243,12 +251,11 @@ describe('Componente DataVisualization', () => {
       />, { wrapper: createWrapper() }
     );
 
-    const row = screen.getAllByRole('row')[1];
-    const actionButtons = within(row).getAllByRole('button');
-    const menuButton = actionButtons[2];
+    const row = screen.getByRole('row', { name: /Item 1/i });
+    const menuButton = within(row).getByRole('button', { name: /mais ações/i });
     await user.click(menuButton);
 
-    const menuItem = await screen.findByText('Ver');
+    const menuItem = await screen.findByRole('menuitem', { name: /Ver/i });
     await user.click(menuItem);
 
     expect(extraAction).toHaveBeenCalledWith(mockData[0]);

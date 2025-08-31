@@ -147,6 +147,7 @@ export function DataVisualization<T extends { id: string }>({
                       variant={action.variant || "outline"}
                       onClick={() => action.onClick(item)}
                       disabled={action.disabled?.(item)}
+                      aria-label={action.label}
                     >
                       {action.icon}
                     </Button>
@@ -154,7 +155,7 @@ export function DataVisualization<T extends { id: string }>({
                   {actions.length > 2 && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="ghost">
+                        <Button size="sm" variant="ghost" aria-label="Mais ações">
                           <MoreHorizontal className="size-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -228,6 +229,7 @@ export function DataVisualization<T extends { id: string }>({
                   variant={viewMode === "table" ? "default" : "ghost"}
                   onClick={() => onViewModeChange("table")}
                   className="rounded-r-none"
+                  aria-label="Modo tabela"
                 >
                   <List className="size-4" />
                 </Button>
@@ -236,6 +238,7 @@ export function DataVisualization<T extends { id: string }>({
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   onClick={() => onViewModeChange("grid")}
                   className="rounded-l-none border-l"
+                  aria-label="Modo grade"
                 >
                   <Grid className="size-4" />
                 </Button>

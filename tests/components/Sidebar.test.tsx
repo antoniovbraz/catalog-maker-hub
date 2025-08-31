@@ -80,8 +80,9 @@ describe('AppSidebar accessibility', () => {
       </MemoryRouter>
     );
 
-    const [configButton] = screen.getAllByRole('button', { name: /configurações/i });
-    expect(configButton).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: /configurações/i })
+    ).not.toHaveLength(0);
   });
 
   it('allows keyboard navigation through items', async () => {
@@ -95,15 +96,19 @@ describe('AppSidebar accessibility', () => {
     );
 
     await user.tab();
-    const [dashboardLink] = screen.getAllByRole('link', { name: /dashboard/i });
-    expect(dashboardLink).toHaveFocus();
+    const dashboardLinks = screen.getAllByRole('link', { name: /dashboard/i });
+    expect(
+      dashboardLinks.some(link => link === document.activeElement)
+    ).toBe(true);
 
     await user.tab();
     expect(screen.getByRole('link', { name: /estratégia/i })).toHaveFocus();
 
     await user.tab();
-    const [configButton] = screen.getAllByRole('button', { name: /configurações/i });
-    expect(configButton).toHaveFocus();
+    const configButtons = screen.getAllByRole('button', { name: /configurações/i });
+    expect(
+      configButtons.some(btn => btn === document.activeElement)
+    ).toBe(true);
 
     await user.tab();
     expect(screen.getByRole('link', { name: /marketplaces/i })).toHaveFocus();
