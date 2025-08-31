@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { testUtils } from '../setup';
+import { toast } from '../mocks/toast';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
 import { productsService } from '@/services/products';
 
@@ -87,7 +88,7 @@ describe('useProducts hooks', () => {
 
       await result.current.mutateAsync(productData);
       expect(productsService.create).toHaveBeenCalledWith(productData);
-      expect(testUtils.mockToast).toHaveBeenCalledWith(
+      expect(toast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Sucesso',
           description: 'Produto criado com sucesso!',
@@ -111,7 +112,7 @@ describe('useProducts hooks', () => {
       });
 
       await expect(result.current.mutateAsync(productData)).rejects.toThrow(mockError);
-      expect(testUtils.mockToast).toHaveBeenCalledWith(
+      expect(toast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Erro',
           description: mockError.message,
@@ -147,7 +148,7 @@ describe('useProducts hooks', () => {
 
       await result.current.mutateAsync('test-id');
       expect(productsService.delete).toHaveBeenCalledWith('test-id');
-      expect(testUtils.mockToast).toHaveBeenCalledWith(
+      expect(toast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Sucesso',
           description: 'Produto deletado com sucesso!',

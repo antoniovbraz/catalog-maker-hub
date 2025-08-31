@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
+import * as toastMock from './mocks/toast';
 
 // Limpa e reseta mocks após cada teste
 afterEach(() => {
@@ -33,7 +34,7 @@ const mockSupabaseClient = {
 };
 
 // Mock das funções de toast
-const mockToast = vi.fn();
+const { toast: mockToast } = toastMock;
 
 // Mock do React Query
 const mockQueryClient = {
@@ -48,14 +49,7 @@ vi.mock('@/integrations/supabase/client', () => ({
 }));
 
 // Mock do toast
-vi.mock('@/components/ui/use-toast', () => ({
-  toast: mockToast,
-  useToast: () => ({ toast: mockToast }),
-}));
-vi.mock('@/hooks/use-toast', () => ({
-  toast: mockToast,
-  useToast: () => ({ toast: mockToast }),
-}));
+vi.mock('@/hooks/use-toast', () => toastMock);
 
 // Mock do React Router
 vi.mock('react-router-dom', async () => {
