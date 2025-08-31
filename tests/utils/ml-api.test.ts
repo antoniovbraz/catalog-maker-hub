@@ -65,6 +65,19 @@ describe('ML API Utils', () => {
       expect(result).toEqual({ success: true });
     });
 
+    it('não deve compartilhar rate limit entre funções', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { success: true },
+        error: null
+      });
+
+      for (let i = 0; i < 30; i++) {
+        await callMLFunction('ml-sync-v2', 'get_status', {});
+      }
+
+      await expect(callMLFunction('ml-auth', 'get_status', {})).resolves.toEqual({ success: true });
+    });
+
     it('deve tratar timeout corretamente', async () => {
       testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() => 
         new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 2000))
@@ -166,9 +179,10 @@ describe('ML API Utils', () => {
       await callMLFunction('ml-sync-v2', 'sync_product', { productId: '2' });
 
       const stats = getRateLimitStats();
-      expect(stats.sync_product).toBeDefined();
-      expect(stats.sync_product.calls).toBe(2);
-      expect(stats.sync_product.limit).toBe(60);
+      const key = 'ml-sync-v2:sync_product';
+      expect(stats[key]).toBeDefined();
+      expect(stats[key].calls).toBe(2);
+      expect(stats[key].limit).toBe(60);
     });
 
     it('deve limpar estatísticas antigas da janela', async () => {
@@ -183,7 +197,7 @@ describe('ML API Utils', () => {
       vi.advanceTimersByTime(65 * 1000);
 
       const stats = getRateLimitStats();
-      expect(stats.sync_product.calls).toBe(0);
+      expect(stats['ml-sync-v2:sync_product'].calls).toBe(0);
     });
   });
 
@@ -198,7 +212,7 @@ describe('ML API Utils', () => {
       }
 
       const stats = getRateLimitStats();
-      expect(stats.sync_product.calls).toBe(1);
+      expect(stats['ml-sync-v2:sync_product'].calls).toBe(1);
     });
 
     it('deve melhorar mensagens de erro de timeout', async () => {

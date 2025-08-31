@@ -19,33 +19,35 @@ export interface MLCallOptions {
 /**
  * Verifica se uma operação pode ser executada com base no rate limit
  */
-function canMakeCall(operation: string): boolean {
-  const limit = RATE_LIMITS[operation as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
+function canMakeCall(functionName: string, action: string): boolean {
+  const limit = RATE_LIMITS[action as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
+  const operationKey = `${functionName}:${action}`;
   const now = Date.now();
   const windowStart = now - limit.window;
-  
-  if (!callHistory.has(operation)) {
-    callHistory.set(operation, []);
+
+  if (!callHistory.has(operationKey)) {
+    callHistory.set(operationKey, []);
   }
-  
-  const calls = callHistory.get(operation)!;
-  
+
+  const calls = callHistory.get(operationKey)!;
+
   // Remove chamadas fora da janela
   const recentCalls = calls.filter(time => time > windowStart);
-  callHistory.set(operation, recentCalls);
-  
+  callHistory.set(operationKey, recentCalls);
+
   return recentCalls.length < limit.max;
 }
 
 /**
  * Registra uma chamada no histórico
  */
-function recordCall(operation: string): void {
-  if (!callHistory.has(operation)) {
-    callHistory.set(operation, []);
+function recordCall(functionName: string, action: string): void {
+  const operationKey = `${functionName}:${action}`;
+  if (!callHistory.has(operationKey)) {
+    callHistory.set(operationKey, []);
   }
-  
-  callHistory.get(operation)!.push(Date.now());
+
+  callHistory.get(operationKey)!.push(Date.now());
 }
 
 /**
@@ -58,9 +60,9 @@ export async function callMLFunction(
   options: MLCallOptions = {}
 ): Promise<unknown> {
   const { skipRateCheck = false, timeout = 30000, headers } = options;
-  
+
   // Verificar rate limit se não for para pular
-  if (!skipRateCheck && !canMakeCall(action)) {
+  if (!skipRateCheck && !canMakeCall(functionName, action)) {
     const limit = RATE_LIMITS[action as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
     throw new Error(`Rate limit excedido para ${action}. Máximo ${limit.max} chamadas por ${limit.window / 1000}s.`);
   }
@@ -100,7 +102,7 @@ export async function callMLFunction(
     }
     
     // Registrar a chamada como sucesso
-    recordCall(action);
+    recordCall(functionName, action);
     
     console.log(`[ML API] Success in ${action}:`, data);
     return data;
@@ -109,7 +111,7 @@ export async function callMLFunction(
     console.error(`[ML API] Exception in ${action}:`, error);
     
     // Registrar a tentativa mesmo com erro para rate limiting
-    recordCall(action);
+    recordCall(functionName, action);
     
     // Melhorar a mensagem de erro
     let errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
@@ -184,13 +186,14 @@ export function clearCallHistory(): void {
 export function getRateLimitStats(): Record<string, { calls: number; limit: number; windowMs: number }> {
   const stats: Record<string, { calls: number; limit: number; windowMs: number }> = {};
   
-  for (const [operation, calls] of callHistory.entries()) {
-    const limit = RATE_LIMITS[operation as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
+  for (const [operationKey, calls] of callHistory.entries()) {
+    const [, action] = operationKey.split(':');
+    const limit = RATE_LIMITS[action as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
     const now = Date.now();
     const windowStart = now - limit.window;
     const recentCalls = calls.filter(time => time > windowStart);
-    
-    stats[operation] = {
+
+    stats[operationKey] = {
       calls: recentCalls.length,
       limit: limit.max,
       windowMs: limit.window,
