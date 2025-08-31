@@ -44,6 +44,7 @@ Estamos sempre abertos a pull requests! Para contribuições de código, por fav
     git commit -m "feat: add amazing new feature"
     ```
     Nós seguimos o padrão [Conventional Commits](https://www.conventionalcommits.org/). As mensagens de commit devem estar em inglês; a documentação deve ser escrita em português.
+    Durante o commit, o [Husky](https://typicode.github.io/husky) executará o `lint-staged` para rodar o ESLint apenas nos arquivos que estiverem **staged**.
 6.  **Faça o push** para a sua branch:
     ```bash
     git push origin feature/nova-feature-incrivel
