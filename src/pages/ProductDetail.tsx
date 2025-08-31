@@ -172,6 +172,14 @@ export default function ProductDetail() {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">SKU</label>
                   <p>{product.sku || <span className="text-muted-foreground">Não informado</span>}</p>
+                  
+                  {/* Mostrar SKU do ML se for diferente */}
+                  {product.source === 'mercado_livre' && product.ml_seller_sku && product.ml_seller_sku !== product.sku && (
+                    <>
+                      <label className="text-sm font-medium text-muted-foreground">SKU Original ML</label>
+                      <p className="text-sm text-muted-foreground">{product.ml_seller_sku}</p>
+                    </>
+                  )}
                 </div>
               </div>
 

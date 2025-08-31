@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Settings, ShoppingCart, BarChart3, Database } from "@/components/ui/icons";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { MLConnectionCard } from "@/components/ml/MLConnectionCard";
-import { MLSystemOverview } from "@/components/ml/MLSystemOverview";
+import { MLStatusOverview } from "@/components/ml/MLStatusOverview";
 import { MLHealthStatus } from "@/components/ml/MLHealthStatus";
 import { MLNotificationCenter } from "@/components/ml/MLNotificationCenter";
 import { MLSyncStatus } from "@/components/ml/MLSyncStatus";
@@ -72,12 +72,12 @@ const MercadoLivre = () => {
     }
   }, [searchParams, setSearchParams, toast]);
 
-  // Auto-switch to dashboard if connected
+  // Auto-switch to dashboard only after successful connection
   useEffect(() => {
-    if (authStatus?.isConnected && activeTab === "connection") {
+    if (authStatus?.isConnected && activeTab === "connection" && searchParams.get('success') === 'connected') {
       setActiveTab("dashboard");
     }
-  }, [authStatus?.isConnected, activeTab]);
+  }, [authStatus?.isConnected, activeTab, searchParams]);
 
   const handleSyncSettings = () => {
     let submitForm: (() => Promise<void>) | null = null;
@@ -168,7 +168,7 @@ const MercadoLivre = () => {
           <TabsContent value="dashboard" className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
               {/* System Overview */}
-              <MLSystemOverview />
+              <MLStatusOverview />
 
               {/* Health and Status Row */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

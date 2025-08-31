@@ -1,62 +1,184 @@
 import { supabase } from '@/integrations/supabase/client';
-import { MLService } from '@/services/ml-service';
 
-async function wait(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+// Rate limiting e gestão de chamadas para ML API
+const RATE_LIMITS = {
+  sync_product: { max: 60, window: 60 * 1000 }, // 60 por minuto
+  resync_product: { max: 30, window: 60 * 1000 }, // 30 por minuto
+  import_from_ml: { max: 5, window: 60 * 1000 }, // 5 por minuto
+  default: { max: 30, window: 60 * 1000 },
+};
 
-interface CallOptions {
-  operationType?: string;
+const callHistory = new Map<string, number[]>();
+
+export interface MLCallOptions {
   skipRateCheck?: boolean;
+  timeout?: number;
 }
 
+/**
+ * Verifica se uma operação pode ser executada com base no rate limit
+ */
+function canMakeCall(operation: string): boolean {
+  const limit = RATE_LIMITS[operation as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
+  const now = Date.now();
+  const windowStart = now - limit.window;
+  
+  if (!callHistory.has(operation)) {
+    callHistory.set(operation, []);
+  }
+  
+  const calls = callHistory.get(operation)!;
+  
+  // Remove chamadas fora da janela
+  const recentCalls = calls.filter(time => time > windowStart);
+  callHistory.set(operation, recentCalls);
+  
+  return recentCalls.length < limit.max;
+}
+
+/**
+ * Registra uma chamada no histórico
+ */
+function recordCall(operation: string): void {
+  if (!callHistory.has(operation)) {
+    callHistory.set(operation, []);
+  }
+  
+  callHistory.get(operation)!.push(Date.now());
+}
+
+/**
+ * Chama uma função ML com rate limiting e error handling melhorado
+ */
 export async function callMLFunction(
-  action: string,
-  body: Record<string, any>,
-  options: CallOptions = {}
-) {
-  const operationType = options.operationType || action;
-
-  if (!options.skipRateCheck) {
-    while (!(await MLService.checkRateLimit(operationType))) {
-      await wait(1000);
+  action: string, 
+  params: Record<string, any>, 
+  options: MLCallOptions = {}
+): Promise<any> {
+  const { skipRateCheck = false, timeout = 30000 } = options;
+  
+  // Verificar rate limit se não for para pular
+  if (!skipRateCheck && !canMakeCall(action)) {
+    const limit = RATE_LIMITS[action as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
+    throw new Error(`Rate limit excedido para ${action}. Máximo ${limit.max} chamadas por ${limit.window / 1000}s.`);
+  }
+  
+  try {
+    console.log(`[ML API] Calling ${action} with params:`, params);
+    
+    // Criar uma promise com timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Timeout após ${timeout}ms`)), timeout);
+    });
+    
+    const callPromise = supabase.functions.invoke('ml-sync-v2', {
+      body: { action, ...params }
+    });
+    
+    const { data, error } = await Promise.race([callPromise, timeoutPromise]) as any;
+    
+    if (error) {
+      console.error(`[ML API] Error in ${action}:`, error);
+      throw new Error(error.message || `Erro na operação ${action}`);
     }
+    
+    // Registrar a chamada como sucesso
+    recordCall(action);
+    
+    console.log(`[ML API] Success in ${action}:`, data);
+    return data;
+    
+  } catch (error) {
+    console.error(`[ML API] Exception in ${action}:`, error);
+    
+    // Registrar a tentativa mesmo com erro para rate limiting
+    recordCall(action);
+    
+    // Melhorar a mensagem de erro
+    let errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    
+    if (errorMessage.includes('timeout')) {
+      errorMessage = `Operação ${action} demorou muito para responder`;
+    } else if (errorMessage.includes('network')) {
+      errorMessage = `Erro de conexão durante ${action}`;
+    } else if (errorMessage.includes('unauthorized')) {
+      errorMessage = 'Token do Mercado Livre expirado ou inválido';
+    }
+    
+    throw new Error(errorMessage);
   }
-
-  const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
-    body: { action, ...body }
-  });
-
-  if (error) {
-    throw new Error(error.message || 'ML function call failed');
-  }
-
-  if (data?.error) {
-    throw new Error(data.error);
-  }
-
-  return data;
 }
 
+/**
+ * Processa uma lista de IDs em lotes com controle de rate limiting
+ */
 export async function processInBatches<T>(
-  items: T[],
-  handler: (item: T) => Promise<any>,
-  operationType: string,
-  concurrency = 3
-) {
-  const results: PromiseSettledResult<any>[] = [];
-
-  for (let i = 0; i < items.length; i += concurrency) {
-    const batch = items.slice(i, i + concurrency);
-
-    while (!(await MLService.checkRateLimit(operationType))) {
-      await wait(1000);
+  items: string[],
+  processor: (item: string) => Promise<T>,
+  operation: string,
+  batchSize: number = 3,
+  delayBetweenBatches: number = 1000
+): Promise<PromiseSettledResult<T>[]> {
+  const results: PromiseSettledResult<T>[] = [];
+  
+  console.log(`[ML API] Processing ${items.length} items in batches of ${batchSize} for ${operation}`);
+  
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    console.log(`[ML API] Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(items.length / batchSize)}`);
+    
+    const batchPromises = batch.map(async (item) => {
+      try {
+        return await processor(item);
+      } catch (error) {
+        console.error(`[ML API] Error processing item ${item}:`, error);
+        throw error;
+      }
+    });
+    
+    const batchResults = await Promise.allSettled(batchPromises);
+    results.push(...batchResults);
+    
+    // Delay entre lotes para evitar rate limiting
+    if (i + batchSize < items.length) {
+      console.log(`[ML API] Waiting ${delayBetweenBatches}ms before next batch...`);
+      await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
     }
-
-    const settled = await Promise.allSettled(batch.map(handler));
-    results.push(...settled);
   }
-
+  
+  const successful = results.filter(r => r.status === 'fulfilled').length;
+  const failed = results.filter(r => r.status === 'rejected').length;
+  
+  console.log(`[ML API] Batch processing completed: ${successful} successful, ${failed} failed`);
+  
   return results;
 }
 
+/**
+ * Limpa o histórico de chamadas (útil para testes)
+ */
+export function clearCallHistory(): void {
+  callHistory.clear();
+}
+
+/**
+ * Obtém estatísticas do rate limiting atual
+ */
+export function getRateLimitStats(): Record<string, { calls: number; limit: number; windowMs: number }> {
+  const stats: Record<string, { calls: number; limit: number; windowMs: number }> = {};
+  
+  for (const [operation, calls] of callHistory.entries()) {
+    const limit = RATE_LIMITS[operation as keyof typeof RATE_LIMITS] || RATE_LIMITS.default;
+    const now = Date.now();
+    const windowStart = now - limit.window;
+    const recentCalls = calls.filter(time => time > windowStart);
+    
+    stats[operation] = {
+      calls: recentCalls.length,
+      limit: limit.max,
+      windowMs: limit.window,
+    };
+  }
+  
+  return stats;
+}

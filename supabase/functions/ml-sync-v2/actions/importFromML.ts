@@ -173,11 +173,15 @@ export async function importFromML(
       const warrantyAttr = attributes.find((attr: any) => attr.id === 'WARRANTY');
       const warranty = warrantyAttr ? warrantyAttr.value_name : '';
 
-      const sku =
-        itemDetail.seller_custom_field ||
-        itemDetail.seller_sku ||
-        attributes.find((attr: any) => attr.id === 'SELLER_SKU')?.value_name ||
-        `ML-${itemId}`;
+      // Gerar SKU limpo e único baseado no título do produto
+      const baseTitle = itemDetail.title.replace(/[^a-zA-Z0-9]/g, '').substring(0, 15).toUpperCase();
+      const sku = `${baseTitle}-${itemId.substring(itemId.length - 6)}`;
+      
+      // Capturar seller_sku do ML separadamente para referência
+      const mlSellerSku = itemDetail.seller_custom_field || 
+                         itemDetail.seller_sku || 
+                         attributes.find((attr: any) => attr.id === 'SELLER_SKU')?.value_name || 
+                         null;
 
       const { data: newProduct, error: productError } = await supabase
         .from('products')
@@ -198,7 +202,7 @@ export async function importFromML(
           warranty: warranty,
           brand: brand,
           model: model,
-          ml_seller_sku: itemDetail.seller_sku || '',
+          ml_seller_sku: mlSellerSku,
           ml_available_quantity: itemDetail.available_quantity || 0,
           ml_sold_quantity: itemDetail.sold_quantity || 0,
           ml_variation_id: itemDetail.variation_id || null,

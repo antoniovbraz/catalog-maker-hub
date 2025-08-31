@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { ML_QUERY_KEYS } from "./useMLIntegration";
-import { callMLFunction, processInBatches } from "@/utils/ml/ml-api";
+import { MLService } from "@/services/ml-service";
 
 interface ResyncProductParams {
   productId: string;
@@ -18,7 +18,7 @@ export function useMLResync() {
     mutationFn: async (params: ResyncProductParams) => {
       console.log('Re-syncing product:', params.productId);
       
-      return await callMLFunction('resync_product', { productId: params.productId });
+      return await MLService.syncProduct(params.productId);
     },
     onSuccess: (data, variables) => {
       // Invalidar caches relevantes
@@ -28,7 +28,7 @@ export function useMLResync() {
       
       toast({
         title: "Re-sincronização Concluída",
-        description: data?.message || "Produto re-sincronizado com sucesso.",
+        description: "Produto re-sincronizado com sucesso.",
       });
     },
     onError: (error: Error) => {
@@ -46,22 +46,7 @@ export function useMLResync() {
     mutationFn: async (params: ResyncBatchParams) => {
       console.log('Re-syncing batch:', params.productIds.length, 'products');
       
-      const results = await processInBatches(
-        params.productIds,
-        (productId) => callMLFunction('resync_product', { productId }, { skipRateCheck: true }),
-        'resync_product',
-        3
-      );
-
-      const successful = results.filter(result => result.status === 'fulfilled').length;
-      const failed = results.filter(result => result.status === 'rejected').length;
-
-      return {
-        total: params.productIds.length,
-        successful,
-        failed,
-        results
-      };
+      return await MLService.syncBatch(params.productIds);
     },
     onSuccess: (data) => {
       // Invalidar caches relevantes

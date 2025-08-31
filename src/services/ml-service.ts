@@ -8,6 +8,11 @@ export interface MLSyncStatus {
   pending_products: number;
   error_products: number;
   last_sync: string | null;
+  // Operações recentes (últimas 24h)
+  successful_24h?: number;
+  failed_24h?: number;
+  total_24h?: number;
+  health_status?: string;
   // Aliases para compatibilidade
   total?: number;
   synced?: number;
@@ -153,7 +158,15 @@ export class MLService {
     }
 
     return {
-      ...data,
+      total_products: data?.total_products || 0,
+      synced_products: data?.synced_products || 0,
+      pending_products: data?.pending_products || 0,
+      error_products: data?.error_products || 0,
+      last_sync: data?.last_sync || null,
+      successful_24h: data?.successful_24h || 0,
+      failed_24h: data?.failed_24h || 0,
+      total_24h: data?.total_24h || 0,
+      health_status: data?.health_status || 'unknown',
       // Aliases para compatibilidade
       total: data?.total_products || 0,
       synced: data?.synced_products || 0,

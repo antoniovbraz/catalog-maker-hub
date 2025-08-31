@@ -1,0 +1,204 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { callMLFunction, processInBatches, clearCallHistory, getRateLimitStats } from '@/utils/ml/ml-api';
+import { testUtils } from '../setup';
+
+describe('ML API Utils', () => {
+  beforeEach(() => {
+    testUtils.resetAllMocks();
+    clearCallHistory();
+    vi.clearAllTimers();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  describe('callMLFunction', () => {
+    it('deve fazer chamada básica com sucesso', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { success: true },
+        error: null
+      });
+
+      const result = await callMLFunction('sync_product', { productId: '123' });
+
+      expect(result).toEqual({ success: true });
+      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
+        body: { action: 'sync_product', productId: '123' }
+      });
+    });
+
+    it('deve respeitar rate limiting', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { success: true },
+        error: null
+      });
+
+      // Fazer 60 chamadas (limite para sync_product)
+      for (let i = 0; i < 60; i++) {
+        await callMLFunction('sync_product', { productId: `${i}` });
+      }
+
+      // A 61ª chamada deve falhar por rate limit
+      await expect(callMLFunction('sync_product', { productId: '61' })).rejects.toThrow('Rate limit excedido');
+    });
+
+    it('deve pular rate limiting quando especificado', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { success: true },
+        error: null
+      });
+
+      // Fazer 60 chamadas para esgotar rate limit
+      for (let i = 0; i < 60; i++) {
+        await callMLFunction('sync_product', { productId: `${i}` });
+      }
+
+      // Esta deve passar por usar skipRateCheck
+      const result = await callMLFunction('sync_product', { productId: '61' }, { skipRateCheck: true });
+      expect(result).toEqual({ success: true });
+    });
+
+    it('deve tratar timeout corretamente', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() => 
+        new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 2000))
+      );
+
+      await expect(
+        callMLFunction('sync_product', { productId: '123' }, { timeout: 1000 })
+      ).rejects.toThrow('Timeout após 1000ms');
+    });
+
+    it('deve tratar erros do Supabase', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: null,
+        error: { message: 'Database error' }
+      });
+
+      await expect(callMLFunction('sync_product', { productId: '123' })).rejects.toThrow('Database error');
+    });
+
+    it('deve melhorar mensagens de erro conhecidas', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: null,
+        error: { message: 'unauthorized token' }
+      });
+
+      await expect(callMLFunction('sync_product', { productId: '123' })).rejects.toThrow('Token do Mercado Livre expirado ou inválido');
+    });
+  });
+
+  describe('processInBatches', () => {
+    it('deve processar itens em lotes', async () => {
+      const processor = vi.fn().mockResolvedValue('success');
+      const items = ['1', '2', '3', '4', '5'];
+
+      const results = await processInBatches(items, processor, 'test_operation', 2, 0);
+
+      expect(results).toHaveLength(5);
+      expect(results.every(r => r.status === 'fulfilled')).toBe(true);
+      expect(processor).toHaveBeenCalledTimes(5);
+    });
+
+    it('deve aguardar entre lotes', async () => {
+      const processor = vi.fn().mockResolvedValue('success');
+      const items = ['1', '2', '3', '4'];
+      const delay = 1000;
+
+      const promise = processInBatches(items, processor, 'test_operation', 2, delay);
+
+      // Avançar o tempo para processar o primeiro lote
+      await vi.advanceTimersByTimeAsync(0);
+      expect(processor).toHaveBeenCalledTimes(2);
+
+      // Avançar o delay entre lotes
+      await vi.advanceTimersByTimeAsync(delay);
+      
+      // Aguardar o processamento do segundo lote
+      await vi.advanceTimersByTimeAsync(0);
+      
+      const results = await promise;
+      expect(results).toHaveLength(4);
+      expect(processor).toHaveBeenCalledTimes(4);
+    });
+
+    it('deve tratar erros individuais', async () => {
+      const processor = vi.fn()
+        .mockResolvedValueOnce('success')
+        .mockRejectedValueOnce(new Error('item error'))
+        .mockResolvedValueOnce('success');
+      
+      const items = ['1', '2', '3'];
+
+      const results = await processInBatches(items, processor, 'test_operation', 3, 0);
+
+      expect(results).toHaveLength(3);
+      expect(results[0].status).toBe('fulfilled');
+      expect(results[1].status).toBe('rejected');
+      expect(results[2].status).toBe('fulfilled');
+    });
+  });
+
+  describe('Rate Limit Stats', () => {
+    it('deve retornar estatísticas vazias inicialmente', () => {
+      const stats = getRateLimitStats();
+      expect(stats).toEqual({});
+    });
+
+    it('deve rastrear estatísticas de chamadas', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { success: true },
+        error: null
+      });
+
+      await callMLFunction('sync_product', { productId: '1' });
+      await callMLFunction('sync_product', { productId: '2' });
+
+      const stats = getRateLimitStats();
+      expect(stats.sync_product).toBeDefined();
+      expect(stats.sync_product.calls).toBe(2);
+      expect(stats.sync_product.limit).toBe(60);
+    });
+
+    it('deve limpar estatísticas antigas da janela', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: { success: true },
+        error: null
+      });
+
+      await callMLFunction('sync_product', { productId: '1' });
+
+      // Avançar tempo além da janela (60 segundos)
+      vi.advanceTimersByTime(65 * 1000);
+
+      const stats = getRateLimitStats();
+      expect(stats.sync_product.calls).toBe(0);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('deve registrar chamadas mesmo com erro', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockRejectedValue(new Error('Network error'));
+
+      try {
+        await callMLFunction('sync_product', { productId: '1' });
+      } catch (error) {
+        // Expected error
+      }
+
+      const stats = getRateLimitStats();
+      expect(stats.sync_product.calls).toBe(1);
+    });
+
+    it('deve melhorar mensagens de erro de timeout', async () => {
+      testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() => 
+        new Promise(() => {}) // Never resolves
+      );
+
+      await expect(
+        callMLFunction('sync_product', { productId: '123' }, { timeout: 100 })
+      ).rejects.toThrow('Operação sync_product demorou muito para responder');
+    });
+  });
+});
