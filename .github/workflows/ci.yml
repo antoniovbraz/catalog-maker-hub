@@ -32,6 +32,10 @@ jobs:
     - name: Run tests
       run: npm run test:coverage
 
+    - name: Check coverage threshold
+      run: |
+        node -e "const fs=require('fs');const pct=JSON.parse(fs.readFileSync('coverage/coverage-summary.json')).total.lines.pct; if(pct < 80){console.error(`Coverage ${pct}% is below 80%`); process.exit(1);}" 
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:

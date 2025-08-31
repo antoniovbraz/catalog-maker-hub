@@ -38,6 +38,8 @@ tests/
 
 ## 🎯 Cobertura de Testes
 
+A meta global de cobertura é **80%** para branches, funções, linhas e statements.
+
 ### Metas de Cobertura
 - **Services**: 90%+ (crítico para confiabilidade)
 - **Utils**: 90%+ (funções puras, fáceis de testar)
