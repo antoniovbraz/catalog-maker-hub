@@ -6,6 +6,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const DEFAULT_IMAGE_PLACEHOLDER =
+  'https://http2.mlstatic.com/D_NQ_NP_2X_602223-MLA0000000000_000000-O.webp';
+
+const errorResponse = (message: string, status = 400) => ({
+  success: false,
+  error: message,
+  status,
+});
+
 interface SyncRequest {
   action: 'sync_product' | 'sync_batch' | 'get_sync_status' | 'import_from_ml';
   product_id?: string;
@@ -76,12 +85,18 @@ serve(async (req) => {
           throw new Error('Product ID is required');
         }
 
-        const result = await syncSingleProduct(supabase, tenantId, body.product_id, authToken.access_token, body.force_update);
-        
-        return new Response(
-          JSON.stringify(result),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        const result = await syncSingleProduct(
+          supabase,
+          tenantId,
+          body.product_id,
+          authToken.access_token,
+          body.force_update,
         );
+
+        return new Response(JSON.stringify(result), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: result.success ? 200 : result.status || 500,
+        });
       }
 
       case 'sync_batch': {
@@ -218,20 +233,65 @@ async function syncSingleProduct(
       }
     }
 
+    // Get product images
+    const { data: images } = await supabase
+      .from('product_images')
+      .select('image_url')
+      .eq('tenant_id', tenantId)
+      .eq('product_id', productId)
+      .order('sort_order');
+
+    const pictures =
+      images && images.length > 0
+        ? images.map((img) => ({ source: img.image_url }))
+        : [{ source: DEFAULT_IMAGE_PLACEHOLDER }];
+
+    // Validate required fields
+    const missingFields: string[] = [];
+    if (!product.name) missingFields.push('name');
+    if (!product.sku) missingFields.push('sku');
+    if (!product.description) missingFields.push('description');
+    if (product.cost_unit === null || product.cost_unit === undefined) missingFields.push('cost_unit');
+    if (!images || images.length === 0) missingFields.push('images');
+
+    if (missingFields.length > 0) {
+      const message = `Missing required fields: ${missingFields.join(', ')}`;
+
+      await supabase
+        .from('ml_sync_log')
+        .insert({
+          tenant_id: tenantId,
+          operation_type: 'sync_product',
+          entity_type: 'product',
+          entity_id: productId,
+          status: 'error',
+          error_details: { message, missing_fields: missingFields },
+          execution_time_ms: Date.now() - startTime,
+        });
+
+      return errorResponse(message, 400);
+    }
+
+    const margin = parseFloat(Deno.env.get('ML_PRICE_MARGIN') || '1');
+    const productPrice = (product as any).price ?? (product as any).ml_price;
+    const price = productPrice
+      ? parseFloat(productPrice)
+      : parseFloat(product.cost_unit) * margin;
+
     // Build ML item data
     const mlItemData = {
       title: product.name,
       category_id: mlCategoryId,
-      price: parseFloat(product.cost_unit) * 1.5, // Simple markup for demo
+      price,
       currency_id: 'BRL',
       available_quantity: 999, // Default stock
       buying_mode: 'buy_it_now',
       listing_type_id: 'gold_special',
       condition: 'new',
       description: {
-        plain_text: product.description || `Produto ${product.name}`
+        plain_text: product.description || `Produto ${product.name}`,
       },
-      pictures: [], // TODO: Add product images
+      pictures,
     };
 
     let mlResponse;
