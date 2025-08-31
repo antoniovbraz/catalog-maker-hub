@@ -98,7 +98,18 @@ export async function callMLFunction(
     
     if (error) {
       console.error(`[ML API] Error in ${action}:`, error);
-      throw new Error(error.message || `Erro na operação ${action}`);
+
+      interface InvokeError {
+        message?: string;
+        details?: { message?: string };
+        error?: { message?: string };
+      }
+
+      const invokeError = error as InvokeError;
+      const details = invokeError.details || invokeError.error;
+      const message = details?.message || invokeError.message || `Erro na operação ${action}`;
+
+      throw new Error(message);
     }
     
     // Registrar a chamada como sucesso
