@@ -269,14 +269,31 @@ async function syncSingleProduct(
           execution_time_ms: Date.now() - startTime,
         });
 
+      await supabase
+        .from('ml_product_mapping')
+        .upsert(
+          {
+            tenant_id: tenantId,
+            product_id: productId,
+            sync_status: 'error',
+            error_message: message,
+            last_sync_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'tenant_id,product_id',
+          },
+        );
+
       return errorResponse(message, 400);
     }
 
     const margin = parseFloat(Deno.env.get('ML_PRICE_MARGIN') || '1');
-    const productPrice = (product as any).price ?? (product as any).ml_price;
+    const { price: productPriceField, ml_price: mlPriceField } =
+      product as { price?: string | number | null; ml_price?: string | number | null };
+    const productPrice = productPriceField ?? mlPriceField;
     const price = productPrice
-      ? parseFloat(productPrice)
-      : parseFloat(product.cost_unit) * margin;
+      ? parseFloat(String(productPrice))
+      : parseFloat(String(product.cost_unit)) * margin;
 
     // Build ML item data
     const mlItemData = {
