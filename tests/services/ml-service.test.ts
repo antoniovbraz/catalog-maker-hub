@@ -1,4 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+vi.mock('@/utils/ml/ml-api', () => ({
+  callMLFunction: vi.fn(),
+}));
+
+import { callMLFunction } from '@/utils/ml/ml-api';
 import { MLService, MLPerformanceMetrics } from '@/services/ml-service';
 import { testUtils } from '../setup';
 
@@ -7,17 +13,16 @@ import { testUtils } from '../setup';
 describe('MLService', () => {
   beforeEach(() => {
     testUtils.resetAllMocks();
-    (testUtils.mockSupabaseClient as any).functions = { 
-      invoke: vi.fn().mockResolvedValue({ data: null, error: null })
-    };
+    vi.mocked(callMLFunction).mockReset();
     testUtils.mockSupabaseClient.rpc.mockResolvedValue({ data: null, error: null });
   });
 
   describe('Auth Status', () => {
     it('deve obter status de auth quando conectado', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({ 
-        data: { connected: true, user_id_ml: 123, ml_nickname: 'test' }, 
-        error: null 
+      vi.mocked(callMLFunction).mockResolvedValue({
+        connected: true,
+        user_id_ml: 123,
+        ml_nickname: 'test'
       });
 
       const status = await MLService.getAuthStatus();
@@ -25,16 +30,11 @@ describe('MLService', () => {
       expect(status.isConnected).toBe(true);
       expect(status.user_id_ml).toBe(123);
       expect(status.ml_nickname).toBe('test');
-      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-auth', {
-        body: { action: 'get_status' }
-      });
+      expect(callMLFunction).toHaveBeenCalledWith('ml-auth', 'get_status', {}, {});
     });
 
     it('deve retornar desconectado quando há erro', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({ 
-        data: null, 
-        error: { message: 'Token expired' }
-      });
+      vi.mocked(callMLFunction).mockRejectedValue(new Error('Token expired'));
 
       const status = await MLService.getAuthStatus();
 
@@ -43,7 +43,7 @@ describe('MLService', () => {
     });
 
     it('deve tratar exceções de rede', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockRejectedValue(new Error('Network error'));
+      vi.mocked(callMLFunction).mockRejectedValue(new Error('Network error'));
 
       const status = await MLService.getAuthStatus();
 
@@ -54,58 +54,38 @@ describe('MLService', () => {
 
   describe('Sync Operations', () => {
     it('deve sincronizar produto individual', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({ 
-        data: { success: true }, 
-        error: null 
-      });
+      vi.mocked(callMLFunction).mockResolvedValue({ success: true });
 
       await MLService.syncProduct('product-123');
 
-      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
-        body: { action: 'sync_product', product_id: 'product-123' }
-      });
+      expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'sync_product', { product_id: 'product-123' }, {});
     });
 
     it('deve sincronizar em lote', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
-        data: { successful: 3, failed: 1 },
-        error: null
-      });
+      vi.mocked(callMLFunction).mockResolvedValue({ successful: 3, failed: 1 });
 
       const result = await MLService.syncBatch(['p1', 'p2', 'p3', 'p4']);
 
       expect(result.successful).toBe(3);
       expect(result.failed).toBe(1);
-      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
-        body: { action: 'sync_batch', product_ids: ['p1', 'p2', 'p3', 'p4'] }
-      });
+      expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'sync_batch', { product_ids: ['p1', 'p2', 'p3', 'p4'] }, {});
     });
 
     it('deve re-sincronizar produto', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
-        data: null,
-        error: null
-      });
+      vi.mocked(callMLFunction).mockResolvedValue(null);
 
       await MLService.resyncProduct('product-123');
 
-      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
-        body: { action: 'resync_product', productId: 'product-123' }
-      });
+      expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'resync_product', { productId: 'product-123' }, {});
     });
 
     it('deve importar do ML', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
-        data: { imported: 5, items: [] },
-        error: null
-      });
+      vi.mocked(callMLFunction).mockResolvedValue({ imported: 5, items: [] });
 
       const result = await MLService.importFromML();
 
       expect(result.imported).toBe(5);
-      expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
-        body: { action: 'import_from_ml' }
-      });
+      expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'import_from_ml', {}, {});
     });
   });
 
@@ -237,10 +217,7 @@ describe('MLService', () => {
     });
 
     it('deve tratar erros de function invoke adequadamente', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({ 
-        data: null, 
-        error: { message: 'Function error' }
-      });
+      vi.mocked(callMLFunction).mockRejectedValue(new Error('Function error'));
 
       await expect(MLService.syncProduct('test')).rejects.toThrow('Function error');
     });

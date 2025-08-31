@@ -25,6 +25,7 @@ const mockSupabaseClient = {
   rpc: vi.fn(),
   auth: {
     getUser: vi.fn(),
+    getSession: vi.fn(),
     signIn: vi.fn(),
     signOut: vi.fn(),
     signInWithPassword: vi.fn(),
