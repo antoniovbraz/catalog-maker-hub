@@ -27,6 +27,10 @@ const mockSupabaseClient = {
     getUser: vi.fn(),
     signIn: vi.fn(),
     signOut: vi.fn(),
+    signInWithPassword: vi.fn(),
+  },
+  functions: {
+    invoke: vi.fn(),
   },
   storage: {
     from: vi.fn(),

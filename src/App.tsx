@@ -26,10 +26,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AssistantsManagement from "./pages/admin/AssistantsManagement";
 import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
-import MLIntegration from "./pages/MLIntegration";
+import MercadoLivre from "./pages/MercadoLivre";
 import MLCallback from "./pages/MLCallback";
-import MLDashboard from "./pages/MLDashboard";
-import { MLDashboardModern } from "./components/ml/MLDashboardModern";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -189,7 +187,7 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <SharedLayout>
-                    <MLIntegration />
+                    <MercadoLivre />
                   </SharedLayout>
                 </ProtectedRoute>
               } 
@@ -199,26 +197,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MLCallback />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/ml-dashboard" 
-              element={
-                <ProtectedRoute>
-                  <SharedLayout>
-                    <MLDashboardModern />
-                  </SharedLayout>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/ml-dashboard-legacy" 
-              element={
-                <ProtectedRoute>
-                  <SharedLayout>
-                    <MLDashboard />
-                  </SharedLayout>
                 </ProtectedRoute>
               } 
             />
