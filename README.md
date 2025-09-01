@@ -23,6 +23,11 @@ O desenvolvimento desta integração foi acelerado utilizando uma metodologia de
 *   **Sincronização Automática de Estoque**: Mantenha o estoque consistente entre o Catalog Maker Hub e o Mercado Livre para evitar overselling.
 *   **Dashboard de Integração**: Monitore o status da sua conexão, logs de sincronização e muito mais.
 
+### Fluxos de Sincronização
+
+*   **Enviar ao Mercado Livre**: envie produtos cadastrados no Catalog Maker Hub para criar ou atualizar anúncios no ML. Disponível individualmente pelo botão "Enviar ao Mercado Livre" ou em lote selecionando vários produtos.
+*   **Importar do ML**: traga dados de anúncios existentes no Mercado Livre para o Catalog Maker Hub quando um produto ainda não possui `ml_item_id`.
+
 ---
 
 ## 🚀 Começando

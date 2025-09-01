@@ -29,12 +29,13 @@ describe('MLProductList', () => {
     (useMLSync as vi.Mock).mockReturnValue({
       syncProduct: { mutate: syncMutate, isPending: false },
       syncBatch: { mutate: vi.fn(), isPending: false },
+      importFromML: { mutate: vi.fn(), isPending: false },
     });
 
     render(<MLProductList />);
 
     const row = screen.getByText('Produto Teste').closest('tr')!;
-    const button = within(row).getByRole('button');
+    const button = within(row).getByLabelText('Enviar ao Mercado Livre');
     fireEvent.click(button);
 
     expect(syncMutate).toHaveBeenCalledWith('1');
@@ -59,14 +60,42 @@ describe('MLProductList', () => {
     (useMLSync as vi.Mock).mockReturnValue({
       syncProduct: { mutate: syncMutate, isPending: false },
       syncBatch: { mutate: vi.fn(), isPending: false },
+      importFromML: { mutate: vi.fn(), isPending: false },
     });
 
     render(<MLProductList />);
 
     const row = screen.getByText('Produto Completo').closest('tr')!;
-    const button = within(row).getByRole('button');
+    const button = within(row).getByLabelText('Enviar ao Mercado Livre');
     fireEvent.click(button);
 
     expect(syncMutate).toHaveBeenCalledWith('1');
+  });
+
+  it('should call importFromML when clicking Importar do ML', () => {
+    const importMutate = vi.fn();
+    (useMLProducts as vi.Mock).mockReturnValue({
+      data: [
+        {
+          id: '1',
+          name: 'Produto sem ML',
+          sync_status: 'not_synced',
+        },
+      ],
+      isLoading: false,
+    });
+    (useMLSync as vi.Mock).mockReturnValue({
+      syncProduct: { mutate: vi.fn(), isPending: false },
+      syncBatch: { mutate: vi.fn(), isPending: false },
+      importFromML: { mutate: importMutate, isPending: false },
+    });
+
+    render(<MLProductList />);
+
+    const row = screen.getByText('Produto sem ML').closest('tr')!;
+    const button = within(row).getByRole('button', { name: /importar do ml/i });
+    fireEvent.click(button);
+
+    expect(importMutate).toHaveBeenCalled();
   });
 });
