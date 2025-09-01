@@ -181,9 +181,21 @@ export function useMLAuth() {
 export function useMLSync() {
   const queryClient = useQueryClient();
 
-    const syncProduct = useMutation({
-      mutationFn: MLService.syncProduct,
-      onSuccess: () => {
+  const syncProduct = useMutation({
+    mutationFn: async (productId: string) => {
+      try {
+        await MLService.syncProduct(productId);
+      } catch (error) {
+        const message = (error as Error).message || '';
+        if (message.includes('Missing required fields')) {
+          await MLService.resyncProduct(productId);
+          await MLService.syncProduct(productId);
+        } else {
+          throw error;
+        }
+      }
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
       toast({
         title: "Produto Sincronizado",
