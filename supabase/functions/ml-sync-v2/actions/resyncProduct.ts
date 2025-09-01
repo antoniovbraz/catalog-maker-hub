@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ActionContext, ResyncProductRequest, errorResponse, corsHeaders } from '../types.ts';
 
 export async function resyncProduct(
@@ -96,25 +97,42 @@ export async function resyncProduct(
       skuToUse = itemData.id;
     }
 
+    const shouldUpdateName = !productMapping.products?.name;
+    const localCost = productMapping.products?.cost_unit;
+    const shouldUpdateCost =
+      localCost === null || localCost === undefined || Number(localCost) <= 0;
+    const hasPriceField =
+      productMapping.products &&
+      Object.prototype.hasOwnProperty.call(productMapping.products, 'price');
+    const localPrice = (productMapping.products as any)?.price;
+    const shouldUpdatePrice =
+      hasPriceField && (!localPrice || Number(localPrice) <= 0);
+
+    const updateData: Record<string, any> = {
+      description: description,
+      sku: skuToUse,
+      brand: brand,
+      model: model,
+      warranty: warranty,
+      weight: weight,
+      dimensions: dimensions,
+      ml_attributes: itemData.attributes || {},
+      ml_seller_sku: itemData.seller_sku,
+      ml_available_quantity: itemData.available_quantity || 0,
+      ml_sold_quantity: itemData.sold_quantity || 0,
+      ml_variation_id:
+        itemData.variations?.length > 0 ? itemData.variations[0].id : null,
+      ml_pictures: itemData.pictures || [],
+      updated_at: new Date().toISOString(),
+    };
+
+    if (shouldUpdateName) updateData.name = itemData.title;
+    if (shouldUpdateCost) updateData.cost_unit = itemData.price;
+    if (shouldUpdatePrice) updateData.price = itemData.price;
+
     const { error: updateError } = await supabase
       .from('products')
-      .update({
-        description: description,
-        sku: skuToUse,
-        brand: brand,
-        model: model,
-        warranty: warranty,
-        weight: weight,
-        dimensions: dimensions,
-        ml_attributes: itemData.attributes || {},
-        ml_seller_sku: itemData.seller_sku,
-        ml_available_quantity: itemData.available_quantity || 0,
-        ml_sold_quantity: itemData.sold_quantity || 0,
-        ml_variation_id:
-          itemData.variations?.length > 0 ? itemData.variations[0].id : null,
-        ml_pictures: itemData.pictures || [],
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', req.productId)
       .eq('tenant_id', tenantId);
 
@@ -187,6 +205,18 @@ export async function resyncProduct(
       });
 
     console.log('Product re-sync completed successfully');
+    const updatedFields = [
+      'description',
+      'sku',
+      'brand',
+      'model',
+      'warranty',
+      'dimensions',
+      'attributes',
+    ];
+    if (shouldUpdateName) updatedFields.push('name');
+    if (shouldUpdateCost) updatedFields.push('cost_unit');
+    if (shouldUpdatePrice) updatedFields.push('price');
 
     return new Response(
       JSON.stringify({
@@ -195,15 +225,7 @@ export async function resyncProduct(
         data: {
           title: itemData.title,
           category: categoryData?.name,
-          updated_fields: [
-            'description',
-            'sku',
-            'brand',
-            'model',
-            'warranty',
-            'dimensions',
-            'attributes',
-          ],
+          updated_fields: updatedFields,
         },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
