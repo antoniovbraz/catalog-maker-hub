@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMLSync } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -13,7 +14,7 @@ import { useState } from "react";
 
 export function MLProductList() {
   const { data: products = [], isLoading } = useMLProducts();
-  const { syncProduct, syncBatch } = useMLSync();
+  const { syncProduct, syncBatch, importFromML } = useMLSync();
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -178,18 +179,44 @@ export function MLProductList() {
                         const isProcessing = syncProduct.isPending;
                         const isLoading = syncProduct.isPending && syncProduct.variables === product.id;
                         return (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleSyncProduct(product.id)}
-                            disabled={isProcessing}
-                          >
-                            {isLoading ? (
-                              <Loader2 className="size-4 animate-spin" />
-                            ) : (
-                              <RefreshCw className="size-4" />
+                          <div className="flex gap-2">
+                            {!product.ml_item_id && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => importFromML.mutate()}
+                                disabled={importFromML.isPending}
+                              >
+                                {importFromML.isPending && (
+                                  <Loader2 className="mr-2 size-4 animate-spin" />
+                                )}
+                                Importar do ML
+                              </Button>
                             )}
-                          </Button>
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleSyncProduct(product.id)}
+                                    disabled={isProcessing}
+                                    aria-label="Enviar ao Mercado Livre"
+                                  >
+                                    {isLoading ? (
+                                      <Loader2 className="size-4 animate-spin" />
+                                    ) : (
+                                      <RefreshCw className="size-4" />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Enviar ao Mercado Livre
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                         );
                       })()}
                     </TableCell>
