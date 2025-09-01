@@ -1,4 +1,4 @@
-import { Package, Plus, Edit, Trash2, Tag, Download, ExternalLink } from "@/components/ui/icons";
+import { Package, Plus, Edit, Trash2, Tag, Download, Loader2 } from "@/components/ui/icons";
 import { ConfigurationPageLayout } from "@/components/layout/ConfigurationPageLayout";
 import { Button } from "@/components/ui/button";
 import { DataVisualization } from "@/components/ui/data-visualization";
@@ -17,10 +17,13 @@ import { MLAdvertiseModal } from "@/components/forms/MLAdvertiseModal";
 import { MLConflictModal } from "@/components/forms/MLConflictModal";
 import type { MLSyncProduct } from "@/services/ml-service";
 import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
   const { data: mlProducts = [] } = useMLProducts();
+  const { syncStatusQuery } = useMLIntegration();
   const { importFromML } = useMLSync();
   const { resyncProduct } = useMLProductResync();
   const deleteMutation = useDeleteProduct();
@@ -31,7 +34,6 @@ export default function Products() {
       key: "name",
       header: "Nome",
       render: (item) => {
-        const mlProduct = mlProducts.find(ml => ml.id === item.id);
         const hasIncompleteData = item.source === 'mercado_livre' && (!item.description || !item.sku || !item.brand);
         
         return (
@@ -45,9 +47,22 @@ export default function Products() {
                 {item.name}
               </Link>
               {hasIncompleteData && (
-                <Badge variant="outline" className="border-orange-300 text-orange-600">
-                  Dados Incompletos
-                </Badge>
+                <>
+                  <Badge variant="outline" className="border-orange-300 text-orange-600">
+                    Dados Incompletos
+                  </Badge>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={() => resyncProduct.mutate({ productId: item.id })}
+                    disabled={resyncProduct.isPending && resyncProduct.variables?.productId === item.id}
+                  >
+                    {resyncProduct.isPending && resyncProduct.variables?.productId === item.id && (
+                      <Loader2 className="mr-1 size-3 animate-spin" />
+                    )}
+                    Completar dados
+                  </Button>
+                </>
               )}
               {item.sku && (
                 <Badge variant="outline" className="text-xs">
@@ -216,58 +231,6 @@ export default function Products() {
     }
   };
 
-  const getActionsForProduct = (product: ProductWithCategory): DataAction<ProductWithCategory>[] => {
-    const mlProduct = mlProducts.find(ml => ml.id === product.id);
-    const hasIncompleteData = product.source === 'mercado_livre' && (!product.description || !product.sku || !product.brand);
-    
-    const baseActions: DataAction<ProductWithCategory>[] = [
-      {
-        label: "Editar",
-        icon: <Edit className="size-4" />,
-        onClick: (product) => handleEdit(product),
-      }
-    ];
-
-    // Ação de re-sincronização para produtos ML com dados incompletos
-    if (hasIncompleteData) {
-      baseActions.push({
-        label: "Re-sincronizar",
-        icon: <Package className="size-4" />,
-        onClick: (product) => resyncProduct.mutate({ productId: product.id }),
-        variant: "outline",
-        disabled: () => resyncProduct.isPending,
-      });
-    }
-
-    // Ações condicionais baseadas na origem
-    if (product.source === 'manual') {
-      baseActions.push({
-        label: "Anunciar no ML",
-        icon: <Tag className="size-4" />,
-        onClick: (product) => handleAdvertiseOnML(product),
-        variant: "default",
-      });
-    } else if (product.source === 'mercado_livre' && mlProduct?.ml_item_id) {
-      baseActions.push({
-        label: "Ver no ML",
-        icon: <ExternalLink className="size-4" />,
-        onClick: () => {
-          window.open(`https://www.mercadolivre.com.br/MLB-${mlProduct.ml_item_id}`, '_blank');
-        },
-        variant: "outline",
-      });
-    }
-
-    baseActions.push({
-      label: "Excluir",
-      icon: <Trash2 className="size-4" />,
-      onClick: (product) => handleDelete(product),
-      variant: "destructive",
-    });
-
-    return baseActions;
-  };
-
   const actions: DataAction<ProductWithCategory>[] = [
     {
       label: "Editar",
@@ -325,7 +288,20 @@ export default function Products() {
       breadcrumbs={breadcrumbs}
       actions={headerActions}
     >
-      <div className="xl:col-span-12">
+      <div className="space-y-4 xl:col-span-12">
+        {syncStatusQuery.data && (
+          <div className="rounded-md border p-4 text-sm">
+            <p>
+              Última sincronização:{" "}
+              {syncStatusQuery.data.last_sync ?
+                formatDistanceToNow(new Date(syncStatusQuery.data.last_sync), { addSuffix: true, locale: ptBR }) :
+                'Nunca'}
+            </p>
+            <p className="text-muted-foreground">
+              Sucessos 24h: {syncStatusQuery.data.successful_24h} • Falhas 24h: {syncStatusQuery.data.failed_24h}
+            </p>
+          </div>
+        )}
         <DataVisualization
           title="Produtos"
           data={products}
