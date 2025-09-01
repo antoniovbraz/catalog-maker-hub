@@ -82,20 +82,33 @@ export function MLProductList() {
             </div>
           </div>
           
-          {selectedProducts.length > 0 && (
+          <div className="flex gap-2">
             <Button
-              onClick={handleSyncBatch}
-              disabled={syncBatch.isPending || syncProduct.isPending}
+              onClick={() => importFromML.mutate()}
+              disabled={importFromML.isPending}
               size="sm"
             >
-              {syncBatch.isPending || syncProduct.isPending ? (
+              {importFromML.isPending && (
                 <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <Play className="mr-2 size-4" />
               )}
-              Sincronizar Selecionados ({selectedProducts.length})
+              Importar do ML
             </Button>
-          )}
+
+            {selectedProducts.length > 0 && (
+              <Button
+                onClick={handleSyncBatch}
+                disabled={syncBatch.isPending || syncProduct.isPending}
+                size="sm"
+              >
+                {syncBatch.isPending || syncProduct.isPending ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Play className="mr-2 size-4" />
+                )}
+                Sincronizar Selecionados ({selectedProducts.length})
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       
@@ -180,20 +193,6 @@ export function MLProductList() {
                         const isLoading = syncProduct.isPending && syncProduct.variables === product.id;
                         return (
                           <div className="flex gap-2">
-                            {!product.ml_item_id && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => importFromML.mutate()}
-                                disabled={importFromML.isPending}
-                              >
-                                {importFromML.isPending && (
-                                  <Loader2 className="mr-2 size-4 animate-spin" />
-                                )}
-                                Importar do ML
-                              </Button>
-                            )}
-
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>

@@ -92,8 +92,7 @@ describe('MLProductList', () => {
 
     render(<MLProductList />);
 
-    const row = screen.getByText('Produto sem ML').closest('tr')!;
-    const button = within(row).getByRole('button', { name: /importar do ml/i });
+    const button = screen.getByRole('button', { name: /importar do ml/i });
     fireEvent.click(button);
 
     expect(importMutate).toHaveBeenCalled();
