@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
 import { useMLSync } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
+import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { toast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
@@ -15,6 +16,7 @@ import { useState } from "react";
 export function MLProductList() {
   const { data: products = [], isLoading } = useMLProducts();
   const { syncProduct, syncBatch } = useMLSync();
+  const { resyncProduct } = useMLProductResync();
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -34,7 +36,7 @@ export function MLProductList() {
     }
   };
 
-  const handleSyncProduct = (productId: string) => {
+  const handleSyncProduct = async (productId: string) => {
     const product = (products || []).find(p => p.id === productId);
     if (!product) return;
 
@@ -52,6 +54,7 @@ export function MLProductList() {
         title: 'Dados incompletos',
         description: `Faltando: ${missingFields.join(', ')}. Importando automaticamente do Mercado Livre...`,
       });
+      await resyncProduct.mutateAsync({ productId });
     }
 
     syncProduct.mutate(productId);
@@ -102,12 +105,12 @@ export function MLProductList() {
           </div>
           
           {selectedProducts.length > 0 && (
-            <Button 
+            <Button
               onClick={handleSyncBatch}
-              disabled={syncBatch.isPending}
+              disabled={syncBatch.isPending || resyncProduct.isPending || syncProduct.isPending}
               size="sm"
             >
-              {syncBatch.isPending ? (
+              {syncBatch.isPending || resyncProduct.isPending || syncProduct.isPending ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               ) : (
                 <Play className="mr-2 size-4" />
@@ -194,18 +197,25 @@ export function MLProductList() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSyncProduct(product.id)}
-                        disabled={syncProduct.isPending}
-                      >
-                        {syncProduct.isPending ? (
-                          <Loader2 className="size-4 animate-spin" />
-                        ) : (
-                          <RefreshCw className="size-4" />
-                        )}
-                      </Button>
+                      {(() => {
+                        const isProcessing = syncProduct.isPending || resyncProduct.isPending;
+                        const isLoading = (resyncProduct.isPending && resyncProduct.variables?.productId === product.id) ||
+                          (syncProduct.isPending && syncProduct.variables === product.id);
+                        return (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSyncProduct(product.id)}
+                            disabled={isProcessing}
+                          >
+                            {isLoading ? (
+                              <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                              <RefreshCw className="size-4" />
+                            )}
+                          </Button>
+                        );
+                      })()}
                     </TableCell>
                   </TableRow>
                 ))}
