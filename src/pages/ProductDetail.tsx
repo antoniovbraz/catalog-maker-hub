@@ -1,7 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Package, ArrowLeft, ExternalLink, RefreshCw, Edit, Tag, Calendar, Box, Ruler, Weight } from "@/components/ui/icons";
+import {
+  Package,
+  ArrowLeft,
+  ExternalLink,
+  RefreshCw,
+  Edit,
+  Tag,
+  Calendar,
+  Box,
+  Ruler,
+  Weight,
+  AlertTriangle,
+} from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -14,8 +26,33 @@ import { useProductImages } from "@/hooks/useProductImages";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useMLConnectionStatus } from "@/hooks/useMLIntegration";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+interface MLSyncLog {
+  id: string;
+  status: string;
+  operation_type: string;
+  created_at: string;
+}
+
+interface MLAttribute {
+  id?: string;
+  name?: string;
+  value_name?: string;
+  value_id?: string;
+}
+
+interface MLVariation {
+  id?: string;
+  price?: number;
+  available_quantity?: number;
+  attribute_combinations?: { name: string; value_name: string }[];
+}
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +64,33 @@ export default function ProductDetail() {
   const { data: mlProducts = [] } = useMLProducts();
   const { data: productImages = [] } = useProductImages(id!);
   const { resyncProduct } = useMLProductResync();
+  const { isExpiringSoon, expiresAt } = useMLConnectionStatus();
+
+  const { data: syncLog = [] } = useQuery<MLSyncLog[]>({
+    queryKey: ["ml_sync_log", product?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ml_sync_log")
+        .select("id, status, operation_type, created_at")
+        .eq("entity_id", product.id)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw new Error(error.message);
+      return data as MLSyncLog[];
+    },
+    enabled: !!product?.id,
+  });
+
+  const attributes: MLAttribute[] = Array.isArray(product.ml_attributes)
+    ? (product.ml_attributes as MLAttribute[])
+    : [];
+
+  const variations: MLVariation[] = Array.isArray(
+    (product.ml_attributes as { variations?: MLVariation[] })?.variations
+  )
+    ? ((product.ml_attributes as { variations?: MLVariation[] })
+        .variations as MLVariation[])
+    : [];
 
   if (productLoading) {
     return (
@@ -106,35 +170,25 @@ export default function ProductDetail() {
         </div>
 
         <div className="flex items-center gap-2">
-          {hasIncompleteData && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleResync}
-              disabled={resyncProduct.isPending}
-            >
-              <RefreshCw className={`mr-2 size-4 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
-              {resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
-            </Button>
-          )}
-          
           <Button size="sm" onClick={handleEdit}>
             <Edit className="mr-2 size-4" />
             Editar
           </Button>
-
-          {mlProduct?.ml_item_id && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => window.open(`https://www.mercadolivre.com.br/MLB-${mlProduct.ml_item_id}`, '_blank')}
-            >
-              <ExternalLink className="mr-2 size-4" />
-              Ver no ML
-            </Button>
-          )}
         </div>
       </div>
+
+      {/* Alert Token Expiring */}
+      {isExpiringSoon && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="size-4" />
+          <AlertDescription>
+            O token do Mercado Livre expira em breve
+            {expiresAt
+              ? ` (${format(new Date(expiresAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })})`
+              : ''}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Alert para dados incompletos */}
       {hasIncompleteData && (
@@ -145,7 +199,7 @@ export default function ProductDetail() {
               <span className="font-medium">Dados Incompletos</span>
             </div>
             <p className="mt-1 text-sm text-orange-600">
-              Este produto foi importado do Mercado Livre mas alguns dados não foram capturados. 
+              Este produto foi importado do Mercado Livre mas alguns dados não foram capturados.
               Clique em "Re-sincronizar" para atualizar as informações.
             </p>
           </CardContent>
@@ -289,8 +343,8 @@ export default function ProductDetail() {
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {productImages.map((image, index) => (
                     <div key={index} className="aspect-square overflow-hidden rounded-lg border">
-                      <img 
-                        src={image.image_url} 
+                      <img
+                        src={image.image_url}
                         alt={`${product.name} - Imagem ${index + 1}`}
                         className="size-full cursor-pointer object-cover transition-transform hover:scale-105"
                         onClick={() => window.open(image.image_url, '_blank')}
@@ -298,6 +352,61 @@ export default function ProductDetail() {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Atributos ML */}
+          {attributes.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Atributos ML</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-2">
+                {attributes.map((attr, index) => (
+                  <div
+                    key={attr.id || attr.name || index}
+                    className="flex justify-between text-sm"
+                  >
+                    <span className="font-medium">{attr.name || attr.id}</span>
+                    <span>{attr.value_name || attr.value_id || '-'}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Variações */}
+          {(variations.length > 0 || product.ml_variation_id) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Variações</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {variations.length > 0 ? (
+                  variations.map((variation, index) => (
+                    <div
+                      key={variation.id || index}
+                      className="rounded-md border p-2 text-sm"
+                    >
+                      {variation.attribute_combinations && (
+                        <div className="mb-1">
+                          {variation.attribute_combinations.map((comb, idx) => (
+                            <div key={idx}>{`${comb.name}: ${comb.value_name}`}</div>
+                          ))}
+                        </div>
+                      )}
+                      {variation.price && (
+                        <div>Preço: {formatarMoeda(variation.price)}</div>
+                      )}
+                      {variation.available_quantity != null && (
+                        <div>Estoque: {variation.available_quantity}</div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm">ID da variação: {product.ml_variation_id}</p>
+                )}
               </CardContent>
             </Card>
           )}
@@ -384,6 +493,50 @@ export default function ProductDetail() {
                     <p className="text-sm">{format(new Date(mlProduct.last_sync_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</p>
                   </div>
                 )}
+
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {mlProduct.ml_permalink && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(mlProduct.ml_permalink!, '_blank')}
+                    >
+                      <ExternalLink className="mr-2 size-4" />
+                      Abrir no Mercado Livre
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResync}
+                    disabled={resyncProduct.isPending}
+                  >
+                    <RefreshCw className={`mr-2 size-4 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+                    {resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Registro de Sincronizações */}
+          {syncLog.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Registro de Sincronizações</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {syncLog.map((log) => (
+                  <div key={log.id} className="border-b pb-2 last:border-0 last:pb-0">
+                    <div className="flex items-center justify-between">
+                      <span>{format(new Date(log.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</span>
+                      <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
+                        {log.status}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground">{log.operation_type}</p>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           )}
