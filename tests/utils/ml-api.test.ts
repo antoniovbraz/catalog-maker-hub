@@ -108,6 +108,22 @@ describe('ML API Utils', () => {
 
       await expect(callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' })).rejects.toThrow('Token do Mercado Livre expirado ou inválido');
     });
+
+    it('deve extrair erro do contexto quando FunctionsHttpError é retornado', async () => {
+      const context = {
+        text: vi.fn().mockResolvedValue(JSON.stringify({ error: 'Missing required fields' }))
+      };
+
+      testUtils.mockSupabaseClient.functions.invoke.mockResolvedValue({
+        data: null,
+        error: { name: 'FunctionsHttpError', context }
+      });
+
+      await expect(
+        callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' })
+      ).rejects.toThrow('Missing required fields');
+      expect(context.text).toHaveBeenCalled();
+    });
   });
 
   describe('processInBatches', () => {
