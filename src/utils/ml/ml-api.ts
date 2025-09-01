@@ -93,21 +93,56 @@ export async function callMLFunction(
       timeoutPromise,
     ])) as {
       data: unknown;
-      error: { message?: string } | null;
+      error: { message?: string; name?: string; context?: unknown } | null;
     };
-    
+
     if (error) {
       console.error(`[ML API] Error in ${action}:`, error);
 
-      interface InvokeError {
-        message?: string;
-        details?: { message?: string };
-        error?: { message?: string };
+      let message: string | undefined;
+
+      // Tenta extrair mensagem do payload quando FunctionsHttpError é retornado
+      if (error.name === 'FunctionsHttpError' && error.context) {
+        try {
+          interface ErrorContext {
+            text?: () => Promise<string>;
+            [key: string]: unknown;
+          }
+          const ctx = error.context as ErrorContext;
+          type Payload = { error?: unknown; message?: string };
+          let payload: Payload | undefined = ctx as Payload;
+
+          if (typeof ctx?.text === 'function') {
+            const text = await ctx.text();
+            payload = JSON.parse(text);
+          } else if (typeof ctx === 'string') {
+            payload = JSON.parse(ctx);
+          }
+
+          const payloadError =
+            (typeof payload?.error === 'object'
+              ? (payload.error as { message?: string })?.message
+              : (payload?.error as string | undefined)) ||
+            payload?.message;
+          if (payloadError) {
+            message = String(payloadError);
+          }
+        } catch (parseErr) {
+          console.error('[ML API] Failed to parse error context:', parseErr);
+        }
       }
 
-      const invokeError = error as InvokeError;
-      const details = invokeError.details || invokeError.error;
-      const message = details?.message || invokeError.message || `Erro na operação ${action}`;
+      if (!message) {
+        interface InvokeError {
+          message?: string;
+          details?: { message?: string };
+          error?: { message?: string };
+        }
+
+        const invokeError = error as InvokeError;
+        const details = invokeError.details || invokeError.error;
+        message = details?.message || invokeError.message || `Erro na operação ${action}`;
+      }
 
       throw new Error(message);
     }
