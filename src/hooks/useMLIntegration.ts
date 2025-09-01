@@ -188,8 +188,29 @@ export function useMLSync() {
       } catch (error) {
         const message = (error as Error).message || '';
         if (message.includes('Missing required fields')) {
-          await MLService.resyncProduct(productId);
-          await MLService.syncProduct(productId);
+          try {
+            await MLService.resyncProduct(productId);
+            await MLService.syncProduct(productId);
+          } catch (resyncError: unknown) {
+            const status = (resyncError as { status?: number })?.status;
+            const errorMessage = (resyncError as Error)?.message || '';
+
+            if (status === 404 || errorMessage.includes("404")) {
+              toast({
+                title: "Erro na Re-sincronização",
+                description: "Produto não está vinculado a um item do Mercado Livre",
+                variant: "destructive",
+              });
+            } else {
+              toast({
+                title: "Erro na Re-sincronização",
+                description: "Falha ao importar dados do ML",
+                variant: "destructive",
+              });
+            }
+
+            throw resyncError;
+          }
         } else {
           throw error;
         }
@@ -203,6 +224,13 @@ export function useMLSync() {
       });
     },
     onError: (error: Error) => {
+      const handledMessages = [
+        "Produto não está vinculado a um item do Mercado Livre",
+        "Falha ao importar dados do ML",
+      ];
+
+      if (handledMessages.includes(error.message)) return;
+
       toast({
         title: "Erro na Sincronização",
         description: error.message,

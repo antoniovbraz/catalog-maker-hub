@@ -345,6 +345,13 @@ npm test tests/services/ml-service.test.ts
 **Erros de token expirado**
 - ✅ **Corrigido**: Renovação automática implementada
 
+### Como corrigir erros de sync
+
+1. Ao sincronizar um produto, o sistema tenta corrigir dados faltantes automaticamente via `resync_product`.
+2. Se o toast **"Produto não está vinculado a um item do Mercado Livre"** aparecer,
+   vincule o produto a um item existente ou execute uma nova importação do ML.
+3. Se o toast **"Falha ao importar dados do ML"** surgir, verifique a conexão com o Mercado Livre e tente novamente.
+
 ### Como Reportar Problemas
 
 1. Verifique os logs da edge function
