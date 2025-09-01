@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { updateProductFromItem } from './updateProductFromItem.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,23 +61,30 @@ serve(async (req) => {
     }
 
     // Process webhook based on topic
+    let result: { updatedFields?: string[]; error?: Error } | undefined;
     switch (payload.topic) {
       case 'orders_v2':
-        await processOrderWebhook(supabase, tenantId, payload);
+        result = await processOrderWebhook(supabase, tenantId, payload);
         break;
-      
+
       case 'items':
-        await processItemWebhook(supabase, tenantId, payload);
+        result = await processItemWebhook(supabase, tenantId, payload);
         break;
-      
+
       default:
         console.log('Unhandled webhook topic:', payload.topic);
     }
 
-    // Mark webhook as processed
+    // Mark webhook as processed with results
     await supabase
       .from('ml_webhook_events')
-      .update({ processed_at: new Date().toISOString() })
+      .update({
+        processed_at: new Date().toISOString(),
+        updated_fields: result?.updatedFields || null,
+        error_details: result?.error
+          ? { message: result.error.message, stack: result.error.stack }
+          : null,
+      })
       .eq('tenant_id', tenantId)
       .eq('resource', payload.resource)
       .eq('topic', payload.topic);
@@ -100,12 +108,12 @@ serve(async (req) => {
 });
 
 async function processOrderWebhook(
-  supabase: any,
+  supabase: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   tenantId: string,
   payload: MLWebhookPayload
-) {
+): Promise<{ error?: Error }> {
   console.log('Processing order webhook for tenant:', tenantId);
-  
+
   try {
     // Get ML auth token for this tenant
     const { data: authToken, error: authError } = await supabase
@@ -150,18 +158,21 @@ async function processOrderWebhook(
         });
     }
 
+    return {};
+
   } catch (error) {
     console.error('Error processing order webhook:', error);
+    return { error: error as Error };
   }
 }
 
 async function processItemWebhook(
-  supabase: any,
+  supabase: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   tenantId: string,
   payload: MLWebhookPayload
-) {
+): Promise<{ updatedFields?: string[]; error?: Error }> {
   console.log('Processing item webhook for tenant:', tenantId);
-  
+
   try {
     // Get ML auth token
     const { data: authToken, error: authError } = await supabase
@@ -188,6 +199,13 @@ async function processItemWebhook(
 
     const itemData = await itemResponse.json();
 
+    const updatedFields = await updateProductFromItem(
+      supabase,
+      tenantId,
+      itemData,
+      authToken.access_token
+    );
+
     // Update local product mapping
     await supabase
       .from('ml_product_mapping')
@@ -200,7 +218,10 @@ async function processItemWebhook(
       .eq('tenant_id', tenantId)
       .eq('ml_item_id', itemData.id);
 
+    return { updatedFields };
+
   } catch (error) {
     console.error('Error processing item webhook:', error);
+    return { error: error as Error };
   }
 }
