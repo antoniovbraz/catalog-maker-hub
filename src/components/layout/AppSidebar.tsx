@@ -22,7 +22,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ComponentType } from "react";
 
 import {
   Sidebar,
@@ -92,7 +92,7 @@ function MenuItem({ item, collapsed, isActive }: MenuItemProps) {
 
 interface CollapsibleMenuGroupProps {
   title: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   items: typeof configMenuItems;
   collapsed: boolean;
   location: ReturnType<typeof useLocation>;
