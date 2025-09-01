@@ -61,36 +61,27 @@ export default function ProductDetail() {
   
   const { data: productData, isLoading: productLoading } = useProduct(id!);
   const product = productData as ProductWithCategory;
+  const productId = product?.id;
   const { data: mlProducts = [] } = useMLProducts();
   const { data: productImages = [] } = useProductImages(id!);
   const { resyncProduct } = useMLProductResync();
   const { isExpiringSoon, expiresAt } = useMLConnectionStatus();
 
   const { data: syncLog = [] } = useQuery<MLSyncLog[]>({
-    queryKey: ["ml_sync_log", product?.id],
+    queryKey: ["ml_sync_log", productId],
     queryFn: async () => {
+      if (!productId) return [];
       const { data, error } = await supabase
         .from("ml_sync_log")
         .select("id, status, operation_type, created_at")
-        .eq("entity_id", product.id)
+        .eq("entity_id", productId)
         .order("created_at", { ascending: false })
         .limit(10);
       if (error) throw new Error(error.message);
       return data as MLSyncLog[];
     },
-    enabled: !!product?.id,
+    enabled: !!productId,
   });
-
-  const attributes: MLAttribute[] = Array.isArray(product.ml_attributes)
-    ? (product.ml_attributes as MLAttribute[])
-    : [];
-
-  const variations: MLVariation[] = Array.isArray(
-    (product.ml_attributes as { variations?: MLVariation[] })?.variations
-  )
-    ? ((product.ml_attributes as { variations?: MLVariation[] })
-        .variations as MLVariation[])
-    : [];
 
   if (productLoading) {
     return (
@@ -115,6 +106,17 @@ export default function ProductDetail() {
       </div>
     );
   }
+
+  const attributes: MLAttribute[] = Array.isArray(product.ml_attributes)
+    ? (product.ml_attributes as MLAttribute[])
+    : [];
+
+  const variations: MLVariation[] = Array.isArray(
+    (product.ml_attributes as { variations?: MLVariation[] })?.variations
+  )
+    ? ((product.ml_attributes as { variations?: MLVariation[] })
+        .variations as MLVariation[])
+    : [];
 
   const mlProduct = mlProducts.find(ml => ml.id === product.id);
   const hasIncompleteData = product.source === 'mercado_livre' && (!product.description || !product.sku || !product.brand);
