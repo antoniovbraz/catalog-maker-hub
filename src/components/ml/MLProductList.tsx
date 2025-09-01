@@ -6,8 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
 import { useMLSync } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
-import { useMLProductResync } from "@/hooks/useMLProductResync";
-import { toast } from "@/hooks/use-toast";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -16,7 +14,6 @@ import { useState } from "react";
 export function MLProductList() {
   const { data: products = [], isLoading } = useMLProducts();
   const { syncProduct, syncBatch } = useMLSync();
-  const { resyncProduct } = useMLProductResync();
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
@@ -36,27 +33,7 @@ export function MLProductList() {
     }
   };
 
-  const handleSyncProduct = async (productId: string) => {
-    const product = (products || []).find(p => p.id === productId);
-    if (!product) return;
-
-    const missingFields: string[] = [];
-    if (!product.name) missingFields.push('nome');
-    if (!product.sku) missingFields.push('SKU');
-    if (!product.description) missingFields.push('descrição');
-    if (product.cost_unit == null || product.cost_unit <= 0) {
-      missingFields.push('custo unitário');
-    }
-    if (!product.image_url) missingFields.push('imagem');
-
-    if (missingFields.length > 0) {
-      toast({
-        title: 'Dados incompletos',
-        description: `Faltando: ${missingFields.join(', ')}. Importando automaticamente do Mercado Livre...`,
-      });
-      await resyncProduct.mutateAsync({ productId });
-    }
-
+  const handleSyncProduct = (productId: string) => {
     syncProduct.mutate(productId);
   };
 
@@ -107,10 +84,10 @@ export function MLProductList() {
           {selectedProducts.length > 0 && (
             <Button
               onClick={handleSyncBatch}
-              disabled={syncBatch.isPending || resyncProduct.isPending || syncProduct.isPending}
+              disabled={syncBatch.isPending || syncProduct.isPending}
               size="sm"
             >
-              {syncBatch.isPending || resyncProduct.isPending || syncProduct.isPending ? (
+              {syncBatch.isPending || syncProduct.isPending ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               ) : (
                 <Play className="mr-2 size-4" />
@@ -198,9 +175,8 @@ export function MLProductList() {
                     </TableCell>
                     <TableCell>
                       {(() => {
-                        const isProcessing = syncProduct.isPending || resyncProduct.isPending;
-                        const isLoading = (resyncProduct.isPending && resyncProduct.variables?.productId === product.id) ||
-                          (syncProduct.isPending && syncProduct.variables === product.id);
+                        const isProcessing = syncProduct.isPending;
+                        const isLoading = syncProduct.isPending && syncProduct.variables === product.id;
                         return (
                           <Button
                             variant="outline"

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MLProductList } from '@/components/ml/MLProductList';
-import { toast } from '@/hooks/use-toast';
 
 vi.mock('@/hooks/useMLProducts', () => ({
   useMLProducts: vi.fn(),
@@ -11,18 +10,12 @@ vi.mock('@/hooks/useMLIntegration', () => ({
   useMLSync: vi.fn(),
 }));
 
-vi.mock('@/hooks/useMLProductResync', () => ({
-  useMLProductResync: vi.fn(),
-}));
-
 import { useMLProducts } from '@/hooks/useMLProducts';
 import { useMLSync } from '@/hooks/useMLIntegration';
-import { useMLProductResync } from '@/hooks/useMLProductResync';
 
 describe('MLProductList', () => {
-  it('should attempt auto-import when required fields are missing', async () => {
+  it('should call sync even when required fields are missing', () => {
     const syncMutate = vi.fn();
-    const resyncMutateAsync = vi.fn().mockResolvedValue(undefined);
     (useMLProducts as vi.Mock).mockReturnValue({
       data: [
         {
@@ -37,9 +30,6 @@ describe('MLProductList', () => {
       syncProduct: { mutate: syncMutate, isPending: false },
       syncBatch: { mutate: vi.fn(), isPending: false },
     });
-    (useMLProductResync as vi.Mock).mockReturnValue({
-      resyncProduct: { mutateAsync: resyncMutateAsync, isPending: false, variables: undefined },
-    });
 
     render(<MLProductList />);
 
@@ -47,14 +37,7 @@ describe('MLProductList', () => {
     const button = within(row).getByRole('button');
     fireEvent.click(button);
 
-    expect(resyncMutateAsync).toHaveBeenCalledWith({ productId: '1' });
-    await waitFor(() => expect(syncMutate).toHaveBeenCalledWith('1'));
-    expect(toast).toHaveBeenCalled();
-    expect(toast).toHaveBeenCalledWith(
-      expect.objectContaining({
-        description: expect.stringContaining('Importando automaticamente do Mercado Livre'),
-      })
-    );
+    expect(syncMutate).toHaveBeenCalledWith('1');
   });
 
   it('should call sync when all required fields are present', () => {
@@ -77,9 +60,6 @@ describe('MLProductList', () => {
       syncProduct: { mutate: syncMutate, isPending: false },
       syncBatch: { mutate: vi.fn(), isPending: false },
     });
-    (useMLProductResync as vi.Mock).mockReturnValue({
-      resyncProduct: { mutateAsync: vi.fn(), isPending: false, variables: undefined },
-    });
 
     render(<MLProductList />);
 
@@ -90,4 +70,3 @@ describe('MLProductList', () => {
     expect(syncMutate).toHaveBeenCalledWith('1');
   });
 });
-
