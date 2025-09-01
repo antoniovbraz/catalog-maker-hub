@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Package, AlertTriangle } from "lucide-react";
+import { ExternalLink, Package, AlertTriangle } from "@/components/ui/icons";
 import type { ProductWithCategory } from "@/types/products";
 import type { MLSyncProduct } from "@/services/ml-service";
 
@@ -84,7 +83,10 @@ export function MLConflictModal({ product, conflicts, onSuccess, onSubmitForm }:
 
       <div className="space-y-4">
         <h4 className="font-medium">Como deseja proceder?</h4>
-        <RadioGroup value={resolution} onValueChange={(value: any) => setResolution(value)}>
+        <RadioGroup
+          value={resolution}
+          onValueChange={(value: 'link' | 'create_new' | 'cancel') => setResolution(value)}
+        >
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="link" id="link" />
             <Label htmlFor="link" className="flex-1">
