@@ -49,11 +49,9 @@ export function MLProductList() {
 
     if (missingFields.length > 0) {
       toast({
-        title: 'Campos obrigatórios ausentes',
-        description: `Preencha: ${missingFields.join(', ')}`,
-        variant: 'destructive',
+        title: 'Dados incompletos',
+        description: `Faltando: ${missingFields.join(', ')}. Importando automaticamente do Mercado Livre...`,
       });
-      return;
     }
 
     syncProduct.mutate(productId);

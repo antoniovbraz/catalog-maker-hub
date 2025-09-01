@@ -75,13 +75,114 @@ export async function syncSingleProduct(
         mlCategoryId = categoryMapping.ml_category_id;
       }
     }
-
-    const { data: images } = await supabase
+    let { data: images } = await supabase
       .from('product_images')
       .select('image_url')
       .eq('tenant_id', tenantId)
       .eq('product_id', productId)
       .order('sort_order');
+
+    const initialMissing: string[] = [];
+    if (!product.description) initialMissing.push('description');
+    if (!product.sku) initialMissing.push('sku');
+    if (
+      product.cost_unit === null ||
+      product.cost_unit === undefined
+    )
+      initialMissing.push('cost_unit');
+    if (!images || images.length === 0) initialMissing.push('images');
+
+    if (product.source === 'mercado_livre' && initialMissing.length > 0) {
+      try {
+        if (existingMapping?.ml_item_id) {
+          const itemResponse = await fetch(
+            `https://api.mercadolibre.com/items/${existingMapping.ml_item_id}`,
+            { headers: { Authorization: `Bearer ${mlToken}` } }
+          );
+          if (itemResponse.ok) {
+            const itemData = await itemResponse.json();
+            let description = product.description;
+            if (!product.description) {
+              try {
+                const descResponse = await fetch(
+                  `https://api.mercadolibre.com/items/${itemData.id}/description`,
+                  { headers: { Authorization: `Bearer ${mlToken}` } }
+                );
+                if (descResponse.ok) {
+                  const descData = await descResponse.json();
+                  description = descData.plain_text || '';
+                }
+              } catch (e) {
+                console.warn('Could not fetch description:', e);
+              }
+            }
+
+            let sku = product.sku;
+            if (!sku) {
+              sku =
+                itemData.seller_sku ||
+                itemData.variations?.[0]?.seller_sku ||
+                itemData.variations?.[0]?.id ||
+                itemData.id;
+            }
+
+            const costUnit =
+              product.cost_unit === null || product.cost_unit === undefined
+                ? itemData.price
+                : product.cost_unit;
+
+            const updates: Record<string, unknown> = {
+              updated_at: new Date().toISOString(),
+            };
+            if (!product.description) updates.description = description;
+            if (!product.sku) updates.sku = sku;
+            if (product.cost_unit === null || product.cost_unit === undefined)
+              updates.cost_unit = costUnit;
+
+            if (Object.keys(updates).length > 1) {
+              await supabase
+                .from('products')
+                .update(updates)
+                .eq('id', productId)
+                .eq('tenant_id', tenantId);
+
+              product.description = description;
+              product.sku = sku;
+              product.cost_unit = costUnit;
+            }
+
+            if ((!images || images.length === 0) && itemData.pictures?.length > 0) {
+              for (let i = 0; i < Math.min(itemData.pictures.length, 10); i++) {
+                const picture = itemData.pictures[i];
+                await supabase
+                  .from('product_images')
+                  .upsert(
+                    {
+                      tenant_id: tenantId,
+                      product_id: productId,
+                      image_url: picture.url || picture.secure_url,
+                      sort_order: i,
+                      image_type: 'ml_sync',
+                      updated_at: new Date().toISOString(),
+                    },
+                    { onConflict: 'tenant_id,product_id,image_url' }
+                  );
+              }
+
+              const refreshed = await supabase
+                .from('product_images')
+                .select('image_url')
+                .eq('tenant_id', tenantId)
+                .eq('product_id', productId)
+                .order('sort_order');
+              images = refreshed.data || images;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Auto-import failed:', e);
+      }
+    }
 
     const pictures =
       images && images.length > 0

@@ -15,7 +15,7 @@ import { useMLProducts } from '@/hooks/useMLProducts';
 import { useMLSync } from '@/hooks/useMLIntegration';
 
 describe('MLProductList', () => {
-  it('should not call sync when required fields are missing', () => {
+  it('should attempt auto-import when required fields are missing', () => {
     const mutate = vi.fn();
     (useMLProducts as vi.Mock).mockReturnValue({
       data: [
@@ -38,11 +38,11 @@ describe('MLProductList', () => {
     const button = within(row).getByRole('button');
     fireEvent.click(button);
 
-    expect(mutate).not.toHaveBeenCalled();
+    expect(mutate).toHaveBeenCalledWith('1');
     expect(toast).toHaveBeenCalled();
     expect(toast).toHaveBeenCalledWith(
       expect.objectContaining({
-        description: expect.stringContaining('SKU'),
+        description: expect.stringContaining('Importando automaticamente do Mercado Livre'),
       })
     );
   });
