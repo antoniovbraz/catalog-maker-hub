@@ -65,6 +65,25 @@ describe('updateProductFromItem', () => {
     expect(productsQuery.update).toHaveBeenCalled();
     expect(productsQuery.eq).toHaveBeenCalledWith('id', 'prod-1');
     expect(productsQuery.eq).toHaveBeenCalledWith('tenant_id', 'tenant1');
-    expect(fields).toEqual(['sku', 'description', 'attributes', 'pictures', 'stock']);
+    expect(fields).toEqual(['sku', 'attributes', 'pictures', 'stock', 'description']);
+  });
+
+  it('skips description update when fetch fails', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).fetch = vi.fn().mockResolvedValue({ ok: false });
+
+    const itemData = {
+      id: 'ML2',
+      seller_sku: 'SKU2',
+      attributes: [],
+      pictures: [{ url: 'pic2' }],
+      available_quantity: 5,
+    };
+
+    const fields = await updateProductFromItem(supabase, 'tenant1', itemData, 'token');
+
+    const updateArg = productsQuery.update.mock.calls[0][0];
+    expect(updateArg).not.toHaveProperty('description');
+    expect(fields).toEqual(['sku', 'attributes', 'pictures', 'stock']);
   });
 });

@@ -17,11 +17,14 @@ export async function updateProductFromItem(
     throw new Error('Product mapping not found');
   }
 
-  let description = '';
+  let description: string | undefined;
   try {
-    const descResponse = await fetch(`https://api.mercadolibre.com/items/${itemData.id}/description`, {
-      headers: { Authorization: `Bearer ${mlToken}` }
-    });
+    const descResponse = await fetch(
+      `https://api.mercadolibre.com/items/${itemData.id}/description`,
+      {
+        headers: { Authorization: `Bearer ${mlToken}` }
+      }
+    );
     if (descResponse.ok) {
       const descData = await descResponse.json();
       description = descData.plain_text || '';
@@ -38,16 +41,21 @@ export async function updateProductFromItem(
     skuToUse = itemData.id;
   }
 
+  const updateData: Record<string, unknown> = {
+    sku: skuToUse,
+    ml_attributes: itemData.attributes || {},
+    ml_pictures: itemData.pictures || [],
+    ml_available_quantity: itemData.available_quantity || 0,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (description !== undefined) {
+    updateData.description = description;
+  }
+
   const { error: updateError } = await supabase
     .from('products')
-    .update({
-      description: description,
-      sku: skuToUse,
-      ml_attributes: itemData.attributes || {},
-      ml_pictures: itemData.pictures || [],
-      ml_available_quantity: itemData.available_quantity || 0,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updateData)
     .eq('id', mapping.product_id)
     .eq('tenant_id', tenantId);
 
@@ -55,6 +63,9 @@ export async function updateProductFromItem(
     throw new Error('Error updating product');
   }
 
-  updatedFields.push('sku', 'description', 'attributes', 'pictures', 'stock');
+  updatedFields.push('sku', 'attributes', 'pictures', 'stock');
+  if (description !== undefined) {
+    updatedFields.push('description');
+  }
   return updatedFields;
 }
