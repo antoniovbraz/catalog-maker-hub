@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Store, Package, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import { ShoppingCart, Store, Package, ExternalLink, CheckCircle2, AlertCircle } from "@/components/ui/icons";
 
 interface ProductSourceBadgeProps {
   source: 'manual' | 'mercado_livre' | 'shopee';
