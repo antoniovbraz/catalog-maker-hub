@@ -53,7 +53,7 @@ export default function Products() {
                   </Badge>
                   <Button
                     variant="outline"
-                    size="xs"
+                    size="sm"
                     onClick={() => resyncProduct.mutate({ productId: item.id })}
                     disabled={resyncProduct.isPending && resyncProduct.variables?.productId === item.id}
                   >

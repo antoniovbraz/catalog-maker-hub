@@ -1,4 +1,22 @@
-import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+interface QueryResult<T = any> {
+  data: T | null;
+  error: { message: string } | null;
+}
+
+interface QueryBuilder {
+  select: (columns?: string) => QueryBuilder;
+  update: (values: Record<string, unknown>) => QueryBuilder; 
+  insert: (values: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
+  upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
+  eq: (column: string, value: unknown) => QueryBuilder;
+  single: () => QueryBuilder;
+  data?: any;
+  error?: { message: string } | null;
+}
+
+interface SupabaseClient {
+  from: (table: string) => QueryBuilder;
+}
 
 export type SyncAction =
   | 'sync_product'

@@ -81,12 +81,12 @@ export class MLService {
 
   static async getAuthStatus(): Promise<MLAuthStatus> {
     try {
-      const data = await callMLFunction('ml-auth', 'get_status', {}, {});
+      const data = await callMLFunction('ml-auth', 'get_status', {}, {}) as Record<string, unknown>;
       return {
-        isConnected: data?.connected || false,
-        user_id_ml: data?.user_id_ml,
-        ml_nickname: data?.ml_nickname,
-        expires_at: data?.expires_at,
+        isConnected: (data?.connected as boolean) || false,
+        user_id_ml: data?.user_id_ml as number,
+        ml_nickname: data?.ml_nickname as string,
+        expires_at: data?.expires_at as string,
       };
     } catch (error) {
       console.error('ML Auth Status Exception:', error);
@@ -106,7 +106,8 @@ export class MLService {
 
   static async startAuth(): Promise<{ auth_url: string; state: string }> {
     try {
-      return await callMLFunction('ml-auth', 'start_auth', {}, {});
+      const data = await callMLFunction('ml-auth', 'start_auth', {}, {}) as { auth_url: string; state: string };
+      return data;
     } catch (error) {
       throw new Error(
         error instanceof Error ? error.message || 'Failed to start ML authentication' : 'Failed to start ML authentication'
@@ -147,30 +148,34 @@ export class MLService {
   // ====== SINCRONIZAÇÃO ======
 
   static async getSyncStatus(): Promise<MLSyncStatus> {
-    const data = await callMLFunction('ml-sync-v2', 'get_status', {}, {});
+    const data = await callMLFunction('ml-sync-v2', 'get_status', {}, {}) as Record<string, unknown>;
+
+    const baseStatus = {
+      total_products: (data?.total_products as number) || 0,
+      synced_products: (data?.synced_products as number) || 0,
+      pending_products: (data?.pending_products as number) || 0,
+      error_products: (data?.error_products as number) || 0,
+      last_sync: (data?.last_sync as string) || null,
+      successful_24h: (data?.successful_24h as number) || 0,
+      failed_24h: (data?.failed_24h as number) || 0,
+      total_24h: (data?.total_24h as number) || 0,
+      health_status: (data?.health_status as string) || 'unknown',
+    };
 
     return {
-      total_products: data?.total_products || 0,
-      synced_products: data?.synced_products || 0,
-      pending_products: data?.pending_products || 0,
-      error_products: data?.error_products || 0,
-      last_sync: data?.last_sync || null,
-      successful_24h: data?.successful_24h || 0,
-      failed_24h: data?.failed_24h || 0,
-      total_24h: data?.total_24h || 0,
-      health_status: data?.health_status || 'unknown',
+      ...baseStatus,
       // Aliases para compatibilidade
-      total: data?.total_products || 0,
-      synced: data?.synced_products || 0,
-      pending: data?.pending_products || 0,
-      error: data?.error_products || 0,
-      status_counts: data,
+      total: baseStatus.total_products,
+      synced: baseStatus.synced_products,
+      pending: baseStatus.pending_products,
+      error: baseStatus.error_products,
+      status_counts: baseStatus,
       products: []
     };
   }
 
   static async getMLProducts(): Promise<MLSyncProduct[]> {
-    const data = await callMLFunction('ml-sync-v2', 'get_products', {}, {});
+    const data = await callMLFunction('ml-sync-v2', 'get_products', {}, {}) as { products?: MLSyncProduct[] };
 
     return data?.products || [];
   }
@@ -180,7 +185,7 @@ export class MLService {
   }
 
   static async syncBatch(productIds: string[]): Promise<MLBatchSyncResult> {
-    const data = await callMLFunction('ml-sync-v2', 'sync_batch', { product_ids: productIds }, {});
+    const data = await callMLFunction('ml-sync-v2', 'sync_batch', { product_ids: productIds }, {}) as { successful?: number; failed?: number };
 
     return {
       successful: data?.successful ?? 0,
@@ -210,7 +215,7 @@ export class MLService {
   }
 
   static async importFromML(): Promise<{ imported: number; items: unknown[] }> {
-    const data = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {});
+    const data = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {}) as { imported?: number; items?: unknown[] };
 
     return {
       imported: data?.imported || 0,
@@ -225,7 +230,7 @@ export class MLService {
   static async createAd(adData: Record<string, unknown>): Promise<{ title: string; success: boolean }> {
     await callMLFunction('ml-sync-v2', 'create_ad', { ad_data: adData }, {});
 
-    return { title: adData.title || 'Anúncio criado', success: true };
+    return { title: (adData.title as string) || 'Anúncio criado', success: true };
   }
 
   // ====== CONFIGURAÇÕES AVANÇADAS ======

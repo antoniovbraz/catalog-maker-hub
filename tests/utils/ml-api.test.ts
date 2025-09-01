@@ -88,7 +88,7 @@ describe('ML API Utils', () => {
       await vi.advanceTimersByTimeAsync(1000);
       const error = await handled;
       expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe('Operação sync_product demorou muito para responder');
+      expect((error as Error).message).toBe('Operação sync_product demorou muito para responder');
     });
 
     it('deve tratar erros do Supabase', async () => {
@@ -241,7 +241,7 @@ describe('ML API Utils', () => {
       await vi.advanceTimersByTimeAsync(100);
       const error = await handled;
       expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe('Operação sync_product demorou muito para responder');
+      expect((error as Error).message).toBe('Operação sync_product demorou muito para responder');
     });
   });
 });

@@ -309,7 +309,7 @@ export function useMLSync() {
   });
 
     const createAd = useMutation({
-      mutationFn: ({ adData }: { adData: unknown }) =>
+      mutationFn: ({ adData }: { adData: Record<string, unknown> }) =>
         MLService.createAd(adData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });

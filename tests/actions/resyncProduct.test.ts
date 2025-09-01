@@ -54,7 +54,14 @@ describe('resyncProduct action', () => {
       }),
     } as any;
 
-    await resyncProduct({ productId: 'prod1' }, { supabase, tenantId: 'tenant1', mlToken: 'token' });
+    await resyncProduct({ action: 'resync_product', productId: 'prod1' }, { 
+      supabase, 
+      tenantId: 'tenant1', 
+      mlToken: 'token',
+      authToken: {},
+      mlClientId: 'test',
+      jwt: 'test'
+    });
 
     expect(productsTable.update).toHaveBeenCalled();
     const updateArg = productsTable.update.mock.calls[0][0];
@@ -107,7 +114,14 @@ describe('resyncProduct action', () => {
       }),
     } as any;
 
-    await resyncProduct({ productId: 'prod2' }, { supabase, tenantId: 'tenant1', mlToken: 'token' });
+    await resyncProduct({ action: 'resync_product', productId: 'prod2' }, { 
+      supabase, 
+      tenantId: 'tenant1', 
+      mlToken: 'token',
+      authToken: {},
+      mlClientId: 'test',
+      jwt: 'test'
+    });
 
     expect(productsTable.update).toHaveBeenCalled();
     const updateArg = productsTable.update.mock.calls[0][0];
