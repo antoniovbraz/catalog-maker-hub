@@ -45,6 +45,23 @@ supabase/functions/
 └── ml-webhook/                         # Webhooks do ML
 ```
 
+## 📥 Campos Sincronizados
+
+### Via API
+
+| Endpoint | Campos Principais | Edge Function | Hooks |
+| -------- | ---------------- | ------------- | ----- |
+| `/items` | `id`, `title`, `price`, `category_id`, `available_quantity` | `ml-sync-v2/actions/syncProduct.ts` | `useMLSync`, `useMLProducts` |
+| `/items/{id}/description` | `plain_text` | `ml-sync-v2/actions/importFromML.ts` | `useMLProducts` |
+| `/categories/{id}` | `id`, `name`, `path_from_root` | `ml-sync-v2/actions/importFromML.ts` | `useMLCategoryMapping` |
+
+### Via Webhooks
+
+| Tópico | Campos Principais | Edge Function | Hooks |
+| ------ | ---------------- | ------------- | ----- |
+| `orders_v2` | `id`, `status`, `buyer`, `order_items` | `ml-webhook/index.ts` | _n/a_ |
+| `items` | `id`, `status`, `variations`, `available_quantity` | `ml-webhook/index.ts` | `useMLProductResync` |
+
 ## 🔐 Autenticação
 
 ### Fluxo OAuth2 com PKCE
@@ -116,9 +133,24 @@ ml_sync_log (
 ### Tipos de Sync
 
 1. **Produto Individual**: Sincroniza um produto específico
-2. **Sync em Lote**: Múltiplos produtos simultaneamente  
+2. **Sync em Lote**: Múltiplos produtos simultaneamente
 3. **Importação ML**: Importa produtos existentes do ML
 4. **Re-sincronização**: Corrige produtos com erro
+
+### Fluxo de Sincronização
+
+1. **Importação**  
+   - Edge Function: `supabase/functions/ml-sync-v2/actions/importFromML.ts`  
+   - Hook: `src/hooks/useMLProducts.ts`  
+   - Busca produtos e categorias via `/items` e `/categories/{id}`.
+2. **Re-sincronização**  
+   - Edge Function: `supabase/functions/ml-sync-v2/actions/syncProduct.ts`  
+   - Hook: `src/hooks/useMLProductResync.ts`  
+   - Reenvia dados corrigidos para o ML quando há falhas.
+3. **Publicação**  
+   - Edge Function: `supabase/functions/ml-sync-v2/actions/syncProduct.ts`  
+   - Hook: `src/hooks/useMLSync.ts`  
+   - Cria ou atualiza anúncios no ML após validações.
 
 ### Estados de Sync
 
