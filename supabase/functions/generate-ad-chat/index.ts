@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.53.0';
 import { generateAdChatSchema } from '../shared/schemas.ts';
+import { setupLogger } from '../shared/logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +14,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  setupLogger(req.headers);
   try {
     const {
       thread_id,

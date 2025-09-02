@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { updateProductFromItem } from './updateProductFromItem.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
 import type { z } from 'zod';
+import { setupLogger } from '../shared/logger.ts';
 
 type MLWebhookPayload = z.infer<typeof mlWebhookSchema>;
 
@@ -17,6 +18,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  setupLogger(req.headers);
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
