@@ -113,6 +113,82 @@ describe('importFromML action', () => {
     expect(inserted.category_ml_path).toEqual([{ id: 'CAT1', name: 'Root' }]);
   });
 
+  it('uses seller_sku as sku when seller_custom_field is missing', async () => {
+    const itemData = {
+      id: 'MLA1',
+      title: 'Test Item',
+      attributes: [],
+      price: 100,
+      available_quantity: 10,
+      sold_quantity: 0,
+      seller_sku: 'SSKU123',
+      category_id: null,
+      variations: [],
+      pictures: [],
+    } as any;
+
+    global.fetch = vi.fn((url: RequestInfo) => {
+      const urlStr = url.toString();
+      if (urlStr.includes('/items/search')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            results: ['MLA1'],
+            paging: { total: 1, offset: 0, limit: 50 },
+          }),
+        } as any);
+      }
+      if (urlStr.includes('/items/MLA1/description')) {
+        return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
+      }
+      if (urlStr.includes('/items/MLA1')) {
+        return Promise.resolve({ ok: true, json: async () => itemData } as any);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) } as any);
+    });
+
+    const productsTable = {
+      upsert: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: { id: 'prod1' }, error: null }),
+    };
+    const mappingTable = {
+      upsert: vi.fn().mockResolvedValue({ error: null }),
+    };
+    const mlSyncLogTable = { insert: vi.fn().mockResolvedValue({}) };
+    const productImagesTable = { insert: vi.fn().mockResolvedValue({ error: null }) };
+
+    const supabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'products') return productsTable;
+        if (table === 'ml_product_mapping') return mappingTable;
+        if (table === 'ml_sync_log') return mlSyncLogTable;
+        if (table === 'product_images') return productImagesTable;
+        return {
+          upsert: vi.fn().mockReturnThis(),
+          select: vi.fn().mockReturnThis(),
+          single: vi.fn().mockResolvedValue({ data: null, error: null }),
+          update: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockResolvedValue({ error: null }),
+          maybeSingle: vi.fn().mockResolvedValue({ data: null }),
+          ilike: vi.fn().mockReturnThis(),
+        };
+      }),
+    } as any;
+
+    await importFromML({ action: 'import_from_ml' } as any, {
+      supabase,
+      tenantId: 'tenant1',
+      authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
+    });
+
+    expect(productsTable.upsert).toHaveBeenCalled();
+    const inserted = productsTable.upsert.mock.calls[0][0];
+    expect(inserted.sku).toBe('SSKU123');
+    expect(inserted.sku_source).toBe('mercado_livre');
+  });
+
   it('falls back to null sku when not provided', async () => {
     const itemData = {
       id: 'MLA2',
