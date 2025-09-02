@@ -152,7 +152,7 @@ const useMLProducts = () => useQuery({
   staleTime: 2 * 60 * 1000 // 2 min
 });
 
-const useMLSync = () => useMutation({
+const useMLProductSync = () => useMutation({
   mutationFn: MLService.syncProduct,
   onSuccess: () => {
     queryClient.invalidateQueries(['ml-products']);

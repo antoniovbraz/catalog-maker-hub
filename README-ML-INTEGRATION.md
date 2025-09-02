@@ -25,9 +25,8 @@ src/
 │   ├── MLProductList.tsx               # Lista de produtos sincronizados
 │   └── ...
 ├── hooks/                              # Hooks para operações ML
-│   ├── useMLIntegration.ts             # Hook principal
+│   ├── useMLIntegration.ts             # Hook principal (inclui sincronização)
 │   ├── useMLAuth.ts                    # Autenticação
-│   ├── useMLSync.ts                    # Sincronização
 │   └── useMLProductResync.ts           # Re-sincronização
 ├── services/ml-service.ts              # Serviço principal
 ├── utils/ml/ml-api.ts                  # Rate limiting e utilitários
@@ -51,7 +50,7 @@ supabase/functions/
 
 | Endpoint | Campos Principais | Edge Function | Hooks |
 | -------- | ---------------- | ------------- | ----- |
-| `/items` | `id`, `title`, `price`, `category_id`, `available_quantity` | `ml-sync-v2/actions/syncProduct.ts` | `useMLSync`, `useMLProducts` |
+| `/items` | `id`, `title`, `price`, `category_id`, `available_quantity` | `ml-sync-v2/actions/syncProduct.ts` | `useMLIntegration` (`sync`), `useMLProducts` |
 | `/items/{id}/description` | `plain_text` | `ml-sync-v2/actions/importFromML.ts` | `useMLProducts` |
 | `/categories/{id}` | `id`, `name`, `path_from_root` | `ml-sync-v2/actions/importFromML.ts` | `useMLCategoryMapping` |
 
@@ -147,9 +146,9 @@ ml_sync_log (
    - Edge Function: `supabase/functions/ml-sync-v2/actions/syncProduct.ts`  
    - Hook: `src/hooks/useMLProductResync.ts`  
    - Reenvia dados corrigidos para o ML quando há falhas.
-3. **Publicação**  
-   - Edge Function: `supabase/functions/ml-sync-v2/actions/syncProduct.ts`  
-   - Hook: `src/hooks/useMLSync.ts`  
+3. **Publicação**
+   - Edge Function: `supabase/functions/ml-sync-v2/actions/syncProduct.ts`
+   - Hook: `useMLIntegration` (propriedade `sync`)
    - Cria ou atualiza anúncios no ML após validações.
 
 ### Estados de Sync
@@ -191,17 +190,17 @@ function MyComponent() {
 ### Sincronizar Produtos
 
 ```typescript
-import { useMLSync } from '@/hooks/useMLIntegration';
+import { useMLIntegration } from '@/hooks/useMLIntegration';
 
 function ProductSync() {
-  const { syncProduct, syncBatch } = useMLSync();
-  
+  const { sync } = useMLIntegration();
+
   const handleSync = (productId: string) => {
-    syncProduct.mutate(productId);
+    sync.syncProduct.mutate(productId);
   };
-  
+
   const handleBatchSync = (productIds: string[]) => {
-    syncBatch.mutate(productIds);
+    sync.syncBatch.mutate(productIds);
   };
 }
 ```
@@ -209,13 +208,13 @@ function ProductSync() {
 ### Importar do ML
 
 ```typescript
-import { useMLSync } from '@/hooks/useMLIntegration';
+import { useMLIntegration } from '@/hooks/useMLIntegration';
 
 function ImportButton() {
-  const { importFromML } = useMLSync();
-  
+  const { sync } = useMLIntegration();
+
   const handleImport = () => {
-    importFromML.mutate();
+    sync.importFromML.mutate();
   };
 }
 ```

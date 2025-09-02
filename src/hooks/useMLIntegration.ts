@@ -68,6 +68,7 @@ export function useMLIntegration() {
   const isLoading = authQuery.isLoading;
   const hasError = authQuery.isError || syncStatusQuery.isError;
   const authData = authQuery.data;
+  const syncActions = useMLSyncActions();
   const syncData = syncStatusQuery.data;
   const performanceData = performanceQuery.data;
   const settingsData = advancedSettingsQuery.data;
@@ -77,19 +78,22 @@ export function useMLIntegration() {
     isConnected,
     isLoading,
     hasError,
-    
+
     // Dados
     auth: authData,
-    sync: syncData,
+    sync: {
+      status: syncData,
+      ...syncActions,
+    },
     performance: performanceData,
     settings: settingsData,
-    
+
     // Queries individuais (para loading states específicos)
     authQuery,
     syncStatusQuery,
     performanceQuery,
     advancedSettingsQuery,
-    
+
     // Utilitários
     invalidateAllQueries,
   };
@@ -178,7 +182,7 @@ export function useMLAuth() {
   };
 }
 
-export function useMLSync() {
+function useMLSyncActions() {
   const queryClient = useQueryClient();
 
   const syncProduct = useMutation({

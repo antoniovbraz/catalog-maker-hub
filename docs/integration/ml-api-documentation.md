@@ -163,7 +163,7 @@ export async function processWebhook(payload: WebhookPayload) {
 
 ```typescript
 // hooks/useMLIntegration.ts
-import { useMLIntegration, useMLAuth, useMLSync } from '@/hooks/useMLIntegration';
+import { useMLIntegration, useMLAuth } from '@/hooks/useMLIntegration';
 
 // Consulta status de autenticação
 export function useMLAuthStatus() {
@@ -173,7 +173,8 @@ export function useMLAuthStatus() {
 
 // Sincronização de produtos
 export function useMLProductSync() {
-  return useMLSync();
+  const { sync } = useMLIntegration();
+  return sync;
 }
 ```
 
