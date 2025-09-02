@@ -1323,6 +1323,26 @@ export type Database = {
       }
     }
     Functions: {
+      audit_security_definer_functions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          function_name: string
+          recommendation: string
+          search_path_setting: string
+          security_level: string
+        }[]
+      }
+      audit_table_security: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          object_name: string
+          object_type: string
+          policies_count: number
+          recommendation: string
+          rls_enabled: boolean
+          security_level: string
+        }[]
+      }
       backup_ml_configuration: {
         Args: Record<PropertyKey, never>
         Returns: Json
