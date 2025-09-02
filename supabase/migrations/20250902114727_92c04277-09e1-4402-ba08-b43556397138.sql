@@ -21,9 +21,15 @@ ON storage.objects
 FOR INSERT, UPDATE, DELETE
 USING (
   bucket_id = 'product_images'
-  AND owner = auth.uid()
+  AND (
+    owner = auth.uid()
+    OR owner = auth.jwt()->>'tenant_id'
+  )
 )
 WITH CHECK (
   bucket_id = 'product_images'
-  AND owner = auth.uid()
+  AND (
+    owner = auth.uid()
+    OR owner = auth.jwt()->>'tenant_id'
+  )
 );
