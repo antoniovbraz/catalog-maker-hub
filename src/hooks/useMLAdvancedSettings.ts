@@ -1,25 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-
-export interface MLAdvancedSettings {
-  id: string;
-  tenant_id: string;
-  feature_flags: Record<string, any>;
-  rate_limits: {
-    sync_product: number;
-    sync_order: number;
-    token_refresh: number;
-    default: number;
-  };
-  backup_schedule: string;
-  auto_recovery_enabled: boolean;
-  advanced_monitoring: boolean;
-  multi_account_enabled: boolean;
-  security_level: string;
-  created_at: string;
-  updated_at: string;
-}
+import {
+  mlAdvancedSettingsSchema,
+  type MLAdvancedSettings,
+} from "@/types/ml/advanced-settings";
 
 export function useMLAdvancedSettings() {
   return useQuery({
@@ -32,7 +17,7 @@ export function useMLAdvancedSettings() {
         throw new Error(error.message);
       }
 
-      return data;
+      return mlAdvancedSettingsSchema.parse(data);
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
@@ -43,7 +28,9 @@ export function useUpdateMLAdvancedSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (settings: Partial<MLAdvancedSettings>): Promise<MLAdvancedSettings> => {
+    mutationFn: async (
+      settings: Partial<MLAdvancedSettings>
+    ): Promise<MLAdvancedSettings> => {
       const { data, error } = await supabase.rpc("update_ml_advanced_settings", {
         p_settings: settings,
       });
@@ -53,7 +40,7 @@ export function useUpdateMLAdvancedSettings() {
         throw new Error(error.message || "Falha ao atualizar configurações");
       }
 
-      return data;
+      return mlAdvancedSettingsSchema.parse(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ml-advanced-settings"] });

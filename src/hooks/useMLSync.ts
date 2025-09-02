@@ -4,27 +4,32 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { z } from "zod";
 
 // Re-export from new service
 export { useMLIntegration, useMLSync, ML_QUERY_KEYS } from './useMLIntegration';
 
 // Legacy types for backwards compatibility
-export interface MLSyncProduct {
-  id: string;
-  name: string;
-  ml_item_id?: string;
-  sync_status: 'not_synced' | 'syncing' | 'synced' | 'error';
-  last_sync_at?: string;
-  error_message?: string;
-}
+const mlSyncProductSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  ml_item_id: z.string().optional(),
+  sync_status: z.enum(['not_synced', 'syncing', 'synced', 'error']),
+  last_sync_at: z.string().optional(),
+  error_message: z.string().optional(),
+});
 
-export interface MLSyncStatus {
-  total_products: number;
-  synced_products: number;
-  pending_products: number;
-  error_products: number;
-  last_sync_at?: string;
-}
+export type MLSyncProduct = z.infer<typeof mlSyncProductSchema>;
+
+const mlSyncStatusSchema = z.object({
+  total_products: z.number(),
+  synced_products: z.number(),
+  pending_products: z.number(),
+  error_products: z.number(),
+  last_sync_at: z.string().optional(),
+});
+
+export type MLSyncStatus = z.infer<typeof mlSyncStatusSchema>;
 
 // Query key for backwards compatibility
 export const ML_SYNC_QUERY_KEY = "ml-sync";
@@ -41,16 +46,16 @@ export function useMLSyncStatus() {
       });
 
       if (error) throw error;
-      
+
       // Adaptar para formato antigo
       const result = data.status_counts;
-      return {
+      return mlSyncStatusSchema.parse({
         total_products: result.total,
         synced_products: result.synced,
         pending_products: result.pending,
         error_products: result.error,
-        last_sync_at: new Date().toISOString()
-      };
+        last_sync_at: new Date().toISOString(),
+      });
     },
     staleTime: 2 * 60 * 1000,
   });
@@ -67,15 +72,17 @@ export function useMLSyncProducts() {
       });
 
       if (error) throw error;
-      
-      return data.products.map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        ml_item_id: item.ml_item_id,
-        sync_status: item.sync_status,
-        last_sync_at: item.last_sync_at,
-        error_message: item.error_message,
-      }));
+
+      return z.array(mlSyncProductSchema).parse(
+        data.products.map((item: Record<string, unknown>) => ({
+          id: item.id as string,
+          name: item.name as string,
+          ml_item_id: item.ml_item_id as string | undefined,
+          sync_status: item.sync_status as MLSyncProduct['sync_status'],
+          last_sync_at: item.last_sync_at as string | undefined,
+          error_message: item.error_message as string | undefined,
+        }))
+      );
     },
     staleTime: 30 * 1000,
   });
