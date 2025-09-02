@@ -824,14 +824,20 @@ export type Database = {
           ml_seller_sku: string | null
           ml_sold_quantity: number | null
           ml_stock_quantity: number | null
-          ml_variation_id: string | null
-          ml_variations: Json | null
-          model: string | null
-          name: string
-          packaging_cost: number | null
-          sku: string | null
-          source: string
-          tax_rate: number | null
+            ml_variation_id: string | null
+            ml_variations: Json | null
+            ml_item_id: string | null
+            origin: Database["public"]["Enums"]["product_origin"] | null
+            sku_source: Database["public"]["Enums"]["sku_source"] | null
+            category_ml_id: string | null
+            category_ml_path: string | null
+            updated_from_ml_at: string | null
+            model: string | null
+            name: string
+            packaging_cost: number | null
+            sku: string | null
+            source: string
+            tax_rate: number | null
           tenant_id: string | null
           updated_at: string
           warranty: string | null
@@ -851,14 +857,20 @@ export type Database = {
           ml_seller_sku?: string | null
           ml_sold_quantity?: number | null
           ml_stock_quantity?: number | null
-          ml_variation_id?: string | null
-          ml_variations?: Json | null
-          model?: string | null
-          name: string
-          packaging_cost?: number | null
-          sku?: string | null
-          source?: string
-          tax_rate?: number | null
+            ml_variation_id?: string | null
+            ml_variations?: Json | null
+            ml_item_id?: string | null
+            origin?: Database["public"]["Enums"]["product_origin"] | null
+            sku_source?: Database["public"]["Enums"]["sku_source"] | null
+            category_ml_id?: string | null
+            category_ml_path?: string | null
+            updated_from_ml_at?: string | null
+            model?: string | null
+            name: string
+            packaging_cost?: number | null
+            sku?: string | null
+            source?: string
+            tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
           warranty?: string | null
@@ -878,14 +890,20 @@ export type Database = {
           ml_seller_sku?: string | null
           ml_sold_quantity?: number | null
           ml_stock_quantity?: number | null
-          ml_variation_id?: string | null
-          ml_variations?: Json | null
-          model?: string | null
-          name?: string
-          packaging_cost?: number | null
-          sku?: string | null
-          source?: string
-          tax_rate?: number | null
+            ml_variation_id?: string | null
+            ml_variations?: Json | null
+            ml_item_id?: string | null
+            origin?: Database["public"]["Enums"]["product_origin"] | null
+            sku_source?: Database["public"]["Enums"]["sku_source"] | null
+            category_ml_id?: string | null
+            category_ml_path?: string | null
+            updated_from_ml_at?: string | null
+            model?: string | null
+            name?: string
+            packaging_cost?: number | null
+            sku?: string | null
+            source?: string
+            tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
           warranty?: string | null
@@ -1476,6 +1494,8 @@ export type Database = {
         | "error"
         | "conflict"
         | "pending"
+      product_origin: "mercado_livre" | "manual" | "import"
+      sku_source: "mercado_livre" | "internal" | "none"
       user_role: "super_admin" | "admin" | "user"
     }
     CompositeTypes: {

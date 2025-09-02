@@ -18,7 +18,8 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "align:ml": "node scripts/align-ml-data.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -10,6 +10,12 @@ export interface ProductType {
   packaging_cost: number;
   tax_rate: number;
   source: 'manual' | 'mercado_livre' | 'shopee';
+  origin?: 'mercado_livre' | 'manual' | 'import';
+  ml_item_id?: string | null;
+  sku_source?: 'mercado_livre' | 'internal' | 'none';
+  category_ml_id?: string | null;
+  category_ml_path?: string | null;
+  updated_from_ml_at?: string | null;
   created_at: string;
   updated_at: string;
   // Novos campos ML
@@ -44,6 +50,12 @@ export const productSchema = z.object({
   packaging_cost: z.number().min(0, "Custo de embalagem deve ser positivo").default(0),
   tax_rate: z.number().min(0, "Taxa de imposto deve ser positiva").max(100, "Taxa não pode exceder 100%").default(0),
   source: z.enum(['manual', 'mercado_livre', 'shopee']).default('manual'),
+  origin: z.enum(['mercado_livre', 'manual', 'import']).default('manual'),
+  sku_source: z.enum(['mercado_livre', 'internal', 'none']).default('none'),
+  ml_item_id: z.string().optional(),
+  category_ml_id: z.string().optional(),
+  category_ml_path: z.string().optional(),
+  updated_from_ml_at: z.string().optional(),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
