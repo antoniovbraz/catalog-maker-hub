@@ -228,6 +228,7 @@ export async function importFromML(
           ml_available_quantity: itemDetail.available_quantity || 0,
           ml_sold_quantity: itemDetail.sold_quantity || 0,
           ml_variation_id: itemDetail.variation_id || null,
+          ml_variations: itemDetail.variations || [],
           ml_pictures: itemDetail.pictures || [],
         })
         .select()

@@ -825,6 +825,7 @@ export type Database = {
           ml_sold_quantity: number | null
           ml_stock_quantity: number | null
           ml_variation_id: string | null
+          ml_variations: Json | null
           model: string | null
           name: string
           packaging_cost: number | null
@@ -851,6 +852,7 @@ export type Database = {
           ml_sold_quantity?: number | null
           ml_stock_quantity?: number | null
           ml_variation_id?: string | null
+          ml_variations?: Json | null
           model?: string | null
           name: string
           packaging_cost?: number | null
@@ -877,6 +879,7 @@ export type Database = {
           ml_sold_quantity?: number | null
           ml_stock_quantity?: number | null
           ml_variation_id?: string | null
+          ml_variations?: Json | null
           model?: string | null
           name?: string
           packaging_cost?: number | null
