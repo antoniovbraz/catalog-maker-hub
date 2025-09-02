@@ -214,12 +214,11 @@ export class MLService {
     return { successful, failed };
   }
 
-  static async importFromML(): Promise<{ imported: number; items: unknown[] }> {
-    const data = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {}) as { imported?: number; items?: unknown[] };
+  static async importFromML(): Promise<{ imported: number }> {
+    const data = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {}) as { imported?: number };
 
     return {
-      imported: data?.imported || 0,
-      items: data?.items || []
+      imported: data?.imported || 0
     };
   }
 

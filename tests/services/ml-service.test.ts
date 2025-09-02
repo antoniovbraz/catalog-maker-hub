@@ -84,7 +84,7 @@ describe('MLService', () => {
     });
 
     it('deve importar do ML', async () => {
-      vi.mocked(callMLFunction).mockResolvedValue({ imported: 5, items: [] });
+      vi.mocked(callMLFunction).mockResolvedValue({ imported: 5 });
 
       const result = await MLService.importFromML();
 
