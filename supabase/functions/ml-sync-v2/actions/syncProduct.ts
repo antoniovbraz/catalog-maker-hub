@@ -1,4 +1,5 @@
 import { ActionContext, SyncProductRequest, errorResponse, corsHeaders } from '../types.ts';
+import { isMLWriteEnabled } from '../../shared/write-guard.ts';
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const DEFAULT_IMAGE_PLACEHOLDER =
@@ -389,6 +390,10 @@ export async function syncProduct(
 ): Promise<Response> {
   if (!req.product_id) {
     return errorResponse('Product ID required', 400);
+  }
+
+  if (!isMLWriteEnabled()) {
+    return errorResponse('ML write operations disabled', 403);
   }
 
   try {

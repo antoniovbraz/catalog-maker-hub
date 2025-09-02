@@ -12,7 +12,7 @@ import { MLProductRow } from "./MLProductRow";
 export function MLProductList() {
   const { data, isLoading } = useMLProducts();
   const products = data?.pages.flat() ?? [];
-  const { sync } = useMLIntegration();
+  const { sync, writeEnabled } = useMLIntegration();
   const { syncProduct, syncBatch, importFromML } = sync;
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -80,7 +80,7 @@ export function MLProductList() {
               Importar do ML
             </Button>
 
-            {selectedProducts.length > 0 && (
+            {writeEnabled && selectedProducts.length > 0 && (
               <Button
                 onClick={handleSyncBatch}
                 disabled={syncBatch.isPending || syncProduct.isPending}
@@ -138,6 +138,7 @@ export function MLProductList() {
                       syncProduct.isPending &&
                       syncProduct.variables === product.id
                     }
+                    writeEnabled={writeEnabled}
                   />
                 ))}
               </TableBody>

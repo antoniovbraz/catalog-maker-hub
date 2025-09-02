@@ -1,5 +1,6 @@
 import { ActionContext, SyncBatchRequest, errorResponse, corsHeaders } from '../types.ts';
 import { syncSingleProduct } from './syncProduct.ts';
+import { isMLWriteEnabled } from '../../shared/write-guard.ts';
 
 export async function syncBatch(
   req: SyncBatchRequest,
@@ -7,6 +8,10 @@ export async function syncBatch(
 ): Promise<Response> {
   if (!req.product_ids || !Array.isArray(req.product_ids)) {
     return errorResponse('Product IDs array required', 400);
+  }
+
+  if (!isMLWriteEnabled()) {
+    return errorResponse('ML write operations disabled', 403);
   }
 
     const startTime = Date.now();

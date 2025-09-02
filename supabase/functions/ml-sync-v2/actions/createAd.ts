@@ -1,4 +1,5 @@
 import { ActionContext, CreateAdRequest, errorResponse, corsHeaders } from '../types.ts';
+import { isMLWriteEnabled } from '../../shared/write-guard.ts';
 
 export async function createAd(
   req: CreateAdRequest,
@@ -6,6 +7,10 @@ export async function createAd(
 ): Promise<Response> {
   if (!req.ad_data) {
     return errorResponse('Ad data required', 400);
+  }
+
+  if (!isMLWriteEnabled()) {
+    return errorResponse('ML write operations disabled', 403);
   }
 
   await supabase

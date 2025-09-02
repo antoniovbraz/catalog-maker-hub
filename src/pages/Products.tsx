@@ -24,7 +24,7 @@ export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
   const { data: mlProductsData } = useMLProducts();
   const mlProducts = mlProductsData?.pages.flat() ?? [];
-  const { sync, syncStatusQuery } = useMLIntegration();
+  const { sync, syncStatusQuery, writeEnabled } = useMLIntegration();
   const { importFromML } = sync;
   const { resyncProduct } = useMLProductResync();
   const deleteMutation = useDeleteProduct();
@@ -238,13 +238,15 @@ export default function Products() {
       icon: <Edit className="size-4" />,
       onClick: (product) => handleEdit(product),
     },
-    {
-      label: "Anunciar no ML",
-      icon: <Tag className="size-4" />,
-      onClick: (product) => handleAdvertiseOnML(product),
-      variant: "default",
-      disabled: (product) => product.source !== 'manual',
-    },
+    ...(writeEnabled
+      ? [{
+          label: "Anunciar no ML",
+          icon: <Tag className="size-4" />,
+          onClick: (product: ProductWithCategory) => handleAdvertiseOnML(product),
+          variant: "default",
+          disabled: (product: ProductWithCategory) => product.source !== 'manual',
+        }]
+      : []),
     {
       label: "Ver no ML",
       icon: <Package className="size-4" />,
