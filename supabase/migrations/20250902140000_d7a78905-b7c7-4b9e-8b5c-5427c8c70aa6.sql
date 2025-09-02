@@ -1,6 +1,7 @@
--- Backfill encrypted tokens and update cron job auth header
 
--- Backfill existing tokens so the decrypting view won't fail
+-- Disable trigger to avoid double encryption during backfill
+ALTER TABLE public.ml_auth_tokens DISABLE TRIGGER encrypt_ml_tokens_trigger;
+
 DO $$
 DECLARE
   secret_key text := current_setting('app.ml_encryption_key', true);
@@ -11,17 +12,13 @@ BEGIN
 
   UPDATE public.ml_auth_tokens
   SET
-    access_token = CASE
-      WHEN access_token LIKE '%.%.%' THEN encode(pgp_sym_encrypt(access_token, secret_key), 'base64')
-      ELSE access_token
-    END,
-    refresh_token = CASE
-      WHEN refresh_token LIKE '%.%.%' THEN encode(pgp_sym_encrypt(refresh_token, secret_key), 'base64')
-      ELSE refresh_token
-    END
-  WHERE access_token IS NOT NULL OR refresh_token IS NOT NULL;
+    access_token = encode(pgp_sym_encrypt(access_token, secret_key), 'base64'),
+    refresh_token = encode(pgp_sym_encrypt(refresh_token, secret_key), 'base64')
+  WHERE access_token LIKE '%.%.%' OR refresh_token LIKE '%.%.%';
 END;
 $$;
+
+ALTER TABLE public.ml_auth_tokens ENABLE TRIGGER encrypt_ml_tokens_trigger;
 
 -- Update cron job to use dynamic service role key
 SELECT cron.unschedule('ml-token-renewal-hourly');
