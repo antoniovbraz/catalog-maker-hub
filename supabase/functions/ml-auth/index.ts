@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { mlAuthSchema } from '../shared/schemas.ts';
 import type { z } from 'zod';
+import { setupLogger } from '../shared/logger.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,6 +42,7 @@ serve(async (req) => {
   }
 
   try {
+    setupLogger(req.headers);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const mlClientId = Deno.env.get('ML_CLIENT_ID')!;

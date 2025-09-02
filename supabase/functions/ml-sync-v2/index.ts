@@ -15,6 +15,7 @@ import { linkProduct } from './actions/linkProduct.ts';
 import { getProducts } from './actions/getProducts.ts';
 import { createAd } from './actions/createAd.ts';
 import { resyncProduct } from './actions/resyncProduct.ts';
+import { setupLogger } from '../shared/logger.ts';
 
 type Handler = (req: SyncRequest, ctx: ActionContext) => Promise<Response>;
 const actions: Record<SyncRequest['action'], Handler> = {
@@ -34,6 +35,7 @@ serve(async (req) => {
   }
 
   try {
+    setupLogger(req.headers);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const mlClientId = Deno.env.get('ML_CLIENT_ID')!;
