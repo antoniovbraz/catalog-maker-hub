@@ -57,12 +57,6 @@ export class AdsService extends BaseService<ProductImage> {
         throw new Error(`Erro no upload: ${uploadError.message}`);
       }
 
-      await supabase
-        .from('storage.objects')
-        .update({ owner: tenantId })
-        .eq('bucket_id', 'product_images')
-        .eq('name', filePath);
-
       // Obter URL pública da imagem
       const { data: { publicUrl } } = supabase.storage
         .from('product_images')
@@ -96,11 +90,16 @@ export class AdsService extends BaseService<ProductImage> {
 
       // Extrair caminho do arquivo da URL (agora no formato tenant_id/product_id/arquivo)
       const url = new URL(image.image_url);
-      const filePath = url.pathname.split('/product_images/')[1];
+      const isLegacyPath = url.pathname.includes('/product-images/');
+      const filePath = isLegacyPath
+        ? url.pathname.split('/product-images/')[1]
+        : url.pathname.split('/product_images/')[1];
+
+      const bucket = isLegacyPath ? 'product-images' : 'product_images';
 
       // Deletar arquivo do Storage
       const { error: storageError } = await supabase.storage
-        .from('product_images')
+        .from(bucket)
         .remove([filePath]);
 
       if (storageError) {
