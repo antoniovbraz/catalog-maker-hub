@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import type { DataColumn, DataAction } from "@/components/ui/data-visualization";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { formatarMoeda } from "@/utils/pricing";
 import { useProductsWithCategories, useDeleteProduct } from "@/hooks/useProducts";
 import type { ProductWithCategory } from "@/types/products";
@@ -35,7 +41,9 @@ export default function Products() {
       key: "name",
       header: "Nome",
       render: (item) => {
-        const hasIncompleteData = item.source === 'mercado_livre' && (!item.description || !item.sku || !item.brand);
+        const hasIncompleteData =
+          item.source === 'mercado_livre' &&
+          (!item.description || !item.ml_seller_sku || !item.brand);
         
         return (
           <div className="flex items-center gap-2">
@@ -65,10 +73,39 @@ export default function Products() {
                   </Button>
                 </>
               )}
-              {item.sku && (
-                <Badge variant="outline" className="text-xs">
-                  {item.sku}
-                </Badge>
+              {item.source === 'mercado_livre' ? (
+                item.ml_seller_sku ? (
+                  <div className="flex items-center gap-1">
+                    <span className="font-mono text-xs">{item.ml_seller_sku}</span>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Badge variant="outline" className="text-xs">
+                            SKU Original ML
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          SKU definido originalmente no Mercado Livre
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                ) : (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-muted-foreground">—</span>
+                      </TooltipTrigger>
+                      <TooltipContent>Defina o SKU no ML</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )
+              ) : (
+                item.sku && (
+                  <Badge variant="outline" className="text-xs">
+                    {item.sku}
+                  </Badge>
+                )
               )}
             </div>
           </div>

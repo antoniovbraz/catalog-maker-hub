@@ -15,6 +15,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatarMoeda } from "@/utils/pricing";
@@ -121,7 +127,9 @@ export default function ProductDetail() {
     : [];
 
   const mlProduct = mlProducts.find(ml => ml.id === product.id);
-  const hasIncompleteData = product.source === 'mercado_livre' && (!product.description || !product.sku || !product.brand);
+  const hasIncompleteData =
+    product.source === 'mercado_livre' &&
+    (!product.description || !product.ml_seller_sku || !product.brand);
 
   const formatWeight = (w: number) => {
     if (w >= 1000) {
@@ -236,14 +244,37 @@ export default function ProductDetail() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">SKU</label>
-                  <p>{product.sku || <span className="text-muted-foreground">Não informado</span>}</p>
-                  
-                  {/* Mostrar SKU do ML se for diferente */}
-                  {product.source === 'mercado_livre' && product.ml_seller_sku && product.ml_seller_sku !== product.sku && (
-                    <>
-                      <label className="text-sm font-medium text-muted-foreground">SKU Original ML</label>
-                      <p className="text-sm text-muted-foreground">{product.ml_seller_sku}</p>
-                    </>
+                  {product.source === 'mercado_livre' ? (
+                    product.ml_seller_sku ? (
+                      <div className="flex items-center gap-2">
+                        <p>{product.ml_seller_sku}</p>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="outline">SKU Original ML</Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              SKU definido originalmente no Mercado Livre
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    ) : (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-muted-foreground">—</span>
+                          </TooltipTrigger>
+                          <TooltipContent>Defina o SKU no ML</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )
+                  ) : (
+                    <p>
+                      {product.sku || (
+                        <span className="text-muted-foreground">Não informado</span>
+                      )}
+                    </p>
                   )}
                 </div>
               </div>
