@@ -78,14 +78,22 @@ export function MLImageUploadModal({
           // Upload para Supabase Storage
           const fileName = `${productId}/${Date.now()}-${image.file.name}`;
           const { error } = await supabase.storage
-            .from('product-images')
+            .from('product_images')
             .upload(fileName, image.file);
 
           if (error) throw error;
 
+          if (tenantId) {
+            await supabase
+              .from('storage.objects')
+              .update({ owner: tenantId })
+              .eq('bucket_id', 'product_images')
+              .eq('name', fileName);
+          }
+
           // Obter URL pública
           const { data: { publicUrl } } = supabase.storage
-            .from('product-images')
+            .from('product_images')
             .getPublicUrl(fileName);
 
           // Salvar referência no banco
@@ -130,7 +138,7 @@ export function MLImageUploadModal({
       await Promise.allSettled(uploadPromises);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['product-images', tenantId, productId] });
+      queryClient.invalidateQueries({ queryKey: ['product_images', tenantId, productId] });
       toast({
         title: "Imagens carregadas",
         description: "Imagens do produto salvas com sucesso.",
