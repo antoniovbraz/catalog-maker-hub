@@ -23,27 +23,6 @@ WITH CHECK (
   OR get_current_user_role() = 'super_admin'::user_role
 );
 
--- ml_integration_status
-DROP POLICY IF EXISTS "Users can view own tenant ML integration status" ON public.ml_integration_status;
-DROP POLICY IF EXISTS "Users can manage own tenant ML integration status" ON public.ml_integration_status;
-
-CREATE POLICY "Users can view own tenant ML integration status"
-ON public.ml_integration_status
-FOR SELECT
-USING (
-  tenant_id = (auth.jwt()->>'tenant_id')::uuid
-);
-
-CREATE POLICY "Users can manage own tenant ML integration status"
-ON public.ml_integration_status
-FOR INSERT, UPDATE, DELETE
-USING (
-  tenant_id = (auth.jwt()->>'tenant_id')::uuid
-)
-WITH CHECK (
-  tenant_id = (auth.jwt()->>'tenant_id')::uuid
-);
-
 -- product_images
 DROP POLICY IF EXISTS "Users can access own tenant product images" ON public.product_images;
 
