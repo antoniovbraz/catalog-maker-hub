@@ -16,7 +16,7 @@ export function useProductImages(productId: string) {
   const { profile } = useAuth();
   const tenantId = profile?.tenant_id;
   return useQuery<ProductImage[]>({
-    queryKey: ['product-images', tenantId, productId],
+    queryKey: ['product_images', tenantId, productId],
     queryFn: async () => {
       if (!productId) return [];
       

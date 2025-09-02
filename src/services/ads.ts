@@ -49,7 +49,7 @@ export class AdsService extends BaseService<ProductImage> {
 
       // Upload do arquivo para o Storage
       const { error: uploadError } = await supabase.storage
-        .from('product-images')
+        .from('product_images')
         .upload(filePath, file);
 
       if (uploadError) {
@@ -57,9 +57,15 @@ export class AdsService extends BaseService<ProductImage> {
         throw new Error(`Erro no upload: ${uploadError.message}`);
       }
 
+      await supabase
+        .from('storage.objects')
+        .update({ owner: tenantId })
+        .eq('bucket_id', 'product_images')
+        .eq('name', filePath);
+
       // Obter URL pública da imagem
       const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
+        .from('product_images')
         .getPublicUrl(filePath);
 
       // Salvar referência no banco (tenant_id será adicionado automaticamente pelo BaseService)
@@ -90,11 +96,11 @@ export class AdsService extends BaseService<ProductImage> {
 
       // Extrair caminho do arquivo da URL (agora no formato tenant_id/product_id/arquivo)
       const url = new URL(image.image_url);
-      const filePath = url.pathname.split('/product-images/')[1];
+      const filePath = url.pathname.split('/product_images/')[1];
 
       // Deletar arquivo do Storage
       const { error: storageError } = await supabase.storage
-        .from('product-images')
+        .from('product_images')
         .remove([filePath]);
 
       if (storageError) {
