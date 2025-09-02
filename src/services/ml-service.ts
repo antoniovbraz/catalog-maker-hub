@@ -1,5 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { callMLFunction } from '@/utils/ml/ml-api';
+import {
+  mlAdvancedSettingsSchema,
+  type MLAdvancedSettings,
+} from '@/types/ml/advanced-settings';
 
 // ==================== TIPOS ====================
 
@@ -58,20 +62,6 @@ export interface MLPerformanceMetrics {
   average_response_time: number;
   success_rate: number;
   operations_by_type: Record<string, number>;
-}
-
-export interface MLAdvancedSettings {
-  id: string;
-  tenant_id: string;
-  feature_flags: Record<string, boolean>;
-  rate_limits: Record<string, number>;
-  auto_recovery_enabled: boolean;
-  advanced_monitoring: boolean;
-  multi_account_enabled: boolean;
-  backup_schedule: string;
-  security_level: string;
-  created_at: string;
-  updated_at: string;
 }
 
 // ==================== SERVIÇO PRINCIPAL ====================
@@ -241,7 +231,7 @@ export class MLService {
       throw new Error(error.message || 'Failed to get advanced settings');
     }
 
-    return data;
+    return mlAdvancedSettingsSchema.parse(data);
   }
 
   static async updateAdvancedSettings(settings: Partial<MLAdvancedSettings>): Promise<MLAdvancedSettings> {
@@ -253,7 +243,7 @@ export class MLService {
       throw new Error(error.message || 'Failed to update advanced settings');
     }
 
-    return data;
+    return mlAdvancedSettingsSchema.partial().parse(data);
   }
 
   // ====== MÉTRICAS E PERFORMANCE ======
