@@ -179,6 +179,8 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
 
   const isLoading = createMutation.isPending || updateMutation.isPending;
   const custoTotal = formData.cost_unit + formData.packaging_cost;
+  const isMLProduct =
+    product?.source === "mercado_livre" || product?.origin === "mercado_livre";
 
   return (
     <div className="space-y-6">
@@ -345,19 +347,30 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
         onToggle={optionalFields.toggle}
       >
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="sku" className="text-sm font-medium">
-              SKU
-            </Label>
-            <Input
-              id="sku"
-              value={formData.sku}
-              onChange={(e) => handleInputChange("sku", e.target.value)}
-              placeholder="Ex: SM-G991B"
-              className="mt-1"
-              disabled={isLoading}
-            />
-          </div>
+          {isMLProduct ? (
+            <div>
+              <Label htmlFor="sku" className="text-sm font-medium">
+                SKU
+              </Label>
+              <p className="mt-1 text-sm text-muted-foreground">
+                SKU deve ser definido no Mercado Livre.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <Label htmlFor="sku" className="text-sm font-medium">
+                SKU
+              </Label>
+              <Input
+                id="sku"
+                value={formData.sku}
+                onChange={(e) => handleInputChange("sku", e.target.value)}
+                placeholder="Ex: SM-G991B"
+                className="mt-1"
+                disabled={isLoading}
+              />
+            </div>
+          )}
           <div>
             <Label htmlFor="description" className="text-sm font-medium">
               Descrição
