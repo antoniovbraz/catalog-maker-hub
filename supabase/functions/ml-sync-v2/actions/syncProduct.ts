@@ -118,12 +118,14 @@ export async function syncSingleProduct(
             }
 
             let sku = product.sku;
+            let skuSource = product.sku_source;
             if (!sku) {
-              sku =
-                itemData.seller_sku ||
-                itemData.variations?.[0]?.seller_sku ||
-                itemData.variations?.[0]?.id ||
-                itemData.id;
+              const mlSku =
+                itemData.seller_custom_field ||
+                itemData.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
+                null;
+              sku = mlSku;
+              skuSource = mlSku ? 'mercado_livre' : 'none';
             }
 
             const costUnit =
@@ -135,7 +137,12 @@ export async function syncSingleProduct(
               updated_at: new Date().toISOString(),
             };
             if (!product.description) updates.description = description;
-            if (!product.sku) updates.sku = sku;
+            if (!product.sku) {
+              updates.sku = sku;
+              updates.sku_source = skuSource;
+              updates.ml_seller_sku = sku;
+              updates.updated_from_ml_at = new Date().toISOString();
+            }
             if (product.cost_unit === null || product.cost_unit === undefined)
               updates.cost_unit = costUnit;
 

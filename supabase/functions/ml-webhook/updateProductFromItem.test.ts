@@ -53,7 +53,7 @@ describe('updateProductFromItem', () => {
   it('updates product fields from item data', async () => {
     const itemData = {
       id: 'ML1',
-      seller_sku: 'SKU1',
+      seller_custom_field: 'SCF1',
       attributes: [],
       pictures: [{ url: 'pic1' }],
       available_quantity: 3,
@@ -74,7 +74,7 @@ describe('updateProductFromItem', () => {
 
     const itemData = {
       id: 'ML2',
-      seller_sku: 'SKU2',
+      seller_custom_field: 'SCF2',
       attributes: [],
       pictures: [{ url: 'pic2' }],
       available_quantity: 5,
@@ -85,5 +85,21 @@ describe('updateProductFromItem', () => {
     const updateArg = productsQuery.update.mock.calls[0][0];
     expect(updateArg).not.toHaveProperty('description');
     expect(fields).toEqual(['sku', 'attributes', 'pictures', 'stock']);
+  });
+
+  it('sets sku to null when ML does not provide', async () => {
+    const itemData = {
+      id: 'ML3',
+      attributes: [],
+      pictures: [],
+      available_quantity: 1,
+    };
+
+    await updateProductFromItem(supabase, 'tenant1', itemData, 'token');
+
+    const updateArg = productsQuery.update.mock.calls[0][0];
+    expect(updateArg.sku).toBeNull();
+    expect(updateArg.sku_source).toBe('none');
+    expect(updateArg).toHaveProperty('updated_from_ml_at');
   });
 });
