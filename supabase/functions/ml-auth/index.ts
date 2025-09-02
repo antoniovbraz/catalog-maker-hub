@@ -349,7 +349,7 @@ serve(async (req) => {
       case 'refresh_token': {
         // Get current token
         const { data: currentToken, error: tokenError } = await supabase
-          .from('ml_auth_tokens')
+          .from('ml_auth_tokens_decrypted')
           .select('*')
           .eq('tenant_id', tenantId)
           .single();
@@ -439,7 +439,7 @@ serve(async (req) => {
       case 'get_status': {
         // Get current auth status
         const { data: token, error: tokenError } = await supabase
-          .from('ml_auth_tokens')
+          .from('ml_auth_tokens_decrypted')
           .select('*')
           .eq('tenant_id', tenantId)
           .single();

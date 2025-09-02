@@ -20,8 +20,8 @@ Armazena tokens de acesso do Mercado Livre.
 CREATE TABLE ml_auth_tokens (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL,
-  access_token TEXT NOT NULL,
-  refresh_token TEXT,
+  access_token TEXT NOT NULL, -- stored encrypted with pgp_sym_encrypt
+  refresh_token TEXT, -- stored encrypted with pgp_sym_encrypt
   token_type TEXT DEFAULT 'Bearer',
   expires_at TIMESTAMPTZ NOT NULL,
   scope TEXT,
@@ -30,6 +30,8 @@ CREATE TABLE ml_auth_tokens (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 ```
+
+Os tokens são criptografados utilizando `pgp_sym_encrypt` e expostos através da view `ml_auth_tokens_decrypted`.
 
 **RLS Policy:** Usuários acessam apenas tokens do próprio tenant.
 

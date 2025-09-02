@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Shared ML Service Layer - Implementa princípios SOLID e DRY
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -58,7 +59,7 @@ export class MLService {
   // Buscar token ML ativo para tenant
   async getMLToken(tenantId: string): Promise<string | null> {
     const { data: tokenData, error } = await this.supabase
-      .from('ml_auth_tokens')
+      .from('ml_auth_tokens_decrypted')
       .select('access_token, expires_at')
       .eq('tenant_id', tenantId)
       .gt('expires_at', new Date().toISOString())

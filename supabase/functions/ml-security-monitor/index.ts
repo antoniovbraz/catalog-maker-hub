@@ -61,7 +61,7 @@ serve(async (req) => {
 
     // 2. Check for tokens about to expire without refresh
     const { data: expiringTokens } = await supabase
-      .from('ml_auth_tokens')
+      .from('ml_auth_tokens_decrypted')
       .select('tenant_id, expires_at, user_id_ml')
       .lt('expires_at', new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()) // Expires in 2h
       .gt('expires_at', new Date().toISOString()); // Not already expired

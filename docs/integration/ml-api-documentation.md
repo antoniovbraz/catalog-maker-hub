@@ -226,7 +226,7 @@ SELECT
   expires_at,
   expires_at > now() as is_valid,
   user_id_ml
-FROM ml_auth_tokens;
+FROM ml_auth_tokens_decrypted;
 
 -- Logs de sincronização recentes
 SELECT 

@@ -72,7 +72,7 @@ serve(async (req) => {
     }
 
     const { data: authToken, error: authError } = await supabase
-      .from('ml_auth_tokens')
+      .from('ml_auth_tokens_decrypted')
       .select('*')
       .eq('tenant_id', tenantId)
       .single();

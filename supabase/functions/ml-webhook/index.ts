@@ -111,7 +111,7 @@ async function processOrderWebhook(
   try {
     // Get ML auth token for this tenant
     const { data: authToken, error: authError } = await supabase
-      .from('ml_auth_tokens')
+      .from('ml_auth_tokens_decrypted')
       .select('access_token')
       .eq('tenant_id', tenantId)
       .single();
@@ -170,7 +170,7 @@ async function processItemWebhook(
   try {
     // Get ML auth token
     const { data: authToken, error: authError } = await supabase
-      .from('ml_auth_tokens')
+      .from('ml_auth_tokens_decrypted')
       .select('access_token')
       .eq('tenant_id', tenantId)
       .single();
