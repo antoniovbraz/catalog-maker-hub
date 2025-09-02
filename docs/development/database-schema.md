@@ -56,6 +56,21 @@ CREATE TABLE ml_applications (
 
 ### Sincronização de Produtos
 
+#### Campos adicionais em `products`
+Campos de apoio à importação do Mercado Livre.
+
+```sql
+ALTER TABLE products
+  ADD COLUMN sku_source TEXT DEFAULT 'none',
+  ADD COLUMN ml_item_id TEXT,
+  ADD COLUMN category_ml_id TEXT,
+  ADD COLUMN category_ml_path JSONB DEFAULT '[]',
+  ADD COLUMN updated_from_ml_at TIMESTAMPTZ;
+
+CREATE UNIQUE INDEX idx_products_tenant_ml_item_id
+  ON products(tenant_id, ml_item_id);
+```
+
 #### `ml_product_mapping`
 Mapeia produtos locais para anúncios ML.
 

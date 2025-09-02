@@ -218,6 +218,7 @@ export async function importFromML(
 
         // Capturar SKU fornecido pelo ML
         const mlSku =
+          itemDetail.seller_sku ||
           itemDetail.seller_custom_field ||
           attributes.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
           null;
