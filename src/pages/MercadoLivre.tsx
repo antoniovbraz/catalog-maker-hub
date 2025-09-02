@@ -14,11 +14,14 @@ import { MLSyncStatus } from "@/components/ml/MLSyncStatus";
 import { MLAnalyticsCard } from "@/components/ml/MLAnalyticsCard";
 import { MLProductList } from "@/components/ml/MLProductList";
 import { MLMultiAccountManager } from "@/components/ml/MLMultiAccountManager";
-import { useMLIntegration } from "@/hooks/useMLIntegration";
+import { useMLIntegration, ML_QUERY_KEYS } from "@/hooks/useMLIntegration";
 import { useMLCleanup } from "@/hooks/useMLCleanup";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { useToast } from "@/hooks/use-toast";
 import { MLSyncSettingsModal } from "@/components/forms/MLSyncSettingsModal";
+import { useQueryClient } from "@tanstack/react-query";
+import { MLService } from "@/services/ml-service";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MercadoLivre = () => {
   const { auth } = useMLIntegration();
@@ -27,9 +30,23 @@ const MercadoLivre = () => {
   const [activeTab, setActiveTab] = useState("connection");
   const { showFormModal } = useGlobalModal();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { profile } = useAuth();
   
   // Ativar limpeza automática de dados temporários ML
   useMLCleanup();
+
+  // Prefetch products when entering route
+  useEffect(() => {
+    if (profile?.tenant_id) {
+      queryClient.prefetchInfiniteQuery({
+        queryKey: ML_QUERY_KEYS.products(profile.tenant_id),
+        queryFn: () => MLService.getMLProducts(),
+        initialPageParam: 0,
+        getNextPageParam: () => undefined,
+      });
+    }
+  }, [profile?.tenant_id, queryClient]);
 
   // Handle callback success/error messages
   useEffect(() => {
@@ -171,14 +188,14 @@ const MercadoLivre = () => {
               <MLStatusOverview />
 
               {/* Health and Status Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <MLHealthStatus />
                 <MLNotificationCenter />
                 <MLSyncStatus />
               </div>
 
               {/* Analytics and Management Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <MLAnalyticsCard />
                 <MLMultiAccountManager />
               </div>

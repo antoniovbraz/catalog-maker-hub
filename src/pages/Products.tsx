@@ -22,7 +22,8 @@ import { ptBR } from "date-fns/locale";
 
 export default function Products() {
   const { data: products = [], isLoading } = useProductsWithCategories();
-  const { data: mlProducts = [] } = useMLProducts();
+  const { data: mlProductsData } = useMLProducts();
+  const mlProducts = mlProductsData?.pages.flat() ?? [];
   const { sync, syncStatusQuery } = useMLIntegration();
   const { importFromML } = sync;
   const { resyncProduct } = useMLProductResync();
@@ -289,16 +290,16 @@ export default function Products() {
       actions={headerActions}
     >
       <div className="space-y-4 xl:col-span-12">
-        {syncStatusQuery.data && (
+        {syncStatusQuery.data?.pages[0] && (
           <div className="rounded-md border p-4 text-sm">
             <p>
               Última sincronização:{" "}
-              {syncStatusQuery.data.last_sync ?
-                formatDistanceToNow(new Date(syncStatusQuery.data.last_sync), { addSuffix: true, locale: ptBR }) :
+              {syncStatusQuery.data.pages[0].last_sync ?
+                formatDistanceToNow(new Date(syncStatusQuery.data.pages[0].last_sync), { addSuffix: true, locale: ptBR }) :
                 'Nunca'}
             </p>
             <p className="text-muted-foreground">
-              Sucessos 24h: {syncStatusQuery.data.successful_24h} • Falhas 24h: {syncStatusQuery.data.failed_24h}
+              Sucessos 24h: {syncStatusQuery.data.pages[0].successful_24h} • Falhas 24h: {syncStatusQuery.data.pages[0].failed_24h}
             </p>
           </div>
         )}

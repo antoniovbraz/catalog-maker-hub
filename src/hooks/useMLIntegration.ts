@@ -1,5 +1,5 @@
 // Hook centralizado para integração ML - implementa princípios SOLID e DRY
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { MLService, MLBatchSyncResult } from '@/services/ml-service';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,10 +40,12 @@ export function useMLIntegration() {
   });
 
   // Status de sincronização
-  const syncStatusQuery = useQuery({
+  const syncStatusQuery = useInfiniteQuery({
     queryKey: ML_QUERY_KEYS.syncStatus(tenantId),
-    queryFn: MLService.getSyncStatus,
+    queryFn: () => MLService.getSyncStatus(),
     enabled: (!!tenantId && authQuery.data?.isConnected) || false,
+    initialPageParam: 0,
+    getNextPageParam: () => undefined,
     staleTime: 30 * 1000, // 30 segundos
   });
 
@@ -74,7 +76,7 @@ export function useMLIntegration() {
   const hasError = authQuery.isError || syncStatusQuery.isError;
   const authData = authQuery.data;
   const syncActions = useMLSyncActions();
-  const syncData = syncStatusQuery.data;
+  const syncData = syncStatusQuery.data?.pages[0];
   const performanceData = performanceQuery.data;
   const settingsData = advancedSettingsQuery.data;
 
