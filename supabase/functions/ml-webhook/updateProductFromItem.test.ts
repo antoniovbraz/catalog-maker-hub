@@ -29,7 +29,7 @@ describe('updateProductFromItem', () => {
     vi.resetAllMocks();
     mappingQuery.select.mockReturnValue(mappingQuery);
     mappingQuery.eq.mockReturnValue(mappingQuery);
-    mappingQuery.single.mockResolvedValue({ data: { product_id: 'prod-1' }, error: null });
+    mappingQuery.single.mockResolvedValue({ data: { product_id: 'prod-1', ml_variation_id: 'VAR1' }, error: null });
     eqCall = 0;
     productsQuery.update.mockReturnValue(productsQuery);
     productsQuery.eq.mockImplementation(() => {
@@ -61,7 +61,7 @@ describe('updateProductFromItem', () => {
 
     const fields = await updateProductFromItem(supabase, 'tenant1', itemData, 'token');
 
-    expect(mappingQuery.select).toHaveBeenCalledWith('product_id');
+    expect(mappingQuery.select).toHaveBeenCalledWith('product_id, ml_variation_id');
     expect(productsQuery.update).toHaveBeenCalled();
     expect(productsQuery.eq).toHaveBeenCalledWith('id', 'prod-1');
     expect(productsQuery.eq).toHaveBeenCalledWith('tenant_id', 'tenant1');
@@ -101,5 +101,26 @@ describe('updateProductFromItem', () => {
     expect(updateArg.sku).toBeNull();
     expect(updateArg.sku_source).toBe('none');
     expect(updateArg).toHaveProperty('updated_from_ml_at');
+  });
+
+  it('uses variation seller_sku when item-level sku missing', async () => {
+    mappingQuery.single.mockResolvedValueOnce({
+      data: { product_id: 'prod-2', ml_variation_id: 'VAR2' },
+      error: null,
+    });
+    const itemData = {
+      id: 'ML4',
+      attributes: [],
+      pictures: [],
+      available_quantity: 1,
+      variations: [{ id: 'VAR2', seller_sku: 'VSKU2' }],
+    };
+
+    await updateProductFromItem(supabase, 'tenant1', itemData, 'token');
+
+    const updateArg = productsQuery.update.mock.calls[0][0];
+    expect(updateArg.sku).toBe('VSKU2');
+    expect(updateArg.sku_source).toBe('mercado_livre');
+    expect(updateArg.ml_variation_id).toBe('VAR2');
   });
 });
