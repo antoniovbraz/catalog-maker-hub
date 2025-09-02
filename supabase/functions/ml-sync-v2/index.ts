@@ -6,6 +6,7 @@ import {
   corsHeaders,
   errorResponse,
 } from './types.ts';
+import { mlSyncRequestSchema } from '../shared/schemas.ts';
 import { getStatus } from './actions/getStatus.ts';
 import { syncProduct } from './actions/syncProduct.ts';
 import { syncBatch } from './actions/syncBatch.ts';
@@ -15,8 +16,8 @@ import { getProducts } from './actions/getProducts.ts';
 import { createAd } from './actions/createAd.ts';
 import { resyncProduct } from './actions/resyncProduct.ts';
 
-type Handler = (req: any, ctx: ActionContext) => Promise<Response>;
-const actions: Record<string, Handler> = {
+type Handler = (req: SyncRequest, ctx: ActionContext) => Promise<Response>;
+const actions: Record<SyncRequest['action'], Handler> = {
   get_status: getStatus,
   sync_product: syncProduct,
   sync_batch: syncBatch,
@@ -63,10 +64,11 @@ serve(async (req) => {
     let body: SyncRequest;
     try {
       const bodyText = await req.text();
-      body = bodyText ? JSON.parse(bodyText) : ({ action: 'get_status' } as SyncRequest);
+      const json = bodyText ? JSON.parse(bodyText) : {};
+      body = mlSyncRequestSchema.parse(json) as SyncRequest;
     } catch (error) {
       console.error('Error parsing request body:', error);
-      body = { action: 'get_status' } as SyncRequest;
+      body = mlSyncRequestSchema.parse({ action: 'get_status' });
     }
 
     const { data: authToken, error: authError } = await supabase
@@ -95,7 +97,7 @@ serve(async (req) => {
       return errorResponse('Invalid action', 400);
     }
 
-    return await handler(body as any, context);
+    return await handler(body, context);
   } catch (error) {
     console.error('ML Sync Error:', error);
     return new Response(JSON.stringify({ error: (error as Error).message }), {

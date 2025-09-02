@@ -1,17 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { mlAuthSchema } from '../shared/schemas.ts';
+import type { z } from 'zod';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-interface AuthRequest {
-  action: 'start_auth' | 'handle_callback' | 'refresh_token' | 'get_status';
-  code?: string;
-  state?: string;
-  tenant_id?: string;
-}
 
 // PKCE Helper Functions - Compatível com Deno
 async function generateRandomString(length: number): Promise<string> {
@@ -96,13 +91,14 @@ serve(async (req) => {
     console.log('Successfully retrieved tenant_id:', tenantId);
 
     // Tentar ler body JSON, mas permitir se estiver vazio
-    let body: AuthRequest;
+    let body: z.infer<typeof mlAuthSchema>;
     try {
       const bodyText = await req.text();
-      body = bodyText ? JSON.parse(bodyText) : { action: 'get_status' };
+      const json = bodyText ? JSON.parse(bodyText) : {};
+      body = mlAuthSchema.parse(json);
     } catch (error) {
       console.error('Error parsing request body:', error);
-      body = { action: 'get_status' };
+      body = mlAuthSchema.parse({});
     }
 
     switch (body.action) {

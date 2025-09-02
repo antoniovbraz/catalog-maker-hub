@@ -1,19 +1,11 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { generateAdSchema } from '../shared/schemas.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-interface GenerateAdRequest {
-  assistant_id: string;
-  product_info: string;
-  marketplace: string;
-  image_urls: string[];
-  custom_prompt?: string;
-  description_only?: boolean;
-}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -28,7 +20,14 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { assistant_id, product_info, marketplace, image_urls, custom_prompt, description_only }: GenerateAdRequest = await req.json();
+    const {
+      assistant_id,
+      product_info,
+      marketplace,
+      image_urls,
+      custom_prompt,
+      description_only,
+    } = generateAdSchema.parse(await req.json());
 
     console.log('Iniciando geração de anúncio', { assistant_id, marketplace, description_only });
 
