@@ -56,6 +56,12 @@ export const productSchema = z.object({
   category_ml_id: z.string().optional(),
   category_ml_path: z.string().optional(),
   updated_from_ml_at: z.string().optional(),
-});
+
+// Derive sku_source = 'internal' when a manual SKU is provided
+}).transform((data) => ({
+  ...data,
+  sku_source: data.sku ? 'internal' : data.sku_source,
+}));
 
 export type ProductFormData = z.infer<typeof productSchema>;
+
