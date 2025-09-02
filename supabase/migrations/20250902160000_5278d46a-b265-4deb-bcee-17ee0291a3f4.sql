@@ -12,6 +12,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_products_account_ml
 ON public.products (tenant_id, ml_item_id)
 WHERE origin = 'mercado_livre';
 
+-- Backfill sku_source for existing manual SKUs
+UPDATE public.products
+SET sku_source = 'internal'
+WHERE sku IS NOT NULL AND (sku_source IS NULL OR sku_source = 'none');
+
 -- Trigger to enforce SKU integrity
 CREATE OR REPLACE FUNCTION public.enforce_ml_sku_integrity()
 RETURNS trigger AS $$

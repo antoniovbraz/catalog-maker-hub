@@ -54,7 +54,8 @@ describe('Zod schema contract tests', () => {
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
     };
-    expect(() => productSchema.parse(data)).not.toThrow();
+    const parsed = productSchema.parse(data);
+    expect(parsed.sku_source).toBe('internal');
   });
 
   it('parses commission response', () => {
