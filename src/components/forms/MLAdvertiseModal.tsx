@@ -9,9 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Package, DollarSign, Tag, Info } from "@/components/ui/icons";
+import { AlertCircle, Package, Tag, Info } from "@/components/ui/icons";
 import type { ProductWithCategory } from "@/types/products";
 import { formatarMoeda } from "@/utils/pricing";
 import { cn } from "@/lib/utils";
@@ -112,13 +111,10 @@ export function MLAdvertiseModal({ product, onSuccess, onSubmitForm }: MLAdverti
 
     setIsLoading(true);
     try {
-      // Usar novo hook de sync
-      const { useMLSync } = await import("@/hooks/useMLIntegration");
+      await import("@/hooks/useMLIntegration");
       // TODO: Implementar integração real com createAd
       console.log('Creating ML ad:', { product_id: product.id, ...formData });
       onSuccess();
-    } catch (error) {
-      throw error;
     } finally {
       setIsLoading(false);
     }

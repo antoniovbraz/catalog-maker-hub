@@ -7,11 +7,11 @@ vi.mock('@/hooks/useMLProducts', () => ({
 }));
 
 vi.mock('@/hooks/useMLIntegration', () => ({
-  useMLSync: vi.fn(),
+  useMLIntegration: vi.fn(),
 }));
 
 import { useMLProducts } from '@/hooks/useMLProducts';
-import { useMLSync } from '@/hooks/useMLIntegration';
+import { useMLIntegration } from '@/hooks/useMLIntegration';
 
 describe('MLProductList', () => {
   it('should call sync even when required fields are missing', () => {
@@ -26,10 +26,12 @@ describe('MLProductList', () => {
       ],
       isLoading: false,
     });
-    (useMLSync as Mock).mockReturnValue({
-      syncProduct: { mutate: syncMutate, isPending: false },
-      syncBatch: { mutate: vi.fn(), isPending: false },
-      importFromML: { mutate: vi.fn(), isPending: false },
+    (useMLIntegration as Mock).mockReturnValue({
+      sync: {
+        syncProduct: { mutate: syncMutate, isPending: false },
+        syncBatch: { mutate: vi.fn(), isPending: false },
+        importFromML: { mutate: vi.fn(), isPending: false },
+      },
     });
 
     render(<MLProductList />);
@@ -57,10 +59,12 @@ describe('MLProductList', () => {
       ],
       isLoading: false,
     });
-    (useMLSync as Mock).mockReturnValue({
-      syncProduct: { mutate: syncMutate, isPending: false },
-      syncBatch: { mutate: vi.fn(), isPending: false },
-      importFromML: { mutate: vi.fn(), isPending: false },
+    (useMLIntegration as Mock).mockReturnValue({
+      sync: {
+        syncProduct: { mutate: syncMutate, isPending: false },
+        syncBatch: { mutate: vi.fn(), isPending: false },
+        importFromML: { mutate: vi.fn(), isPending: false },
+      },
     });
 
     render(<MLProductList />);
@@ -84,10 +88,12 @@ describe('MLProductList', () => {
       ],
       isLoading: false,
     });
-    (useMLSync as Mock).mockReturnValue({
-      syncProduct: { mutate: vi.fn(), isPending: false },
-      syncBatch: { mutate: vi.fn(), isPending: false },
-      importFromML: { mutate: importMutate, isPending: false },
+    (useMLIntegration as Mock).mockReturnValue({
+      sync: {
+        syncProduct: { mutate: vi.fn(), isPending: false },
+        syncBatch: { mutate: vi.fn(), isPending: false },
+        importFromML: { mutate: importMutate, isPending: false },
+      },
     });
 
     render(<MLProductList />);

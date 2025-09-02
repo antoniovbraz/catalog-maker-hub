@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useMLSync } from "@/hooks/useMLIntegration";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatDistanceToNow } from "date-fns";
@@ -14,7 +14,8 @@ import { useState } from "react";
 
 export function MLProductList() {
   const { data: products = [], isLoading } = useMLProducts();
-  const { syncProduct, syncBatch, importFromML } = useMLSync();
+  const { sync } = useMLIntegration();
+  const { syncProduct, syncBatch, importFromML } = sync;
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
