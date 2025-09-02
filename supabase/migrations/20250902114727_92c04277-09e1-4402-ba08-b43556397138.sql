@@ -23,13 +23,13 @@ USING (
   bucket_id = 'product_images'
   AND (
     owner = auth.uid()
-    OR owner = auth.jwt()->>'tenant_id'
+    OR owner = (auth.jwt()->>'tenant_id')::uuid
   )
 )
 WITH CHECK (
   bucket_id = 'product_images'
   AND (
     owner = auth.uid()
-    OR owner = auth.jwt()->>'tenant_id'
+    OR owner = (auth.jwt()->>'tenant_id')::uuid
   )
 );
