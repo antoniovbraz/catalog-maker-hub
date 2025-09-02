@@ -15,6 +15,7 @@ export const ML_QUERY_KEYS = {
   performanceMetrics: (tenantId: string | undefined, days: number) => ['ml', tenantId, 'performance', days] as const,
   advancedSettings: (tenantId?: string) => ['ml', tenantId, 'settings', 'advanced'] as const,
   integrationHealth: (tenantId?: string) => ['ml', tenantId, 'health'] as const,
+  writeEnabled: () => ['ml', 'writeEnabled'] as const,
 } as const;
 
 // ====== HOOK PRINCIPAL ======
@@ -57,6 +58,17 @@ export function useMLIntegration() {
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
+  const writeEnabledQuery = useQuery({
+    queryKey: ML_QUERY_KEYS.writeEnabled(),
+    queryFn: async () => {
+      const res = await fetch('/api/ml/write-enabled');
+      if (!res.ok) throw new Error('Failed to fetch write flag');
+      const data = await res.json();
+      return data.enabled as boolean;
+    },
+    staleTime: 60 * 1000,
+  });
+
   // Configurações avançadas
   const advancedSettingsQuery = useQuery({
     queryKey: ML_QUERY_KEYS.advancedSettings(tenantId),
@@ -79,6 +91,7 @@ export function useMLIntegration() {
   const syncData = syncStatusQuery.data?.pages[0];
   const performanceData = performanceQuery.data;
   const settingsData = advancedSettingsQuery.data;
+  const writeEnabled = writeEnabledQuery.data ?? false;
 
   return {
     // Estados
@@ -94,12 +107,14 @@ export function useMLIntegration() {
     },
     performance: performanceData,
     settings: settingsData,
+    writeEnabled,
 
     // Queries individuais (para loading states específicos)
     authQuery,
     syncStatusQuery,
     performanceQuery,
     advancedSettingsQuery,
+    writeEnabledQuery,
 
     // Utilitários
     invalidateAllQueries,

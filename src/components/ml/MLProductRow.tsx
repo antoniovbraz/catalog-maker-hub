@@ -16,6 +16,7 @@ interface MLProductRowProps {
   onSync: (productId: string) => void;
   isProcessing: boolean;
   isLoading: boolean;
+  writeEnabled: boolean;
 }
 
 function MLProductRowComponent({
@@ -25,6 +26,7 @@ function MLProductRowComponent({
   onSync,
   isProcessing,
   isLoading,
+  writeEnabled,
 }: MLProductRowProps) {
   const handleSelectChange = useCallback(
     (checked: boolean) => {
@@ -92,26 +94,28 @@ function MLProductRowComponent({
       </TableCell>
       <TableCell>
         <div className="flex gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSyncClick}
-                  disabled={isProcessing}
-                  aria-label="Enviar ao Mercado Livre"
-                >
-                  {isLoading ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="size-4" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Enviar ao Mercado Livre</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {writeEnabled && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSyncClick}
+                    disabled={isProcessing}
+                    aria-label="Enviar ao Mercado Livre"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="size-4" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Enviar ao Mercado Livre</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </TableCell>
     </TableRow>

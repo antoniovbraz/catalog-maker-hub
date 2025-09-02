@@ -34,6 +34,7 @@ describe('MLProductList', () => {
         syncBatch: { mutate: vi.fn(), isPending: false },
         importFromML: { mutate: vi.fn(), isPending: false },
       },
+      writeEnabled: true,
     });
 
     render(<MLProductList />);
@@ -69,6 +70,7 @@ describe('MLProductList', () => {
         syncBatch: { mutate: vi.fn(), isPending: false },
         importFromML: { mutate: vi.fn(), isPending: false },
       },
+      writeEnabled: true,
     });
 
     render(<MLProductList />);
@@ -100,6 +102,7 @@ describe('MLProductList', () => {
         syncBatch: { mutate: vi.fn(), isPending: false },
         importFromML: { mutate: importMutate, isPending: false },
       },
+      writeEnabled: true,
     });
 
     render(<MLProductList />);
