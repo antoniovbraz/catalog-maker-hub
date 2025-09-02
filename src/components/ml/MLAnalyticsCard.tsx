@@ -10,7 +10,7 @@ export function MLAnalyticsCard() {
   const { auth, authQuery } = useMLIntegration();
   const authStatus = auth;
   const authLoading = authQuery.isLoading;
-  const { data: metrics, isLoading: metricsLoading } = useMLPerformanceMetrics(7);
+  const { data: metrics } = useMLPerformanceMetrics(7);
   const backupMutation = useMLBackup();
 
   if (!authStatus?.isConnected || authLoading) {

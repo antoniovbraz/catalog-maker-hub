@@ -1,5 +1,19 @@
 import { ActionContext, GetProductsRequest, errorResponse, corsHeaders } from '../types.ts';
 
+interface ProductMapping {
+  products: {
+    id: string;
+    name: string;
+    sku: string;
+    source: string;
+  };
+  sync_status: string | null;
+  ml_item_id: string | null;
+  last_sync_at: string | null;
+  ml_title: string | null;
+  ml_permalink: string | null;
+}
+
 export async function getProducts(
   _req: GetProductsRequest,
   { supabase, tenantId }: ActionContext
@@ -28,7 +42,7 @@ export async function getProducts(
     return errorResponse('Failed to get ML products', 500);
   }
 
-  const transformedProducts = (mlProducts || []).map((mapping: any) => ({
+  const transformedProducts = (mlProducts || []).map((mapping: ProductMapping) => ({
     id: mapping.products.id,
     name: mapping.products.name,
     sku: mapping.products.sku,

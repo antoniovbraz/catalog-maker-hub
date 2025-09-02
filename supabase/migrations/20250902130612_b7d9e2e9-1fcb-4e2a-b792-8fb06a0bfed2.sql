@@ -27,6 +27,23 @@ CREATE TRIGGER encrypt_ml_tokens_trigger
 BEFORE INSERT OR UPDATE ON public.ml_auth_tokens
 FOR EACH ROW EXECUTE FUNCTION public.encrypt_ml_tokens();
 
+-- Backfill existing tokens so the decrypting view won't fail
+DO $$
+DECLARE
+  secret_key text := current_setting('app.ml_encryption_key', true);
+BEGIN
+  IF secret_key IS NULL THEN
+    secret_key := 'changeme';
+  END IF;
+
+  UPDATE public.ml_auth_tokens
+  SET
+    access_token = encode(pgp_sym_encrypt(access_token, secret_key), 'base64'),
+    refresh_token = encode(pgp_sym_encrypt(refresh_token, secret_key), 'base64')
+  WHERE access_token IS NOT NULL OR refresh_token IS NOT NULL;
+END;
+$$;
+
 -- View with decrypted tokens
 CREATE OR REPLACE VIEW public.ml_auth_tokens_decrypted AS
 SELECT
@@ -50,7 +67,10 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url:='https://ngkhzbzynkhgezkqykeb.supabase.co/functions/v1/ml-token-renewal',
-    headers:='{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5na2h6Ynp5bmtoZ2V6a3F5a2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQwMDM3ODgsImV4cCI6MjA2OTU3OTc4OH0.EMk6edTPpwvcy_6VVDxARgoRsJrY9EiijbfR4dFDQAQ"}'::jsonb,
+    headers:=jsonb_build_object(
+      'Content-Type','application/json',
+      'Authorization', 'Bearer ' || coalesce(current_setting('app.ml_service_role_key', true), '')
+    ),
     body:=jsonb_build_object('triggered_at', now())
   );
   $$
