@@ -10,6 +10,41 @@ interface MLAttribute {
   value_name?: string;
 }
 
+export function parseWeight(valueName: string = ''): { value: number; unit: string } {
+  const normalized = valueName.replace(',', '.').trim();
+  const match = normalized.match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]*)$/);
+  const value = match ? parseFloat(match[1]) : 0;
+  const unit = match && match[2] ? match[2].toLowerCase() : 'g';
+  return { value, unit };
+}
+
+export function weightToGrams(value: number, unit: string): number {
+  switch (unit) {
+    case 'kg':
+    case 'kgs':
+    case 'kilogram':
+    case 'kilograms':
+      return value * 1000;
+    case 'g':
+    case 'gram':
+    case 'grams':
+      return value;
+    case 'lb':
+    case 'lbs':
+    case 'pound':
+    case 'pounds':
+    case 'libra':
+    case 'libras':
+      return value * 453.592;
+    case 'oz':
+    case 'ounce':
+    case 'ounces':
+      return value * 28.3495;
+    default:
+      return value;
+  }
+}
+
 export async function importFromML(
   _req: ImportFromMLRequest,
   { supabase, tenantId, authToken }: ActionContext
@@ -186,7 +221,11 @@ export async function importFromML(
         if (length) dimensions.length = length;
 
         const weightAttr = attributes.find((attr) => attr.id === 'WEIGHT');
-        const weight = weightAttr ? parseFloat(weightAttr.value_name) || 0 : 0;
+        let weight = 0;
+        if (weightAttr?.value_name) {
+          const { value, unit } = parseWeight(weightAttr.value_name);
+          weight = weightToGrams(value, unit);
+        }
 
         const warrantyAttr = attributes.find((attr) => attr.id === 'WARRANTY');
         const warranty = warrantyAttr ? warrantyAttr.value_name : '';

@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { importFromML } from '../../supabase/functions/ml-sync-v2/actions/importFromML.ts';
+import {
+  importFromML,
+  parseWeight,
+  weightToGrams,
+} from '../../supabase/functions/ml-sync-v2/actions/importFromML.ts';
 
 const originalFetch = global.fetch;
 
@@ -82,5 +86,18 @@ describe('importFromML action', () => {
     expect(productsTable.insert).toHaveBeenCalled();
     const inserted = productsTable.insert.mock.calls[0][0];
     expect(inserted.ml_variations).toEqual(itemData.variations);
+  });
+});
+
+describe('weight parsing', () => {
+  it.each([
+    ['500 g', 500],
+    ['0.5 kg', 500],
+    ['2kg', 2000],
+    ['1,2 kg', 1200],
+  ])('converts %s to %d grams', (input, expected) => {
+    const { value, unit } = parseWeight(input);
+    const grams = weightToGrams(value, unit);
+    expect(grams).toBeCloseTo(expected);
   });
 });
