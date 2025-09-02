@@ -2,13 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  ShieldCheck, 
-  Globe, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
+import {
+  ShieldCheck,
+  Globe,
+  TrendingUp,
+  CheckCircle,
   Zap,
   Eye
 } from "@/components/ui/icons";
@@ -63,7 +61,7 @@ export function MLSystemOverview() {
       name: "Backup Automático",
       status: settings?.backup_schedule ? "active" : "inactive",
       description: `Agendado ${settings?.backup_schedule || 'diariamente'}`,
-      icon: <TrendingUp className="text-info size-4" />
+      icon: <TrendingUp className="size-4 text-primary" />
     }
   ];
 
@@ -90,6 +88,7 @@ export function MLSystemOverview() {
             <CardDescription>Status completo da integração enterprise</CardDescription>
           </div>
         </div>
+        {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
         <Badge className={`bg-${systemHealth.color} text-${systemHealth.color}-foreground`}>
           {systemHealth.status === 'excellent' && '🟢 Excelente'}
           {systemHealth.status === 'good' && '🟡 Bom'}

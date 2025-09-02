@@ -1,8 +1,3 @@
-interface QueryResult<T = any> {
-  data: T | null;
-  error: { message: string } | null;
-}
-
 interface QueryBuilder {
   select: (columns?: string) => QueryBuilder;
   update: (values: Record<string, unknown>) => QueryBuilder; 
@@ -10,7 +5,7 @@ interface QueryBuilder {
   upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
   eq: (column: string, value: unknown) => QueryBuilder;
   single: () => QueryBuilder;
-  data?: any;
+  data?: unknown;
   error?: { message: string } | null;
 }
 

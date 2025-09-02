@@ -1,13 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Package, 
-  Loader2, 
-  CheckCircle2, 
-  AlertCircle, 
+import {
+  Package,
+  CheckCircle2,
+  AlertCircle,
   RefreshCw,
-  TrendingUp,
   Activity
 } from "@/components/ui/icons";
 import { useMLIntegration, useMLConnectionStatus } from "@/hooks/useMLIntegration";
@@ -84,7 +82,7 @@ export function MLStatusOverview() {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Status de Conexão */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

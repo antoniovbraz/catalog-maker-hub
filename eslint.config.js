@@ -48,5 +48,11 @@ export default tseslint.config(
       "tailwindcss/no-custom-classname": "error",
       "local/no-outside-ui-imports": "error",
     },
+  },
+  {
+    files: ["tests/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
   }
 );

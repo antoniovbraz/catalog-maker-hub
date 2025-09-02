@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Settings, Store, UserCheck, RefreshCw, Shield, Zap } from "@/components/ui/icons";
 import { useMLIntegration } from "@/hooks/useMLIntegration";
-import { useState } from "react";
 
 interface MLAccount {
   id: string;
@@ -17,7 +16,6 @@ interface MLAccount {
 export function MLMultiAccountManager() {
   const { auth } = useMLIntegration();
   const authStatus = auth;
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
 
   // Simulação de múltiplas contas (futura implementação)
   const mockAccounts: MLAccount[] = [
