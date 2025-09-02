@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -22,12 +23,19 @@ import Sales from "./pages/Sales";
 import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
 import Subscription from "./pages/Subscription";
-import AdminDashboard from "./pages/AdminDashboard";
 import AssistantsManagement from "./pages/admin/AssistantsManagement";
 import NotFound from "./pages/NotFound";
 import AdGenerator from "./pages/AdGenerator";
-import MercadoLivre from "./pages/MercadoLivre";
 import MLCallback from "./pages/MLCallback";
+
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const MercadoLivre = lazy(() => import("./pages/MercadoLivre"));
+
+const loadingFallback = (
+  <div role="status" aria-busy="true" className="p-4">
+    Carregando...
+  </div>
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -182,18 +190,20 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/integrations/mercado-livre" 
-              element={
-                <ProtectedRoute>
-                  <SharedLayout>
-                    <MercadoLivre />
-                  </SharedLayout>
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/integrations/mercado-livre/callback" 
+              <Route
+                path="/integrations/mercado-livre"
+                element={
+                  <ProtectedRoute>
+                    <SharedLayout>
+                      <Suspense fallback={loadingFallback}>
+                        <MercadoLivre />
+                      </Suspense>
+                    </SharedLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/integrations/mercado-livre/callback"
               element={
                 <ProtectedRoute>
                   <MLCallback />
@@ -214,16 +224,18 @@ const App = () => (
             />
             
             {/* Admin Routes */}
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute requiredRole="super_admin">
-                <SharedLayout>
-                  <AdminDashboard />
-                </SharedLayout>
-              </ProtectedRoute>
-            } 
-          />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="super_admin">
+                  <SharedLayout>
+                    <Suspense fallback={loadingFallback}>
+                      <AdminDashboard />
+                    </Suspense>
+                  </SharedLayout>
+                </ProtectedRoute>
+              }
+            />
           <Route 
             path="/admin/assistentes-ia" 
             element={
