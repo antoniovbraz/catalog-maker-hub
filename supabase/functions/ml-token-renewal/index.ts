@@ -8,6 +8,40 @@ const corsHeaders = {
 
 console.log('ML Token Renewal Service initialized');
 
+async function refreshWithRetry(refreshToken: string, mlClientId: string, mlClientSecret: string) {
+  const maxRetries = 3;
+  const baseDelay = 500; // ms
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch('https://api.mercadolibre.com/oauth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          grant_type: 'refresh_token',
+          client_id: mlClientId,
+          client_secret: mlClientSecret,
+          refresh_token: refreshToken,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error;
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`Retrying token refresh in ${delay}ms due to error:`, error);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -30,7 +64,7 @@ serve(async (req) => {
     twoHoursFromNow.setHours(twoHoursFromNow.getHours() + 2);
 
     const { data: expiringSoonTokens, error: queryError } = await supabase
-      .from('ml_auth_tokens')
+      .from('ml_auth_tokens_decrypted')
       .select('*')
       .lt('expires_at', twoHoursFromNow.toISOString())
       .gt('expires_at', new Date().toISOString()) // Not already expired
@@ -51,43 +85,8 @@ serve(async (req) => {
       try {
         console.log(`Renewing token for tenant: ${token.tenant_id}`);
 
-        // Make refresh request to ML
-        const refreshResponse = await fetch('https://api.mercadolibre.com/oauth/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            grant_type: 'refresh_token',
-            client_id: mlClientId,
-            client_secret: mlClientSecret,
-            refresh_token: token.refresh_token,
-          }),
-        });
-
-        if (!refreshResponse.ok) {
-          const errorData = await refreshResponse.text();
-          console.error(`Failed to refresh token for tenant ${token.tenant_id}:`, errorData);
-          
-          // Log failure for monitoring
-          await supabase.from('ml_sync_log').insert({
-            tenant_id: token.tenant_id,
-            operation_type: 'token_refresh',
-            entity_type: 'token',
-            status: 'error',
-            error_details: { 
-              http_status: refreshResponse.status,
-              error: errorData,
-              timestamp: new Date().toISOString()
-            },
-            response_status: refreshResponse.status
-          });
-
-          failedCount++;
-          continue;
-        }
-
-        const tokenData = await refreshResponse.json();
+        // Refresh token with retry/backoff
+        const tokenData = await refreshWithRetry(token.refresh_token, mlClientId, mlClientSecret);
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + tokenData.expires_in);
 

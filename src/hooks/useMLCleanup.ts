@@ -66,7 +66,7 @@ export function useMLStatus() {
     checkConnectionHealth: async () => {
       try {
         const { data } = await supabase
-          .from('ml_auth_tokens')
+          .from('ml_auth_tokens_decrypted')
           .select('expires_at, user_id_ml, created_at')
           .single();
         

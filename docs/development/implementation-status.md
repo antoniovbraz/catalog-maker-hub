@@ -155,11 +155,11 @@ USING ((tenant_id = (SELECT profiles.tenant_id FROM profiles WHERE profiles.id =
 ### **Database Testing** ✅
 ```sql
 -- Testado com dados reais
-INSERT INTO ml_auth_tokens (tenant_id, access_token, expires_at) 
+INSERT INTO ml_auth_tokens (tenant_id, access_token, expires_at)
 VALUES ('test-tenant', 'test-token', now() + interval '6 hours');
 
 -- RLS funcionando
-SELECT * FROM ml_auth_tokens; -- Retorna apenas dados do tenant atual
+SELECT * FROM ml_auth_tokens_decrypted; -- Retorna apenas dados do tenant atual
 ```
 
 ### **Edge Functions Testing** 🔄
