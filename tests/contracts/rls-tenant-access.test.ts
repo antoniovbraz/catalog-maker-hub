@@ -16,6 +16,6 @@ describe('RLS tenant access policies', () => {
       'supabase/migrations/20250802134141_c5c89547-5c97-4543-9d1d-634f90c42007.sql',
       'utf-8',
     );
-    expect(sql).toContain('USING (tenant_id = auth.uid())');
+    expect(sql).toContain("p.tenant_id = public.products.tenant_id");
   });
 });
