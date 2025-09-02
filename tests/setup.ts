@@ -3,6 +3,14 @@ import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 import * as toastMock from './mocks/toast';
 
+// Inject environment variables for tests
+process.env.SUPABASE_URL = 'https://test.supabase.co';
+process.env.SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.ML_CLIENT_ID = 'test-client-id';
+process.env.ML_CLIENT_SECRET = 'test-client-secret';
+process.env.ML_REDIRECT_URL = 'https://example.com/callback';
+process.env.ML_WEBHOOK_SECRET = 'test-webhook-secret';
+
 // Limpa e reseta mocks após cada teste
 afterEach(() => {
   cleanup();
