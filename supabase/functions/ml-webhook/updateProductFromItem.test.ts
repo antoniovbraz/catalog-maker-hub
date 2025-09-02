@@ -105,7 +105,7 @@ describe('updateProductFromItem', () => {
 
   it('uses variation seller_sku when item-level sku missing', async () => {
     mappingQuery.single.mockResolvedValueOnce({
-      data: { product_id: 'prod-2', ml_variation_id: 'VAR2' },
+      data: { product_id: 'prod-2', ml_variation_id: '67890' },
       error: null,
     });
     const itemData = {
@@ -113,7 +113,8 @@ describe('updateProductFromItem', () => {
       attributes: [],
       pictures: [],
       available_quantity: 1,
-      variations: [{ id: 'VAR2', seller_sku: 'VSKU2' }],
+      // ML returns numeric variation IDs
+      variations: [{ id: 67890, seller_sku: 'VSKU2' }],
     };
 
     await updateProductFromItem(supabase, 'tenant1', itemData, 'token');
@@ -121,6 +122,6 @@ describe('updateProductFromItem', () => {
     const updateArg = productsQuery.update.mock.calls[0][0];
     expect(updateArg.sku).toBe('VSKU2');
     expect(updateArg.sku_source).toBe('mercado_livre');
-    expect(updateArg.ml_variation_id).toBe('VAR2');
+    expect(updateArg.ml_variation_id).toBe('67890');
   });
 });
