@@ -1,16 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Package, ExternalLink, RefreshCw, Play, Loader2 } from "@/components/ui/icons";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Package, Play, Loader2 } from "@/components/ui/icons";
 import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { MLProductRow } from "./MLProductRow";
 
 export function MLProductList() {
   const { data, isLoading } = useMLProducts();
@@ -20,45 +17,32 @@ export function MLProductList() {
   
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
-  const handleSelectProduct = (productId: string, checked: boolean) => {
+  const handleSelectProduct = useCallback((productId: string, checked: boolean) => {
     if (checked) {
       setSelectedProducts(prev => [...prev, productId]);
     } else {
       setSelectedProducts(prev => prev.filter(id => id !== productId));
     }
-  };
+  }, []);
 
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = useCallback((checked: boolean) => {
     if (checked) {
       setSelectedProducts((products || []).map(p => p.id));
     } else {
       setSelectedProducts([]);
     }
-  };
+  }, [products]);
 
-  const handleSyncProduct = (productId: string) => {
+  const handleSyncProduct = useCallback((productId: string) => {
     syncProduct.mutate(productId);
-  };
+  }, [syncProduct]);
 
-  const handleSyncBatch = () => {
+  const handleSyncBatch = useCallback(() => {
     if (selectedProducts.length > 0) {
       syncBatch.mutate(selectedProducts);
       setSelectedProducts([]);
     }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'synced':
-        return <Badge className="bg-success text-success-foreground">Sincronizado</Badge>;
-      case 'syncing':
-        return <Badge variant="secondary">Sincronizando</Badge>;
-      case 'error':
-        return <Badge variant="destructive">Erro</Badge>;
-      default:
-        return <Badge variant="outline">Não Sincronizado</Badge>;
-    }
-  };
+  }, [selectedProducts, syncBatch]);
 
   if (isLoading) {
     return (
@@ -143,85 +127,18 @@ export function MLProductList() {
               </TableHeader>
               <TableBody>
                 {(products || []).map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedProducts.includes(product.id)}
-                        onCheckedChange={(checked) => 
-                          handleSelectProduct(product.id, checked as boolean)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {product.name}
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(product.sync_status)}
-                    </TableCell>
-                    <TableCell>
-                      {product.ml_item_id ? (
-                        <div className="flex items-center space-x-1">
-                          <span className="font-mono text-sm">{product.ml_item_id}</span>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => window.open(
-                              `https://www.mercadolivre.com.br/p/${product.ml_item_id}`, 
-                              '_blank'
-                            )}
-                          >
-                            <ExternalLink className="size-3" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {product.last_sync_at ? (
-                        <span className="text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(product.last_sync_at), { 
-                            addSuffix: true, 
-                            locale: ptBR 
-                          })}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {(() => {
-                        const isProcessing = syncProduct.isPending;
-                        const isLoading = syncProduct.isPending && syncProduct.variables === product.id;
-                        return (
-                          <div className="flex gap-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleSyncProduct(product.id)}
-                                    disabled={isProcessing}
-                                    aria-label="Enviar ao Mercado Livre"
-                                  >
-                                    {isLoading ? (
-                                      <Loader2 className="size-4 animate-spin" />
-                                    ) : (
-                                      <RefreshCw className="size-4" />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Enviar ao Mercado Livre
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        );
-                      })()}
-                    </TableCell>
-                  </TableRow>
+                  <MLProductRow
+                    key={product.id}
+                    product={product}
+                    isSelected={selectedProducts.includes(product.id)}
+                    onSelect={handleSelectProduct}
+                    onSync={handleSyncProduct}
+                    isProcessing={syncProduct.isPending}
+                    isLoading={
+                      syncProduct.isPending &&
+                      syncProduct.variables === product.id
+                    }
+                  />
                 ))}
               </TableBody>
             </Table>
