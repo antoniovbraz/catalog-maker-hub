@@ -118,6 +118,13 @@ export default function ProductDetail() {
   const mlProduct = mlProducts.find(ml => ml.id === product.id);
   const hasIncompleteData = product.source === 'mercado_livre' && (!product.description || !product.sku || !product.brand);
 
+  const formatWeight = (w: number) => {
+    if (w >= 1000) {
+      return `${(w / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kg`;
+    }
+    return `${w.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} g`;
+  };
+
   const handleEdit = () => {
     let submitForm: (() => Promise<void>) | null = null;
 
@@ -306,7 +313,7 @@ export default function ProductDetail() {
                         <Weight className="size-3" />
                         Peso
                       </label>
-                      <p>{product.weight} kg</p>
+                      <p>{formatWeight(product.weight)}</p>
                     </div>
                   )}
                   {product.dimensions?.length && (
