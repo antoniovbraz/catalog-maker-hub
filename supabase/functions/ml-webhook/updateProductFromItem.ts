@@ -8,7 +8,7 @@ export async function updateProductFromItem(
 
   const { data: mapping, error: mappingError } = await supabase
     .from('ml_product_mapping')
-    .select('product_id')
+    .select('product_id, ml_variation_id')
     .eq('tenant_id', tenantId)
     .eq('ml_item_id', itemData.id)
     .single();
@@ -33,9 +33,26 @@ export async function updateProductFromItem(
     console.warn('Could not fetch description:', e);
   }
 
+  const variation =
+    mapping?.ml_variation_id
+      ? itemData.variations?.find(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (v: any) => v.id === mapping.ml_variation_id
+        )
+      : itemData.variations?.[0];
   const mlSku =
     itemData.seller_custom_field ||
-    itemData.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
+    itemData.attributes?.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (attr: any) => attr.id === 'SELLER_SKU'
+    )?.value_name ||
+    variation?.seller_custom_field ||
+    variation?.seller_sku ||
+    variation?.attributes?.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (attr: any) => attr.id === 'SELLER_SKU'
+    )?.value_name ||
+    variation?.id ||
     null;
   const skuSource = mlSku ? 'mercado_livre' : 'none';
 
@@ -46,6 +63,7 @@ export async function updateProductFromItem(
     ml_pictures: itemData.pictures || [],
     ml_available_quantity: itemData.available_quantity || 0,
     ml_seller_sku: mlSku,
+    ml_variation_id: variation?.id || null,
     updated_at: new Date().toISOString(),
     updated_from_ml_at: new Date().toISOString(),
   };

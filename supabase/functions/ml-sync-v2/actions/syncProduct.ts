@@ -120,9 +120,26 @@ export async function syncSingleProduct(
             let sku = product.sku;
             let skuSource = product.sku_source;
             if (!sku) {
+              const variation =
+                existingMapping?.ml_variation_id
+                  ? itemData.variations?.find(
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (v: any) => v.id === existingMapping.ml_variation_id
+                    )
+                  : itemData.variations?.[0];
               const mlSku =
                 itemData.seller_custom_field ||
-                itemData.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
+                itemData.attributes?.find(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (attr: any) => attr.id === 'SELLER_SKU'
+                )?.value_name ||
+                variation?.seller_custom_field ||
+                variation?.seller_sku ||
+                variation?.attributes?.find(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (attr: any) => attr.id === 'SELLER_SKU'
+                )?.value_name ||
+                variation?.id ||
                 null;
               sku = mlSku;
               skuSource = mlSku ? 'mercado_livre' : 'none';
