@@ -36,8 +36,9 @@ export async function updateProductFromItem(
   const variation =
     mapping?.ml_variation_id
       ? itemData.variations?.find(
+          // Normalize IDs because ML API returns numbers and Supabase stores strings
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (v: any) => v.id === mapping.ml_variation_id
+          (v: any) => String(v.id) === String(mapping.ml_variation_id)
         )
       : itemData.variations?.[0];
   const mlSku =
@@ -63,7 +64,7 @@ export async function updateProductFromItem(
     ml_pictures: itemData.pictures || [],
     ml_available_quantity: itemData.available_quantity || 0,
     ml_seller_sku: mlSku,
-    ml_variation_id: variation?.id || null,
+    ml_variation_id: variation ? String(variation.id) : null,
     updated_at: new Date().toISOString(),
     updated_from_ml_at: new Date().toISOString(),
   };

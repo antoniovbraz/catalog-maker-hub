@@ -101,7 +101,8 @@ export async function resyncProduct(
     const variation =
       productMapping.ml_variation_id
         ? itemData.variations?.find(
-            (v: any) => v.id === productMapping.ml_variation_id
+            // Normalize IDs as Supabase returns strings and ML API returns numbers
+            (v: any) => String(v.id) === String(productMapping.ml_variation_id)
           )
         : itemData.variations?.[0];
     const mlSku =
@@ -140,7 +141,7 @@ export async function resyncProduct(
       ml_seller_sku: mlSku,
       ml_available_quantity: itemData.available_quantity || 0,
       ml_sold_quantity: itemData.sold_quantity || 0,
-      ml_variation_id: variation?.id || null,
+      ml_variation_id: variation ? String(variation.id) : null,
       ml_pictures: itemData.pictures || [],
       updated_at: new Date().toISOString(),
       updated_from_ml_at: new Date().toISOString(),

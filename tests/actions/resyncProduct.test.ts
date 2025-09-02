@@ -196,7 +196,8 @@ describe('resyncProduct action', () => {
       available_quantity: 0,
       sold_quantity: 0,
       pictures: [],
-      variations: [{ id: 'VAR1', seller_sku: 'VSKU1' }],
+      // ML API returns numeric IDs, ensure comparison works when mapping stores string
+      variations: [{ id: 12345, seller_sku: 'VSKU1' }],
     } as any;
 
     global.fetch = vi.fn((url: RequestInfo) => {
@@ -217,7 +218,8 @@ describe('resyncProduct action', () => {
       single: vi.fn().mockResolvedValue({
         data: {
           ml_item_id: 'MLA5',
-          ml_variation_id: 'VAR1',
+          // Supabase stores variation IDs as text
+          ml_variation_id: '12345',
           products: { id: 'prod5', cost_unit: 0 },
         },
         error: null,
@@ -247,7 +249,7 @@ describe('resyncProduct action', () => {
     const updateArg = productsTable.update.mock.calls[0][0];
     expect(updateArg.sku).toBe('VSKU1');
     expect(updateArg.sku_source).toBe('mercado_livre');
-    expect(updateArg.ml_variation_id).toBe('VAR1');
+    expect(updateArg.ml_variation_id).toBe('12345');
   });
 
   it('should normalize weight units to grams', async () => {

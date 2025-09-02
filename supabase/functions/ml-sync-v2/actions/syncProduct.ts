@@ -123,8 +123,10 @@ export async function syncSingleProduct(
               const variation =
                 existingMapping?.ml_variation_id
                   ? itemData.variations?.find(
+                      // Normalize IDs because ML API returns numbers and Supabase stores strings
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (v: any) => v.id === existingMapping.ml_variation_id
+                      (v: any) =>
+                        String(v.id) === String(existingMapping.ml_variation_id)
                     )
                   : itemData.variations?.[0];
               const mlSku =
