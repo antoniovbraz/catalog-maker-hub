@@ -1,21 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { updateProductFromItem } from './updateProductFromItem.ts';
+import { mlWebhookSchema } from '../shared/schemas.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-interface MLWebhookPayload {
-  topic: string;
-  resource: string;
-  user_id: number;
-  application_id: number;
-  attempts: number;
-  sent: string;
-  received: string;
-}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -29,7 +20,7 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const payload: MLWebhookPayload = await req.json();
+    const payload = mlWebhookSchema.parse(await req.json());
     console.log('Received ML webhook:', payload);
 
     // Find tenant by ML user ID

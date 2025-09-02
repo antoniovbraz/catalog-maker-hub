@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { assistantCreateSchema, assistantUpdateSchema } from '../shared/schemas.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -103,7 +104,8 @@ serve(async (req) => {
 async function handleCreateAssistant(req: Request) {
   try {
     console.log('=== INICIANDO CRIAÇÃO ===');
-    const { name, marketplace, model, instructions, tenant_id } = await req.json();
+    const { name, marketplace, model, instructions, tenant_id } =
+      assistantCreateSchema.parse(await req.json());
     console.log('Dados recebidos:', { name, marketplace, model, tenant_id });
 
     // Criar assistente na OpenAI
@@ -181,9 +183,9 @@ async function handleUpdateAssistant(req: Request, assistantDbId: string) {
     console.log('=== INICIANDO ATUALIZAÇÃO ===');
     console.log('Assistant DB ID:', assistantDbId);
     
-    const requestBody = await req.json();
+    const requestBody = assistantUpdateSchema.parse(await req.json());
     console.log('Dados recebidos:', requestBody);
-    
+
     const { name, model, instructions } = requestBody;
 
     // Buscar assistente no banco
