@@ -32,6 +32,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MLSyncLog {
   id: string;
@@ -67,8 +68,11 @@ export default function ProductDetail() {
   const { resyncProduct } = useMLProductResync();
   const { isExpiringSoon, expiresAt } = useMLConnectionStatus();
 
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
+
   const { data: syncLog = [] } = useQuery<MLSyncLog[]>({
-    queryKey: ["ml_sync_log", productId],
+    queryKey: ["ml_sync_log", tenantId, productId],
     queryFn: async () => {
       if (!productId) return [];
       const { data, error } = await supabase
@@ -80,7 +84,7 @@ export default function ProductDetail() {
       if (error) throw new Error(error.message);
       return data as MLSyncLog[];
     },
-    enabled: !!productId,
+    enabled: !!productId && !!tenantId,
   });
 
   if (productLoading) {

@@ -3,6 +3,7 @@ import { useDropzone } from "react-dropzone";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,8 @@ export function MLImageUploadModal({
   productName,
 }: MLImageUploadModalProps) {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -74,7 +77,7 @@ export function MLImageUploadModal({
 
           // Upload para Supabase Storage
           const fileName = `${productId}/${Date.now()}-${image.file.name}`;
-          const { data, error } = await supabase.storage
+          const { error } = await supabase.storage
             .from('product-images')
             .upload(fileName, image.file);
 
@@ -127,7 +130,7 @@ export function MLImageUploadModal({
       await Promise.allSettled(uploadPromises);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['product-images', productId] });
+      queryClient.invalidateQueries({ queryKey: ['product-images', tenantId, productId] });
       toast({
         title: "Imagens carregadas",
         description: "Imagens do produto salvas com sucesso.",

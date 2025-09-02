@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,8 +53,10 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
   const [isCalculated, setIsCalculated] = useState<boolean>(false);
 
   // Fetch sales data with product and marketplace info
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const { data: salesData = [], isLoading, refetch } = useQuery({
-    queryKey: ["sales-strategy-data"],
+    queryKey: ["sales-strategy-data", tenantId],
     queryFn: async () => {
       // First get sales data
       const { data: sales, error: salesError } = await supabase
@@ -130,7 +133,7 @@ export const StrategyForm = ({ onCancel }: StrategyFormProps) => {
 
       return dataWithMargins;
     },
-    enabled: false, // Only run when explicitly triggered
+    enabled: !!tenantId && false, // Only run when explicitly triggered
   });
 
   // Calculate strategy analysis

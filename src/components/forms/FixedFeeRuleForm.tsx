@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,18 +58,21 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   const { data: marketplaces = [] } = useQuery({
-    queryKey: ["marketplaces"],
+    queryKey: ["marketplaces", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("marketplaces")
         .select("id, name")
         .order("name");
-      
+
       if (error) throw error;
       return data as Marketplace[];
-    }
+    },
+    enabled: !!tenantId
   });
 
   const createMutation = useMutation({
@@ -86,7 +90,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules"] });
+      queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules", tenantId] });
       setFormData({
         marketplace_id: "",
         rule_type: "",
@@ -123,7 +127,7 @@ export const FixedFeeRuleForm = ({ onCancel }: FixedFeeRuleFormProps) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules"] });
+      queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules", tenantId] });
       setFormData({
         marketplace_id: "",
         rule_type: "",

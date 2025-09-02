@@ -9,10 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
+import { useAuth } from '@/contexts/AuthContext';
 
 const FixedFees = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const { showConfirmModal, showFormModal } = useGlobalModal();
 
   interface FixedFeeRule {
@@ -48,7 +51,7 @@ const FixedFees = () => {
   ];
 
   const { data: fixedFeeRules = [], isLoading } = useQuery({
-    queryKey: ["marketplace_fixed_fee_rules"],
+    queryKey: ["marketplace_fixed_fee_rules", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("marketplace_fixed_fee_rules")
@@ -57,10 +60,11 @@ const FixedFees = () => {
           marketplaces (name)
         `)
         .order("created_at", { ascending: false });
-      
+
       if (error) throw error;
       return data as FixedFeeRule[];
-    }
+    },
+    enabled: !!tenantId,
   });
 
   const deleteMutation = useMutation({
@@ -73,7 +77,7 @@ const FixedFees = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules"] });
+      queryClient.invalidateQueries({ queryKey: ["marketplace_fixed_fee_rules", tenantId] });
       toast({ title: "Taxa fixa excluída com sucesso!" });
     },
     onError: (error) => {

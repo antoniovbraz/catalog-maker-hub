@@ -14,12 +14,13 @@ const SubscriptionsTab = lazy(() => import('./admin/tabs/SubscriptionsTab'));
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const isSuperAdmin = profile?.role === 'super_admin';
 
   // Queries otimizadas separadas com error handling e cache
   const { data: userCount = 0, isLoading: userCountLoading, error: userCountError } = useQuery({
-    queryKey: ['admin-user-count'],
-    enabled: isSuperAdmin,
+    queryKey: ['admin-user-count', tenantId],
+    enabled: isSuperAdmin && !!tenantId,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { count, error } = await supabase
@@ -34,8 +35,8 @@ export default function AdminDashboard() {
   });
 
   const { data: revenue, isLoading: revenueLoading, error: revenueError } = useQuery({
-    queryKey: ['admin-revenue'],
-    enabled: isSuperAdmin,
+    queryKey: ['admin-revenue', tenantId],
+    enabled: isSuperAdmin && !!tenantId,
     staleTime: 2 * 60 * 1000, // 2 minutos de cache (mais frequente)
     queryFn: async () => {
       try {

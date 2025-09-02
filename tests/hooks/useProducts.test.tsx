@@ -8,6 +8,9 @@ import { productsService } from '@/services/products';
 
 // Mock do service
 vi.mock('@/services/products');
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ profile: { tenant_id: 'test-tenant-id' } })
+}));
 
 const { wrapper, queryClient } = createWrapper();
 

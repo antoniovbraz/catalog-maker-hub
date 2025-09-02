@@ -1,14 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 import {
   mlAdvancedSettingsSchema,
   type MLAdvancedSettings,
 } from "@/types/ml/advanced-settings";
 
 export function useMLAdvancedSettings() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: ["ml-advanced-settings"],
+    queryKey: ["ml-advanced-settings", tenantId],
     queryFn: async (): Promise<MLAdvancedSettings> => {
       const { data, error } = await supabase.rpc("get_ml_advanced_settings");
 
@@ -19,6 +22,7 @@ export function useMLAdvancedSettings() {
 
       return mlAdvancedSettingsSchema.parse(data);
     },
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
   });
@@ -26,6 +30,8 @@ export function useMLAdvancedSettings() {
 
 export function useUpdateMLAdvancedSettings() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: async (
@@ -43,7 +49,7 @@ export function useUpdateMLAdvancedSettings() {
       return mlAdvancedSettingsSchema.parse(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ml-advanced-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["ml-advanced-settings", tenantId] });
       toast({
         title: "Configurações Atualizadas",
         description: "Configurações avançadas foram salvas com sucesso.",

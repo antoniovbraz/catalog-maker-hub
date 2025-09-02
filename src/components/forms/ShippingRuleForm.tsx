@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,10 +23,12 @@ interface ShippingRule {
 export const ShippingRuleForm = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const { showFormModal, showConfirmModal } = useGlobalModal();
 
   const { data: shippingRules = [], isLoading } = useQuery({
-    queryKey: ["shipping_rules"],
+    queryKey: ["shipping_rules", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("shipping_rules")
@@ -36,6 +39,7 @@ export const ShippingRuleForm = () => {
       if (error) throw error;
       return data as ShippingRule[];
     },
+    enabled: !!tenantId,
   });
 
   const deleteMutation = useMutation({
@@ -47,7 +51,7 @@ export const ShippingRuleForm = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["shipping_rules"] });
+      queryClient.invalidateQueries({ queryKey: ["shipping_rules", tenantId] });
       toast({ title: "Regra de frete excluída com sucesso!" });
     },
     onError: (error) => {

@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToast } from '@/hooks/use-toast';
 import { Info } from '@/components/ui/icons';
 import { handleSupabaseError } from '@/utils/errors';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Marketplace {
   id: string;
@@ -67,9 +68,11 @@ export function FixedFeeRuleModalForm({ rule, onSuccess, onSubmitForm }: FixedFe
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   const { data: marketplaces = [] } = useQuery({
-    queryKey: ['marketplaces'],
+    queryKey: ['marketplaces', tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('marketplaces')
@@ -78,6 +81,7 @@ export function FixedFeeRuleModalForm({ rule, onSuccess, onSubmitForm }: FixedFe
       if (error) throw error;
       return data as Marketplace[];
     },
+    enabled: !!tenantId,
   });
 
   const createMutation = useMutation({
@@ -96,7 +100,7 @@ export function FixedFeeRuleModalForm({ rule, onSuccess, onSubmitForm }: FixedFe
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['marketplace_fixed_fee_rules'] });
+      queryClient.invalidateQueries({ queryKey: ['marketplace_fixed_fee_rules', tenantId] });
       toast({ title: 'Taxa fixa criada com sucesso!' });
       onSuccess();
     },
@@ -125,7 +129,7 @@ export function FixedFeeRuleModalForm({ rule, onSuccess, onSubmitForm }: FixedFe
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['marketplace_fixed_fee_rules'] });
+      queryClient.invalidateQueries({ queryKey: ['marketplace_fixed_fee_rules', tenantId] });
       toast({ title: 'Taxa fixa atualizada com sucesso!' });
       onSuccess();
     },

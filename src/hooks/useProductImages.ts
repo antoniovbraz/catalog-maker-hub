@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProductImage {
   id: string;
@@ -12,8 +13,10 @@ interface ProductImage {
 }
 
 export function useProductImages(productId: string) {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery<ProductImage[]>({
-    queryKey: ['product-images', productId],
+    queryKey: ['product-images', tenantId, productId],
     queryFn: async () => {
       if (!productId) return [];
       
@@ -30,7 +33,7 @@ export function useProductImages(productId: string) {
       
       return data || [];
     },
-    enabled: !!productId,
+    enabled: !!productId && !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

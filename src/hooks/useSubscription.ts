@@ -5,37 +5,43 @@ import { toast } from '@/hooks/use-toast';
 import type { Subscription } from '@/types/subscription';
 
 export function useSubscriptionPlans() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: ['subscription-plans'],
+    queryKey: ['subscription-plans', tenantId],
     queryFn: () => subscriptionService.getAllPlans(),
+    enabled: !!tenantId,
     staleTime: 10 * 60 * 1000, // 10 minutos
   });
 }
 
 export function useCurrentSubscription() {
-  const { user } = useAuth();
-  
+  const { user, profile } = useAuth();
+  const tenantId = profile?.tenant_id;
+
   return useQuery({
-    queryKey: ['current-subscription', user?.id],
+    queryKey: ['current-subscription', tenantId, user?.id],
     queryFn: () => user ? subscriptionService.getCurrentSubscription(user.id) : null,
-    enabled: !!user,
+    enabled: !!user && !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 }
 
 export function useUsageTracking(resourceType?: string) {
-  const { user } = useAuth();
-  
+  const { user, profile } = useAuth();
+  const tenantId = profile?.tenant_id;
+
   return useQuery({
-    queryKey: ['usage-tracking', user?.id, resourceType],
+    queryKey: ['usage-tracking', tenantId, user?.id, resourceType],
     queryFn: () => user ? subscriptionService.getUserUsage(user.id, resourceType) : [],
-    enabled: !!user,
+    enabled: !!user && !!tenantId,
     staleTime: 2 * 60 * 1000, // 2 minutos
   });
 }
 
 export function useUsageLimit() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const queryClient = useQueryClient();
   
   const checkLimit = useMutation({
@@ -52,7 +58,7 @@ export function useUsageLimit() {
     },
     onSuccess: () => {
       // Invalidar queries relacionadas ao uso
-      queryClient.invalidateQueries({ queryKey: ['usage-tracking'] });
+      queryClient.invalidateQueries({ queryKey: ['usage-tracking', tenantId] });
     },
   });
   
@@ -61,11 +67,13 @@ export function useUsageLimit() {
 
 export function useSubscriptionMutations() {
   const queryClient = useQueryClient();
-  
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
+
   const createSubscription = useMutation({
     mutationFn: subscriptionService.createSubscription,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['current-subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['current-subscription', tenantId] });
       toast({
         title: "Assinatura criada",
         description: "Sua assinatura foi ativada com sucesso!"
@@ -84,7 +92,7 @@ export function useSubscriptionMutations() {
       mutationFn: ({ userId, updates }: { userId: string; updates: Partial<Subscription> }) =>
         subscriptionService.updateSubscription(userId, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['current-subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['current-subscription', tenantId] });
       toast({
         title: "Assinatura atualizada",
         description: "Suas informações foram atualizadas."
@@ -102,7 +110,7 @@ export function useSubscriptionMutations() {
   const cancelSubscription = useMutation({
     mutationFn: subscriptionService.cancelSubscription,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['current-subscription'] });
+      queryClient.invalidateQueries({ queryKey: ['current-subscription', tenantId] });
       toast({
         title: "Assinatura cancelada",
         description: "Sua assinatura foi cancelada. Você ainda pode usar até o final do período."
