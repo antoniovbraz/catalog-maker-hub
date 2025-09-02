@@ -33,20 +33,21 @@ export async function updateProductFromItem(
     console.warn('Could not fetch description:', e);
   }
 
-  let skuToUse = itemData.seller_sku || '';
-  if (!skuToUse && itemData.variations?.length > 0) {
-    skuToUse = itemData.variations[0].seller_sku || itemData.variations[0].id || '';
-  }
-  if (!skuToUse) {
-    skuToUse = itemData.id;
-  }
+  const mlSku =
+    itemData.seller_custom_field ||
+    itemData.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
+    null;
+  const skuSource = mlSku ? 'mercado_livre' : 'none';
 
   const updateData: Record<string, unknown> = {
-    sku: skuToUse,
+    sku: mlSku,
+    sku_source: skuSource,
     ml_attributes: itemData.attributes || {},
     ml_pictures: itemData.pictures || [],
     ml_available_quantity: itemData.available_quantity || 0,
+    ml_seller_sku: mlSku,
     updated_at: new Date().toISOString(),
+    updated_from_ml_at: new Date().toISOString(),
   };
 
   if (description !== undefined) {

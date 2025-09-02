@@ -99,14 +99,11 @@ export async function resyncProduct(
       weight = weightToGrams(value, unit);
     }
 
-    let skuToUse = itemData.seller_sku || '';
-    if (!skuToUse && itemData.variations?.length > 0) {
-      skuToUse =
-        itemData.variations[0].seller_sku || itemData.variations[0].id || '';
-    }
-    if (!skuToUse) {
-      skuToUse = itemData.id;
-    }
+    const mlSku =
+      itemData.seller_custom_field ||
+      itemData.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
+      null;
+    const skuSource = mlSku ? 'mercado_livre' : 'none';
 
     const shouldUpdateName = !productMapping.products?.name;
     const localCost = productMapping.products?.cost_unit;
@@ -121,20 +118,22 @@ export async function resyncProduct(
 
     const updateData: Record<string, any> = {
       description: description,
-      sku: skuToUse,
+      sku: mlSku,
+      sku_source: skuSource,
       brand: brand,
       model: model,
       warranty: warranty,
       weight: weight,
       dimensions: dimensions,
       ml_attributes: itemData.attributes || {},
-      ml_seller_sku: itemData.seller_sku,
+      ml_seller_sku: mlSku,
       ml_available_quantity: itemData.available_quantity || 0,
       ml_sold_quantity: itemData.sold_quantity || 0,
       ml_variation_id:
         itemData.variations?.length > 0 ? itemData.variations[0].id : null,
       ml_pictures: itemData.pictures || [],
       updated_at: new Date().toISOString(),
+      updated_from_ml_at: new Date().toISOString(),
     };
 
     if (shouldUpdateName) updateData.name = itemData.title;
