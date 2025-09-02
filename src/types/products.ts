@@ -14,8 +14,8 @@ export interface ProductType {
   updated_at: string;
   // Novos campos ML
   ml_stock_quantity?: number;
-  ml_attributes?: any;
-  dimensions?: any;
+  ml_attributes?: unknown;
+  dimensions?: unknown;
   weight?: number;
   warranty?: string;
   brand?: string;
@@ -24,7 +24,8 @@ export interface ProductType {
   ml_available_quantity?: number;
   ml_sold_quantity?: number;
   ml_variation_id?: string;
-  ml_pictures?: any[];
+  ml_variations?: unknown[];
+  ml_pictures?: unknown[];
 }
 
 export interface ProductWithCategory extends ProductType {

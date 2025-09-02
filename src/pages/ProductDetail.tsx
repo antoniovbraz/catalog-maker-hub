@@ -111,11 +111,8 @@ export default function ProductDetail() {
     ? (product.ml_attributes as MLAttribute[])
     : [];
 
-  const variations: MLVariation[] = Array.isArray(
-    (product.ml_attributes as { variations?: MLVariation[] })?.variations
-  )
-    ? ((product.ml_attributes as { variations?: MLVariation[] })
-        .variations as MLVariation[])
+  const variations: MLVariation[] = Array.isArray(product.ml_variations)
+    ? (product.ml_variations as MLVariation[])
     : [];
 
   const mlProduct = mlProducts.find(ml => ml.id === product.id);
