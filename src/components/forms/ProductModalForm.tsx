@@ -133,6 +133,7 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
 
     const dataToSubmit = {
       ...formData,
+      sku_source: formData.sku ? "internal" : "none",
       category_id:
         formData.category_id === "none" || formData.category_id === ""
           ? null
