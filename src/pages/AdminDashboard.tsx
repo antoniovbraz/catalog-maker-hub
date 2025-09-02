@@ -1,37 +1,15 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DataVisualization } from '@/components/ui/data-visualization';
 import { Heading, Text } from '@/components/ui/typography';
 import { Crown, Users, TrendingUp, DollarSign, Activity, Settings, UserPlus, BarChart3 } from '@/components/ui/icons';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { lazy, Suspense } from 'react';
 
-interface UserTableRow {
-  id: string;
-  full_name: string | null;
-  email: string | null;
-  role: string;
-  company_name: string | null;
-  created_at: string;
-  is_active: boolean;
-}
-
-interface SubscriptionTableRow {
-  id: string;
-  user?: {
-    full_name: string | null;
-    email: string | null;
-  } | null;
-  plan?: {
-    display_name?: string;
-    price_monthly?: number;
-  } | null;
-  status: string;
-  current_period_end?: string | null;
-}
+const UsersTab = lazy(() => import('./admin/tabs/UsersTab'));
+const SubscriptionsTab = lazy(() => import('./admin/tabs/SubscriptionsTab'));
 
 
 export default function AdminDashboard() {
@@ -39,74 +17,19 @@ export default function AdminDashboard() {
   const isSuperAdmin = profile?.role === 'super_admin';
 
   // Queries otimizadas separadas com error handling e cache
-  const { data: allUsers, isLoading: usersLoading, error: usersError } = useQuery({
-    queryKey: ['admin-users'],
+  const { data: userCount = 0, isLoading: userCountLoading, error: userCountError } = useQuery({
+    queryKey: ['admin-user-count'],
     enabled: isSuperAdmin,
-    staleTime: 5 * 60 * 1000, // 5 minutos de cache
-    queryFn: async (): Promise<UserTableRow[]> => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, full_name, email, role, company_name, created_at, is_active')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Users query error:', error);
-          throw new Error(`Erro ao buscar usuários: ${error.message}`);
-        }
-        return (data || []) as UserTableRow[];
-      } catch (error) {
-        console.error('Users fetch error:', error);
-        throw error;
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true });
+      if (error) {
+        console.error('User count query error:', error);
+        throw new Error(`Erro ao buscar total de usuários: ${error.message}`);
       }
-    }
-  });
-
-  const { data: allSubscriptions, isLoading: subscriptionsLoading, error: subscriptionsError } = useQuery({
-    queryKey: ['admin-subscriptions'],
-    enabled: isSuperAdmin,
-    staleTime: 5 * 60 * 1000, // 5 minutos de cache
-    queryFn: async (): Promise<SubscriptionTableRow[]> => {
-      try {
-        // Buscar assinaturas básicas primeiro
-        const { data: subscriptions, error: subError } = await supabase
-          .from('subscriptions')
-          .select('id, user_id, plan_id, status, current_period_end')
-          .order('created_at', { ascending: false });
-
-        if (subError) {
-          console.error('Subscriptions basic query error:', subError);
-          throw new Error(`Erro ao buscar assinaturas: ${subError.message}`);
-        }
-
-        // Se não há assinaturas, retorna array vazio
-        if (!subscriptions || subscriptions.length === 0) {
-          return [];
-        }
-
-        // Buscar dados de usuários e planos separadamente
-        const userIds = [...new Set(subscriptions.map(sub => sub.user_id))];
-        const planIds = [...new Set(subscriptions.map(sub => sub.plan_id))];
-
-        const [{ data: users }, { data: plans }] = await Promise.all([
-          supabase.from('profiles').select('id, full_name, email').in('id', userIds),
-          supabase.from('subscription_plans').select('id, display_name, price_monthly').in('id', planIds)
-        ]);
-
-        // Mapear dados
-        const transformedData = subscriptions.map(sub => ({
-          id: sub.id,
-          status: sub.status,
-          current_period_end: sub.current_period_end,
-          user: users?.find(u => u.id === sub.user_id) || null,
-          plan: plans?.find(p => p.id === sub.plan_id) || null
-        }));
-        
-        return transformedData as SubscriptionTableRow[];
-      } catch (error) {
-        console.error('Subscriptions fetch error:', error);
-        throw error;
-      }
+      return count || 0;
     }
   });
 
@@ -166,8 +89,8 @@ export default function AdminDashboard() {
   });
 
   // Verificar erros e mostrar mensagem apropriada
-  if (usersError || subscriptionsError || revenueError) {
-    const errorMessage = usersError?.message || subscriptionsError?.message || revenueError?.message || 'Erro desconhecido';
+  if (userCountError || revenueError) {
+    const errorMessage = userCountError?.message || revenueError?.message || 'Erro desconhecido';
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -202,7 +125,7 @@ export default function AdminDashboard() {
   const stats = [
     {
       title: "Total de Usuários",
-      value: allUsers?.length || 0,
+      value: userCount,
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50"
@@ -230,92 +153,8 @@ export default function AdminDashboard() {
     }
   ];
 
-  const userColumns = [
-    {
-      key: 'full_name',
-      header: 'Nome',
-      render: (item: UserTableRow) => (
-        <div>
-          <div className="font-medium">{item.full_name || 'N/A'}</div>
-          <div className="text-sm text-muted-foreground">{item.email}</div>
-        </div>
-      )
-    },
-    {
-      key: 'role',
-      header: 'Role',
-      render: (item: UserTableRow) => (
-        <Badge variant={item.role === 'super_admin' ? 'destructive' : 'secondary'}>
-          {item.role}
-        </Badge>
-      )
-    },
-    {
-      key: 'company_name',
-      header: 'Empresa'
-    },
-    {
-      key: 'created_at',
-      header: 'Criado em',
-      render: (item: UserTableRow) => new Date(String(item.created_at)).toLocaleDateString('pt-BR')
-    },
-    {
-      key: 'is_active',
-      header: 'Status',
-      render: (item: UserTableRow) => (
-        <Badge variant={item.is_active ? 'default' : 'secondary'}>
-          {item.is_active ? 'Ativo' : 'Inativo'}
-        </Badge>
-      )
-    }
-  ];
-
-  const subscriptionColumns = [
-    {
-      key: 'user.full_name',
-      header: 'Usuário',
-      render: (item: SubscriptionTableRow) => (
-        <div>
-          <div className="font-medium">{item.user?.full_name || 'N/A'}</div>
-          <div className="text-sm text-muted-foreground">{item.user?.email}</div>
-        </div>
-      )
-    },
-    {
-      key: 'plan.display_name',
-      header: 'Plano',
-      render: (item: SubscriptionTableRow) => (
-        <Badge variant="outline">
-          {item.plan?.display_name}
-        </Badge>
-      )
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (item: SubscriptionTableRow) => (
-        <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
-          {item.status}
-        </Badge>
-      )
-    },
-    {
-      key: 'plan.price_monthly',
-      header: 'Valor Mensal',
-      render: (item: SubscriptionTableRow) => `R$ ${(item.plan?.price_monthly || 0).toFixed(2)}`
-    },
-    {
-      key: 'current_period_end',
-      header: 'Período',
-      render: (item: SubscriptionTableRow) => {
-        if (!item.current_period_end) return 'N/A';
-        return new Date(item.current_period_end).toLocaleDateString('pt-BR');
-      }
-    }
-  ];
-
   // Loading state otimizado com skeleton específico por seção
-  const isLoading = usersLoading || subscriptionsLoading || revenueLoading;
+  const isLoading = userCountLoading || revenueLoading;
   
   if (isLoading) {
     return (
@@ -419,39 +258,33 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <Tabs defaultValue="users" className="space-y-lg">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="users" className="flex items-center gap-2">
+          <TabsTrigger value="users" aria-controls="users-content" className="flex items-center gap-2">
             <Users className="size-4" />
             Usuários
           </TabsTrigger>
-          <TabsTrigger value="subscriptions" className="flex items-center gap-2">
+          <TabsTrigger value="subscriptions" aria-controls="subscriptions-content" className="flex items-center gap-2">
             <Crown className="size-4" />
             Assinaturas
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
+          <TabsTrigger value="analytics" aria-controls="analytics-content" className="flex items-center gap-2">
             <Activity className="size-4" />
             Analytics
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="users" className="space-y-lg">
-          <DataVisualization
-            title="Gestão de Usuários"
-            description="Gerencie todos os usuários da plataforma"
-            data={allUsers || []}
-            columns={userColumns}
-          />
+        <TabsContent value="users" id="users-content" className="space-y-lg">
+          <Suspense fallback={<div className="p-4">Carregando...</div>}>
+            <UsersTab />
+          </Suspense>
         </TabsContent>
 
-        <TabsContent value="subscriptions" className="space-y-lg">
-          <DataVisualization
-            title="Gestão de Assinaturas"
-            description="Monitore todas as assinaturas ativas na plataforma"
-            data={allSubscriptions || []}
-            columns={subscriptionColumns}
-          />
+        <TabsContent value="subscriptions" id="subscriptions-content" className="space-y-lg">
+          <Suspense fallback={<div className="p-4">Carregando...</div>}>
+            <SubscriptionsTab />
+          </Suspense>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-lg">
+        <TabsContent value="analytics" id="analytics-content" className="space-y-lg">
           <div className="grid gap-6">
             <Card>
               <CardHeader>
