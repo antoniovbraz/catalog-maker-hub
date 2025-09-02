@@ -17,13 +17,15 @@ describe('MLProductList', () => {
   it('should call sync even when required fields are missing', () => {
     const syncMutate = vi.fn();
     (useMLProducts as Mock).mockReturnValue({
-      data: [
-        {
-          id: '1',
-          name: 'Produto Teste',
-          sync_status: 'not_synced',
-        },
-      ],
+      data: {
+        pages: [[
+          {
+            id: '1',
+            name: 'Produto Teste',
+            sync_status: 'not_synced',
+          },
+        ]],
+      },
       isLoading: false,
     });
     (useMLIntegration as Mock).mockReturnValue({
@@ -46,17 +48,19 @@ describe('MLProductList', () => {
   it('should call sync when all required fields are present', () => {
     const syncMutate = vi.fn();
     (useMLProducts as Mock).mockReturnValue({
-      data: [
-        {
-          id: '1',
-          name: 'Produto Completo',
-          sku: 'SKU-1',
-          description: 'desc',
-          cost_unit: 100,
-          image_url: 'http://example.com/img.jpg',
-          sync_status: 'not_synced',
-        },
-      ],
+      data: {
+        pages: [[
+          {
+            id: '1',
+            name: 'Produto Completo',
+            sku: 'SKU-1',
+            description: 'desc',
+            cost_unit: 100,
+            image_url: 'http://example.com/img.jpg',
+            sync_status: 'not_synced',
+          },
+        ]],
+      },
       isLoading: false,
     });
     (useMLIntegration as Mock).mockReturnValue({
@@ -79,13 +83,15 @@ describe('MLProductList', () => {
   it('should call importFromML when clicking Importar do ML', () => {
     const importMutate = vi.fn();
     (useMLProducts as Mock).mockReturnValue({
-      data: [
-        {
-          id: '1',
-          name: 'Produto sem ML',
-          sync_status: 'not_synced',
-        },
-      ],
+      data: {
+        pages: [[
+          {
+            id: '1',
+            name: 'Produto sem ML',
+            sync_status: 'not_synced',
+          },
+        ]],
+      },
       isLoading: false,
     });
     (useMLIntegration as Mock).mockReturnValue({

@@ -63,7 +63,8 @@ export default function ProductDetail() {
   const { data: productData, isLoading: productLoading } = useProduct(id!);
   const product = productData as ProductWithCategory;
   const productId = product?.id;
-  const { data: mlProducts = [] } = useMLProducts();
+  const { data: mlProductsData } = useMLProducts();
+  const mlProducts = mlProductsData?.pages.flat() ?? [];
   const { data: productImages = [] } = useProductImages(id!);
   const { resyncProduct } = useMLProductResync();
   const { isExpiringSoon, expiresAt } = useMLConnectionStatus();

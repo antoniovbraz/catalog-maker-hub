@@ -13,7 +13,8 @@ import { ptBR } from "date-fns/locale";
 import { useState } from "react";
 
 export function MLProductList() {
-  const { data: products = [], isLoading } = useMLProducts();
+  const { data, isLoading } = useMLProducts();
+  const products = data?.pages.flat() ?? [];
   const { sync } = useMLIntegration();
   const { syncProduct, syncBatch, importFromML } = sync;
   
