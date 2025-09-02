@@ -21,12 +21,6 @@ CREATE TABLE public.saved_pricing (
 -- Enable RLS
 ALTER TABLE public.saved_pricing ENABLE ROW LEVEL SECURITY;
 
--- Create policy for public access
-CREATE POLICY "Allow public access" 
-ON public.saved_pricing 
-FOR ALL 
-USING (true);
-
 -- Create trigger for automatic timestamp updates
 CREATE TRIGGER update_saved_pricing_updated_at
 BEFORE UPDATE ON public.saved_pricing

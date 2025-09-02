@@ -86,15 +86,6 @@ ALTER TABLE public.marketplace_fixed_fee_rules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shipping_rules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sales ENABLE ROW LEVEL SECURITY;
 
--- Políticas básicas (acesso público para demo)
-CREATE POLICY "Allow public access" ON public.marketplaces FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON public.categories FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON public.products FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON public.commissions FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON public.marketplace_fixed_fee_rules FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON public.shipping_rules FOR ALL USING (true);
-CREATE POLICY "Allow public access" ON public.sales FOR ALL USING (true);
-
 -- Função para atualizar updated_at
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
