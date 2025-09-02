@@ -53,7 +53,6 @@ export async function importFromML(
   let offset = 0;
   let totalItems = 0;
   let importedCount = 0;
-  let skippedCount = 0;
   let processedCount = 0;
   const errors: string[] = [];
 
@@ -105,19 +104,6 @@ export async function importFromML(
 
         const itemDetail = await itemDetailResponse.json();
         console.log(`Got details for item ${itemId}:`, itemDetail.title);
-
-        const { data: existingMapping } = await supabase
-          .from('ml_product_mapping')
-          .select('*')
-          .eq('tenant_id', tenantId)
-          .eq('ml_item_id', itemId)
-          .maybeSingle();
-
-        if (existingMapping) {
-          console.log(`Item ${itemId} already exists, skipping`);
-          skippedCount++;
-          continue;
-        }
 
         let fullDescription = '';
         try {
@@ -230,48 +216,49 @@ export async function importFromML(
         const warrantyAttr = attributes.find((attr) => attr.id === 'WARRANTY');
         const warranty = warrantyAttr ? warrantyAttr.value_name : '';
 
-        // Gerar SKU limpo e único baseado no título do produto
-        const baseTitle = itemDetail.title
-          .replace(/[^a-zA-Z0-9]/g, '')
-          .substring(0, 15)
-          .toUpperCase();
-        const sku = `${baseTitle}-${itemId.substring(itemId.length - 6)}`;
-
-        // Capturar seller_sku do ML separadamente para referência
-        const mlSellerSku =
+        // Capturar SKU fornecido pelo ML
+        const mlSku =
           itemDetail.seller_custom_field ||
-          itemDetail.seller_sku ||
           attributes.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
           null;
+        const skuSource = mlSku ? 'mercado_livre' : 'none';
 
         const { data: newProduct, error: productError } = await supabase
-        .from('products')
-        .insert({
-          tenant_id: tenantId,
-          name: itemDetail.title,
-          description: fullDescription || itemDetail.description || '',
-          sku: sku,
-          category_id: categoryId,
-          cost_unit: itemDetail.price * 0.7,
-          packaging_cost: 0,
-          tax_rate: 0,
-          source: 'mercado_livre',
-          ml_stock_quantity: itemDetail.available_quantity || 0,
-          ml_attributes: attributes,
-          dimensions: dimensions,
-          weight: weight,
-          warranty: warranty,
-          brand: brand,
-          model: model,
-          ml_seller_sku: mlSellerSku,
-          ml_available_quantity: itemDetail.available_quantity || 0,
-          ml_sold_quantity: itemDetail.sold_quantity || 0,
-          ml_variation_id: itemDetail.variation_id || null,
-          ml_variations: itemDetail.variations || [],
-          ml_pictures: itemDetail.pictures || [],
-        })
-        .select()
-        .single();
+          .from('products')
+          .upsert(
+            {
+              tenant_id: tenantId,
+              name: itemDetail.title,
+              description: fullDescription || itemDetail.description || '',
+              sku: mlSku,
+              sku_source: skuSource,
+              category_id: categoryId,
+              cost_unit: itemDetail.price * 0.7,
+              packaging_cost: 0,
+              tax_rate: 0,
+              source: 'mercado_livre',
+              ml_stock_quantity: itemDetail.available_quantity || 0,
+              ml_attributes: attributes,
+              dimensions: dimensions,
+              weight: weight,
+              warranty: warranty,
+              brand: brand,
+              model: model,
+              ml_seller_sku: mlSku,
+              ml_available_quantity: itemDetail.available_quantity || 0,
+              ml_sold_quantity: itemDetail.sold_quantity || 0,
+              ml_variation_id: itemDetail.variation_id || null,
+              ml_variations: itemDetail.variations || [],
+              ml_pictures: itemDetail.pictures || [],
+              ml_item_id: itemId,
+              category_ml_id: itemDetail.category_id,
+              category_ml_path: categoryPath,
+              updated_from_ml_at: new Date().toISOString(),
+            },
+            { onConflict: 'tenant_id, ml_item_id' }
+          )
+          .select()
+          .single();
 
       if (productError) {
         console.error(`Failed to create product for item ${itemId}:`, productError);
@@ -285,28 +272,30 @@ export async function importFromML(
 
       const { error: mappingError } = await supabase
         .from('ml_product_mapping')
-        .insert({
-          tenant_id: tenantId,
-          product_id: newProduct.id,
-          ml_item_id: itemId,
-          ml_title: itemDetail.title,
-          ml_permalink: itemDetail.permalink,
-          ml_price: itemDetail.price,
-          ml_currency_id: itemDetail.currency_id || 'BRL',
-          ml_listing_type: itemDetail.listing_type_id || 'gold_special',
-          ml_condition: itemDetail.condition || 'new',
-          ml_category_id: itemDetail.category_id,
-          sync_status: 'synced',
-          sync_direction: 'from_ml',
-          last_sync_at: new Date().toISOString(),
-        });
+        .upsert(
+          {
+            tenant_id: tenantId,
+            product_id: newProduct.id,
+            ml_item_id: itemId,
+            ml_title: itemDetail.title,
+            ml_permalink: itemDetail.permalink,
+            ml_price: itemDetail.price,
+            ml_currency_id: itemDetail.currency_id || 'BRL',
+            ml_listing_type: itemDetail.listing_type_id || 'gold_special',
+            ml_condition: itemDetail.condition || 'new',
+            ml_category_id: itemDetail.category_id,
+            sync_status: 'synced',
+            sync_direction: 'from_ml',
+            last_sync_at: new Date().toISOString(),
+          },
+          { onConflict: 'tenant_id, ml_item_id' }
+        );
 
       if (mappingError) {
         console.error(
           `Failed to create mapping for item ${itemId}:`,
           mappingError
         );
-        await supabase.from('products').delete().eq('id', newProduct.id);
         errors.push(
           `Failed to create mapping for item ${itemId}: ${mappingError.message}`
         );
@@ -365,7 +354,6 @@ export async function importFromML(
       response_data: {
         total_found: totalItems,
         imported: importedCount,
-        skipped: skippedCount,
         processed: processedCount,
         errors: errors.length,
       },
@@ -373,14 +361,13 @@ export async function importFromML(
     });
 
   console.log(
-    `Import completed: ${importedCount} imported, ${skippedCount} skipped, ${errors.length} errors`
+    `Import completed: ${importedCount} imported, ${errors.length} errors`
   );
 
   return new Response(
     JSON.stringify({
       success: true,
       imported: importedCount,
-      skipped: skippedCount,
       processed: processedCount,
       total_found: totalItems,
       errors: errors,
