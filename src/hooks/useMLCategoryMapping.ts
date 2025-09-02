@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface MLCategoryMapping {
   id: string;
@@ -27,8 +28,10 @@ export interface PopularMLCategory {
 const ML_CATEGORY_MAPPING_QUERY_KEY = 'ml-category-mappings';
 
 export function useMLCategoryMappings() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY],
+    queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY, tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ml_category_mapping')
@@ -44,12 +47,15 @@ export function useMLCategoryMappings() {
 
       return data as MLCategoryMapping[];
     },
+    enabled: !!tenantId,
   });
 }
 
 export function usePopularMLCategories() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: ['popular-ml-categories'],
+    queryKey: ['popular-ml-categories', tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .rpc('get_popular_ml_categories');
@@ -61,12 +67,15 @@ export function usePopularMLCategories() {
 
       return data as PopularMLCategory[];
     },
+    enabled: !!tenantId,
     staleTime: 30 * 60 * 1000, // 30 minutos
   });
 }
 
 export function useCreateMLCategoryMapping() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: async (mapping: Omit<MLCategoryMapping, 'id' | 'tenant_id' | 'created_at' | 'updated_at'>) => {
@@ -83,8 +92,8 @@ export function useCreateMLCategoryMapping() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories'] });
+      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY, tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories', tenantId] });
       toast({
         title: "Mapeamento criado",
         description: "Mapeamento de categoria criado com sucesso.",
@@ -102,6 +111,8 @@ export function useCreateMLCategoryMapping() {
 
 export function useUpdateMLCategoryMapping() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: async ({ id, ...mapping }: Partial<MLCategoryMapping> & { id: string }) => {
@@ -119,8 +130,8 @@ export function useUpdateMLCategoryMapping() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories'] });
+      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY, tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories', tenantId] });
       toast({
         title: "Mapeamento atualizado",
         description: "Mapeamento de categoria atualizado com sucesso.",
@@ -138,6 +149,8 @@ export function useUpdateMLCategoryMapping() {
 
 export function useDeleteMLCategoryMapping() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -151,8 +164,8 @@ export function useDeleteMLCategoryMapping() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories'] });
+      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY, tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories', tenantId] });
       toast({
         title: "Mapeamento excluído",
         description: "Mapeamento de categoria excluído com sucesso.",
@@ -170,6 +183,8 @@ export function useDeleteMLCategoryMapping() {
 
 export function useSyncMLCategoryMapping() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: async ({
@@ -195,8 +210,8 @@ export function useSyncMLCategoryMapping() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories'] });
+      queryClient.invalidateQueries({ queryKey: [ML_CATEGORY_MAPPING_QUERY_KEY, tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['popular-ml-categories', tenantId] });
       toast({
         title: "Mapeamento sincronizado",
         description: "Categoria do Mercado Livre mapeada automaticamente.",

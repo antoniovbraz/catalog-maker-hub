@@ -3,13 +3,17 @@ import { assistantsService } from '@/services/assistants';
 import type { AssistantFormData } from '@/types/assistants';
 import { useToast } from '@/hooks/use-toast';
 import { useLogger } from '@/utils/logger';
+import { useAuth } from '@/contexts/AuthContext';
 
-const ASSISTANTS_QUERY_KEY = ['assistants'] as const;
+const ASSISTANTS_QUERY_KEY = (tenantId?: string) => ['assistants', tenantId] as const;
 
 export function useAssistants() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: ASSISTANTS_QUERY_KEY,
+    queryKey: ASSISTANTS_QUERY_KEY(tenantId),
     queryFn: () => assistantsService.getAll(),
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 }
@@ -18,11 +22,13 @@ export function useCreateAssistant() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const logger = useLogger('useCreateAssistant');
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: (data: AssistantFormData) => assistantsService.createAssistant(data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ASSISTANTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ASSISTANTS_QUERY_KEY(tenantId) });
       toast({
         title: "Assistente criado",
         description: `${data.name} foi criado com sucesso.`,
@@ -44,12 +50,14 @@ export function useUpdateAssistant() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const logger = useLogger('useUpdateAssistant');
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<AssistantFormData> }) =>
       assistantsService.updateAssistant(id, data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ASSISTANTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ASSISTANTS_QUERY_KEY(tenantId) });
       toast({
         title: "Assistente atualizado",
         description: `${data.name} foi atualizado com sucesso.`,
@@ -71,11 +79,13 @@ export function useDeleteAssistant() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const logger = useLogger('useDeleteAssistant');
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: (id: string) => assistantsService.deleteAssistant(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ASSISTANTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ASSISTANTS_QUERY_KEY(tenantId) });
       toast({
         title: "Assistente removido",
         description: "O assistente foi removido com sucesso.",
@@ -94,10 +104,12 @@ export function useDeleteAssistant() {
 }
 
 export function useAssistantByMarketplace(marketplace: string) {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: ['assistants', 'marketplace', marketplace],
+    queryKey: ['assistants', tenantId, 'marketplace', marketplace],
     queryFn: () => assistantsService.getAssistantByMarketplace(marketplace),
-    enabled: !!marketplace,
+    enabled: !!marketplace && !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 }

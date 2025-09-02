@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Dialog,
   DialogContent,
@@ -68,6 +69,8 @@ export function MLCategoryMappingModal({
   mappingId,
 }: MLCategoryMappingModalProps) {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const [isCustomCategory, setIsCustomCategory] = useState(false);
 
   const form = useForm<MLCategoryMappingFormData>({
@@ -83,21 +86,22 @@ export function MLCategoryMappingModal({
 
   // Buscar categorias locais
   const { data: localCategories } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['categories', tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
         .order('name');
-      
+
       if (error) throw error;
       return data;
     },
+    enabled: !!tenantId,
   });
 
   // Buscar mapping existente se estiver editando
   const { data: existingMapping, isLoading: isLoadingMapping } = useQuery({
-    queryKey: ['ml-category-mapping', mappingId],
+    queryKey: ['ml-category-mapping', tenantId, mappingId],
     queryFn: async () => {
       if (!mappingId) return null;
       
@@ -110,7 +114,7 @@ export function MLCategoryMappingModal({
       if (error) throw error;
       return data;
     },
-    enabled: !!mappingId,
+    enabled: !!tenantId && !!mappingId,
   });
 
   // Preencher form com dados existentes
@@ -147,7 +151,7 @@ export function MLCategoryMappingModal({
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ml-category-mappings'] });
+      queryClient.invalidateQueries({ queryKey: ['ml-category-mappings', tenantId] });
       toast({
         title: "Mapeamento salvo",
         description: "Mapeamento de categoria criado com sucesso.",

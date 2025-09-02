@@ -10,6 +10,9 @@ vi.mock('@/integrations/supabase/client', () => ({
     from: vi.fn(),
   },
 }));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ profile: { tenant_id: 'test-tenant-id' } })
+}));
 
 const { wrapper, queryClient } = createWrapper();
 

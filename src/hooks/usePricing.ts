@@ -2,22 +2,28 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pricingService } from "@/services/pricing";
 import { PricingFormData, PricingCalculationParams } from "@/types/pricing";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 export const PRICING_QUERY_KEY = "saved_pricing";
 
 export function useSavedPricing() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [PRICING_QUERY_KEY],
+    queryKey: [PRICING_QUERY_KEY, tenantId],
     queryFn: () => pricingService.getAllWithDetails(),
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
 export function usePricingByProductAndMarketplace(productId: string, marketplaceId: string) {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [PRICING_QUERY_KEY, productId, marketplaceId],
+    queryKey: [PRICING_QUERY_KEY, tenantId, productId, marketplaceId],
     queryFn: () => pricingService.getByProductAndMarketplace(productId, marketplaceId),
-    enabled: !!productId && !!marketplaceId,
+    enabled: !!productId && !!marketplaceId && !!tenantId,
   });
 }
 
@@ -63,9 +69,11 @@ export function useCalculateMargemReal() {
 
 export function useSavePricing() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
-    mutationFn: (data: PricingFormData & { preco_sugerido: number; margem_unitaria: number; margem_percentual: number }) => 
+    mutationFn: (data: PricingFormData & { preco_sugerido: number; margem_unitaria: number; margem_percentual: number }) =>
       pricingService.upsert({
         product_id: data.product_id,
         marketplace_id: data.marketplace_id,
@@ -82,7 +90,7 @@ export function useSavePricing() {
         margem_percentual: data.margem_percentual
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY, tenantId] });
       toast({
         title: "Sucesso",
         description: "Precificação salva com sucesso!",
@@ -100,11 +108,13 @@ export function useSavePricing() {
 
 export function useDeleteSavedPricing() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: (id: string) => pricingService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY, tenantId] });
       toast({
         title: "Sucesso",
         description: "Precificação deletada com sucesso!",
@@ -122,11 +132,13 @@ export function useDeleteSavedPricing() {
 
 export function useRecalculateAllPricing() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: () => pricingService.recalculateAllPricing(),
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [PRICING_QUERY_KEY, tenantId] });
       toast({
         title: "Recálculo concluído",
         description: `${result.updated} precificações atualizadas${result.errors > 0 ? ` (${result.errors} erros)` : ''}`,

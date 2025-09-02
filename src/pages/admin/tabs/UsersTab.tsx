@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DataVisualization } from "@/components/ui/data-visualization";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserTableRow {
   id: string;
@@ -15,9 +16,12 @@ interface UserTableRow {
 }
 
 function UsersTabComponent() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const { data: allUsers = [], isLoading } = useQuery({
-    queryKey: ["admin-users"],
+    queryKey: ["admin-users", tenantId],
     staleTime: 5 * 60 * 1000,
+    enabled: !!tenantId,
     queryFn: async (): Promise<UserTableRow[]> => {
       try {
         const { data, error } = await supabase

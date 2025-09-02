@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { handleSupabaseError } from "@/utils/errors";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ShippingRule {
   id: string;
@@ -41,6 +42,8 @@ interface ShippingRuleFormData {
 export function ShippingRuleModalForm({ rule, onSuccess, onSubmitForm }: ShippingRuleModalFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const isEdit = !!rule;
 
   const [formData, setFormData] = useState<ShippingRuleFormData>({
@@ -51,7 +54,7 @@ export function ShippingRuleModalForm({ rule, onSuccess, onSubmitForm }: Shippin
   });
 
   const { data: products = [] } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
@@ -60,10 +63,11 @@ export function ShippingRuleModalForm({ rule, onSuccess, onSubmitForm }: Shippin
       if (error) throw error;
       return data as Product[];
     },
+    enabled: !!tenantId,
   });
 
   const { data: marketplaces = [] } = useQuery({
-    queryKey: ["marketplaces"],
+    queryKey: ["marketplaces", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("marketplaces")
@@ -72,6 +76,7 @@ export function ShippingRuleModalForm({ rule, onSuccess, onSubmitForm }: Shippin
       if (error) throw error;
       return data as Marketplace[];
     },
+    enabled: !!tenantId,
   });
 
   const upsertMutation = useMutation({
@@ -92,7 +97,7 @@ export function ShippingRuleModalForm({ rule, onSuccess, onSubmitForm }: Shippin
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["shipping_rules"] });
+      queryClient.invalidateQueries({ queryKey: ["shipping_rules", tenantId] });
       toast({
         title: isEdit
           ? "Regra de frete atualizada com sucesso!"

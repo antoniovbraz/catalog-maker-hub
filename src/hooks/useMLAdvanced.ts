@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface MLPerformanceMetrics {
   total_operations: number;
@@ -12,8 +13,10 @@ export interface MLPerformanceMetrics {
 }
 
 export function useMLPerformanceMetrics(days: number = 7) {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: ["ml-performance-metrics", days],
+    queryKey: ["ml-performance-metrics", tenantId, days],
     queryFn: async (): Promise<MLPerformanceMetrics> => {
       const { data, error } = await supabase.rpc("get_ml_performance_metrics", {
         p_days: days,
@@ -33,16 +36,15 @@ export function useMLPerformanceMetrics(days: number = 7) {
         operations_by_type: {},
       };
     },
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
   });
 }
 
 export function useMLBackup() {
-  const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (): Promise<any> => {
+    mutationFn: async (): Promise<unknown> => {
       const { data, error } = await supabase.rpc("backup_ml_configuration");
 
       if (error) {

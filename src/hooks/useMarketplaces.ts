@@ -2,57 +2,73 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { marketplacesService } from "@/services/marketplaces";
 import { MarketplaceFormData } from "@/types/marketplaces";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 export const MARKETPLACES_QUERY_KEY = "marketplaces";
 
 export function useMarketplaces() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [MARKETPLACES_QUERY_KEY],
+    queryKey: [MARKETPLACES_QUERY_KEY, tenantId],
     queryFn: () => marketplacesService.getAll(),
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useMarketplacesHierarchical() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [MARKETPLACES_QUERY_KEY, 'hierarchical'],
+    queryKey: [MARKETPLACES_QUERY_KEY, tenantId, 'hierarchical'],
     queryFn: () => marketplacesService.getHierarchical(),
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useMarketplacePlatforms() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [MARKETPLACES_QUERY_KEY, 'platforms'],
+    queryKey: [MARKETPLACES_QUERY_KEY, tenantId, 'platforms'],
     queryFn: () => marketplacesService.getPlatforms(),
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useMarketplaceModalities(platformId?: string, categoryId?: string) {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [MARKETPLACES_QUERY_KEY, 'modalities', platformId, categoryId],
+    queryKey: [MARKETPLACES_QUERY_KEY, tenantId, 'modalities', platformId, categoryId],
     queryFn: () => platformId ? marketplacesService.getModalitiesByPlatform(platformId, categoryId) : Promise.resolve([]),
-    enabled: !!platformId,
+    enabled: !!platformId && !!tenantId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
 export function useMarketplace(id: string) {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   return useQuery({
-    queryKey: [MARKETPLACES_QUERY_KEY, id],
+    queryKey: [MARKETPLACES_QUERY_KEY, tenantId, id],
     queryFn: () => marketplacesService.getById(id),
-    enabled: !!id,
+    enabled: !!id && !!tenantId,
   });
 }
 
 export function useCreateMarketplace() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: (data: MarketplaceFormData) => marketplacesService.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({
         title: "Sucesso",
         description: "Marketplace criado com sucesso!",
@@ -70,12 +86,14 @@ export function useCreateMarketplace() {
 
 export function useUpdateMarketplace() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: MarketplaceFormData }) =>
       marketplacesService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({
         title: "Sucesso",
         description: "Marketplace atualizado com sucesso!",
@@ -93,11 +111,13 @@ export function useUpdateMarketplace() {
 
 export function useDeleteMarketplace() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   return useMutation({
     mutationFn: (id: string) => marketplacesService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({
         title: "Sucesso",
         description: "Marketplace deletado com sucesso!",

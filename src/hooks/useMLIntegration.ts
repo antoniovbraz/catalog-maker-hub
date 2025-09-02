@@ -2,31 +2,36 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { MLService, MLBatchSyncResult } from '@/services/ml-service';
+import { useAuth } from '@/contexts/AuthContext';
 export { useMLAuthDisconnect } from './useMLAuthDisconnect';
 
 // Chaves de query centralizadas
 export const ML_QUERY_KEYS = {
-  auth: ['ml', 'auth'] as const,
-  syncStatus: ['ml', 'sync', 'status'] as const,
-  syncProducts: ['ml', 'sync', 'products'] as const,
-  products: ['ml', 'products'] as const,
-  performanceMetrics: (days: number) => ['ml', 'performance', days] as const,
-  advancedSettings: ['ml', 'settings', 'advanced'] as const,
-  integrationHealth: ['ml', 'health'] as const,
+  base: (tenantId?: string) => ['ml', tenantId] as const,
+  auth: (tenantId?: string) => ['ml', tenantId, 'auth'] as const,
+  syncStatus: (tenantId?: string) => ['ml', tenantId, 'sync', 'status'] as const,
+  syncProducts: (tenantId?: string) => ['ml', tenantId, 'sync', 'products'] as const,
+  products: (tenantId?: string) => ['ml', tenantId, 'products'] as const,
+  performanceMetrics: (tenantId: string | undefined, days: number) => ['ml', tenantId, 'performance', days] as const,
+  advancedSettings: (tenantId?: string) => ['ml', tenantId, 'settings', 'advanced'] as const,
+  integrationHealth: (tenantId?: string) => ['ml', tenantId, 'health'] as const,
 } as const;
 
 // ====== HOOK PRINCIPAL ======
 export function useMLIntegration() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const queryClient = useQueryClient();
 
   // Autenticação
   const authQuery = useQuery({
-    queryKey: ML_QUERY_KEYS.auth,
+    queryKey: ML_QUERY_KEYS.auth(tenantId),
     queryFn: MLService.getAuthStatus,
+    enabled: !!tenantId,
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: (failureCount, error) => {
       // Não retentar para erros específicos
-      if (error?.message?.includes('token_expired') || 
+      if (error?.message?.includes('token_expired') ||
           error?.message?.includes('unauthorized')) {
         return false;
       }
@@ -36,31 +41,31 @@ export function useMLIntegration() {
 
   // Status de sincronização
   const syncStatusQuery = useQuery({
-    queryKey: ML_QUERY_KEYS.syncStatus,
+    queryKey: ML_QUERY_KEYS.syncStatus(tenantId),
     queryFn: MLService.getSyncStatus,
-    enabled: authQuery.data?.isConnected || false,
+    enabled: (!!tenantId && authQuery.data?.isConnected) || false,
     staleTime: 30 * 1000, // 30 segundos
   });
 
   // Métricas de performance
   const performanceQuery = useQuery({
-    queryKey: ML_QUERY_KEYS.performanceMetrics(7),
+    queryKey: ML_QUERY_KEYS.performanceMetrics(tenantId, 7),
     queryFn: () => MLService.getPerformanceMetrics(7),
-    enabled: authQuery.data?.isConnected || false,
+    enabled: (!!tenantId && authQuery.data?.isConnected) || false,
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
   // Configurações avançadas
   const advancedSettingsQuery = useQuery({
-    queryKey: ML_QUERY_KEYS.advancedSettings,
+    queryKey: ML_QUERY_KEYS.advancedSettings(tenantId),
     queryFn: MLService.getAdvancedSettings,
-    enabled: authQuery.data?.isConnected || false,
+    enabled: (!!tenantId && authQuery.data?.isConnected) || false,
     staleTime: 10 * 60 * 1000, // 10 minutos
   });
 
   // Invalidar todas as queries ML
   const invalidateAllQueries = () => {
-    queryClient.invalidateQueries({ queryKey: ['ml'] });
+    queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.base(tenantId) });
   };
 
   // Estado computado
@@ -123,7 +128,7 @@ export function useMLAuth() {
     mutationFn: ({ code, state }: { code: string; state: string }) => 
       MLService.handleCallback(code, state),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.auth });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.auth(tenantId) });
       toast({
         title: "Conectado com Sucesso",
         description: "Sua conta do Mercado Livre foi conectada.",
@@ -141,7 +146,7 @@ export function useMLAuth() {
   const refreshToken = useMutation({
     mutationFn: MLService.refreshToken,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.auth });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.auth(tenantId) });
       toast({
         title: "Token Renovado",
         description: "Sua sessão foi renovada com sucesso.",
@@ -159,7 +164,7 @@ export function useMLAuth() {
   const disconnect = useMutation({
     mutationFn: MLService.disconnect,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ml'] });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.base(tenantId) });
       toast({
         title: "Desconectado",
         description: "Sua conta do Mercado Livre foi desconectada.",
@@ -221,7 +226,7 @@ function useMLSyncActions() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus(tenantId) });
       toast({
         title: "Produto Sincronizado",
         description: `Produto sincronizado com sucesso no ML.`,
@@ -246,7 +251,7 @@ function useMLSyncActions() {
   const syncBatch = useMutation<MLBatchSyncResult, Error, string[]>({
     mutationFn: MLService.syncBatch,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus(tenantId) });
 
       if (data?.successful && data.successful > 0) {
         toast({
@@ -275,9 +280,9 @@ function useMLSyncActions() {
   const importFromML = useMutation({
     mutationFn: MLService.importFromML,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products });
-      queryClient.invalidateQueries({ queryKey: ['products'] }); // Invalidar produtos também
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus(tenantId) });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products(tenantId) });
+      queryClient.invalidateQueries({ queryKey: ['products', tenantId] }); // Invalidar produtos também
       
       toast({
         title: "Importação Concluída",
@@ -297,7 +302,7 @@ function useMLSyncActions() {
       mutationFn: ({ productId, mlItemId }: { productId: string; mlItemId: string }) =>
         MLService.linkProduct(productId, mlItemId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus(tenantId) });
       toast({
         title: "Produto Vinculado",
         description: "Produto vinculado com sucesso ao item do ML.",
@@ -316,7 +321,7 @@ function useMLSyncActions() {
       mutationFn: ({ adData }: { adData: Record<string, unknown> }) =>
         MLService.createAd(adData),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus(tenantId) });
       toast({
         title: "Anúncio Criado",
         description: `Anúncio "${data?.title || 'criado'}" criado com sucesso no ML.`,
@@ -346,7 +351,7 @@ export function useMLSettings() {
   const updateAdvancedSettings = useMutation({
     mutationFn: MLService.updateAdvancedSettings,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.advancedSettings });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.advancedSettings(tenantId) });
       toast({
         title: "Configurações Atualizadas",
         description: "Configurações avançadas do ML foram atualizadas.",

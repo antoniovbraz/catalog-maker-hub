@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { ML_QUERY_KEYS } from "./useMLIntegration";
 import { MLService } from "@/services/ml-service";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ResyncProductParams {
   productId: string;
@@ -13,6 +14,8 @@ interface ResyncBatchParams {
 
 export function useMLProductResync() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
 
   const resyncProduct = useMutation({
     mutationFn: async (params: ResyncProductParams) => {
@@ -22,9 +25,9 @@ export function useMLProductResync() {
     },
     onSuccess: (data, variables) => {
       // Invalidar caches relevantes
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products });
-      queryClient.invalidateQueries({ queryKey: ['product', variables.productId] });
+      queryClient.invalidateQueries({ queryKey: ['products', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products(tenantId) });
+      queryClient.invalidateQueries({ queryKey: ['product', tenantId, variables.productId] });
       
       toast({
         title: "Re-sincronização Concluída",
@@ -50,8 +53,8 @@ export function useMLProductResync() {
     },
     onSuccess: (data) => {
       // Invalidar caches relevantes
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products });
+      queryClient.invalidateQueries({ queryKey: ['products', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products(tenantId) });
       
       toast({
         title: "Re-sincronização em Lote Concluída",

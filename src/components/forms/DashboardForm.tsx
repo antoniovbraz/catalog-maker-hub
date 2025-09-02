@@ -13,6 +13,7 @@ import { Sparkline } from "@/components/ui/sparkline";
 import { EnhancedTooltip } from "@/components/common/EnhancedTooltip";
 import { useCalculatePrice, useSavePricing } from "@/hooks/usePricing";
 import { useAutomaticPricingUpdate } from "@/hooks/useAutomaticPricingUpdate";
+import { useAuth } from '@/contexts/AuthContext';
 import { PRICING_CONFIG } from "@/lib/config";
 import { useLogger } from "@/utils/logger";
 import { colors } from "@/styles/tokens";
@@ -241,9 +242,12 @@ export const DashboardForm = () => {
   // Hook para atualização automática das precificações
   useAutomaticPricingUpdate();
 
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
+
   // Fetch products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
@@ -252,11 +256,12 @@ export const DashboardForm = () => {
       if (error) throw error;
       return data as Product[];
     },
+    enabled: !!tenantId,
   });
 
   // Fetch marketplaces
   const { data: marketplaces = [], isLoading: loadingMarketplaces } = useQuery({
-    queryKey: ["marketplaces"],
+    queryKey: ["marketplaces", tenantId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("marketplaces")
@@ -265,11 +270,12 @@ export const DashboardForm = () => {
       if (error) throw error;
       return data as Marketplace[];
     },
+    enabled: !!tenantId,
   });
 
   // Fetch saved pricing for selected product and marketplaces
   const { data: savedPricings = [], isLoading: loadingSavedPricings } = useQuery<SavedPricing[]>({
-    queryKey: ["saved-pricing", selectedProductId, selectedMarketplaces],
+    queryKey: ["saved-pricing", tenantId, selectedProductId, selectedMarketplaces],
     queryFn: async () => {
       if (!selectedProductId || selectedMarketplaces.length === 0) return [];
 
@@ -286,7 +292,7 @@ export const DashboardForm = () => {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!selectedProductId && selectedMarketplaces.length > 0,
+    enabled: !!tenantId && !!selectedProductId && selectedMarketplaces.length > 0,
   });
 
   // Função para recalcular e salvar automaticamente
