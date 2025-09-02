@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionContext, ResyncProductRequest, errorResponse, corsHeaders } from '../types.ts';
+import {
+  ActionContext,
+  ResyncProductRequest,
+  errorResponse,
+  corsHeaders,
+} from '../types.ts';
+import { parseWeight, weightToGrams } from './importFromML.ts';
 
 export async function resyncProduct(
   req: ResyncProductRequest,
@@ -84,9 +90,14 @@ export async function resyncProduct(
         null,
     } as Record<string, any>;
 
-    const weight = parseFloat(
-      itemData.attributes?.find((attr: any) => attr.id === 'WEIGHT')?.value_name || '0'
+    const weightAttr = itemData.attributes?.find(
+      (attr: any) => attr.id === 'WEIGHT'
     );
+    let weight = 0;
+    if (weightAttr?.value_name) {
+      const { value, unit } = parseWeight(weightAttr.value_name);
+      weight = weightToGrams(value, unit);
+    }
 
     let skuToUse = itemData.seller_sku || '';
     if (!skuToUse && itemData.variations?.length > 0) {
