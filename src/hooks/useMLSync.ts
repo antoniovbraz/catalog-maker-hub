@@ -14,7 +14,7 @@ const mlSyncProductSchema = z.object({
   id: z.string(),
   name: z.string(),
   ml_item_id: z.string().optional(),
-  sync_status: z.enum(['not_synced', 'syncing', 'synced', 'error']),
+  sync_status: z.enum(['not_synced', 'syncing', 'synced', 'pending', 'error']),
   last_sync_at: z.string().optional(),
   error_message: z.string().optional(),
 });
