@@ -107,6 +107,8 @@ export function useMLIntegration() {
 // ====== HOOKS ESPECÍFICOS PARA AÇÕES ======
 
 export function useMLAuth() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const queryClient = useQueryClient();
 
   const startAuth = useMutation({
@@ -188,6 +190,8 @@ export function useMLAuth() {
 }
 
 function useMLSyncActions() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const queryClient = useQueryClient();
 
   const syncProduct = useMutation({
@@ -346,6 +350,8 @@ function useMLSyncActions() {
 }
 
 export function useMLSettings() {
+  const { profile } = useAuth();
+  const tenantId = profile?.tenant_id;
   const queryClient = useQueryClient();
 
   const updateAdvancedSettings = useMutation({
