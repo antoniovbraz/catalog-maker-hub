@@ -1,4 +1,5 @@
 import pino from 'https://esm.sh/pino@8';
+import { AsyncLocalStorage } from 'https://deno.land/std@0.168.0/node/async_hooks.ts';
 
 const originalConsole = globalThis.console;
 
@@ -33,23 +34,24 @@ const baseLogger = pino(
   stream,
 );
 
-function bindLogger(logger: pino.Logger): Console {
-  return {
-    log: logger.info.bind(logger),
-    info: logger.info.bind(logger),
-    error: logger.error.bind(logger),
-    warn: logger.warn.bind(logger),
-    debug: logger.debug.bind(logger),
-  } as Console;
+const loggerStore = new AsyncLocalStorage<pino.Logger>();
+
+function getLogger(): pino.Logger {
+  return loggerStore.getStore() ?? baseLogger;
 }
 
-// Default console without correlationId
-globalThis.console = bindLogger(baseLogger);
+globalThis.console = {
+  log: (...args: unknown[]) => getLogger().info(...args),
+  info: (...args: unknown[]) => getLogger().info(...args),
+  error: (...args: unknown[]) => getLogger().error(...args),
+  warn: (...args: unknown[]) => getLogger().warn(...args),
+  debug: (...args: unknown[]) => getLogger().debug(...args),
+} as Console;
 
 export function setupLogger(headers: Headers) {
   const correlationId = headers.get('x-correlation-id') ?? crypto.randomUUID();
   const logger = baseLogger.child({ correlationId });
-  globalThis.console = bindLogger(logger);
+  loggerStore.enterWith(logger);
   return logger;
 }
 
