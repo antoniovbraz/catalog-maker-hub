@@ -120,7 +120,8 @@ export async function importFromML(
         }
 
         let categoryName = '';
-        let categoryPath: Array<{ id: string; name: string }> = [];
+        let categoryPathArray: Array<{ id: string; name: string }> = [];
+        let categoryPath = '';
         if (itemDetail.category_id) {
           try {
             const catResponse = await fetch(
@@ -130,7 +131,10 @@ export async function importFromML(
             if (catResponse.ok) {
               const catData = await catResponse.json();
               categoryName = catData.name;
-              categoryPath = catData.path_from_root || [];
+              categoryPathArray = catData.path_from_root || [];
+              categoryPath = categoryPathArray
+                .map((c: { name: string }) => c.name)
+                .join(' > ');
             }
           } catch (error) {
             console.log(
@@ -148,7 +152,7 @@ export async function importFromML(
               tenant_id: tenantId,
               ml_category_id: itemDetail.category_id,
               ml_category_name: categoryName,
-              ml_path_from_root: categoryPath,
+              ml_path_from_root: categoryPathArray,
               auto_mapped: true,
             })
             .select()

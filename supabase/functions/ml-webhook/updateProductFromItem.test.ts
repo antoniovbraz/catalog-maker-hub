@@ -44,9 +44,15 @@ describe('updateProductFromItem', () => {
       if (table === 'products') return productsQuery;
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (globalThis as any).fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ plain_text: 'desc' }),
+    (globalThis as any).fetch = vi.fn((url: RequestInfo) => {
+      const urlStr = url.toString();
+      if (urlStr.includes('/description')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ plain_text: 'desc' }) });
+      }
+      if (urlStr.includes('/categories')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ path_from_root: [{ name: 'Root' }] }) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
     });
   });
 
@@ -57,6 +63,7 @@ describe('updateProductFromItem', () => {
       attributes: [],
       pictures: [{ url: 'pic1' }],
       available_quantity: 3,
+      category_id: 'CAT1'
     };
 
     const fields = await updateProductFromItem(supabase, 'tenant1', itemData, 'token');
@@ -66,6 +73,9 @@ describe('updateProductFromItem', () => {
     expect(productsQuery.eq).toHaveBeenCalledWith('id', 'prod-1');
     expect(productsQuery.eq).toHaveBeenCalledWith('tenant_id', 'tenant1');
     expect(fields).toEqual(['sku', 'attributes', 'pictures', 'stock', 'description']);
+    const updateArgs = productsQuery.update.mock.calls[0][0];
+    expect(updateArgs.category_ml_id).toBe('CAT1');
+    expect(updateArgs.category_ml_path).toBe('Root');
   });
 
   it('skips description update when fetch fails', async () => {
