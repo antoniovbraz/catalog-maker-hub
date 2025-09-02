@@ -82,7 +82,7 @@ export function useMLIntegration() {
     // Dados
     auth: authData,
     sync: {
-      status: syncData,
+      ...(syncData ?? {}),
       ...syncActions,
     },
     performance: performanceData,
