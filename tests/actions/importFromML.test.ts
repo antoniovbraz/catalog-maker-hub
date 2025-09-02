@@ -110,7 +110,7 @@ describe('importFromML action', () => {
     const inserted = productsTable.upsert.mock.calls[0][0];
     expect(inserted.sku).toBe('SCF123');
     expect(inserted.sku_source).toBe('mercado_livre');
-    expect(inserted.category_ml_path).toEqual([{ id: 'CAT1', name: 'Root' }]);
+    expect(inserted.category_ml_path).toBe('Root');
   });
 
   it('uses seller_sku as sku when seller_custom_field is missing', async () => {

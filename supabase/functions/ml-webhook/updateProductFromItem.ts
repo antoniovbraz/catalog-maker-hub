@@ -33,6 +33,24 @@ export async function updateProductFromItem(
     console.warn('Could not fetch description:', e);
   }
 
+  let categoryPath = '';
+  if (itemData.category_id) {
+    try {
+      const catResponse = await fetch(
+        `https://api.mercadolibre.com/categories/${itemData.category_id}`,
+        { headers: { Authorization: `Bearer ${mlToken}` } }
+      );
+      if (catResponse.ok) {
+        const catData = await catResponse.json();
+        categoryPath = (catData.path_from_root || [])
+          .map((c: { name: string }) => c.name)
+          .join(' > ');
+      }
+    } catch (e) {
+      console.warn('Could not fetch category:', e);
+    }
+  }
+
   const variation =
     mapping?.ml_variation_id
       ? itemData.variations?.find(
@@ -68,6 +86,11 @@ export async function updateProductFromItem(
     updated_at: new Date().toISOString(),
     updated_from_ml_at: new Date().toISOString(),
   };
+
+  if (itemData.category_id) {
+    updateData.category_ml_id = itemData.category_id;
+    updateData.category_ml_path = categoryPath;
+  }
 
   if (description !== undefined) {
     updateData.description = description;

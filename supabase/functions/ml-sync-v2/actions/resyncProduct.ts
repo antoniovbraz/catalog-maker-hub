@@ -57,6 +57,7 @@ export async function resyncProduct(
     }
 
     let categoryData = null as any;
+    let categoryPath = '';
     if (itemData.category_id) {
       try {
         const catResponse = await fetch(
@@ -65,6 +66,9 @@ export async function resyncProduct(
         );
         if (catResponse.ok) {
           categoryData = await catResponse.json();
+          categoryPath = (categoryData.path_from_root || [])
+            .map((c: any) => c.name)
+            .join(' > ');
         }
       } catch (e) {
         console.warn('Could not fetch category:', e);
@@ -146,6 +150,11 @@ export async function resyncProduct(
       updated_at: new Date().toISOString(),
       updated_from_ml_at: new Date().toISOString(),
     };
+
+    if (categoryData) {
+      updateData.category_ml_id = categoryData.id;
+      updateData.category_ml_path = categoryPath;
+    }
 
     if (shouldUpdateName) updateData.name = itemData.title;
     if (shouldUpdateCost) updateData.cost_unit = itemData.price;

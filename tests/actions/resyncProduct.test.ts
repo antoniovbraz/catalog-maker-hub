@@ -20,11 +20,16 @@ describe('resyncProduct action', () => {
       seller_sku: '',
       variations: [],
       pictures: [],
+      category_id: 'CAT1'
     } as any;
 
     global.fetch = vi.fn((url: RequestInfo) => {
-      if (url.toString().includes('/description')) {
+      const urlStr = url.toString();
+      if (urlStr.includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
+      }
+      if (urlStr.includes('/categories/CAT1')) {
+        return Promise.resolve({ ok: true, json: async () => ({ id: 'CAT1', path_from_root: [{ name: 'Root' }] }) } as any);
       }
       return Promise.resolve({ ok: true, json: async () => itemData } as any);
     });
@@ -67,6 +72,8 @@ describe('resyncProduct action', () => {
     const updateArg = productsTable.update.mock.calls[0][0];
     expect(updateArg.cost_unit).toBe(itemData.price);
     expect(updateArg.name).toBe(itemData.title);
+    expect(updateArg.category_ml_id).toBe('CAT1');
+    expect(updateArg.category_ml_path).toBe('Root');
   });
 
   it('should not override existing cost_unit', async () => {
