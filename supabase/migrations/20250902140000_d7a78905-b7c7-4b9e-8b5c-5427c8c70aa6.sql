@@ -11,8 +11,14 @@ BEGIN
 
   UPDATE public.ml_auth_tokens
   SET
-    access_token = encode(pgp_sym_encrypt(access_token, secret_key), 'base64'),
-    refresh_token = encode(pgp_sym_encrypt(refresh_token, secret_key), 'base64')
+    access_token = CASE
+      WHEN access_token LIKE '%.%.%' THEN encode(pgp_sym_encrypt(access_token, secret_key), 'base64')
+      ELSE access_token
+    END,
+    refresh_token = CASE
+      WHEN refresh_token LIKE '%.%.%' THEN encode(pgp_sym_encrypt(refresh_token, secret_key), 'base64')
+      ELSE refresh_token
+    END
   WHERE access_token IS NOT NULL OR refresh_token IS NOT NULL;
 END;
 $$;
