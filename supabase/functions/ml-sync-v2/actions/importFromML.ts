@@ -243,7 +243,9 @@ export async function importFromML(
           null;
         const skuSource = mlSku ? 'mercado_livre' : 'none';
 
-        const cost = parseCost(itemDetail.sale_terms || []);
+        const cost =
+          parseCost(itemDetail.sale_terms || []) ??
+          (itemDetail.price ?? 0) * 0.7;
 
         const { data: newProduct, error: productError } = await supabase
           .from('products')

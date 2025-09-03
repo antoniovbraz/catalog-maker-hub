@@ -70,7 +70,7 @@ describe('resyncProduct action', () => {
 
     expect(productsTable.update).toHaveBeenCalled();
     const updateArg = productsTable.update.mock.calls[0][0];
-    expect(updateArg.cost_unit).toBe(itemData.price);
+    expect(updateArg.cost_unit).toBe(itemData.price * 0.7);
     expect(updateArg.name).toBe(itemData.title);
     expect(updateArg.category_ml_id).toBe('CAT1');
     expect(updateArg.category_ml_path).toBe('Root');
