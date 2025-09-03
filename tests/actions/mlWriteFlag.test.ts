@@ -1,12 +1,26 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('../../supabase/functions/ml-sync-v2/actions/syncProduct.ts', async () => {
-  const actual = await vi.importActual<
-    typeof import('../../supabase/functions/ml-sync-v2/actions/syncProduct.ts')
-  >('../../supabase/functions/ml-sync-v2/actions/syncProduct.ts');
+  const { isMLWriteEnabled } = await vi.importActual<
+    typeof import('../../supabase/functions/shared/write-guard.ts')
+  >('../../supabase/functions/shared/write-guard.ts');
+
+  const syncSingleProduct = vi.fn().mockResolvedValue({ success: true });
   return {
-    ...actual,
-    syncSingleProduct: vi.fn().mockResolvedValue({ success: true }),
+    syncSingleProduct,
+    async syncProduct(req: any, ctx: any) {
+      if (!isMLWriteEnabled()) {
+        return new Response(null, { status: 403 });
+      }
+      await syncSingleProduct(
+        ctx.supabase,
+        ctx.tenantId,
+        req.product_id,
+        ctx.mlToken,
+        req.force_update
+      );
+      return new Response(null, { status: 200 });
+    },
   };
 });
 
