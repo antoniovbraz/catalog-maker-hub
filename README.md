@@ -1,5 +1,7 @@
 # Catalog Maker Hub - Agora com Integração ao Mercado Livre
 
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+
 ![Catalog Maker Hub](https://raw.githubusercontent.com/antoniovbraz/catalog-maker-hub/main/public/logo.png)
 
 **Catalog Maker Hub** é uma aplicação de código aberto projetada para centralizar e simplificar a gestão de catálogos de produtos em múltiplos marketplaces. Esta versão introduz uma poderosa integração nativa com a **API do Mercado Livre**, permitindo que você gerencie seus anúncios, vendas e estoque de forma automatizada e eficiente.
