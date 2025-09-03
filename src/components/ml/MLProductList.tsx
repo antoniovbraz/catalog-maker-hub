@@ -6,12 +6,12 @@ import { Package, Play, Loader2 } from "@/components/ui/icons";
 import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { MLProductRow } from "./MLProductRow";
 
 export function MLProductList() {
   const { data, isLoading } = useMLProducts();
-  const products = data?.pages.flat() ?? [];
+  const products = useMemo(() => data?.pages.flat() ?? [], [data]);
   const { sync, writeEnabled } = useMLIntegration();
   const { syncProduct, syncBatch, importFromML } = sync;
   

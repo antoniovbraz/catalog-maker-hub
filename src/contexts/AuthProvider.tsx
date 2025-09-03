@@ -131,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout)
       subscription.unsubscribe()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // CORREÇÃO CRÍTICA: Remover [logger] para evitar loop infinito
 
   const signIn = async (email: string, password: string) => {
