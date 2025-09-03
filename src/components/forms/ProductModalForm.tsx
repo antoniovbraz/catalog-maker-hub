@@ -46,15 +46,18 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
 
   useEffect(() => {
     if (product) {
-      setFormData({
-        name: product.name,
-        description: product.description || "",
-        sku: product.sku || "",
-        category_id: product.category_id || "none",
-        cost_unit: product.cost_unit || 0,
-        packaging_cost: product.packaging_cost || 0,
-        tax_rate: product.tax_rate || 0,
-      });
+        setFormData({
+          name: product.name,
+          description: product.description || "",
+          sku: product.sku || "",
+          category_id: product.category_id || "none",
+          cost_unit: product.cost_unit || 0,
+          packaging_cost: product.packaging_cost || 0,
+          tax_rate: product.tax_rate || 0,
+          source: product.source || "manual",
+          origin: product.origin || "manual", 
+          sku_source: product.sku_source || "none",
+        });
     } else {
       setFormData({
         name: "",

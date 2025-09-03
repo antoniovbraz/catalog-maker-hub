@@ -26,8 +26,8 @@ export function MLSyncStatus() {
     return null;
   }
 
-  const syncProgress = syncStatus && syncStatus.total > 0 ? 
-    (syncStatus.synced / syncStatus.total) * 100 : 0;
+  const syncProgress = syncStatus && (syncStatus.total || 0) > 0 ? 
+    ((syncStatus.synced || 0) / (syncStatus.total || 1)) * 100 : 0;
 
   const stats = [
     {

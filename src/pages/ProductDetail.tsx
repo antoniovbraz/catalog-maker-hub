@@ -352,22 +352,22 @@ export default function ProductDetail() {
                       <p>{formatWeight(product.weight)}</p>
                     </div>
                   )}
-                  {product.dimensions?.length && (
+                  {product.dimensions && typeof product.dimensions === 'object' && 'length' in product.dimensions && (product.dimensions as any).length && (
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                      <p>{product.dimensions.length} cm</p>
+                      <p>{(product.dimensions as any).length} cm</p>
                     </div>
                   )}
-                  {product.dimensions?.width && (
+                  {product.dimensions && typeof product.dimensions === 'object' && 'width' in product.dimensions && (product.dimensions as any).width && (
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                      <p>{product.dimensions.width} cm</p>
+                      <p>{(product.dimensions as any).width} cm</p>
                     </div>
                   )}
-                  {product.dimensions?.height && (
+                  {product.dimensions && typeof product.dimensions === 'object' && 'height' in product.dimensions && (product.dimensions as any).height && (
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                      <p>{product.dimensions.height} cm</p>
+                      <p>{(product.dimensions as any).height} cm</p>
                     </div>
                   )}
                 </div>
@@ -410,8 +410,8 @@ export default function ProductDetail() {
                     key={attr.id || attr.name || index}
                     className="flex justify-between text-sm"
                   >
-                    <span className="font-medium">{attr.name || attr.id}</span>
-                    <span>{attr.value_name || attr.value_id || '-'}</span>
+                    <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
+                    <span>{String(attr.value_name || attr.value_id || '-')}</span>
                   </div>
                 ))}
               </CardContent>
@@ -468,7 +468,7 @@ export default function ProductDetail() {
                   <ProductSourceBadge 
                     source={product.source} 
                     mlStatus={mlProduct?.sync_status}
-                    mlItemId={mlProduct?.ml_item_id}
+                    mlItemId={mlProduct?.ml_item_id || undefined}
                   />
                 </div>
               </div>

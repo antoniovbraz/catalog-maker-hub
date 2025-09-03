@@ -125,7 +125,7 @@ export function CommissionModalForm({ commission, onSuccess, onSubmitForm }: Com
       <div className="space-y-2">
         <Label htmlFor="category">Categoria</Label>
         <Select
-          value={formData.category_id}
+          value={formData.category_id || ""}
           onValueChange={(value) => handleInputChange("category_id", value)}
           disabled={isLoading}
         >

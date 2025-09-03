@@ -165,7 +165,7 @@ export function CommissionFormEnhanced({
         <div>
           <Label htmlFor="category">Categoria</Label>
           <Select 
-            value={formData.category_id} 
+            value={formData.category_id || ""} 
             onValueChange={(value) => handleInputChange("category_id", value)}
           >
             <SelectTrigger>

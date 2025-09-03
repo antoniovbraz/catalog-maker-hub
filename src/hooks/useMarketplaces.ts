@@ -66,7 +66,7 @@ export function useCreateMarketplace() {
   const tenantId = profile?.tenant_id;
 
   return useMutation({
-    mutationFn: (data: MarketplaceFormData) => marketplacesService.create(data),
+    mutationFn: (data: MarketplaceFormData) => marketplacesService.create(data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({
@@ -91,7 +91,7 @@ export function useUpdateMarketplace() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: MarketplaceFormData }) =>
-      marketplacesService.update(id, data),
+      marketplacesService.update(id, data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({

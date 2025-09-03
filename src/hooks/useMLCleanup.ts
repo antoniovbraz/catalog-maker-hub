@@ -83,8 +83,8 @@ export function useMLStatus() {
           userIdML: data.user_id_ml,
           expiresAt: data.expires_at
         };
-      } catch (error) {
-        return { status: 'error', error: error.message };
+      } catch (error: unknown) {
+        return { status: 'error', error: (error as Error).message };
       }
     }
   };

@@ -59,7 +59,7 @@ export function DataVisualization<T extends { id: string }>({
   const [currentPage, setCurrentPage] = useState(1);
 
   const getValue = (item: T, key: string): unknown => {
-    return key.split('.').reduce((obj, k) => obj?.[k], item);
+    return key.split('.').reduce((obj: any, k: string) => obj?.[k], item);
   };
 
   // Filter data based on search term

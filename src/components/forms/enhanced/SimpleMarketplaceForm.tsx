@@ -134,8 +134,8 @@ export function SimpleMarketplaceForm({
       marketplace_type: inferredType,
       platform_id: inferredType === "platform" ? null : formData.platform_id,
       category_restrictions: allCategoriesSelected ? [] : selectedCategories,
-      description: formData.description || null,
-      url: formData.url || null,
+      description: formData.description || undefined,
+      url: formData.url || undefined,
     };
     
     if (isEditing && editingMarketplace) {
