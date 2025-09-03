@@ -300,15 +300,10 @@ function useMLSyncActions() {
 
   const importFromML = useMutation({
     mutationFn: MLService.importFromML,
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.syncStatus(tenantId) });
       queryClient.invalidateQueries({ queryKey: ML_QUERY_KEYS.products(tenantId) });
       queryClient.invalidateQueries({ queryKey: ['products', tenantId] }); // Invalidar produtos também
-      
-      toast({
-        title: "Importação Concluída",
-        description: `${data?.imported || 0} produtos importados do Mercado Livre.`,
-      });
     },
     onError: (error: Error) => {
       toast({

@@ -1,10 +1,18 @@
  
 import { describe, it, expect, vi, afterEach } from 'vitest';
+
+vi.mock('../../supabase/functions/ml-sync-v2/actions/resyncProduct.ts', () => ({
+  resyncProduct: vi
+    .fn()
+    .mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 200 })),
+}));
+
 import {
   importFromML,
   parseWeight,
   weightToGrams,
 } from '../../supabase/functions/ml-sync-v2/actions/importFromML.ts';
+import { resyncProduct } from '../../supabase/functions/ml-sync-v2/actions/resyncProduct.ts';
 
 const originalFetch = global.fetch;
 
@@ -60,6 +68,9 @@ describe('importFromML action', () => {
     };
     const mappingTable = {
       upsert: vi.fn().mockResolvedValue({ error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null }),
     };
     const mlSyncLogTable = { insert: vi.fn().mockResolvedValue({}) };
     const productImagesTable = { insert: vi.fn().mockResolvedValue({ error: null }) };
@@ -104,6 +115,7 @@ describe('importFromML action', () => {
       supabase,
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
+      mlToken: 'token',
     });
 
     expect(productsTable.upsert).toHaveBeenCalled();
@@ -154,6 +166,9 @@ describe('importFromML action', () => {
     };
     const mappingTable = {
       upsert: vi.fn().mockResolvedValue({ error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null }),
     };
     const mlSyncLogTable = { insert: vi.fn().mockResolvedValue({}) };
     const productImagesTable = { insert: vi.fn().mockResolvedValue({ error: null }) };
@@ -181,6 +196,7 @@ describe('importFromML action', () => {
       supabase,
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
+      mlToken: 'token',
     });
 
     expect(productsTable.upsert).toHaveBeenCalled();
@@ -229,6 +245,9 @@ describe('importFromML action', () => {
     };
     const mappingTable = {
       upsert: vi.fn().mockResolvedValue({ error: null }),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null }),
     };
     const mlSyncLogTable = { insert: vi.fn().mockResolvedValue({}) };
     const productImagesTable = { insert: vi.fn().mockResolvedValue({ error: null }) };
@@ -256,12 +275,61 @@ describe('importFromML action', () => {
       supabase,
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
+      mlToken: 'token',
     });
 
     expect(productsTable.upsert).toHaveBeenCalled();
     const inserted = productsTable.upsert.mock.calls[0][0];
     expect(inserted.sku).toBeNull();
     expect(inserted.sku_source).toBe('none');
+  });
+
+  it('chama resyncProduct quando já existe mapeamento', async () => {
+    global.fetch = vi.fn((url: RequestInfo) => {
+      const urlStr = url.toString();
+      if (urlStr.includes('/items/search')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ results: ['MLX1'], paging: { total: 1, offset: 0, limit: 50 } }),
+        } as any);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) } as any);
+    });
+
+    const mappingTable = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: { product_id: 'prod1' } }),
+      upsert: vi.fn().mockResolvedValue({ error: null }),
+    };
+
+    const supabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'ml_product_mapping') return mappingTable;
+        return {
+          upsert: vi.fn().mockReturnThis(),
+          select: vi.fn().mockReturnThis(),
+          single: vi.fn().mockResolvedValue({ data: null, error: null }),
+          update: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          insert: vi.fn().mockResolvedValue({ error: null }),
+          maybeSingle: vi.fn().mockResolvedValue({ data: null }),
+          ilike: vi.fn().mockReturnThis(),
+        };
+      }),
+    } as any;
+
+    await importFromML({ action: 'import_from_ml' } as any, {
+      supabase,
+      tenantId: 'tenant1',
+      authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
+      mlToken: 'token',
+    });
+
+    expect(resyncProduct).toHaveBeenCalledWith(
+      { action: 'resync_product', productId: 'prod1' },
+      expect.objectContaining({ tenantId: 'tenant1' })
+    );
   });
 });
 
