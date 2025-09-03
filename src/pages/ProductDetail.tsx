@@ -11,6 +11,7 @@ import {
   Ruler,
   Weight,
   AlertTriangle,
+  Info,
 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +62,11 @@ interface MLVariation {
   attribute_combinations?: { name: string; value_name: string }[];
 }
 
+interface ProductPriceInfo {
+  price: number;
+  source: 'ml' | 'product';
+}
+
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -92,6 +98,31 @@ export default function ProductDetail() {
       return data as MLSyncLog[];
     },
     enabled: !!productId && !!tenantId,
+  });
+
+  const { data: priceInfo } = useQuery<ProductPriceInfo | null>({
+    queryKey: ["product-price", productId],
+    queryFn: async () => {
+      if (!productId) return null;
+      const { data: mlData } = await supabase
+        .from("ml_product_mapping")
+        .select("ml_price")
+        .eq("product_id", productId)
+        .maybeSingle();
+      if (mlData?.ml_price) {
+        return { price: mlData.ml_price, source: "ml" as const };
+      }
+      const { data: productRow } = await supabase
+        .from("products")
+        .select("price")
+        .eq("id", productId)
+        .maybeSingle();
+      return {
+        price: productRow?.price || 0,
+        source: "product" as const,
+      };
+    },
+    enabled: !!productId,
   });
 
   if (productLoading) {
@@ -315,7 +346,23 @@ export default function ProductDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <div className="flex items-center gap-1">
+                    <label className="text-sm font-medium text-muted-foreground">Preço de venda</label>
+                    {priceInfo?.source === "ml" && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="size-3 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>Preço do Mercado Livre</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                  </div>
+                  <p className="text-lg font-semibold">{formatarMoeda(priceInfo?.price || 0)}</p>
+                </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
                   <p className="text-lg font-semibold">{formatarMoeda(product.cost_unit)}</p>
