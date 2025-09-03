@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "lint": "eslint . --cache",
+    "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix --cache",
     "type-check": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
