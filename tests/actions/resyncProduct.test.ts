@@ -76,7 +76,7 @@ describe('resyncProduct action', () => {
     expect(updateArg.category_ml_path).toBe('Root');
   });
 
-  it('should not override existing cost_unit', async () => {
+  it('updates cost_unit when fallback differs from stored value', async () => {
     const itemData = {
       id: 'MLA2',
       title: 'Another Item',
@@ -121,9 +121,9 @@ describe('resyncProduct action', () => {
       }),
     } as any;
 
-    await resyncProduct({ action: 'resync_product', productId: 'prod2' }, { 
-      supabase, 
-      tenantId: 'tenant1', 
+    await resyncProduct({ action: 'resync_product', productId: 'prod2' }, {
+      supabase,
+      tenantId: 'tenant1',
       mlToken: 'token',
       authToken: {},
       mlClientId: 'test',
@@ -132,7 +132,68 @@ describe('resyncProduct action', () => {
 
     expect(productsTable.update).toHaveBeenCalled();
     const updateArg = productsTable.update.mock.calls[0][0];
-    expect(updateArg.cost_unit).toBeUndefined();
+    expect(updateArg.cost_unit).toBeCloseTo(itemData.price * 0.7);
+    expect(updateArg.name).toBeUndefined();
+  });
+
+  it('replaces fallback cost when sale terms provide real cost', async () => {
+    const itemData = {
+      id: 'MLA6',
+      title: 'Item With Real Cost',
+      price: 120,
+      sale_terms: [{ id: 'SELLER_COST', value_name: '80' }],
+      attributes: [],
+      available_quantity: 0,
+      sold_quantity: 0,
+      seller_sku: '',
+      variations: [],
+      pictures: [],
+    } as any;
+
+    global.fetch = vi.fn((url: RequestInfo) => {
+      if (url.toString().includes('/description')) {
+        return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
+      }
+      return Promise.resolve({ ok: true, json: async () => itemData } as any);
+    });
+
+    const productsTable = {
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      error: null,
+    };
+    const mappingTable = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { ml_item_id: 'MLA6', products: { id: 'prod6', cost_unit: 70, name: 'Local Name' } },
+        error: null,
+      }),
+      update: vi.fn().mockReturnThis(),
+    };
+    const mlSyncLogTable = { insert: vi.fn().mockResolvedValue({}) };
+
+    const supabase = {
+      from: vi.fn((table: string) => {
+        if (table === 'ml_product_mapping') return mappingTable;
+        if (table === 'products') return productsTable;
+        if (table === 'ml_sync_log') return mlSyncLogTable;
+        return { upsert: vi.fn().mockResolvedValue({}), update: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis() };
+      }),
+    } as any;
+
+    await resyncProduct({ action: 'resync_product', productId: 'prod6' }, {
+      supabase,
+      tenantId: 'tenant1',
+      mlToken: 'token',
+      authToken: {},
+      mlClientId: 'test',
+      jwt: 'test'
+    });
+
+    expect(productsTable.update).toHaveBeenCalled();
+    const updateArg = productsTable.update.mock.calls[0][0];
+    expect(updateArg.cost_unit).toBe(80);
     expect(updateArg.name).toBeUndefined();
   });
 

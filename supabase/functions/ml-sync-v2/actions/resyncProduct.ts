@@ -128,7 +128,10 @@ export async function resyncProduct(
     const shouldUpdateName = !productMapping.products?.name;
     const localCost = productMapping.products?.cost_unit;
     const shouldUpdateCost =
-      localCost === null || localCost === undefined || Number(localCost) <= 0;
+      localCost === null ||
+      localCost === undefined ||
+      Number(localCost) <= 0 ||
+      Number(localCost) !== cost;
     const hasPriceField =
       productMapping.products &&
       Object.prototype.hasOwnProperty.call(productMapping.products, 'price');

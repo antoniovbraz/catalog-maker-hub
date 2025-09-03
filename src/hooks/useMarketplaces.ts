@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { marketplacesService } from "@/services/marketplaces";
-import { MarketplaceFormData } from "@/types/marketplaces";
+import { MarketplaceFormData, MarketplaceType } from "@/types/marketplaces";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -66,7 +66,8 @@ export function useCreateMarketplace() {
   const tenantId = profile?.tenant_id;
 
   return useMutation({
-    mutationFn: (data: MarketplaceFormData) => marketplacesService.create(data as any),
+    mutationFn: (data: MarketplaceFormData) =>
+      marketplacesService.create(data as unknown as MarketplaceType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({
@@ -91,7 +92,7 @@ export function useUpdateMarketplace() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: MarketplaceFormData }) =>
-      marketplacesService.update(id, data as any),
+      marketplacesService.update(id, data as unknown as MarketplaceType),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [MARKETPLACES_QUERY_KEY, tenantId] });
       toast({
