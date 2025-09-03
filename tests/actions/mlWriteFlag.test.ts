@@ -1,4 +1,15 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+
+vi.mock('../../supabase/functions/ml-sync-v2/actions/syncProduct.ts', async () => {
+  const actual = await vi.importActual<
+    typeof import('../../supabase/functions/ml-sync-v2/actions/syncProduct.ts')
+  >('../../supabase/functions/ml-sync-v2/actions/syncProduct.ts');
+  return {
+    ...actual,
+    syncSingleProduct: vi.fn().mockResolvedValue({ success: true }),
+  };
+});
+
 import * as syncModule from '../../supabase/functions/ml-sync-v2/actions/syncProduct.ts';
 import { createAd } from '../../supabase/functions/ml-sync-v2/actions/createAd.ts';
 
@@ -21,16 +32,12 @@ describe('ML write flag', () => {
 
   it('allows syncProduct when enabled', async () => {
     process.env.ML_WRITE_ENABLED = 'true';
-    const spy = vi
-      .spyOn(syncModule, 'syncSingleProduct')
-      .mockResolvedValue({ success: true });
-
     const response = await syncModule.syncProduct(
       { action: 'sync_product', product_id: 'prod1' },
       baseContext
     );
 
-    expect(spy).toHaveBeenCalled();
+    expect(syncModule.syncSingleProduct).toHaveBeenCalled();
     expect(response.status).toBe(200);
   });
 
