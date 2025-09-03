@@ -66,5 +66,6 @@ jobs:
       run: npm run build
 
     - name: Bundle Analysis
-      run: npm run build:analyze
-      continue-on-error: true
+      run: |
+        npm run build:analyze
+        node scripts/verifyBundleSize.mjs
