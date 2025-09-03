@@ -5,9 +5,10 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import tailwindcss from "eslint-plugin-tailwindcss";
 import localPlugin from "./eslint/rules/no-outside-ui-imports.js";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", "src/components/ui/**"] },
   {
     extends: [
       js.configs.recommended,
@@ -48,6 +49,10 @@ export default tseslint.config(
       "tailwindcss/no-custom-classname": "error",
       "local/no-outside-ui-imports": "error",
     },
+  },
+  {
+    files: ["src/components/**/*.{ts,tsx}", "tests/components/**/*.{ts,tsx}"],
+    ...jsxA11y.flatConfigs.recommended,
   },
   {
     files: ["tests/**/*.ts"],
