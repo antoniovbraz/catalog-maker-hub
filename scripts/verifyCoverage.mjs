@@ -5,7 +5,7 @@ async function verifyCoverage() {
     const data = await readFile('coverage/coverage-summary.json', 'utf8');
     const summary = JSON.parse(data);
     const pct = summary.total.lines.pct;
-    const threshold = 80;
+    const threshold = 90;
 
     if (pct < threshold) {
       console.error(`Coverage ${pct}% is below ${threshold}%`);
