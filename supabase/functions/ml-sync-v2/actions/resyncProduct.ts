@@ -121,7 +121,9 @@ export async function resyncProduct(
       null;
     const skuSource = mlSku ? 'mercado_livre' : 'none';
 
-    const cost = parseCost(itemData.sale_terms || []);
+    const cost =
+      parseCost(itemData.sale_terms || []) ??
+      (itemData.price ?? 0) * 0.7;
 
     const shouldUpdateName = !productMapping.products?.name;
     const localCost = productMapping.products?.cost_unit;
