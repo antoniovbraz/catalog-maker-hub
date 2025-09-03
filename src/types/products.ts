@@ -9,6 +9,7 @@ export interface ProductType {
   cost_unit: number;
   packaging_cost: number;
   tax_rate: number;
+  price?: number;
   source: 'manual' | 'mercado_livre' | 'shopee';
   origin?: 'mercado_livre' | 'manual' | 'import';
   ml_item_id?: string | null;
