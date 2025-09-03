@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 describe('resyncProduct action', () => {
-  it('should map item price to cost_unit when local value is missing or zero', async () => {
+  it('defaults cost_unit to zero when sale terms are missing', async () => {
     const itemData = {
       id: 'MLA1',
       title: 'Test Item',
@@ -70,13 +70,13 @@ describe('resyncProduct action', () => {
 
     expect(productsTable.update).toHaveBeenCalled();
     const updateArg = productsTable.update.mock.calls[0][0];
-    expect(updateArg.cost_unit).toBe(itemData.price * 0.7);
+    expect(updateArg.cost_unit).toBe(0);
     expect(updateArg.name).toBe(itemData.title);
     expect(updateArg.category_ml_id).toBe('CAT1');
     expect(updateArg.category_ml_path).toBe('Root');
   });
 
-  it('updates cost_unit when fallback differs from stored value', async () => {
+  it('updates cost_unit when parsed value differs from stored value', async () => {
     const itemData = {
       id: 'MLA2',
       title: 'Another Item',
@@ -132,11 +132,11 @@ describe('resyncProduct action', () => {
 
     expect(productsTable.update).toHaveBeenCalled();
     const updateArg = productsTable.update.mock.calls[0][0];
-    expect(updateArg.cost_unit).toBeCloseTo(itemData.price * 0.7);
+    expect(updateArg.cost_unit).toBe(0);
     expect(updateArg.name).toBeUndefined();
   });
 
-  it('replaces fallback cost when sale terms provide real cost', async () => {
+  it('uses sale term cost when provided', async () => {
     const itemData = {
       id: 'MLA6',
       title: 'Item With Real Cost',

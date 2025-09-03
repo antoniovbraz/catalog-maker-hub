@@ -121,9 +121,9 @@ export async function resyncProduct(
       null;
     const skuSource = mlSku ? 'mercado_livre' : 'none';
 
-    const cost =
-      parseCost(itemData.sale_terms || []) ??
-      (itemData.price ?? 0) * 0.7;
+    // Cost is derived from ML sale terms when available, otherwise defaults to zero
+    // Previous fallback using 70% of item price was removed to avoid ambiguity
+    const cost = parseCost(itemData.sale_terms || []) ?? 0;
 
     const shouldUpdateName = !productMapping.products?.name;
 
