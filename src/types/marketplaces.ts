@@ -32,7 +32,7 @@ export const marketplaceSchema = z.object({
   platform_id: z.string().uuid().optional().nullable(),
   marketplace_type: z.enum(['platform', 'modality']).default('modality'),
   category_restrictions: z.array(z.string()).optional().default([]),
-  marketplace_metadata: z.record(z.any()).optional(),
+  marketplace_metadata: z.record(z.unknown()).optional(),
 });
 
 export type MarketplaceFormData = z.infer<typeof marketplaceSchema>;
