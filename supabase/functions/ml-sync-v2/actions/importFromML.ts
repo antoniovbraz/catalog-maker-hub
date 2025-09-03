@@ -45,6 +45,21 @@ export function weightToGrams(value: number, unit: string): number {
   }
 }
 
+export function parseCost(
+  saleTerms: Array<{ id: string; value_name?: string }> = []
+): number | null {
+  const costTerm = saleTerms.find((term) =>
+    term.id?.toLowerCase().includes('cost')
+  );
+  if (!costTerm?.value_name) return null;
+  const numeric = costTerm.value_name
+    .replace(/[^0-9.,-]/g, '')
+    .replace(/\./g, '')
+    .replace(',', '.');
+  const value = parseFloat(numeric);
+  return isNaN(value) ? null : value;
+}
+
 export async function importFromML(
   _req: ImportFromMLRequest,
   { supabase, tenantId, authToken }: ActionContext
@@ -228,6 +243,8 @@ export async function importFromML(
           null;
         const skuSource = mlSku ? 'mercado_livre' : 'none';
 
+        const cost = parseCost(itemDetail.sale_terms || []);
+
         const { data: newProduct, error: productError } = await supabase
           .from('products')
           .upsert(
@@ -238,7 +255,7 @@ export async function importFromML(
               sku: mlSku,
               sku_source: skuSource,
               category_id: categoryId,
-              cost_unit: itemDetail.price * 0.7,
+              cost_unit: cost,
               packaging_cost: 0,
               tax_rate: 0,
               source: 'mercado_livre',

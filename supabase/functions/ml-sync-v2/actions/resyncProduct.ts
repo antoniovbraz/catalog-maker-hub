@@ -5,7 +5,7 @@ import {
   errorResponse,
   corsHeaders,
 } from '../types.ts';
-import { parseWeight, weightToGrams } from './importFromML.ts';
+import { parseWeight, weightToGrams, parseCost } from './importFromML.ts';
 
 export async function resyncProduct(
   req: ResyncProductRequest,
@@ -121,6 +121,8 @@ export async function resyncProduct(
       null;
     const skuSource = mlSku ? 'mercado_livre' : 'none';
 
+    const cost = parseCost(itemData.sale_terms || []);
+
     const shouldUpdateName = !productMapping.products?.name;
     const localCost = productMapping.products?.cost_unit;
     const shouldUpdateCost =
@@ -157,7 +159,7 @@ export async function resyncProduct(
     }
 
     if (shouldUpdateName) updateData.name = itemData.title;
-    if (shouldUpdateCost) updateData.cost_unit = itemData.price;
+    if (shouldUpdateCost) updateData.cost_unit = cost;
     if (shouldUpdatePrice) updateData.price = itemData.price;
 
     const { error: updateError } = await supabase
