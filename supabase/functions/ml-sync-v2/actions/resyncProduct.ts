@@ -126,18 +126,6 @@ export async function resyncProduct(
       (itemData.price ?? 0) * 0.7;
 
     const shouldUpdateName = !productMapping.products?.name;
-    const localCost = productMapping.products?.cost_unit;
-    const shouldUpdateCost =
-      localCost === null ||
-      localCost === undefined ||
-      Number(localCost) <= 0 ||
-      Number(localCost) !== cost;
-    const hasPriceField =
-      productMapping.products &&
-      Object.prototype.hasOwnProperty.call(productMapping.products, 'price');
-    const localPrice = (productMapping.products as any)?.price;
-    const shouldUpdatePrice =
-      hasPriceField && (!localPrice || Number(localPrice) <= 0);
 
     const updateData: Record<string, any> = {
       description: description,
@@ -156,6 +144,8 @@ export async function resyncProduct(
       ml_pictures: itemData.pictures || [],
       updated_at: new Date().toISOString(),
       updated_from_ml_at: new Date().toISOString(),
+      cost_unit: cost,
+      price: itemData.price,
     };
 
     if (categoryData) {
@@ -164,8 +154,17 @@ export async function resyncProduct(
     }
 
     if (shouldUpdateName) updateData.name = itemData.title;
-    if (shouldUpdateCost) updateData.cost_unit = cost;
-    if (shouldUpdatePrice) updateData.price = itemData.price;
+
+    const changedFields: string[] = [];
+    const productData = productMapping.products || {};
+    const ignoredFields = ['updated_at', 'updated_from_ml_at'];
+    for (const [key, value] of Object.entries(updateData)) {
+      if (ignoredFields.includes(key)) continue;
+      const currentValue = (productData as any)[key];
+      if (JSON.stringify(currentValue) !== JSON.stringify(value)) {
+        changedFields.push(key);
+      }
+    }
 
     const { error: updateError } = await supabase
       .from('products')
@@ -238,22 +237,13 @@ export async function resyncProduct(
           category: categoryData?.name,
           attributes_count: itemData.attributes?.length || 0,
           pictures_count: itemData.pictures?.length || 0,
+          updated_fields: changedFields,
         },
       });
 
-    console.log('Product re-sync completed successfully');
-    const updatedFields = [
-      'description',
-      'sku',
-      'brand',
-      'model',
-      'warranty',
-      'dimensions',
-      'attributes',
-    ];
-    if (shouldUpdateName) updatedFields.push('name');
-    if (shouldUpdateCost) updatedFields.push('cost_unit');
-    if (shouldUpdatePrice) updatedFields.push('price');
+    console.log('Product re-sync completed successfully', {
+      updatedFields: changedFields,
+    });
 
     return new Response(
       JSON.stringify({
@@ -262,7 +252,7 @@ export async function resyncProduct(
         data: {
           title: itemData.title,
           category: categoryData?.name,
-          updated_fields: updatedFields,
+          updated_fields: changedFields,
         },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
