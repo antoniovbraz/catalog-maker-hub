@@ -10,6 +10,7 @@
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --fix --cache",
     "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
