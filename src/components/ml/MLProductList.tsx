@@ -8,6 +8,7 @@ import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useState, useCallback, useMemo } from "react";
 import { MLProductRow } from "./MLProductRow";
+import { toast } from "@/hooks/use-toast";
 
 export function MLProductList() {
   const { data, isLoading } = useMLProducts();
@@ -70,7 +71,16 @@ export function MLProductList() {
           
           <div className="flex gap-2">
             <Button
-              onClick={() => importFromML.mutate()}
+              onClick={() =>
+                importFromML.mutate(undefined, {
+                  onSuccess: (data) => {
+                    toast({
+                      title: "Importação Concluída",
+                      description: `${data?.updated || 0} produtos atualizados e ${data?.created || 0} produtos importados do Mercado Livre.`,
+                    });
+                  },
+                })
+              }
               disabled={importFromML.isPending}
               size="sm"
             >

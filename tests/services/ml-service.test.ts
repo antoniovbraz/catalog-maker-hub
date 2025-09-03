@@ -84,11 +84,12 @@ describe('MLService', () => {
     });
 
     it('deve importar do ML', async () => {
-      vi.mocked(callMLFunction).mockResolvedValue({ imported: 5 });
+      vi.mocked(callMLFunction).mockResolvedValue({ created: 5, updated: 2 });
 
       const result = await MLService.importFromML();
 
-      expect(result.imported).toBe(5);
+      expect(result.created).toBe(5);
+      expect(result.updated).toBe(2);
       expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'import_from_ml', {}, {});
     });
   });

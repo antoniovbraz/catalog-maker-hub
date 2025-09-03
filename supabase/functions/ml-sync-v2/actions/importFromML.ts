@@ -4,6 +4,7 @@ import {
   errorResponse,
   corsHeaders,
 } from '../types.ts';
+import { resyncProduct } from './resyncProduct.ts';
 
 interface MLAttribute {
   id: string;
@@ -62,12 +63,13 @@ export function parseCost(
 
 export async function importFromML(
   _req: ImportFromMLRequest,
-  { supabase, tenantId, authToken }: ActionContext
+  { supabase, tenantId, authToken, mlToken }: ActionContext
 ): Promise<Response> {
   console.log('Starting ML import for tenant:', tenantId);
   let offset = 0;
   let totalItems = 0;
-  let importedCount = 0;
+  let createdCount = 0;
+  let updatedCount = 0;
   let processedCount = 0;
   const errors: string[] = [];
 
@@ -103,6 +105,34 @@ export async function importFromML(
     for (const itemId of itemIds) {
       try {
         console.log(`Processing item: ${itemId}`);
+
+        const { data: existingMapping } = await supabase
+          .from('ml_product_mapping')
+          .select('product_id')
+          .eq('tenant_id', tenantId)
+          .eq('ml_item_id', itemId)
+          .maybeSingle();
+
+        if (existingMapping?.product_id) {
+          try {
+            const resyncResponse = await resyncProduct(
+              { action: 'resync_product', productId: existingMapping.product_id },
+              { supabase, tenantId, mlToken }
+            );
+
+            if (resyncResponse.ok) {
+              updatedCount++;
+            } else {
+              const text = await resyncResponse.text();
+              errors.push(`Failed to resync item ${itemId}: ${text}`);
+            }
+          } catch (err) {
+            errors.push(`Error resyncing item ${itemId}: ${(err as Error).message}`);
+          } finally {
+            processedCount++;
+          }
+          continue;
+        }
 
         const itemDetailResponse = await fetch(
           `https://api.mercadolibre.com/items/${itemId}`,
@@ -356,7 +386,7 @@ export async function importFromML(
         }
       }
 
-      importedCount++;
+      createdCount++;
     } catch (error) {
       console.error(`Error processing item ${itemId}:`, error);
       errors.push(`Error processing item ${itemId}: ${error.message}`);
@@ -377,7 +407,8 @@ export async function importFromML(
       status: errors.length > 0 ? 'partial_success' : 'success',
       response_data: {
         total_found: totalItems,
-        imported: importedCount,
+        created: createdCount,
+        updated: updatedCount,
         processed: processedCount,
         errors: errors.length,
       },
@@ -385,17 +416,18 @@ export async function importFromML(
     });
 
   console.log(
-    `Import completed: ${importedCount} imported, ${errors.length} errors`
+    `Import completed: ${createdCount} created, ${updatedCount} updated, ${errors.length} errors`
   );
 
   return new Response(
     JSON.stringify({
       success: true,
-      imported: importedCount,
+      created: createdCount,
+      updated: updatedCount,
       processed: processedCount,
       total_found: totalItems,
       errors: errors,
-      message: `Successfully imported ${importedCount} products from Mercado Livre`,
+      message: `Processed ML items - ${createdCount} created, ${updatedCount} updated`,
     }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   );
