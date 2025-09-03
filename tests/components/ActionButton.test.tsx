@@ -5,14 +5,14 @@ import { ActionButton } from '@/components/common/ActionButton';
 
 describe('Componente ActionButton', () => {
   it('renderiza ícone e label', () => {
-    render(<ActionButton icon={<svg data-testid="icon" />} label="Salvar" onClick={() => {}} />);
+    render(<ActionButton icon={<svg data-testid="icon" aria-hidden="true" />} label="Salvar" onClick={() => {}} />);
 
     expect(screen.getByTestId('icon')).toBeInTheDocument();
     expect(screen.getByText('Salvar')).toBeInTheDocument();
   });
 
   it('exibe estado de loading com texto e animação', () => {
-    render(<ActionButton icon={<svg data-testid="icon" />} label="Salvar" loading onClick={() => {}} />);
+    render(<ActionButton icon={<svg data-testid="icon" aria-hidden="true" />} label="Salvar" loading onClick={() => {}} />);
 
     const icon = screen.getByTestId('icon');
     expect(screen.getByText('Processando...')).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe('Componente ActionButton', () => {
 
     render(
       <ActionButton
-        icon={<svg data-testid="icon" />}
+        icon={<svg data-testid="icon" aria-hidden="true" />}
         label="Info"
         tooltip="Dica"
         onClick={() => {}}
@@ -46,7 +46,7 @@ describe('Componente ActionButton', () => {
 
     render(
       <ActionButton
-        icon={<svg data-testid="icon" />}
+        icon={<svg data-testid="icon" aria-hidden="true" />}
         label="Clique"
         onClick={handleClick}
       />

@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useTranslation } from 'react-i18next';
 
 interface ActionButtonProps {
   icon: ReactNode;
@@ -26,6 +27,8 @@ export function ActionButton({
   tooltip,
   className
 }: ActionButtonProps) {
+  const { t } = useTranslation();
+  const content = loading ? t('common.processing') : label;
   const button = (
     <Button
       variant={variant}
@@ -38,16 +41,21 @@ export function ActionButton({
         loading && "cursor-wait",
         className
       )}
+      aria-label={size === 'icon' ? label : undefined}
+      aria-busy={loading || undefined}
     >
-      <span className={cn(
-        "transition-transform duration-200",
-        loading && "animate-spin"
-      )}>
+      <span
+        className={cn(
+          "transition-transform duration-200",
+          loading && "animate-spin"
+        )}
+        aria-hidden="true"
+      >
         {icon}
       </span>
       {size !== "icon" && (
         <span className="font-medium">
-          {loading ? "Processando..." : label}
+          {content}
         </span>
       )}
     </Button>

@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 import * as toastMock from './mocks/toast';
+import '@/lib/i18n';
 
 // Inject environment variables for tests
 process.env.SUPABASE_URL = 'https://test.supabase.co';
