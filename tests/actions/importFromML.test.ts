@@ -35,7 +35,7 @@ describe('importFromML action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | URL | Request) => {
       const urlStr = url.toString();
       if (urlStr.includes('/items/search')) {
         return Promise.resolve({
@@ -116,6 +116,8 @@ describe('importFromML action', () => {
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
       mlToken: 'token',
+      mlClientId: 'test-client',
+      jwt: 'test-jwt',
     });
 
     expect(productsTable.upsert).toHaveBeenCalled();
@@ -139,7 +141,7 @@ describe('importFromML action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | URL | Request) => {
       const urlStr = url.toString();
       if (urlStr.includes('/items/search')) {
         return Promise.resolve({
@@ -197,6 +199,8 @@ describe('importFromML action', () => {
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
       mlToken: 'token',
+      mlClientId: 'test-client',
+      jwt: 'test-jwt',
     });
 
     expect(productsTable.upsert).toHaveBeenCalled();
@@ -218,7 +222,7 @@ describe('importFromML action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | URL | Request) => {
       const urlStr = url.toString();
       if (urlStr.includes('/items/search')) {
         return Promise.resolve({
@@ -276,6 +280,8 @@ describe('importFromML action', () => {
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
       mlToken: 'token',
+      mlClientId: 'test-client',
+      jwt: 'test-jwt',
     });
 
     expect(productsTable.upsert).toHaveBeenCalled();
@@ -285,7 +291,7 @@ describe('importFromML action', () => {
   });
 
   it('chama resyncProduct quando já existe mapeamento', async () => {
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | URL | Request) => {
       const urlStr = url.toString();
       if (urlStr.includes('/items/search')) {
         return Promise.resolve({
@@ -324,6 +330,8 @@ describe('importFromML action', () => {
       tenantId: 'tenant1',
       authToken: { user_id_ml: 'user1', access_token: 'token' } as any,
       mlToken: 'token',
+      mlClientId: 'test-client',
+      jwt: 'test-jwt',
     });
 
     expect(resyncProduct).toHaveBeenCalledWith(

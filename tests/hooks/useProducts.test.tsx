@@ -72,6 +72,9 @@ describe('useProducts hooks', () => {
         cost_unit: 100,
         packaging_cost: 10,
         tax_rate: 18,
+        sku_source: 'none' as const,
+        source: 'manual' as const,
+        origin: 'manual' as const,
       };
 
       vi.mocked(productsService.create).mockResolvedValue(newProduct);
@@ -97,6 +100,9 @@ describe('useProducts hooks', () => {
         cost_unit: 100,
         packaging_cost: 10,
         tax_rate: 18,
+        sku_source: 'none' as const,
+        source: 'manual' as const,
+        origin: 'manual' as const,
       };
 
       vi.mocked(productsService.create).mockRejectedValue(mockError);
@@ -119,7 +125,15 @@ describe('useProducts hooks', () => {
   describe('useUpdateProduct', () => {
     it('deve atualizar produto com sucesso', async () => {
       const updatedProduct = testUtils.createMockProduct({ name: 'Produto Atualizado' });
-      const updateData = { name: 'Produto Atualizado' };
+      const updateData = { 
+        name: 'Produto Atualizado',
+        sku_source: 'none' as const,
+        source: 'manual' as const,
+        origin: 'manual' as const,
+        cost_unit: 100,
+        packaging_cost: 10,
+        tax_rate: 18,
+      };
 
       vi.mocked(productsService.update).mockResolvedValue(updatedProduct);
 

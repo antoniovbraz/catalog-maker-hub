@@ -48,7 +48,7 @@ describe('logError', () => {
     logError(error);
 
     expect(spy).toHaveBeenCalledTimes(1);
-    const [message, context, rawData] = spy.mock.calls[0] as [
+    const [message, context, rawData] = spy.mock.calls[0] as unknown as [
       string,
       string,
       { name: string; stack?: string; timestamp: string }
