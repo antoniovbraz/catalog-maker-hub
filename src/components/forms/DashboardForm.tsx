@@ -342,7 +342,7 @@ export const DashboardForm = () => {
             });
           }
         } catch (error) {
-          logger.error(`Erro ao recalcular marketplace ${marketplaceId}`, error instanceof Error ? error : new Error(String(error)));
+          logger.error(`Erro ao recalcular marketplace ${marketplaceId}`, error);
         }
       });
 
@@ -353,7 +353,7 @@ export const DashboardForm = () => {
         description: `Preços recalculados com as configurações mais atuais para ${marketplaceIds.length} marketplace(s)`,
       });
     } catch (error) {
-      logger.error('Erro durante recálculo automático', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Erro durante recálculo automático', error);
     } finally {
       setIsRecalculating(false);
     }
@@ -417,7 +417,7 @@ export const DashboardForm = () => {
               };
             }
         } catch (error) {
-          logger.error('Erro ao calcular margem real', error instanceof Error ? error : new Error(String(error)));
+          logger.error('Erro ao calcular margem real', error);
         }
       }
 

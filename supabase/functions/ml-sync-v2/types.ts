@@ -4,9 +4,7 @@ interface QueryBuilder {
   insert: (values: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
   eq: (column: string, value: unknown) => QueryBuilder;
-  ilike: (column: string, pattern: string) => QueryBuilder;
   single: () => QueryBuilder;
-  maybeSingle: () => QueryBuilder;
   data?: unknown;
   error?: { message: string } | null;
 }
@@ -68,7 +66,6 @@ export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers':
     'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 export const errorResponse = (message: string, status: number) =>

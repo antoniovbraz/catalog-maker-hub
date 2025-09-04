@@ -247,7 +247,7 @@ export class MLService {
       throw new Error(error.message || 'Failed to update advanced settings');
     }
 
-    return mlAdvancedSettingsSchema.parse(data) as MLAdvancedSettings;
+    return mlAdvancedSettingsSchema.partial().parse(data);
   }
 
   // ====== MÉTRICAS E PERFORMANCE ======

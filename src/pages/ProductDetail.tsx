@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Package,
@@ -32,7 +31,6 @@ import { useMLProducts } from "@/hooks/useMLProducts";
 import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { useProductImages } from "@/hooks/useProductImages";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
-import { CostsCard } from "@/components/common/CostsCard";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -334,12 +332,52 @@ export default function ProductDetail() {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Garantia</label>
                   <p>{product.warranty}</p>
-                 </div>
-               )}
-             </CardContent>
-            </Card>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-          {<CostsCard key="costs-taxes" product={product} priceInfo={priceInfo} /> as any}
+          {/* Custos e Impostos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Tag className="size-5" />
+                Custos e Impostos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <div className="flex items-center gap-1">
+                    <label className="text-sm font-medium text-muted-foreground">Preço de venda</label>
+                    {priceInfo?.source === "ml" && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="size-3 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>Preço do Mercado Livre</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                  </div>
+                  <p className="text-lg font-semibold">{formatarMoeda(priceInfo?.price || 0)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
+                  <p className="text-lg font-semibold">{formatarMoeda(product.cost_unit)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Custo Embalagem</label>
+                  <p className="text-lg font-semibold">{formatarMoeda(product.packaging_cost || 0)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Taxa de Imposto</label>
+                  <p className="text-lg font-semibold">{product.tax_rate || 0}%</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Dimensões e Peso */}
           {(product.weight || product.dimensions) && (
@@ -360,47 +398,38 @@ export default function ProductDetail() {
                       </label>
                       <p>{formatWeight(product.weight)}</p>
                     </div>
-                   )}
-                   {product.dimensions &&
-                     typeof product.dimensions === 'object' &&
-                     'weight' in product.dimensions &&
-                     (product.dimensions as any).weight && (
-                       <div>
-                         <label className="text-sm font-medium text-muted-foreground">Peso (Dimensões)</label>
-                         <p>{String((product.dimensions as any).weight)} g</p>
-                       </div>
+                  )}
+                  {product.dimensions &&
+                    typeof product.dimensions === 'object' &&
+                    'length' in product.dimensions &&
+                    (product.dimensions as Record<string, number>).length && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
+                        <p>{(product.dimensions as Record<string, number>).length} cm</p>
+                      </div>
                     )}
-                   {product.dimensions &&
-                     typeof product.dimensions === 'object' &&
-                     'length' in product.dimensions &&
-                     (product.dimensions as any).length && (
-                       <div>
-                         <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                         <p>{String((product.dimensions as any).length)} cm</p>
-                       </div>
+                  {product.dimensions &&
+                    typeof product.dimensions === 'object' &&
+                    'width' in product.dimensions &&
+                    (product.dimensions as Record<string, number>).width && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Largura</label>
+                        <p>{(product.dimensions as Record<string, number>).width} cm</p>
+                      </div>
                     )}
-                   {product.dimensions &&
-                     typeof product.dimensions === 'object' &&
-                     'width' in product.dimensions &&
-                     (product.dimensions as any).width && (
-                       <div>
-                         <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                         <p>{String((product.dimensions as any).width)} cm</p>
-                       </div>
-                     )}
-                     {product.dimensions &&
-                     typeof product.dimensions === 'object' &&
-                     'height' in product.dimensions &&
-                     (product.dimensions as any).height && (
-                       <div>
-                         <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                         <p>{String((product.dimensions as any).height)} cm</p>
-                       </div>
-                     )}
-                 </div>
-               </CardContent>
-             </Card>
-           )}
+                  {product.dimensions &&
+                    typeof product.dimensions === 'object' &&
+                    'height' in product.dimensions &&
+                    (product.dimensions as Record<string, number>).height && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Altura</label>
+                        <p>{(product.dimensions as Record<string, number>).height} cm</p>
+                      </div>
+                    )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Imagens do Produto */}
           {productImages.length > 0 && (
@@ -437,8 +466,8 @@ export default function ProductDetail() {
                     key={attr.id || attr.name || index}
                     className="flex justify-between text-sm"
                   >
-                     <span className="font-medium">{attr.name || attr.id || 'N/A'}</span>
-                     <span>{attr.value_name || attr.value_id || '-'}</span>
+                    <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
+                    <span>{String(attr.value_name || attr.value_id || '-')}</span>
                   </div>
                 ))}
               </CardContent>

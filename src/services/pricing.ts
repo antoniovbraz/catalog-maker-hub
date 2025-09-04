@@ -61,7 +61,7 @@ export class PricingService extends BaseService<SavedPricingType> {
 
     if (error) this.handleError(error, 'Calcular preço');
     
-    logger.debug('Resposta da RPC calcular_preco', { source: 'PricingService', data });
+    logger.debug('Resposta da RPC calcular_preco', 'PricingService', data);
     
       // A função retorna um objeto JSON completo, não apenas um número
       return (data as Record<string, unknown>) || {};
@@ -84,7 +84,7 @@ export class PricingService extends BaseService<SavedPricingType> {
 
     if (error) this.handleError(error, 'Calcular margem real');
     
-    logger.debug('Resposta da RPC calcular_margem_real', { source: 'PricingService', data });
+    logger.debug('Resposta da RPC calcular_margem_real', 'PricingService', data);
     
       // A função retorna um objeto JSON completo, não apenas um número
       return (data as Record<string, unknown>) || {};
@@ -105,7 +105,7 @@ export class PricingService extends BaseService<SavedPricingType> {
   }
 
   async recalculateAllPricing(): Promise<{ updated: number; errors: number }> {
-    logger.info('Iniciando recálculo automático de todas as precificações...', { source: 'PricingService' });
+    logger.info('Iniciando recálculo automático de todas as precificações...', 'PricingService');
     
     try {
       // Buscar todas as precificações salvas
@@ -157,19 +157,19 @@ export class PricingService extends BaseService<SavedPricingType> {
           await this.upsert(updatedData);
           updatedCount++;
           
-          logger.debug(`Precificação atualizada: ${pricing.products?.name} - ${pricing.marketplaces?.name}`, { source: 'PricingService' });
+          logger.debug(`Precificação atualizada: ${pricing.products?.name} - ${pricing.marketplaces?.name}`, 'PricingService');
           
         } catch (error) {
-          logger.error(`Erro ao recalcular precificação para produto ${pricing.product_id}`, new Error(String(error)), { source: 'PricingService' });
+          logger.error(`Erro ao recalcular precificação para produto ${pricing.product_id}`, 'PricingService', error);
           errorCount++;
         }
       }
 
-      logger.info(`Recálculo concluído: ${updatedCount} atualizadas, ${errorCount} erros`, { source: 'PricingService' });
+      logger.info(`Recálculo concluído: ${updatedCount} atualizadas, ${errorCount} erros`, 'PricingService');
       return { updated: updatedCount, errors: errorCount };
       
     } catch (error) {
-      logger.error('Erro geral no recálculo automático', new Error(String(error)), { source: 'PricingService' });
+      logger.error('Erro geral no recálculo automático', 'PricingService', error);
       throw new Error('Falha no recálculo automático das precificações');
     }
   }

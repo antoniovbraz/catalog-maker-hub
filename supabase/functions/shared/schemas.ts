@@ -1,131 +1,80 @@
-// Simple validation schemas without external dependencies
-// This avoids import issues with Deno edge functions
+import { z } from 'zod';
 
-export interface GenerateAdRequest {
-  assistant_id: string;
-  product_info: string;
-  marketplace: string;
-  image_urls: string[];
-  custom_prompt?: string;
-  description_only?: boolean;
-}
+export const generateAdSchema = z.object({
+  assistant_id: z.string(),
+  product_info: z.string(),
+  marketplace: z.string(),
+  image_urls: z.array(z.string()),
+  custom_prompt: z.string().optional(),
+  description_only: z.boolean().optional(),
+});
 
-export interface GenerateAdChatRequest {
-  thread_id?: string;
-  message: string;
-  product_info?: Record<string, unknown>;
-  marketplace: string;
-  is_initial_message?: boolean;
-}
+export const generateAdChatSchema = z.object({
+  thread_id: z.string().optional(),
+  message: z.string(),
+  product_info: z.record(z.unknown()).optional(),
+  marketplace: z.string(),
+  is_initial_message: z.boolean().optional(),
+});
 
-export interface AssistantCreateRequest {
-  name: string;
-  marketplace: string;
-  model: string;
-  instructions: string;
-  tenant_id: string;
-}
+export const assistantCreateSchema = z.object({
+  name: z.string(),
+  marketplace: z.string(),
+  model: z.string(),
+  instructions: z.string(),
+  tenant_id: z.string(),
+});
 
-export interface AssistantUpdateRequest {
-  name?: string;
-  model?: string;
-  instructions?: string;
-}
+export const assistantUpdateSchema = z.object({
+  name: z.string().optional(),
+  model: z.string().optional(),
+  instructions: z.string().optional(),
+});
 
-export interface MLAuthRequest {
-  action: 'start_auth' | 'handle_callback' | 'refresh_token' | 'get_status';
-  code?: string;
-  state?: string;
-  tenant_id?: string;
-}
+export const mlAuthSchema = z.object({
+  action: z
+    .enum(['start_auth', 'handle_callback', 'refresh_token', 'get_status'])
+    .default('get_status'),
+  code: z.string().optional(),
+  state: z.string().optional(),
+  tenant_id: z.string().optional(),
+});
 
-export interface MLSyncRequest {
-  action: 'get_status' | 'sync_product' | 'sync_batch' | 'import_from_ml' | 'link_product' | 'get_products' | 'create_ad' | 'resync_product';
-  product_id?: string;
-  product_ids?: string[];
-  force_update?: boolean;
-  ml_item_id?: string;
-  ad_data?: Record<string, unknown>;
-  productId?: string;
-}
+export const mlSyncRequestSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('get_status') }),
+  z.object({
+    action: z.literal('sync_product'),
+    product_id: z.string(),
+    force_update: z.boolean().optional(),
+  }),
+  z.object({
+    action: z.literal('sync_batch'),
+    product_ids: z.array(z.string()),
+    force_update: z.boolean().optional(),
+  }),
+  z.object({ action: z.literal('import_from_ml') }),
+  z.object({
+    action: z.literal('link_product'),
+    product_id: z.string(),
+    ml_item_id: z.string(),
+  }),
+  z.object({ action: z.literal('get_products') }),
+  z.object({
+    action: z.literal('create_ad'),
+    ad_data: z.record(z.unknown()),
+  }),
+  z.object({
+    action: z.literal('resync_product'),
+    productId: z.string(),
+  }),
+]);
 
-export interface MLWebhookPayload {
-  topic: string;
-  resource: string;
-  user_id: number;
-  application_id: number;
-  attempts: number;
-  sent: string;
-  received: string;
-}
-
-// Simple validation functions
-export function validateGenerateAdRequest(data: any): data is GenerateAdRequest {
-  return data && 
-    typeof data.assistant_id === 'string' &&
-    typeof data.product_info === 'string' &&
-    typeof data.marketplace === 'string' &&
-    Array.isArray(data.image_urls);
-}
-
-export function validateGenerateAdChatRequest(data: any): data is GenerateAdChatRequest {
-  return data && 
-    typeof data.message === 'string' &&
-    typeof data.marketplace === 'string';
-}
-
-export function validateAssistantCreateRequest(data: any): data is AssistantCreateRequest {
-  return data && 
-    typeof data.name === 'string' &&
-    typeof data.marketplace === 'string' &&
-    typeof data.model === 'string' &&
-    typeof data.instructions === 'string' &&
-    typeof data.tenant_id === 'string';
-}
-
-export function validateMLAuthRequest(data: any): data is MLAuthRequest {
-  return data && 
-    ['start_auth', 'handle_callback', 'refresh_token', 'get_status'].includes(data.action);
-}
-
-export function validateMLSyncRequest(data: any): data is MLSyncRequest {
-  return data && 
-    ['get_status', 'sync_product', 'sync_batch', 'import_from_ml', 'link_product', 'get_products', 'create_ad', 'resync_product'].includes(data.action);
-}
-
-export function validateMLWebhookPayload(data: any): data is MLWebhookPayload {
-  return data && 
-    typeof data.topic === 'string' &&
-    typeof data.resource === 'string' &&
-    typeof data.user_id === 'number';
-}
-
-// Legacy exports for backward compatibility with Zod-like interface
-export const generateAdSchema = { 
-  safeParse: (data: any) => ({ success: validateGenerateAdRequest(data), data }),
-  parse: (data: any) => data // Simple pass-through for compatibility
-};
-export const generateAdChatSchema = { 
-  safeParse: (data: any) => ({ success: validateGenerateAdChatRequest(data), data }),
-  parse: (data: any) => data
-};
-export const assistantCreateSchema = { 
-  safeParse: (data: any) => ({ success: validateAssistantCreateRequest(data), data }),
-  parse: (data: any) => data
-};
-export const assistantUpdateSchema = { 
-  safeParse: (data: any) => ({ success: true, data }),
-  parse: (data: any) => data
-};
-export const mlAuthSchema = { 
-  safeParse: (data: any) => ({ success: validateMLAuthRequest(data), data }),
-  parse: (data: any) => data
-};
-export const mlSyncRequestSchema = { 
-  safeParse: (data: any) => ({ success: validateMLSyncRequest(data), data }),
-  parse: (data: any) => data
-};
-export const mlWebhookSchema = { 
-  safeParse: (data: any) => ({ success: validateMLWebhookPayload(data), data }),
-  parse: (data: any) => data
-};
+export const mlWebhookSchema = z.object({
+  topic: z.string(),
+  resource: z.string(),
+  user_id: z.number(),
+  application_id: z.number(),
+  attempts: z.number(),
+  sent: z.string(),
+  received: z.string(),
+});

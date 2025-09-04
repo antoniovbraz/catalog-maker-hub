@@ -33,7 +33,7 @@ export function useCreateAssistant() {
         title: "Assistente criado",
         description: `${data.name} foi criado com sucesso.`,
       });
-      logger.info('Assistente criado com sucesso', { assistant: data });
+      logger.info('Assistente criado com sucesso', data);
     },
     onError: (error: Error) => {
       toast({
@@ -62,7 +62,7 @@ export function useUpdateAssistant() {
         title: "Assistente atualizado",
         description: `${data.name} foi atualizado com sucesso.`,
       });
-      logger.info('Assistente atualizado com sucesso', { assistant: data });
+      logger.info('Assistente atualizado com sucesso', data);
     },
     onError: (error: Error) => {
       toast({

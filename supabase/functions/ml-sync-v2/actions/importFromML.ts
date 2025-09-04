@@ -113,11 +113,11 @@ export async function importFromML(
           .eq('ml_item_id', itemId)
           .maybeSingle();
 
-        if ((existingMapping as any)?.product_id) {
+        if (existingMapping?.product_id) {
           try {
             const resyncResponse = await resyncProduct(
-              { action: 'resync_product', productId: (existingMapping as any).product_id },
-              { supabase, tenantId, mlToken, authToken: {}, mlClientId: '', jwt: '' }
+              { action: 'resync_product', productId: existingMapping.product_id },
+              { supabase, tenantId, mlToken }
             );
 
             if (resyncResponse.ok) {
@@ -223,18 +223,18 @@ export async function importFromML(
                 .single();
 
               if (newCategory) {
-                categoryId = (newCategory as any).id;
+                categoryId = newCategory.id;
                 await supabase
                   .from('ml_categories')
                   .update({ local_category_id: categoryId })
-                  .eq('id', (mlCategory as any).id);
+                  .eq('id', mlCategory.id);
               }
             } else {
-              categoryId = (localCategory.data as any).id;
+              categoryId = localCategory.data.id;
               await supabase
                 .from('ml_categories')
                 .update({ local_category_id: categoryId })
-                .eq('id', (mlCategory as any).id);
+                .eq('id', mlCategory.id);
             }
           }
         }
@@ -322,14 +322,14 @@ export async function importFromML(
         continue;
       }
 
-      console.log(`Created product ${(newProduct as any).id} for ML item ${itemId}`);
+      console.log(`Created product ${newProduct.id} for ML item ${itemId}`);
 
       const { error: mappingError } = await supabase
         .from('ml_product_mapping')
         .upsert(
           {
             tenant_id: tenantId,
-            product_id: (newProduct as any).id,
+            product_id: newProduct.id,
             ml_item_id: itemId,
             ml_title: itemDetail.title,
             ml_permalink: itemDetail.permalink,
@@ -363,7 +363,7 @@ export async function importFromML(
           const imageInserts = itemDetail.pictures.map(
             (picture: { secure_url?: string; url?: string }, index: number) => ({
               tenant_id: tenantId,
-              product_id: (newProduct as any).id,
+              product_id: newProduct.id,
               image_url: picture.secure_url || picture.url,
               sort_order: index,
               image_type: 'product',
@@ -389,7 +389,7 @@ export async function importFromML(
       createdCount++;
     } catch (error) {
       console.error(`Error processing item ${itemId}:`, error);
-      errors.push(`Error processing item ${itemId}: ${(error as Error).message}`);
+      errors.push(`Error processing item ${itemId}: ${error.message}`);
     } finally {
       processedCount++;
     }

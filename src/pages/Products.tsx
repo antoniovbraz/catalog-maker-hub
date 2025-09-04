@@ -121,7 +121,7 @@ export default function Products() {
           <ProductSourceBadge 
             source={item.source} 
             mlStatus={mlProduct?.sync_status}
-            mlItemId={mlProduct?.ml_item_id || undefined}
+            mlItemId={mlProduct?.ml_item_id}
           />
         );
       },
@@ -280,7 +280,7 @@ export default function Products() {
           label: "Anunciar no ML",
           icon: <Tag className="size-4" />,
           onClick: (product: ProductWithCategory) => handleAdvertiseOnML(product),
-          variant: "default" as const,
+          variant: "default",
           disabled: (product: ProductWithCategory) => product.source !== 'manual',
         }]
       : []),
@@ -291,14 +291,14 @@ export default function Products() {
         // TODO: Abrir link do ML
         console.log('View on ML:', product);
       },
-      variant: "outline" as const,
+      variant: "outline",
       disabled: (product) => product.source !== 'mercado_livre',
     },
     {
       label: "Excluir",
       icon: <Trash2 className="size-4" />,
       onClick: (product) => handleDelete(product),
-      variant: "destructive" as const,
+      variant: "destructive",
     },
   ];
 

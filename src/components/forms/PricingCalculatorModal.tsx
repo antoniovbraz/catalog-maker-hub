@@ -121,7 +121,7 @@ export const PricingCalculatorModal = ({ onCalculationComplete }: PricingCalcula
               margemRealResult = margemResult as unknown as MargemRealResult;
             }
           } catch (error) {
-            logger.error('Erro ao calcular margem real', error instanceof Error ? error : new Error(String(error)));
+            logger.error('Erro ao calcular margem real', error);
           }
         }
 
@@ -146,7 +146,7 @@ export const PricingCalculatorModal = ({ onCalculationComplete }: PricingCalcula
         });
       }
     } catch (error) {
-      logger.error('Erro ao calcular e salvar preço', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Erro ao calcular e salvar preço', error);
       toast({
         title: "Erro",
         description: "Erro ao calcular preço. Tente novamente.",

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { logger, useLogger, Logger } from '@/utils/logger';
+import { logger, useLogger } from '@/utils/logger';
 
 // Ensure console methods are spied
 beforeEach(() => {
@@ -11,19 +11,19 @@ beforeEach(() => {
 });
 
 describe('logger', () => {
-  it('uses console.log for error level', () => {
-    logger.error('oops', new Error('test error'), { foo: 'bar' });
-    expect(console.log).toHaveBeenCalledOnce();
+  it('uses console.error for error level', () => {
+    logger.error('oops', 'CTX', { foo: 'bar' });
+    expect(console.error).toHaveBeenCalledOnce();
   });
 
-  it('uses console.log for warn level', () => {
+  it('uses console.warn for warn level', () => {
     logger.warn('warn msg');
-    expect(console.log).toHaveBeenCalledOnce();
+    expect(console.warn).toHaveBeenCalledOnce();
   });
 
-  it('uses console.log for info level', () => {
+  it('uses console.info for info level', () => {
     logger.info('info msg');
-    expect(console.log).toHaveBeenCalledOnce();
+    expect(console.info).toHaveBeenCalledOnce();
   });
 
   it('uses console.log for debug level', () => {
@@ -31,23 +31,34 @@ describe('logger', () => {
     expect(console.log).toHaveBeenCalledOnce();
   });
 
-  it('logs messages to console', () => {
-    logger.debug('debug msg');
-    expect(console.log).toHaveBeenCalled();
+  it('skips debug logs in production mode', () => {
+    (logger as any).isDevelopment = false;
+    logger.debug('no log');
+    expect(console.log).toHaveBeenCalledTimes(0);
+    (logger as any).isDevelopment = true;
   });
 });
 
 describe('useLogger', () => {
-  it('creates a new logger instance with provided scope', () => {
+  it('delegates to logger with provided context', () => {
+    const spy = vi.spyOn(logger, 'info');
     const log = useLogger('CTX');
-    expect(log).toBeInstanceOf(Logger);
+    log.info('hello');
+    expect(spy).toHaveBeenCalledWith('hello', 'CTX', undefined);
   });
 
-  it('provides all log level methods', () => {
+  it('provides wrappers for all log levels', () => {
     const log = useLogger('CTX');
-    expect(typeof log.error).toBe('function');
-    expect(typeof log.warn).toBe('function');
-    expect(typeof log.info).toBe('function');
-    expect(typeof log.debug).toBe('function');
+    const spyError = vi.spyOn(logger, 'error');
+    const spyWarn = vi.spyOn(logger, 'warn');
+    const spyDebug = vi.spyOn(logger, 'debug');
+
+    log.error('err');
+    log.warn('warn');
+    log.debug('dbg');
+
+    expect(spyError).toHaveBeenCalledWith('err', 'CTX', undefined);
+    expect(spyWarn).toHaveBeenCalledWith('warn', 'CTX', undefined);
+    expect(spyDebug).toHaveBeenCalledWith('dbg', 'CTX', undefined);
   });
 });

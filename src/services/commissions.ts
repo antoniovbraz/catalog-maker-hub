@@ -28,7 +28,7 @@ export class CommissionsService extends BaseService<CommissionType> {
       if (error) this.handleError(error, 'Buscar comissões com detalhes');
       return data || [];
     } catch (error) {
-      logger.error('Erro ao buscar comissões com detalhes', new Error(String(error)), { source: 'CommissionsService' });
+      logger.error('Erro ao buscar comissões com detalhes', 'CommissionsService', error);
       throw error;
     }
   }
@@ -44,7 +44,7 @@ export class CommissionsService extends BaseService<CommissionType> {
       if (error) this.handleError(error, 'Buscar comissões por marketplace');
       return data || [];
     } catch (error) {
-      logger.error('Erro ao buscar comissões por marketplace', new Error(String(error)), { source: 'CommissionsService' });
+      logger.error('Erro ao buscar comissões por marketplace', 'CommissionsService', error);
       throw error;
     }
   }
@@ -60,7 +60,7 @@ export class CommissionsService extends BaseService<CommissionType> {
       if (error) this.handleError(error, 'Buscar comissões por categoria');
       return data || [];
     } catch (error) {
-      logger.error('Erro ao buscar comissões por categoria', new Error(String(error)), { source: 'CommissionsService' });
+      logger.error('Erro ao buscar comissões por categoria', 'CommissionsService', error);
       throw error;
     }
   }
@@ -90,13 +90,13 @@ export class CommissionsService extends BaseService<CommissionType> {
         .single();
 
       if (defaultError) {
-        logger.warn('Nenhuma comissão padrão encontrada', { source: 'CommissionsService', marketplaceId, categoryId });
+        logger.warn('Nenhuma comissão padrão encontrada', 'CommissionsService', { marketplaceId, categoryId });
         return null;
       }
 
       return defaultCommission;
     } catch (error) {
-      logger.error('Erro ao buscar comissão aplicável', new Error(String(error)), { source: 'CommissionsService' });
+      logger.error('Erro ao buscar comissão aplicável', 'CommissionsService', error);
       throw error;
     }
   }
@@ -123,7 +123,7 @@ export class CommissionsService extends BaseService<CommissionType> {
       if (error) this.handleError(error, 'Validar regra única de comissão');
       return (data?.length || 0) === 0;
     } catch (error) {
-      logger.error('Erro ao validar regra única', new Error(String(error)), { source: 'CommissionsService' });
+      logger.error('Erro ao validar regra única', 'CommissionsService', error);
       throw error;
     }
   }
@@ -133,7 +133,7 @@ export class CommissionsService extends BaseService<CommissionType> {
       const commission = await this.findApplicableCommission({ marketplaceId, categoryId });
       return commission?.rate || 0;
     } catch (error) {
-      logger.error('Erro ao calcular taxa de comissão', new Error(String(error)), { source: 'CommissionsService' });
+      logger.error('Erro ao calcular taxa de comissão', 'CommissionsService', error);
       return 0; // Retorna 0 em caso de erro para não quebrar cálculos
     }
   }

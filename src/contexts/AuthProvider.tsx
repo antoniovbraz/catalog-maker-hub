@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearTimeout(safetyTimeout)
         }
       } catch (error) {
-        logger.error('Error fetching profile', error instanceof Error ? error : new Error(String(error)))
+        logger.error('Error fetching profile', error)
         if (isMounted) {
           // IMPORTANTE: Não mostrar toast de erro aqui para evitar spam
           // Se der erro, vamos continuar sem perfil mas não ficar infinito
@@ -116,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           clearTimeout(safetyTimeout)
         }
       } catch (error) {
-        logger.error('Error initializing auth', error instanceof Error ? error : new Error(String(error)))
+        logger.error('Error initializing auth', error)
         if (isMounted) {
           setLoading(false)
           clearTimeout(safetyTimeout)
@@ -204,7 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: 'Até logo!'
       })
     } catch (error) {
-      logger.error('Error signing out', error instanceof Error ? error : new Error(String(error)))
+      logger.error('Error signing out', error)
       toast({
         title: 'Erro no logout',
         description: 'Tente novamente',

@@ -22,7 +22,7 @@ export class AdsService extends BaseService<ProductImage> {
       if (error) this.handleError(error, 'Buscar imagens do produto');
       return (data || []) as ProductImage[];
     } catch (error) {
-      logger.error('Erro ao buscar imagens do produto', new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro ao buscar imagens do produto', 'AdsService', error);
       throw error;
     }
   }
@@ -53,7 +53,7 @@ export class AdsService extends BaseService<ProductImage> {
         .upload(filePath, file);
 
       if (uploadError) {
-        logger.error('Erro no upload da imagem', new Error(uploadError.message), { source: 'AdsService' });
+        logger.error('Erro no upload da imagem', 'AdsService', uploadError);
         throw new Error(`Erro no upload: ${uploadError.message}`);
       }
 
@@ -71,11 +71,11 @@ export class AdsService extends BaseService<ProductImage> {
       };
 
       const savedImage = await this.create(imageData);
-      logger.info('Imagem do produto salva com sucesso', { source: 'AdsService', productId, imageType });
+      logger.info('Imagem do produto salva com sucesso', 'AdsService', { productId, imageType });
       
       return savedImage;
     } catch (error) {
-      logger.error('Erro ao fazer upload da imagem', error instanceof Error ? error : new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro ao fazer upload da imagem', 'AdsService', error);
       throw error;
     }
   }
@@ -103,15 +103,15 @@ export class AdsService extends BaseService<ProductImage> {
         .remove([filePath]);
 
       if (storageError) {
-        logger.warn('Erro ao deletar arquivo do storage', { source: 'AdsService', error: storageError });
+        logger.warn('Erro ao deletar arquivo do storage', 'AdsService', storageError);
         // Continuar mesmo com erro no storage para não travar a exclusão
       }
 
       // Deletar referência do banco
       await this.delete(imageId);
-      logger.info('Imagem do produto deletada com sucesso', { source: 'AdsService', imageId });
+      logger.info('Imagem do produto deletada com sucesso', 'AdsService', { imageId });
     } catch (error) {
-      logger.error('Erro ao deletar imagem', error instanceof Error ? error : new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro ao deletar imagem', 'AdsService', error);
       throw error;
     }
   }
@@ -123,8 +123,7 @@ export class AdsService extends BaseService<ProductImage> {
    */
   async generateListing(request: AdGenerationRequest): Promise<AdGenerationResult> {
     try {
-      logger.info('Iniciando geração de anúncio', {
-        source: 'AdsService',
+      logger.info('Iniciando geração de anúncio', 'AdsService', {
         productId: request.product_id,
         marketplace: request.marketplace,
         imageCount: request.image_urls?.length || 0
@@ -172,7 +171,7 @@ Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
       });
 
       if (error) {
-        logger.error('Erro na chamada da edge function', new Error(error.message), { source: 'AdsService' });
+        logger.error('Erro na chamada da edge function', 'AdsService', error);
         throw new Error(`Erro na geração: ${error.message}`);
       }
 
@@ -188,10 +187,10 @@ Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
         }
       };
 
-      logger.info('Geração de anúncio concluída', { source: 'AdsService', result: adResult });
+      logger.info('Geração de anúncio concluída', 'AdsService', adResult);
       return adResult;
     } catch (error) {
-      logger.error('Erro na geração de anúncio', error instanceof Error ? error : new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro na geração de anúncio', 'AdsService', error);
       throw error;
     }
   }
@@ -205,8 +204,7 @@ Prompt personalizado: ${request.custom_prompt || 'Nenhum'}
     marketplace: string
   ): Promise<string> {
     try {
-      logger.info('Iniciando geração de descrição', {
-        source: 'AdsService',
+      logger.info('Iniciando geração de descrição', 'AdsService', {
         productId,
         marketplace,
         imageCount: imageUrls.length
@@ -251,15 +249,15 @@ Gere apenas uma descrição detalhada e atrativa para este produto no ${marketpl
       });
 
       if (error) {
-        logger.error('Erro na chamada da edge function', new Error(error.message), { source: 'AdsService' });
+        logger.error('Erro na chamada da edge function', 'AdsService', error);
         throw new Error(`Erro na geração: ${error.message}`);
       }
 
       const description = result.description || '';
-      logger.info('Geração de descrição concluída', { source: 'AdsService' });
+      logger.info('Geração de descrição concluída', 'AdsService');
       return description;
     } catch (error) {
-      logger.error('Erro na geração de descrição', error instanceof Error ? error : new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro na geração de descrição', 'AdsService', error);
       throw error;
     }
   }
@@ -273,9 +271,9 @@ Gere apenas uma descrição detalhada e atrativa para este produto no ${marketpl
       );
       
       await Promise.all(promises);
-      logger.info('Ordem das imagens atualizada', { source: 'AdsService', productId, count: imageOrders.length });
+      logger.info('Ordem das imagens atualizada', 'AdsService', { productId, count: imageOrders.length });
     } catch (error) {
-      logger.error('Erro ao reordenar imagens', error instanceof Error ? error : new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro ao reordenar imagens', 'AdsService', error);
       throw error;
     }
   }
@@ -290,7 +288,7 @@ Gere apenas uma descrição detalhada e atrativa para este produto no ${marketpl
       if (error) this.handleError(error, 'Contar imagens do produto');
       return count || 0;
     } catch (error) {
-      logger.error('Erro ao contar imagens do produto', error instanceof Error ? error : new Error(String(error)), { source: 'AdsService' });
+      logger.error('Erro ao contar imagens do produto', 'AdsService', error);
       return 0;
     }
   }

@@ -107,7 +107,7 @@ export function useCreateCommission() {
         title: "Comissão criada",
         description: "A comissão foi criada com sucesso.",
       });
-      logger.info('Comissão criada com sucesso', { source: 'useCreateCommission' });
+      logger.info('Comissão criada com sucesso', 'useCreateCommission');
     },
     onError: (error: Error) => {
       toast({
@@ -115,7 +115,7 @@ export function useCreateCommission() {
         description: error.message,
         variant: "destructive",
       });
-      logger.error('Erro ao criar comissão', error, { source: 'useCreateCommission' });
+      logger.error('Erro ao criar comissão', 'useCreateCommission', error);
     },
   });
 }
@@ -148,7 +148,7 @@ export function useUpdateCommission() {
         title: "Comissão atualizada",
         description: "A comissão foi atualizada com sucesso.",
       });
-      logger.info('Comissão atualizada com sucesso', { source: 'useUpdateCommission' });
+      logger.info('Comissão atualizada com sucesso', 'useUpdateCommission');
     },
     onError: (error: Error) => {
       toast({
@@ -156,7 +156,7 @@ export function useUpdateCommission() {
         description: error.message,
         variant: "destructive",
       });
-      logger.error('Erro ao atualizar comissão', error, { source: 'useUpdateCommission' });
+      logger.error('Erro ao atualizar comissão', 'useUpdateCommission', error);
     },
   });
 }
@@ -176,7 +176,7 @@ export function useDeleteCommission() {
         title: "Comissão excluída",
         description: "A comissão foi excluída com sucesso.",
       });
-      logger.info('Comissão excluída com sucesso', { source: 'useDeleteCommission' });
+      logger.info('Comissão excluída com sucesso', 'useDeleteCommission');
     },
     onError: (error: Error) => {
       toast({
@@ -184,7 +184,7 @@ export function useDeleteCommission() {
         description: error.message,
         variant: "destructive",
       });
-      logger.error('Erro ao excluir comissão', error, { source: 'useDeleteCommission' });
+      logger.error('Erro ao excluir comissão', 'useDeleteCommission', error);
     },
   });
 }

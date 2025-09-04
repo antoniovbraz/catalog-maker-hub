@@ -1,100 +1,88 @@
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+/**
+ * Sistema de logging estruturado para a aplicação
+ * Substitui console.log por um sistema mais profissional
+ */
 
-export interface LogEntry {
-  level: 'debug' | 'info' | 'warn' | 'error';
-  message: string;
-  timestamp: string;
-  scope?: string;
-  tenantId?: string;
-  userId?: string;
-  metadata?: Record<string, unknown>;
-  correlationId?: string;
+export enum LogLevel {
+  ERROR = 'error',
+  WARN = 'warn', 
+  INFO = 'info',
+  DEBUG = 'debug'
 }
 
-export class Logger {
-  private correlationId: string;
-  private scope: string;
+interface LogEntry {
+  level: LogLevel;
+  message: string;
+  context?: string;
+  timestamp: string;
+  data?: unknown;
+}
 
-  constructor(scope: string = 'app', correlationId?: string) {
-    this.scope = scope;
-    this.correlationId = correlationId || this.generateCorrelationId();
-  }
-
-  private generateCorrelationId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private log(entry: Omit<LogEntry, 'timestamp' | 'scope' | 'correlationId'>): void {
-    const logEntry: LogEntry = {
-      ...entry,
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", { locale: ptBR }),
-      scope: this.scope,
-      correlationId: this.correlationId,
+class Logger {
+  private isDevelopment = import.meta.env.DEV;
+  
+  private formatMessage(level: LogLevel, message: string, context?: string, data?: unknown): LogEntry {
+    return {
+      level,
+      message,
+      context,
+      timestamp: new Date().toISOString(),
+      data
     };
+  }
 
-    // Em produção, enviar para serviço de logging
-    if (import.meta.env.PROD) {
-      // TODO: Integrar com serviço de logging (ex: Sentry, LogRocket)
-      console.log(JSON.stringify(logEntry));
-    } else {
-      // Em desenvolvimento, log colorido
-      const colors = {
-        debug: '\x1b[36m', // cyan
-        info: '\x1b[32m',  // green
-        warn: '\x1b[33m',  // yellow
-        error: '\x1b[31m', // red
-        reset: '\x1b[0m'
-      };
-      
-      console.log(
-        `${colors[entry.level]}[${entry.level.toUpperCase()}] ${this.scope}${colors.reset}: ${entry.message}`,
-        entry.metadata ? entry.metadata : ''
-      );
+  private log(entry: LogEntry): void {
+    if (!this.isDevelopment && entry.level === LogLevel.DEBUG) {
+      return; // Não loggar debug em produção
+    }
+
+    const prefix = `[${entry.timestamp}] ${entry.level.toUpperCase()}`;
+    const contextInfo = entry.context ? ` [${entry.context}]` : '';
+    const fullMessage = `${prefix}${contextInfo}: ${entry.message}`;
+
+    switch (entry.level) {
+      case LogLevel.ERROR:
+        console.error(fullMessage, entry.data);
+        break;
+      case LogLevel.WARN:
+        console.warn(fullMessage, entry.data);
+        break;
+      case LogLevel.INFO:
+        console.info(fullMessage, entry.data);
+        break;
+      case LogLevel.DEBUG:
+        console.log(fullMessage, entry.data);
+        break;
     }
   }
 
-  debug(message: string, metadata?: Record<string, unknown>): void {
-    this.log({ level: 'debug', message, metadata });
+  error(message: string, context?: string, data?: unknown): void {
+    this.log(this.formatMessage(LogLevel.ERROR, message, context, data));
   }
 
-  info(message: string, metadata?: Record<string, unknown>): void {
-    this.log({ level: 'info', message, metadata });
+  warn(message: string, context?: string, data?: unknown): void {
+    this.log(this.formatMessage(LogLevel.WARN, message, context, data));
   }
 
-  warn(message: string, metadata?: Record<string, unknown>): void {
-    this.log({ level: 'warn', message, metadata });
+  info(message: string, context?: string, data?: unknown): void {
+    this.log(this.formatMessage(LogLevel.INFO, message, context, data));
   }
 
-  error(message: string, error?: Error, metadata?: Record<string, unknown>): void {
-    this.log({ 
-      level: 'error', 
-      message, 
-      metadata: {
-        ...metadata,
-        error: error ? {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        } : undefined
-      }
-    });
-  }
-
-  child(scope: string): Logger {
-    return new Logger(`${this.scope}:${scope}`, this.correlationId);
+  debug(message: string, context?: string, data?: unknown): void {
+    this.log(this.formatMessage(LogLevel.DEBUG, message, context, data));
   }
 }
 
-// Factory function
-export function createLogger(scope: string): Logger {
-  return new Logger(scope);
-}
+export const logger = new Logger();
 
-// Hook for components
-export function useLogger(scope: string): Logger {
-  return createLogger(scope);
+/**
+ * Hook para logging em componentes React
+ */
+export function useLogger(context: string) {
+  return {
+    error: (message: string, data?: unknown) => logger.error(message, context, data),
+    warn: (message: string, data?: unknown) => logger.warn(message, context, data),
+    info: (message: string, data?: unknown) => logger.info(message, context, data),
+    debug: (message: string, data?: unknown) => logger.debug(message, context, data),
+  };
 }
-
-// Default logger instance
-export const logger = createLogger('catalog-maker-hub');
