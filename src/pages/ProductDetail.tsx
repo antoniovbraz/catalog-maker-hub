@@ -337,8 +337,6 @@ export default function ProductDetail() {
              </CardContent>
             </Card>
 
-          {/* @ts-ignore - Temporary fix for JSX comment type inference */}
-          {/* Custos e Impostos */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -400,41 +398,40 @@ export default function ProductDetail() {
                       <p>{formatWeight(product.weight)}</p>
                     </div>
                    )}
-                   {/* @ts-ignore - Temporary fix for dimensions type inference */}
                    {product.dimensions &&
                      typeof product.dimensions === 'object' &&
                      'weight' in product.dimensions &&
-                     (product.dimensions as Record<string, number>).weight && (
+                     (product.dimensions as any).weight && (
                        <div>
                          <label className="text-sm font-medium text-muted-foreground">Peso (Dimensões)</label>
-                         <p>{(product.dimensions as Record<string, number>).weight} g</p>
+                         <p>{String((product.dimensions as any).weight)} g</p>
                        </div>
                     )}
                    {product.dimensions &&
                      typeof product.dimensions === 'object' &&
                      'length' in product.dimensions &&
-                     (product.dimensions as Record<string, number>).length && (
+                     (product.dimensions as any).length && (
                        <div>
                          <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                         <p>{(product.dimensions as Record<string, number>).length} cm</p>
+                         <p>{String((product.dimensions as any).length)} cm</p>
                        </div>
                     )}
                    {product.dimensions &&
                      typeof product.dimensions === 'object' &&
                      'width' in product.dimensions &&
-                     (product.dimensions as Record<string, number>).width && (
+                     (product.dimensions as any).width && (
                        <div>
                          <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                         <p>{(product.dimensions as Record<string, number>).width} cm</p>
+                         <p>{String((product.dimensions as any).width)} cm</p>
                        </div>
                      )}
-                   {product.dimensions &&
+                     {product.dimensions &&
                      typeof product.dimensions === 'object' &&
                      'height' in product.dimensions &&
-                     (product.dimensions as Record<string, number>).height && (
+                     (product.dimensions as any).height && (
                        <div>
                          <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                         <p>{(product.dimensions as Record<string, number>).height} cm</p>
+                         <p>{String((product.dimensions as any).height)} cm</p>
                        </div>
                      )}
                  </div>
