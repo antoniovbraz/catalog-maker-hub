@@ -77,10 +77,16 @@ serve(async (req) => {
       .select('*')
       .eq('tenant_id', tenantId)
       .single();
-    if (authError || !authToken) {
-      return errorResponse('ML authentication required', 401);
+    if (authError) {
+      console.error('ML auth token error:', authError);
+      return errorResponse(`ML authentication required: ${authError.message}`, 401);
+    }
+    if (!authToken) {
+      console.error('No auth token found for tenant:', tenantId);
+      return errorResponse('ML authentication required: No token found', 401);
     }
     if (new Date(authToken.expires_at) <= new Date()) {
+      console.error('Token expired at:', authToken.expires_at);
       return errorResponse('ML token expired', 401);
     }
 
