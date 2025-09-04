@@ -1,4 +1,5 @@
-import { ActionContext, CreateAdRequest, errorResponse, corsHeaders } from '../types.ts';
+import { ActionContext, CreateAdRequest, errorResponse } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
 
 export async function createAd(

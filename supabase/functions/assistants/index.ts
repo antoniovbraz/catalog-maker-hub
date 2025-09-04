@@ -3,12 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { assistantCreateSchema, assistantUpdateSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, PUT, DELETE, OPTIONS',
-};
+import { corsHeaders, handleCors } from '../shared/cors.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -22,13 +17,10 @@ serve(async (req) => {
   console.log('URL:', req.url);
   console.log('Headers:', Object.fromEntries(req.headers.entries()));
 
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  const corsResponse = handleCors(req);
+  if (corsResponse) {
     console.log('Handling OPTIONS request');
-    return new Response(null, { 
-      status: 200,
-      headers: corsHeaders 
-    });
+    return corsResponse;
   }
 
   try {

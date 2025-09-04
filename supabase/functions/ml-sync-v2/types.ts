@@ -1,3 +1,5 @@
+import { corsHeaders } from '../shared/cors.ts';
+
 interface QueryBuilder {
   select: (columns?: string) => QueryBuilder;
   update: (values: Record<string, unknown>) => QueryBuilder; 
@@ -61,13 +63,6 @@ export interface ActionContext {
   mlToken: string;
   jwt: string;
 }
-
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-};
 
 export const errorResponse = (message: string, status: number) =>
   new Response(JSON.stringify({ error: message }), {

@@ -2,8 +2,8 @@ import {
   ActionContext,
   ImportFromMLRequest,
   errorResponse,
-  corsHeaders,
 } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 import { resyncProduct } from './resyncProduct.ts';
 
 interface MLAttribute {

@@ -1,4 +1,5 @@
-import { ActionContext, LinkProductRequest, errorResponse, corsHeaders } from '../types.ts';
+import { ActionContext, LinkProductRequest, errorResponse } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 
 export async function linkProduct(
   req: LinkProductRequest,
