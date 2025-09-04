@@ -64,8 +64,17 @@ export interface ActionContext {
   jwt: string;
 }
 
-export const errorResponse = (message: string, status: number) =>
-  new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
+export function errorResponse(message: string, status = 400): Response {
+  return new Response(
+    JSON.stringify({
+      error: message
+    }),
+    { 
+      status,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+}
