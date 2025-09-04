@@ -32,6 +32,13 @@ async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: st
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders
+    });
+  }
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
