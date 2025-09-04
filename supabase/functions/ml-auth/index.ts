@@ -36,7 +36,10 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
-      headers: corsHeaders
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Headers': req.headers.get('Access-Control-Request-Headers') || '*'
+      }
     });
   }
   const corsResponse = handleCors(req);

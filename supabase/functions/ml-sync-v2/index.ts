@@ -30,8 +30,16 @@ const actions: Record<SyncRequest['action'], Handler> = {
 };
 
 serve(async (req) => {
-  const corsResponse = handleCors(req);
-  if (corsResponse) return corsResponse;
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Headers': req.headers.get('Access-Control-Request-Headers') || '*'
+      }
+    });
+  }
 
   try {
     setupLogger(req.headers);
