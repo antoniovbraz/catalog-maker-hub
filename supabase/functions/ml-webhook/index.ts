@@ -4,12 +4,12 @@ import { updateProductFromItem } from './updateProductFromItem.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
 import type { z } from 'zod';
 import { setupLogger } from '../shared/logger.ts';
-import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 type MLWebhookPayload = z.infer<typeof mlWebhookSchema>;
 
 serve(async (req) => {
-  const corsResponse = handleCors(req);
+  const corsResponse = applyCors(req);
   if (corsResponse) return corsResponse;
 
   setupLogger(req.headers);

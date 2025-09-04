@@ -5,7 +5,7 @@ import {
   ActionContext,
   errorResponse,
 } from './types.ts';
-import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 import { mlSyncRequestSchema } from '../shared/schemas.ts';
 import { getStatus } from './actions/getStatus.ts';
 import { syncProduct } from './actions/syncProduct.ts';
@@ -30,7 +30,7 @@ const actions: Record<SyncRequest['action'], Handler> = {
 };
 
 serve(async (req) => {
-  const corsResponse = handleCors(req);
+  const corsResponse = applyCors(req);
   if (corsResponse) return corsResponse;
 
   try {
