@@ -1,10 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./base";
 import type { Assistant, AssistantFormData } from "@/types/assistants";
-import { useLogger } from "@/utils/logger";
+import { createLogger } from "@/utils/logger";
 
 export class AssistantsService extends BaseService<Assistant> {
-  private logger = useLogger('AssistantsService');
+  private logger = createLogger('AssistantsService');
 
   constructor() {
     super('assistants');
@@ -157,7 +157,7 @@ export class AssistantsService extends BaseService<Assistant> {
       return data as unknown as Assistant;
     } catch (error) {
       this.logger.error('Erro ao buscar assistente por marketplace', error);
-      throw new Error(`Buscar assistente por marketplace falhou: ${error.message}`);
+      throw new Error(`Buscar assistente por marketplace falhou: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   }
 }

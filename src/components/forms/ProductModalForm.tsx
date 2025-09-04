@@ -40,6 +40,9 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
     cost_unit: 0,
     packaging_cost: 0,
     tax_rate: 0,
+    source: "manual",
+    origin: "manual",
+    sku_source: "none",
   });
   const [errors, setErrors] = useState<Partial<Record<keyof ProductFormData, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof ProductFormData, boolean>>>({});
@@ -67,6 +70,9 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
         cost_unit: 0,
         packaging_cost: 0,
         tax_rate: 0,
+        source: "manual",
+        origin: "manual",
+        sku_source: "none",
       });
     }
     setErrors({});
@@ -134,20 +140,20 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
       throw new Error("validation error");
     }
 
-    const dataToSubmit = {
+    const dataToSubmit: ProductFormData = {
       ...formData,
       sku_source:
         product?.sku_source === "mercado_livre"
-          ? product.sku_source
+          ? "mercado_livre"
           : formData.sku
             ? "internal"
             : "none",
       category_id:
         formData.category_id === "none" || formData.category_id === ""
-          ? null
+          ? undefined
           : formData.category_id,
-      sku: formData.sku || null,
-      description: formData.description || null,
+      sku: formData.sku || undefined,
+      description: formData.description || undefined,
     };
 
     if (isEdit) {

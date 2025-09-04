@@ -405,7 +405,7 @@ export default function ProductDetail() {
                     (product.dimensions as Record<string, number>).length && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                        <p>{(product.dimensions as Record<string, number>).length} cm</p>
+                        <p>{String((product.dimensions as Record<string, number>).length)} cm</p>
                       </div>
                     )}
                   {product.dimensions &&
@@ -414,7 +414,7 @@ export default function ProductDetail() {
                     (product.dimensions as Record<string, number>).width && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                        <p>{(product.dimensions as Record<string, number>).width} cm</p>
+                        <p>{String((product.dimensions as Record<string, number>).width)} cm</p>
                       </div>
                     )}
                   {product.dimensions &&
@@ -423,7 +423,7 @@ export default function ProductDetail() {
                     (product.dimensions as Record<string, number>).height && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                        <p>{(product.dimensions as Record<string, number>).height} cm</p>
+                        <p>{String((product.dimensions as Record<string, number>).height)} cm</p>
                       </div>
                     )}
                 </div>
@@ -466,8 +466,8 @@ export default function ProductDetail() {
                     key={attr.id || attr.name || index}
                     className="flex justify-between text-sm"
                   >
-                    <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
-                    <span>{String(attr.value_name || attr.value_id || '-')}</span>
+                     <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
+                     <span>{String(attr.value_name || attr.value_id || '-')}</span>
                   </div>
                 ))}
               </CardContent>
