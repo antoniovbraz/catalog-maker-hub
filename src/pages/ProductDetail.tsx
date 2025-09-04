@@ -1,3 +1,4 @@
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Package,
@@ -31,6 +32,7 @@ import { useMLProducts } from "@/hooks/useMLProducts";
 import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { useProductImages } from "@/hooks/useProductImages";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
+import { CostsCard } from "@/components/common/CostsCard";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { ProductModalForm } from "@/components/forms/ProductModalForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -337,46 +339,7 @@ export default function ProductDetail() {
              </CardContent>
             </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Tag className="size-5" />
-                Custos e Impostos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 gap-4">
-                <div>
-                  <div className="flex items-center gap-1">
-                    <label className="text-sm font-medium text-muted-foreground">Preço de venda</label>
-                    {priceInfo?.source === "ml" && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="size-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>Preço do Mercado Livre</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                  </div>
-                  <p className="text-lg font-semibold">{formatarMoeda(priceInfo?.price || 0)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
-                  <p className="text-lg font-semibold">{formatarMoeda(product.cost_unit)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Custo Embalagem</label>
-                  <p className="text-lg font-semibold">{formatarMoeda(product.packaging_cost || 0)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Taxa de Imposto</label>
-                  <p className="text-lg font-semibold">{product.tax_rate || 0}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {<CostsCard key="costs-taxes" product={product} priceInfo={priceInfo} /> as any}
 
           {/* Dimensões e Peso */}
           {(product.weight || product.dimensions) && (

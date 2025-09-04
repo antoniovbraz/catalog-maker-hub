@@ -4,7 +4,9 @@ interface QueryBuilder {
   insert: (values: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
   eq: (column: string, value: unknown) => QueryBuilder;
+  ilike: (column: string, pattern: string) => QueryBuilder;
   single: () => QueryBuilder;
+  maybeSingle: () => QueryBuilder;
   data?: unknown;
   error?: { message: string } | null;
 }

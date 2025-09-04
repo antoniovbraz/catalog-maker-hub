@@ -25,13 +25,13 @@ export async function resyncProduct(
       .eq('product_id', req.productId)
       .single();
 
-    if (mappingError || !productMapping?.ml_item_id) {
+    if (mappingError || !(productMapping as any)?.ml_item_id) {
       console.error('Product mapping not found:', mappingError);
       return errorResponse('Produto não possui mapeamento ML válido', 404);
     }
 
     const itemResponse = await fetch(
-      `https://api.mercadolibre.com/items/${productMapping.ml_item_id}`,
+      `https://api.mercadolibre.com/items/${(productMapping as any).ml_item_id}`,
       { headers: { Authorization: `Bearer ${mlToken}` } }
     );
 
@@ -103,10 +103,10 @@ export async function resyncProduct(
       weight = weightToGrams(value, unit);
     }
     const variation =
-      productMapping.ml_variation_id
+      (productMapping as any).ml_variation_id
         ? itemData.variations?.find(
             // Normalize IDs as Supabase returns strings and ML API returns numbers
-            (v: any) => String(v.id) === String(productMapping.ml_variation_id)
+            (v: any) => String(v.id) === String((productMapping as any).ml_variation_id)
           )
         : itemData.variations?.[0];
     const mlSku =
@@ -125,7 +125,7 @@ export async function resyncProduct(
     // Previous fallback using 70% of item price was removed to avoid ambiguity
     const cost = parseCost(itemData.sale_terms || []) ?? 0;
 
-    const shouldUpdateName = !productMapping.products?.name;
+    const shouldUpdateName = !(productMapping as any).products?.name;
 
     const updateData: Record<string, any> = {
       description: description,
@@ -156,7 +156,7 @@ export async function resyncProduct(
     if (shouldUpdateName) updateData.name = itemData.title;
 
     const changedFields: string[] = [];
-    const productData = productMapping.products || {};
+    const productData = (productMapping as any).products || {};
     const ignoredFields = ['updated_at', 'updated_from_ml_at'];
     for (const [key, value] of Object.entries(updateData)) {
       if (ignoredFields.includes(key)) continue;

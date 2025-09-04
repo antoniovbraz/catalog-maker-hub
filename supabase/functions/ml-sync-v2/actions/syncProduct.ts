@@ -1,6 +1,6 @@
 import { ActionContext, SyncProductRequest, errorResponse, corsHeaders } from '../types.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
-import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// Remove the direct import as it's already available in the Deno runtime
 
 const DEFAULT_IMAGE_PLACEHOLDER =
   'https://http2.mlstatic.com/D_NQ_NP_2X_602223-MLA0000000000_000000-O.webp';
@@ -15,7 +15,7 @@ interface SyncResult {
 }
 
 export async function syncSingleProduct(
-  supabase: SupabaseClient,
+  supabase: any,
   tenantId: string,
   productId: string,
   mlToken: string,
@@ -213,7 +213,7 @@ export async function syncSingleProduct(
 
     const pictures =
       images && images.length > 0
-        ? images.map((img) => ({ source: img.image_url }))
+        ? images.map((img: any) => ({ source: img.image_url }))
         : [{ source: DEFAULT_IMAGE_PLACEHOLDER }];
 
     const missingFields: string[] = [];
@@ -258,7 +258,7 @@ export async function syncSingleProduct(
       return { success: false, error: message, status: 400 };
     }
 
-    const margin = parseFloat(Deno.env.get('ML_PRICE_MARGIN') || '1');
+    const margin = parseFloat((globalThis as any).Deno?.env.get('ML_PRICE_MARGIN') || '1');
     const { price: productPriceField, ml_price: mlPriceField } =
       product as { price?: string | number | null; ml_price?: string | number | null };
     const productPrice = productPriceField ?? mlPriceField;
