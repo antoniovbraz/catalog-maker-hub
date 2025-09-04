@@ -40,14 +40,15 @@ export class AuthService extends BaseService<Profile> {
   async getCurrentProfile(): Promise<Profile | null> {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    logger.debug('Getting user for profile', 'AuthService', { 
+    logger.debug('Getting user for profile', { 
+      source: 'AuthService',
       hasUser: !!user, 
       userId: user?.id,
       userError: userError?.message 
     });
     
     if (!user) {
-      logger.debug('No user found in getCurrentProfile', 'AuthService');
+      logger.debug('No user found in getCurrentProfile', { source: 'AuthService' });
       return null;
     }
 
@@ -57,7 +58,8 @@ export class AuthService extends BaseService<Profile> {
       .eq('id', user.id)
       .single();
 
-    logger.debug('Profile query result', 'AuthService', { 
+    logger.debug('Profile query result', { 
+      source: 'AuthService',
       hasData: !!data, 
       error: error?.message,
       errorCode: error?.code,
@@ -65,7 +67,7 @@ export class AuthService extends BaseService<Profile> {
     });
 
     if (error) {
-      logger.error('Error fetching profile', 'AuthService', error);
+      logger.error('Error fetching profile', new Error(String(error)), { source: 'AuthService' });
       return null;
     }
 

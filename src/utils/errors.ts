@@ -65,7 +65,7 @@ export class PricingError extends Error {
  * Log de erro para desenvolvimento
  */
 export function logError(error: Error, context?: string): void {
-  logger.error(error.message, context || 'ERROR', {
+  logger.error(error.message, error, {
     name: error.name,
     stack: error.stack,
     timestamp: new Date().toISOString(),

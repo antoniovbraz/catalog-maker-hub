@@ -50,7 +50,7 @@ export class AssistantsService extends BaseService<Assistant> {
         return result;
 
       } catch (error: unknown) {
-        this.logger.error(`Erro na tentativa ${attempt}/${maxRetries}`, error);
+        this.logger.error(`Erro na tentativa ${attempt}/${maxRetries}`, error instanceof Error ? error : new Error(String(error)));
         
         if (attempt === maxRetries) {
           // Se é a última tentativa, relançar o erro
@@ -75,7 +75,7 @@ export class AssistantsService extends BaseService<Assistant> {
 
   async createAssistant(data: AssistantFormData): Promise<Assistant> {
     try {
-      this.logger.debug('Criando assistente', data);
+      this.logger.debug('Criando assistente', { assistant: data });
       
       // Buscar tenant_id do usuário atual
       const { authService } = await import('./auth');
@@ -101,7 +101,7 @@ export class AssistantsService extends BaseService<Assistant> {
       this.logger.info('Assistente criado com sucesso', result);
       return result as Assistant;
     } catch (error) {
-      this.logger.error('Erro na criação do assistente', error);
+      this.logger.error('Erro na criação do assistente', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -113,10 +113,10 @@ export class AssistantsService extends BaseService<Assistant> {
       // Usar fetch direto para PUT com retry e timeout
         const result = await this.makeRequest('PUT', `assistants/${id}`, data);
       
-      this.logger.info('Assistente atualizado com sucesso', result);
+      this.logger.info('Assistente atualizado com sucesso', { assistant: result });
       return result as Assistant;
     } catch (error) {
-      this.logger.error('Erro na atualização do assistente', error);
+      this.logger.error('Erro na atualização do assistente', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -130,7 +130,7 @@ export class AssistantsService extends BaseService<Assistant> {
       
       this.logger.info('Assistente deletado com sucesso');
     } catch (error) {
-      this.logger.error('Erro na deleção do assistente', error);
+      this.logger.error('Erro na deleção do assistente', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -156,7 +156,7 @@ export class AssistantsService extends BaseService<Assistant> {
       this.logger.debug('Assistente encontrado', data);
       return data as unknown as Assistant;
     } catch (error) {
-      this.logger.error('Erro ao buscar assistente por marketplace', error);
+      this.logger.error('Erro ao buscar assistente por marketplace', error instanceof Error ? error : new Error(String(error)));
       throw new Error(`Buscar assistente por marketplace falhou: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   }

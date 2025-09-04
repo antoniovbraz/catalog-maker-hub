@@ -10,6 +10,7 @@ const NotFound = () => {
   useEffect(() => {
     logger.error(
       'User attempted to access non-existent route',
+      undefined,
       { path: location.pathname }
     );
   }, [location.pathname, logger]);

@@ -69,7 +69,7 @@ export function useAdChat() {
 
       setMessages(prev => [...prev, userMessage, assistantMessage]);
       
-      logger.info('Chat message enviada com sucesso', 'useAdChat');
+      logger.info('Chat message enviada com sucesso', { source: 'useAdChat' });
     },
     onError: (error: Error) => {
       toast({
@@ -77,7 +77,7 @@ export function useAdChat() {
         description: error.message,
         variant: "destructive",
       });
-      logger.error('Erro no chat', 'useAdChat', error);
+      logger.error('Erro no chat', error, { source: 'useAdChat' });
     },
   });
 

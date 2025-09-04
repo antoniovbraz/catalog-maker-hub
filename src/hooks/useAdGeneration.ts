@@ -14,7 +14,7 @@ export function useGenerateListing() {
         title: "Anúncio gerado!",
         description: "O anúncio foi gerado com sucesso. Revise antes de publicar.",
       });
-      logger.info('Anúncio gerado com sucesso', 'useGenerateListing', result);
+      logger.info('Anúncio gerado com sucesso', { source: 'useGenerateListing', result });
     },
     onError: (error: Error) => {
       toast({
@@ -22,7 +22,7 @@ export function useGenerateListing() {
         description: error.message,
         variant: "destructive",
       });
-      logger.error('Erro na geração de anúncio', 'useGenerateListing', error);
+      logger.error('Erro na geração de anúncio', error, { source: 'useGenerateListing' });
     },
   });
 }
@@ -47,7 +47,7 @@ export function useGenerateDescription() {
         title: "Descrição gerada!",
         description: "A descrição foi gerada com sucesso.",
       });
-      logger.info('Descrição gerada com sucesso', 'useGenerateDescription');
+      logger.info('Descrição gerada com sucesso', { source: 'useGenerateDescription' });
     },
     onError: (error: Error) => {
       toast({
@@ -55,7 +55,7 @@ export function useGenerateDescription() {
         description: error.message,
         variant: "destructive",
       });
-      logger.error('Erro na geração de descrição', 'useGenerateDescription', error);
+      logger.error('Erro na geração de descrição', error, { source: 'useGenerateDescription' });
     },
   });
 }

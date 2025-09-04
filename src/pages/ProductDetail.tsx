@@ -332,10 +332,10 @@ export default function ProductDetail() {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Garantia</label>
                   <p>{product.warranty}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                 </div>
+               )}
+             </CardContent>
+           </Card>
 
           {/* Custos e Impostos */}
           <Card>
@@ -466,8 +466,8 @@ export default function ProductDetail() {
                     key={attr.id || attr.name || index}
                     className="flex justify-between text-sm"
                   >
-                     <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
-                     <span>{String(attr.value_name || attr.value_id || '-')}</span>
+                     <span className="font-medium">{attr.name || attr.id || 'N/A'}</span>
+                     <span>{attr.value_name || attr.value_id || '-'}</span>
                   </div>
                 ))}
               </CardContent>
