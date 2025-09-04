@@ -1,5 +1,4 @@
 import pino from 'https://esm.sh/pino@8';
-import { AsyncLocalStorage } from 'https://deno.land/std@0.168.0/node/async_hooks.ts';
 
 const originalConsole = globalThis.console;
 
@@ -34,10 +33,10 @@ const baseLogger = pino(
   stream,
 );
 
-const loggerStore = new AsyncLocalStorage<pino.Logger>();
+let currentLogger: pino.Logger = baseLogger;
 
 function getLogger(): pino.Logger {
-  return loggerStore.getStore() ?? baseLogger;
+  return currentLogger;
 }
 
 globalThis.console = {
@@ -51,7 +50,7 @@ globalThis.console = {
 export function setupLogger(headers: Headers) {
   const correlationId = headers.get('x-correlation-id') ?? crypto.randomUUID();
   const logger = baseLogger.child({ correlationId });
-  loggerStore.enterWith(logger);
+  currentLogger = logger;
   return logger;
 }
 
