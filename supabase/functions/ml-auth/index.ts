@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { mlAuthSchema } from '../shared/schemas.ts';
 import type { z } from 'zod';
 import { setupLogger } from '../shared/logger.ts';
-import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 // PKCE Helper Functions - Compatível com Deno
 async function generateRandomString(length: number): Promise<string> {
@@ -32,7 +32,7 @@ async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: st
 }
 
 serve(async (req) => {
-  const corsResponse = handleCors(req);
+  const corsResponse = applyCors(req);
   if (corsResponse) return corsResponse;
 
   try {

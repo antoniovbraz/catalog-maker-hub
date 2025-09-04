@@ -2,10 +2,10 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateAdSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
-import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 serve(async (req) => {
-  const corsResponse = handleCors(req);
+  const corsResponse = applyCors(req);
   if (corsResponse) return corsResponse;
 
   try {

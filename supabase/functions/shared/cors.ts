@@ -7,7 +7,7 @@ export const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 };
 
-export function handleCors(req: Request): Response | null {
+export function applyCors(req: Request): Response | null {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {

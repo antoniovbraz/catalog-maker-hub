@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Shared ML Service Layer - Implementa princípios SOLID e DRY
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders, handleCors } from './cors.ts'
+import { corsHeaders, applyCors } from './cors.ts'
 
 // Types e Interfaces
 export interface MLAuthData {
@@ -282,7 +282,7 @@ export async function withAuth(
   request: Request,
   handler: (authData: { tenantId: string; userId: string }) => Promise<Response>
 ): Promise<Response> {
-  const corsResponse = handleCors(request);
+  const corsResponse = applyCors(request);
   if (corsResponse) return corsResponse;
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

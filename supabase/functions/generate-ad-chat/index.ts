@@ -3,10 +3,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.53.0';
 import { generateAdChatSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
-import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 serve(async (req) => {
-  const corsResponse = handleCors(req);
+  const corsResponse = applyCors(req);
   if (corsResponse) return corsResponse;
 
   setupLogger(req.headers);
