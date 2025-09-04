@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tansta
 import { toast } from '@/hooks/use-toast';
 import { MLService, MLBatchSyncResult } from '@/services/ml-service';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 export { useMLAuthDisconnect } from './useMLAuthDisconnect';
 
 // Chaves de query centralizadas
@@ -61,10 +62,11 @@ export function useMLIntegration() {
   const writeEnabledQuery = useQuery({
     queryKey: ML_QUERY_KEYS.writeEnabled(),
     queryFn: async () => {
-      const res = await fetch('/api/ml/write-enabled');
-      if (!res.ok) throw new Error('Failed to fetch write flag');
-      const data = await res.json();
-      return data.enabled as boolean;
+      const { data, error } = await supabase.functions.invoke('ml-sync-v2', {
+        body: { action: 'get_write_flag' }
+      });
+      if (error) throw new Error('Failed to fetch write flag');
+      return data?.enabled as boolean;
     },
     staleTime: 60 * 1000,
   });
