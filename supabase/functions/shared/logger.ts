@@ -9,20 +9,20 @@ const logger = {
     console.warn(JSON.stringify({ level: 'warn', message, ...context }));
   },
   error: (message: string, error?: Error, context?: Record<string, unknown>) => {
-    console.error(JSON.stringify({ 
-      level: 'error', 
-      message, 
+    console.error(JSON.stringify({
+      level: 'error',
+      message,
       error: error ? {
         name: error.name,
         message: error.message,
         stack: error.stack
       } : undefined,
-      ...context 
+      ...context
     }));
   }
 };
 
-export function setupLogger(headers: Headers): void {
+export function setupLogger(_headers: Headers): void {
   // No setup needed for this simple logger
 }
 

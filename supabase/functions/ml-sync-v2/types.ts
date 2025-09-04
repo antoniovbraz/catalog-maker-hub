@@ -2,7 +2,7 @@ import { corsHeaders } from '../shared/cors.ts';
 
 interface QueryBuilder {
   select: (columns?: string) => QueryBuilder;
-  update: (values: Record<string, unknown>) => QueryBuilder; 
+  update: (values: Record<string, unknown>) => QueryBuilder;
   insert: (values: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
   eq: (column: string, value: unknown) => QueryBuilder;
@@ -69,7 +69,7 @@ export function errorResponse(message: string, status = 400): Response {
     JSON.stringify({
       error: message
     }),
-    { 
+    {
       status,
       headers: {
         ...corsHeaders,
