@@ -1,4 +1,5 @@
-import { ActionContext, SyncBatchRequest, errorResponse, corsHeaders } from '../types.ts';
+import { ActionContext, SyncBatchRequest, errorResponse } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 import { syncSingleProduct } from './syncProduct.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
 

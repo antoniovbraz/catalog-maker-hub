@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Shared ML Service Layer - Implementa princípios SOLID e DRY
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { corsHeaders, applyCors } from './cors.ts'
 
 // Types e Interfaces
 export interface MLAuthData {
@@ -245,7 +246,7 @@ export class MLService {
   // Error handler padronizado
   handleError(error: any, operation: string): Response {
     console.error(`Error in ${operation}:`, error);
-    
+
     const errorResponse = {
       error: error.message || 'Internal server error',
       operation,
@@ -256,11 +257,7 @@ export class MLService {
 
     return new Response(JSON.stringify(errorResponse), {
       status: statusCode,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
 
@@ -268,11 +265,7 @@ export class MLService {
   createResponse(data: any, status: number = 200): Response {
     return new Response(JSON.stringify(data), {
       status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
 
@@ -284,25 +277,12 @@ export class MLService {
   }
 }
 
-// Middleware de CORS
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-export function handleCORS(request: Request): Response | null {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-  return null;
-}
-
 // Middleware de autenticação
 export async function withAuth(
   request: Request,
   handler: (authData: { tenantId: string; userId: string }) => Promise<Response>
 ): Promise<Response> {
-  const corsResponse = handleCORS(request);
+  const corsResponse = applyCors(request);
   if (corsResponse) return corsResponse;
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

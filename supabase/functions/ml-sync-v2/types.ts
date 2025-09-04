@@ -1,6 +1,8 @@
+import { corsHeaders } from '../shared/cors.ts';
+
 interface QueryBuilder {
   select: (columns?: string) => QueryBuilder;
-  update: (values: Record<string, unknown>) => QueryBuilder; 
+  update: (values: Record<string, unknown>) => QueryBuilder;
   insert: (values: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
   upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
   eq: (column: string, value: unknown) => QueryBuilder;
@@ -62,14 +64,17 @@ export interface ActionContext {
   jwt: string;
 }
 
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-};
-
-export const errorResponse = (message: string, status: number) =>
-  new Response(JSON.stringify({ error: message }), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
+export function errorResponse(message: string, status = 400): Response {
+  return new Response(
+    JSON.stringify({
+      error: message
+    }),
+    {
+      status,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+}

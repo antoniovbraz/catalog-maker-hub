@@ -3,11 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { mlAuthSchema } from '../shared/schemas.ts';
 import type { z } from 'zod';
 import { setupLogger } from '../shared/logger.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 // PKCE Helper Functions - Compatível com Deno
 async function generateRandomString(length: number): Promise<string> {
@@ -31,15 +27,13 @@ async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: st
   const codeVerifier = await generateRandomString(128);
   const challengeBuffer = await sha256(codeVerifier);
   const codeChallenge = base64URLEncode(challengeBuffer);
-  
+
   return { codeVerifier, codeChallenge };
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = applyCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     setupLogger(req.headers);
@@ -108,12 +102,12 @@ serve(async (req) => {
         try {
           // Limpar PKCE expirados antes de criar novo
           await supabase.rpc('cleanup_expired_pkce');
-          
+
           // Gerar PKCE
           const { codeVerifier, codeChallenge } = await generatePKCE();
           const redirectUri = Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
           const state = `${tenantId}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-          
+
           // Armazenar PKCE na base de dados
           const { error: pkceError } = await supabase
             .from('ml_pkce_storage')
@@ -129,7 +123,7 @@ serve(async (req) => {
             console.error('PKCE Storage Error:', pkceError);
             throw new Error('Failed to store PKCE data');
           }
-          
+
           // Gerar URL OAuth com PKCE
           const authUrl = new URL('https://auth.mercadolivre.com.br/authorization');
           authUrl.searchParams.set('response_type', 'code');
@@ -138,9 +132,9 @@ serve(async (req) => {
           authUrl.searchParams.set('state', state);
           authUrl.searchParams.set('code_challenge', codeChallenge);
           authUrl.searchParams.set('code_challenge_method', 'S256');
-          
+
           console.log('Generated OAuth URL with PKCE:', authUrl.toString());
-          
+
           // Log da operação
           await supabase
             .from('ml_sync_log')
@@ -152,14 +146,14 @@ serve(async (req) => {
               request_data: { state, has_pkce: true },
               request_url: authUrl.toString()
             });
-          
+
           return new Response(
             JSON.stringify({ auth_url: authUrl.toString(), state }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         } catch (error) {
           console.error('Start Auth Error:', error);
-          
+
           // Log do erro
           await supabase
             .from('ml_sync_log')
@@ -170,7 +164,7 @@ serve(async (req) => {
               status: 'error',
               error_details: { message: error.message, stack: error.stack }
             });
-            
+
           throw error;
         }
       }
@@ -205,7 +199,7 @@ serve(async (req) => {
           }
 
           console.log('Using PKCE code_verifier for token exchange');
-          
+
           // Trocar código por token com PKCE
           const tokenParams = new URLSearchParams({
             grant_type: 'authorization_code',
@@ -231,7 +225,7 @@ serve(async (req) => {
 
           if (!tokenResponse.ok) {
             console.error('ML Token Exchange Error:', tokenResponseText);
-            
+
             // Log detalhado do erro
             await supabase
               .from('ml_sync_log')
@@ -245,7 +239,7 @@ serve(async (req) => {
                 response_status: tokenResponse.status,
                 request_url: 'https://api.mercadolibre.com/oauth/token'
               });
-              
+
             throw new Error(`Failed to exchange authorization code: ${tokenResponseText}`);
           }
 
@@ -318,20 +312,20 @@ serve(async (req) => {
           console.log('ML Auth completed successfully for tenant:', tenantId);
 
           return new Response(
-            JSON.stringify({ 
-              success: true, 
-              user_info: { 
-                id: mlUser.id, 
+            JSON.stringify({
+              success: true,
+              user_info: {
+                id: mlUser.id,
                 nickname: mlUser.nickname,
-                email: mlUser.email 
-              } 
+                email: mlUser.email
+              }
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
 
         } catch (error) {
           console.error('Handle Callback Error:', error);
-          
+
           // Log detalhado do erro
           await supabase
             .from('ml_sync_log')
@@ -343,7 +337,7 @@ serve(async (req) => {
               error_details: { message: error.message, stack: error.stack },
               request_data: { code: body.code, state: body.state }
             });
-            
+
           throw error;
         }
       }
@@ -382,7 +376,7 @@ serve(async (req) => {
         if (!refreshResponse.ok) {
           const errorText = await refreshResponse.text();
           console.error('ML Token Refresh Error:', errorText);
-          
+
           // Log detalhado do erro de refresh
           await supabase
             .from('ml_sync_log')
@@ -395,7 +389,7 @@ serve(async (req) => {
               request_url: 'https://api.mercadolibre.com/oauth/token',
               response_status: refreshResponse.status
             });
-            
+
           throw new Error(`Failed to refresh token: ${errorText}`);
         }
 
@@ -448,9 +442,9 @@ serve(async (req) => {
 
         if (tokenError) {
           return new Response(
-            JSON.stringify({ 
-              connected: false, 
-              status: 'disconnected' 
+            JSON.stringify({
+              connected: false,
+              status: 'disconnected'
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
@@ -464,7 +458,7 @@ serve(async (req) => {
         if (!nickname && token.access_token && !isExpired) {
           try {
             console.log('Auto-recuperando ml_nickname para tenant:', tenantId);
-            
+
             const mlUserResponse = await fetch('https://api.mercadolibre.com/users/me', {
               headers: {
                 'Authorization': `Bearer ${token.access_token}`,
@@ -475,13 +469,13 @@ serve(async (req) => {
             if (mlUserResponse.ok) {
               const mlUser = await mlUserResponse.json();
               nickname = mlUser.nickname;
-              
+
               // Atualizar no banco
               await supabase
                 .from('ml_auth_tokens')
                 .update({ ml_nickname: nickname })
                 .eq('tenant_id', tenantId);
-                
+
               console.log('Nickname recuperado e atualizado:', nickname);
             }
           } catch (error) {
@@ -490,7 +484,7 @@ serve(async (req) => {
         }
 
         return new Response(
-          JSON.stringify({ 
+          JSON.stringify({
             connected: !isExpired,
             status,
             expires_at: token.expires_at,
@@ -538,9 +532,9 @@ serve(async (req) => {
     console.error('ML Auth Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
   }

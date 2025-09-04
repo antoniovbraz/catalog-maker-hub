@@ -1,11 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { setupLogger } from '../shared/logger.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 console.log('ML Token Renewal Service initialized');
 
@@ -44,10 +40,8 @@ async function refreshWithRetry(refreshToken: string, mlClientId: string, mlClie
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = applyCors(req);
+  if (corsResponse) return corsResponse;
 
   setupLogger(req.headers);
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

@@ -4,19 +4,13 @@ import { updateProductFromItem } from './updateProductFromItem.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
 import type { z } from 'zod';
 import { setupLogger } from '../shared/logger.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 
 type MLWebhookPayload = z.infer<typeof mlWebhookSchema>;
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = applyCors(req);
+  if (corsResponse) return corsResponse;
 
   setupLogger(req.headers);
   try {

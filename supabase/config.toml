@@ -41,3 +41,12 @@ verify_jwt = false
 
 [functions.ml-security-monitor]
 verify_jwt = false
+
+[functions.assistants]
+verify_jwt = false
+
+[functions.generate-ad]
+verify_jwt = false
+
+[functions.generate-ad-chat]
+verify_jwt = false

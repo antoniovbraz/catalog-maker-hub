@@ -1,4 +1,5 @@
-import { ActionContext, GetProductsRequest, errorResponse, corsHeaders } from '../types.ts';
+import { ActionContext, GetProductsRequest, errorResponse } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 
 interface ProductMapping {
   products: {

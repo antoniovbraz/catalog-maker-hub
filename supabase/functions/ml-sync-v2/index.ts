@@ -3,9 +3,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import {
   SyncRequest,
   ActionContext,
-  corsHeaders,
   errorResponse,
 } from './types.ts';
+import { corsHeaders, applyCors } from '../shared/cors.ts';
 import { mlSyncRequestSchema } from '../shared/schemas.ts';
 import { getStatus } from './actions/getStatus.ts';
 import { syncProduct } from './actions/syncProduct.ts';
@@ -30,9 +30,8 @@ const actions: Record<SyncRequest['action'], Handler> = {
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = applyCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     setupLogger(req.headers);
