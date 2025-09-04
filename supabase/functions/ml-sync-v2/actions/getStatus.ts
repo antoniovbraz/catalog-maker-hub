@@ -1,4 +1,5 @@
-import { ActionContext, GetStatusRequest, errorResponse, corsHeaders } from '../types.ts';
+import { ActionContext, GetStatusRequest, errorResponse } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 
 export async function getStatus(
   _req: GetStatusRequest,

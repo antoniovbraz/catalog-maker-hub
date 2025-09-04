@@ -3,8 +3,8 @@ import {
   ActionContext,
   ResyncProductRequest,
   errorResponse,
-  corsHeaders,
 } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 import { parseWeight, weightToGrams, parseCost } from './importFromML.ts';
 
 export async function resyncProduct(

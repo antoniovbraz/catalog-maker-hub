@@ -1,4 +1,5 @@
-import { ActionContext, SyncProductRequest, errorResponse, corsHeaders } from '../types.ts';
+import { ActionContext, SyncProductRequest, errorResponse } from '../types.ts';
+import { corsHeaders } from '../../shared/cors.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
