@@ -19,9 +19,3 @@ export function handleCors(req: Request): Response | null {
   }
   return null;
 }
-
-export function handleCors(req: Request): Response | undefined {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-}
