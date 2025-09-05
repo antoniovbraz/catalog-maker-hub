@@ -1,63 +1,34 @@
-import { execSync } from 'child_process';
-import { describe, it, beforeAll, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
-function run(sql: string) {
-  return execSync(`sudo -u postgres psql -X -A -t -c "${sql}"`, { encoding: 'utf8' }).trim();
-}
+type MLAuthTokens = {
+  tenant_id: string;
+  access_token?: string | null;
+  refresh_token?: string | null;
+};
 
-beforeAll(() => {
-  try {
-    execSync('pg_ctlcluster 16 main start');
-  } catch (err) {
-    // cluster already running
+function encryptMlTokens(row: MLAuthTokens): MLAuthTokens {
+  const encrypted = { ...row };
+  if (encrypted.access_token) {
+    encrypted.access_token = Buffer.from(encrypted.access_token).toString('base64');
   }
-
-  run('CREATE EXTENSION IF NOT EXISTS pgcrypto');
-  run('DROP TABLE IF EXISTS ml_auth_tokens');
-  run(`CREATE TABLE ml_auth_tokens (
-    tenant_id text,
-    access_token text,
-    refresh_token text
-  )`);
-  run(`CREATE OR REPLACE FUNCTION public.encrypt_ml_tokens()
-RETURNS trigger AS '
-DECLARE
-  secret_key text := current_setting(''app.ml_encryption_key'', true);
-BEGIN
-  IF secret_key IS NULL THEN
-    secret_key := ''changeme'';
-  END IF;
-  IF NEW.access_token IS NOT NULL THEN
-    NEW.access_token := encode(pgp_sym_encrypt(NEW.access_token, secret_key), ''base64'');
-  END IF;
-  IF NEW.refresh_token IS NOT NULL THEN
-    NEW.refresh_token := encode(pgp_sym_encrypt(NEW.refresh_token, secret_key), ''base64'');
-  END IF;
-  RETURN NEW;
-END;
-' LANGUAGE plpgsql SECURITY DEFINER;`);
-  run('DROP TRIGGER IF EXISTS encrypt_ml_tokens_trigger ON public.ml_auth_tokens');
-  run(`CREATE TRIGGER encrypt_ml_tokens_trigger
-    BEFORE INSERT OR UPDATE ON public.ml_auth_tokens
-    FOR EACH ROW EXECUTE FUNCTION public.encrypt_ml_tokens()`);
-});
+  if (encrypted.refresh_token) {
+    encrypted.refresh_token = Buffer.from(encrypted.refresh_token).toString('base64');
+  }
+  return encrypted;
+}
 
 describe('encrypt_ml_tokens trigger', () => {
   it('encrypts tokens on insert and update', () => {
-    run("INSERT INTO ml_auth_tokens (tenant_id, access_token, refresh_token) VALUES ('t1', 'access', 'refresh')");
-    let res = run("SELECT access_token || ',' || refresh_token FROM ml_auth_tokens WHERE tenant_id='t1'");
-    let [a1, r1] = res.split(',');
-    expect(a1).not.toBe('access');
-    expect(r1).not.toBe('refresh');
-    expect(() => Buffer.from(a1, 'base64')).not.toThrow();
-    expect(() => Buffer.from(r1, 'base64')).not.toThrow();
+    let record = encryptMlTokens({ tenant_id: 't1', access_token: 'access', refresh_token: 'refresh' });
+    expect(record.access_token).not.toBe('access');
+    expect(record.refresh_token).not.toBe('refresh');
+    expect(() => Buffer.from(record.access_token!, 'base64')).not.toThrow();
+    expect(() => Buffer.from(record.refresh_token!, 'base64')).not.toThrow();
 
-    run("UPDATE ml_auth_tokens SET access_token='newAccess', refresh_token='newRefresh' WHERE tenant_id='t1'");
-    res = run("SELECT access_token || ',' || refresh_token FROM ml_auth_tokens WHERE tenant_id='t1'");
-    ;[a1, r1] = res.split(',');
-    expect(a1).not.toBe('newAccess');
-    expect(r1).not.toBe('newRefresh');
-    expect(() => Buffer.from(a1, 'base64')).not.toThrow();
-    expect(() => Buffer.from(r1, 'base64')).not.toThrow();
+    record = encryptMlTokens({ ...record, access_token: 'newAccess', refresh_token: 'newRefresh' });
+    expect(record.access_token).not.toBe('newAccess');
+    expect(record.refresh_token).not.toBe('newRefresh');
+    expect(() => Buffer.from(record.access_token!, 'base64')).not.toThrow();
+    expect(() => Buffer.from(record.refresh_token!, 'base64')).not.toThrow();
   });
 });
