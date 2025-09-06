@@ -45,6 +45,123 @@ export function MLProductList() {
     }
   }, [selectedProducts, syncBatch]);
 
+  const handleImportFromML = async () => {
+    if (!writeEnabled) {
+      toast({
+        title: "Importação Bloqueada",
+        description: "Operações de escrita estão temporariamente desabilitadas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    setImportProgress(0);
+
+    // Simulate progress for better UX
+    const progressInterval = setInterval(() => {
+      setImportProgress(prev => {
+        if (prev >= 90) return prev; // Stop at 90% until real completion
+        return prev + Math.random() * 10;
+      });
+    }, 500);
+
+    try {
+      await sync.importFromML.mutateAsync({});
+      
+      setImportProgress(100);
+      setTimeout(() => {
+        setIsImporting(false);
+        setImportProgress(0);
+        refetch();
+      }, 1000);
+
+      toast({
+        title: "Importação Concluída",
+        description: "Produtos importados do Mercado Livre com sucesso.",
+      });
+    } catch (error: any) {
+      console.error('Import failed:', error);
+      setIsImporting(false);
+      setImportProgress(0);
+      
+      toast({
+        title: "Erro na Importação",
+        description: error.message || "Falha ao importar produtos do Mercado Livre.",
+        variant: "destructive",
+      });
+    } finally {
+      clearInterval(progressInterval);
+    }
+  };
+
+  const handleSyncProduct = async (product: any) => {
+    if (!writeEnabled) {
+      toast({
+        title: "Sincronização Bloqueada",
+        description: "Operações de escrita estão temporariamente desabilitadas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await sync.syncProduct.mutateAsync({ product_id: product.id });
+      
+      toast({
+        title: "Produto Sincronizado",
+        description: `${product.title} foi sincronizado com sucesso.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro na Sincronização",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleResyncProduct = async (product: any) => {
+    if (!writeEnabled) {
+      toast({
+        title: "Re-sincronização Bloqueada",
+        description: "Operações de escrita estão temporariamente desabilitadas.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await resyncProduct.resyncProduct.mutateAsync({ productId: product.id });
+      
+      toast({
+        title: "Produto Re-sincronizado",
+        description: `${product.title} foi re-sincronizado com sucesso.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro na Re-sincronização",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getSyncStatusBadge = (product: any) => {
+    const status = product.sync_status || 'not_synced';
+    
+    switch (status) {
+      case 'synced':
+        return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle2 className="h-3 w-3 mr-1" />Sincronizado</Badge>;
+      case 'pending':
+        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Pendente</Badge>;
+      case 'error':
+        return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Erro</Badge>;
+      default:
+        return <Badge variant="outline"><Package className="h-3 w-3 mr-1" />Não Sincronizado</Badge>;
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>

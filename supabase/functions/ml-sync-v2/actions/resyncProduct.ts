@@ -11,49 +11,42 @@ export async function resyncProduct(
   req: ResyncProductRequest,
   { supabase, tenantId, mlToken }: ActionContext
 ): Promise<Response> {
-  console.log('Re-syncing product:', req.productId);
-
-  if (!req.productId) {
-    return errorResponse('Product ID is required', 400);
-  }
-
+  console.log(`Re-syncing product: ${req.product_id}`);
+  
   try {
-    const { data: productMapping, error: mappingError } = await supabase
+    // Get product mapping efficiently
+    const { data: mapping, error: mappingError } = await supabase
       .from('ml_product_mapping')
-      .select('*, products(*)')
+      .select('ml_item_id, product_id')
       .eq('tenant_id', tenantId)
-      .eq('product_id', req.productId)
-      .single();
+      .eq('product_id', req.product_id)
+      .maybeSingle();
 
-    if (mappingError || !productMapping?.ml_item_id) {
-      console.error('Product mapping not found:', mappingError);
-      return errorResponse('Produto não possui mapeamento ML válido', 404);
+    if (mappingError || !mapping?.ml_item_id) {
+      throw new Error('Product mapping not found');
     }
 
-    const itemResponse = await fetch(
-      `https://api.mercadolibre.com/items/${productMapping.ml_item_id}`,
-      { headers: { Authorization: `Bearer ${mlToken}` } }
-    );
+    // Fetch item details and description in parallel
+    const [itemResponse, descResponse] = await Promise.all([
+      fetch(`https://api.mercadolibre.com/items/${mapping.ml_item_id}`, {
+        headers: { 'Authorization': `Bearer ${mlToken}` }
+      }),
+      fetch(`https://api.mercadolibre.com/items/${mapping.ml_item_id}/description`, {
+        headers: { 'Authorization': `Bearer ${mlToken}` }
+      })
+    ]);
 
     if (!itemResponse.ok) {
-      throw new Error(`ML API error: ${itemResponse.status}`);
+      throw new Error(`Failed to fetch item details: ${itemResponse.status}`);
     }
 
-    const itemData = await itemResponse.json();
-    console.log('Got item details for re-sync:', itemData.id, itemData.title);
+    const item = await itemResponse.json();
+    console.log(`Got item details for re-sync: ${item.id} ${item.title}`);
 
     let description = '';
-    try {
-      const descResponse = await fetch(
-        `https://api.mercadolibre.com/items/${itemData.id}/description`,
-        { headers: { Authorization: `Bearer ${mlToken}` } }
-      );
-      if (descResponse.ok) {
-        const descData = await descResponse.json();
-        description = descData.plain_text || '';
-      }
-    } catch (e) {
-      console.warn('Could not fetch description:', e);
+    if (descResponse.ok) {
+      const descData = await descResponse.json();
+      description = descData.plain_text || descData.text || '';
     }
 
     let categoryData = null as any;

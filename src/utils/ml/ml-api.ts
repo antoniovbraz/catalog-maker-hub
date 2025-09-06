@@ -56,10 +56,14 @@ function recordCall(functionName: string, action: string): void {
 export async function callMLFunction(
   functionName: string,
   action: string,
-  params: Record<string, unknown>,
+  params: Record<string, unknown> = {},
   options: MLCallOptions = {}
 ): Promise<unknown> {
-  const { skipRateCheck = false, timeout = 30000, headers } = options;
+  const {
+    skipRateCheck = false,
+    timeout = action === 'import_from_ml' ? 120000 : 30000, // 2 min for imports, 30s for others
+    headers = {}
+  } = options;
 
   // Verificar rate limit se não for para pular
   if (!skipRateCheck && !canMakeCall(functionName, action)) {

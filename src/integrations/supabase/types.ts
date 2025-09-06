@@ -813,6 +813,8 @@ export type Database = {
         Row: {
           brand: string | null
           category_id: string | null
+          category_ml_id: string | null
+          category_ml_path: string | null
           cost_unit: number
           created_at: string
           description: string | null
@@ -833,12 +835,15 @@ export type Database = {
           tax_rate: number | null
           tenant_id: string | null
           updated_at: string
+          updated_from_ml_at: string | null
           warranty: string | null
           weight: number | null
         }
         Insert: {
           brand?: string | null
           category_id?: string | null
+          category_ml_id?: string | null
+          category_ml_path?: string | null
           cost_unit: number
           created_at?: string
           description?: string | null
@@ -859,12 +864,15 @@ export type Database = {
           tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
+          updated_from_ml_at?: string | null
           warranty?: string | null
           weight?: number | null
         }
         Update: {
           brand?: string | null
           category_id?: string | null
+          category_ml_id?: string | null
+          category_ml_path?: string | null
           cost_unit?: number
           created_at?: string
           description?: string | null
@@ -885,6 +893,7 @@ export type Database = {
           tax_rate?: number | null
           tenant_id?: string | null
           updated_at?: string
+          updated_from_ml_at?: string | null
           warranty?: string | null
           weight?: number | null
         }
