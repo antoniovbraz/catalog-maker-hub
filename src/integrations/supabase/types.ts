@@ -1263,6 +1263,48 @@ export type Database = {
       }
     }
     Views: {
+      ml_auth_tokens_decrypted: {
+        Row: {
+          access_token: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string | null
+          ml_nickname: string | null
+          refresh_token: string | null
+          scope: string | null
+          tenant_id: string | null
+          token_type: string | null
+          updated_at: string | null
+          user_id_ml: number | null
+        }
+        Insert: {
+          access_token?: never
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          ml_nickname?: string | null
+          refresh_token?: never
+          scope?: string | null
+          tenant_id?: string | null
+          token_type?: string | null
+          updated_at?: string | null
+          user_id_ml?: number | null
+        }
+        Update: {
+          access_token?: never
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string | null
+          ml_nickname?: string | null
+          refresh_token?: never
+          scope?: string | null
+          tenant_id?: string | null
+          token_type?: string | null
+          updated_at?: string | null
+          user_id_ml?: number | null
+        }
+        Relationships: []
+      }
       ml_integration_status: {
         Row: {
           connection_status: string | null
