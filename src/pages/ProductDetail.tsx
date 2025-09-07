@@ -110,7 +110,7 @@ export default function ProductDetail() {
         .eq("product_id", productId)
         .maybeSingle();
       if (mlData?.ml_price) {
-        return { price: mlData.ml_price, source: "ml" as const };
+        return { price: Number(mlData.ml_price), source: "ml" as const };
       }
       const { data: productRow } = await supabase
         .from("products")
@@ -337,7 +337,7 @@ export default function ProductDetail() {
             </CardContent>
           </Card>
 
-          {/* Custos e Impostos */}
+          {/* Costs and Taxes Section */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -361,7 +361,7 @@ export default function ProductDetail() {
                       </TooltipProvider>
                     )}
                   </div>
-                  <p className="text-lg font-semibold">{formatarMoeda(priceInfo?.price || 0)}</p>
+                  <p className="text-lg font-semibold">{formatarMoeda(Number(priceInfo?.price) || 0)}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>

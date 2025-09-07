@@ -1,37 +1,52 @@
 import { ActionContext, SyncProductRequest, errorResponse } from '../types.ts';
 import { corsHeaders } from '../../shared/cors.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const DEFAULT_IMAGE_PLACEHOLDER =
   'https://http2.mlstatic.com/D_NQ_NP_2X_602223-MLA0000000000_000000-O.webp';
 
 interface SyncResult {
   success: boolean;
-  ml_item_id?: string;
-  ml_permalink?: string;
-  operation?: 'updated' | 'created';
-  error?: string;
-  status?: number;
+  message: string;
+  product?: any;
+  sync_log?: any;
 }
 
-export async function syncSingleProduct(
-  supabase: SupabaseClient,
-  tenantId: string,
-  productId: string,
-  mlToken: string,
-  forceUpdate = false
-): Promise<SyncResult> {
-  const startTime = Date.now();
+interface SyncContext {
+  supabase: any;
+  tenantId: string;
+  authToken: string;
+  mlToken: string;
+  mlClientId: string;
+  jwt: string;
+}
+
+export async function syncProduct(
+  req: SyncProductRequest,
+  context: ActionContext
+): Promise<Response> {
+  if (!isMLWriteEnabled()) {
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        message: 'ML write operations disabled' 
+      }),
+      { 
+        status: 423,
+        headers: corsHeaders 
+      }
+    );
+  }
+
+  const { product_id, force_update } = req;
+  const { supabase, tenantId, authToken, mlToken } = context;
 
   try {
+    // Get product data
     const { data: product, error: productError } = await supabase
       .from('products')
-      .select(`
-        *,
-        categories(id, name)
-      `)
-      .eq('id', productId)
+      .select('*')
+      .eq('id', product_id)
       .eq('tenant_id', tenantId)
       .single();
 
@@ -39,385 +54,267 @@ export async function syncSingleProduct(
       throw new Error('Product not found');
     }
 
-    const { data: existingMapping, error: mappingError } = await supabase
+    // Check if already synced unless force update
+    if (!force_update) {
+      const { data: existing } = await supabase
+        .from('ml_product_mapping')
+        .select('ml_item_id, last_sync_at')
+        .eq('product_id', product_id)
+        .eq('tenant_id', tenantId)
+        .maybeSingle();
+
+      if (existing?.ml_item_id) {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Product already synced',
+            ml_item_id: existing.ml_item_id
+          }),
+          { headers: corsHeaders }
+        );
+      }
+    }
+
+    // Get category data
+    let category = null;
+    if (product.category_id) {
+      const { data: categoryData } = await supabase
+        .from('categories')
+        .select('name, category_ml_id, category_ml_path')
+        .eq('id', product.category_id)
+        .eq('tenant_id', tenantId)
+        .maybeSingle();
+      
+      category = categoryData;
+    }
+
+    // Prepare ML listing data
+    const listingData = await prepareMLListing(product, category, supabase, tenantId);
+
+    // Create or update ML listing
+    const mlResponse = await createOrUpdateMLListing(
+      listingData,
+      mlToken,
+      product_id,
+      supabase,
+      tenantId
+    );
+
+    // Log sync operation
+    await logSyncOperation(
+      product_id,
+      tenantId,
+      mlResponse.success,
+      mlResponse.message,
+      supabase
+    );
+
+    return new Response(
+      JSON.stringify(mlResponse),
+      { headers: corsHeaders }
+    );
+  } catch (error) {
+    console.error('Sync error:', error);
+    
+    // Log failed operation
+    await logSyncOperation(
+      product_id,
+      tenantId,
+      false,
+      (error as Error).message,
+      supabase
+    );
+
+    return errorResponse('Sync failed: ' + (error as Error).message);
+  }
+}
+
+async function prepareMLListing(product: any, category: any, supabase: any, tenantId: string) {
+  // Get product images
+  const { data: images } = await supabase
+    .from('product_images')
+    .select('image_url')
+    .eq('product_id', product.id)
+    .eq('tenant_id', tenantId)
+    .order('created_at');
+
+  const pictures =
+    images && images.length > 0
+      ? images.map((img: any) => ({ source: img.image_url }))
+      : [{ source: DEFAULT_IMAGE_PLACEHOLDER }];
+
+  const missingFields: string[] = [];
+  
+  if (!product.name) missingFields.push('title');
+  if (!product.description) missingFields.push('description');
+  if (!category?.category_ml_id) missingFields.push('category_id');
+  if (!product.price || product.price <= 0) missingFields.push('price');
+
+  if (missingFields.length > 0) {
+    throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+  }
+
+  // Build attributes array
+  const attributes = [];
+  
+  if (product.brand) {
+    attributes.push({
+      id: 'BRAND',
+      value_name: product.brand
+    });
+  }
+  
+  if (product.model) {
+    attributes.push({
+      id: 'MODEL',
+      value_name: product.model
+    });
+  }
+
+  return {
+    title: product.name,
+    category_id: category.category_ml_id,
+    price: product.price,
+    currency_id: 'BRL',
+    available_quantity: product.ml_available_quantity || 1,
+    buying_mode: 'buy_it_now',
+    condition: 'new',
+    listing_type_id: 'gold_special',
+    description: { plain_text: product.description },
+    pictures,
+    attributes,
+    shipping: {
+      mode: 'me2',
+      free_shipping: false
+    }
+  };
+}
+
+async function createOrUpdateMLListing(
+  listingData: any,
+  mlToken: string,
+  productId: string,
+  supabase: any,
+  tenantId: string
+): Promise<SyncResult> {
+  try {
+    const accessToken = typeof globalThis.Deno !== 'undefined' 
+      ? globalThis.Deno.env.get('ML_ACCESS_TOKEN') 
+      : process?.env?.ML_ACCESS_TOKEN;
+    
+    const token = mlToken || accessToken;
+    
+    if (!token) {
+      throw new Error('ML access token not available');
+    }
+
+    // Check if mapping exists
+    const { data: mapping } = await supabase
       .from('ml_product_mapping')
-      .select('*')
-      .eq('tenant_id', tenantId)
+      .select('ml_item_id')
       .eq('product_id', productId)
+      .eq('tenant_id', tenantId)
       .maybeSingle();
 
-    if (mappingError) {
-      throw new Error('Failed to get product mapping');
+    let response;
+    let method = 'POST';
+    let url = 'https://api.mercadolibre.com/items';
+
+    if (mapping?.ml_item_id) {
+      // Update existing item
+      method = 'PUT';
+      url = `https://api.mercadolibre.com/items/${mapping.ml_item_id}`;
     }
 
-    await supabase
-      .from('ml_product_mapping')
-      .upsert(
-        {
-          tenant_id: tenantId,
-          product_id: productId,
-          sync_status: 'syncing',
-          last_sync_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'tenant_id,product_id',
-        }
-      );
-
-    let mlCategoryId = 'MLB1051';
-    if (product.categories) {
-      const { data: categoryMapping } = await supabase
-        .from('ml_category_mapping')
-        .select('ml_category_id')
-        .eq('tenant_id', tenantId)
-        .eq('category_id', product.categories.id)
-        .single();
-
-      if (categoryMapping) {
-        mlCategoryId = categoryMapping.ml_category_id;
-      }
-    }
-    let { data: images } = await supabase
-      .from('product_images')
-      .select('image_url')
-      .eq('tenant_id', tenantId)
-      .eq('product_id', productId)
-      .order('sort_order');
-
-    const initialMissing: string[] = [];
-    if (!product.description) initialMissing.push('description');
-    if (!product.sku) initialMissing.push('sku');
-    if (
-      product.cost_unit === null ||
-      product.cost_unit === undefined
-    )
-      initialMissing.push('cost_unit');
-    if (!images || images.length === 0) initialMissing.push('images');
-
-    if (product.source === 'mercado_livre' && initialMissing.length > 0) {
-      try {
-        if (existingMapping?.ml_item_id) {
-          const itemResponse = await fetch(
-            `https://api.mercadolibre.com/items/${existingMapping.ml_item_id}`,
-            { headers: { Authorization: `Bearer ${mlToken}` } }
-          );
-          if (itemResponse.ok) {
-            const itemData = await itemResponse.json();
-            let description = product.description;
-            if (!product.description) {
-              try {
-                const descResponse = await fetch(
-                  `https://api.mercadolibre.com/items/${itemData.id}/description`,
-                  { headers: { Authorization: `Bearer ${mlToken}` } }
-                );
-                if (descResponse.ok) {
-                  const descData = await descResponse.json();
-                  description = descData.plain_text || '';
-                }
-              } catch (e) {
-                console.warn('Could not fetch description:', e);
-              }
-            }
-
-            let sku = product.sku;
-            let skuSource = product.sku_source;
-            if (!sku) {
-              const variation =
-                existingMapping?.ml_variation_id
-                  ? itemData.variations?.find(
-                      // Normalize IDs because ML API returns numbers and Supabase stores strings
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (v: any) =>
-                        String(v.id) === String(existingMapping.ml_variation_id)
-                    )
-                  : itemData.variations?.[0];
-              const mlSku =
-                itemData.seller_custom_field ||
-                itemData.attributes?.find(
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  (attr: any) => attr.id === 'SELLER_SKU'
-                )?.value_name ||
-                variation?.seller_custom_field ||
-                variation?.seller_sku ||
-                variation?.attributes?.find(
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  (attr: any) => attr.id === 'SELLER_SKU'
-                )?.value_name ||
-                variation?.id ||
-                null;
-              sku = mlSku;
-              skuSource = mlSku ? 'mercado_livre' : 'none';
-            }
-
-            const costUnit =
-              product.cost_unit === null || product.cost_unit === undefined
-                ? itemData.price
-                : product.cost_unit;
-
-            const updates: Record<string, unknown> = {
-              updated_at: new Date().toISOString(),
-            };
-            if (!product.description) updates.description = description;
-            if (!product.sku) {
-              updates.sku = sku;
-              updates.sku_source = skuSource;
-              updates.ml_seller_sku = sku;
-              updates.updated_from_ml_at = new Date().toISOString();
-            }
-            if (product.cost_unit === null || product.cost_unit === undefined)
-              updates.cost_unit = costUnit;
-
-            if (Object.keys(updates).length > 1) {
-              await supabase
-                .from('products')
-                .update(updates)
-                .eq('id', productId)
-                .eq('tenant_id', tenantId);
-
-              product.description = description;
-              product.sku = sku;
-              product.cost_unit = costUnit;
-            }
-
-            if ((!images || images.length === 0) && itemData.pictures?.length > 0) {
-              for (let i = 0; i < Math.min(itemData.pictures.length, 10); i++) {
-                const picture = itemData.pictures[i];
-                await supabase
-                  .from('product_images')
-                  .upsert(
-                    {
-                      tenant_id: tenantId,
-                      product_id: productId,
-                      image_url: picture.url || picture.secure_url,
-                      sort_order: i,
-                      image_type: 'ml_sync',
-                      updated_at: new Date().toISOString(),
-                    },
-                    { onConflict: 'tenant_id,product_id,image_url' }
-                  );
-              }
-
-              const refreshed = await supabase
-                .from('product_images')
-                .select('image_url')
-                .eq('tenant_id', tenantId)
-                .eq('product_id', productId)
-                .order('sort_order');
-              images = refreshed.data || images;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Auto-import failed:', e);
-      }
-    }
-
-    const pictures =
-      images && images.length > 0
-        ? images.map((img: any) => ({ source: img.image_url }))
-        : [{ source: DEFAULT_IMAGE_PLACEHOLDER }];
-
-    const missingFields: string[] = [];
-    if (!product.name) missingFields.push('name');
-    if (!product.sku) missingFields.push('sku');
-    if (!product.description) missingFields.push('description');
-    if (
-      product.cost_unit === null ||
-      product.cost_unit === undefined
-    )
-      missingFields.push('cost_unit');
-    if (!images || images.length === 0) missingFields.push('images');
-
-    if (missingFields.length > 0) {
-      const message = `Missing required fields: ${missingFields.join(', ')}`;
-
-      await supabase.from('ml_sync_log').insert({
-        tenant_id: tenantId,
-        operation_type: 'sync_product',
-        entity_type: 'product',
-        entity_id: productId,
-        status: 'error',
-        error_details: { message, missing_fields: missingFields },
-        execution_time_ms: Date.now() - startTime,
-      });
-
-      await supabase
-        .from('ml_product_mapping')
-        .upsert(
-          {
-            tenant_id: tenantId,
-            product_id: productId,
-            sync_status: 'error',
-            error_message: message,
-            last_sync_at: new Date().toISOString(),
-          },
-          {
-            onConflict: 'tenant_id,product_id',
-          }
-        );
-
-      return { success: false, error: message, status: 400 };
-    }
-
-    const margin = parseFloat(Deno.env.get('ML_PRICE_MARGIN') || '1');
-    const { price: productPriceField, ml_price: mlPriceField } =
-      product as { price?: string | number | null; ml_price?: string | number | null };
-    const productPrice = productPriceField ?? mlPriceField;
-    const price = productPrice
-      ? parseFloat(String(productPrice))
-      : parseFloat(String(product.cost_unit)) * margin;
-
-    const mlItemData = {
-      title: product.name,
-      category_id: mlCategoryId,
-      price,
-      currency_id: 'BRL',
-      available_quantity: 999,
-      buying_mode: 'buy_it_now',
-      listing_type_id: 'gold_special',
-      condition: 'new',
-      description: {
-        plain_text: product.description || `Produto ${product.name}`,
+    response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      pictures,
-    };
+      body: JSON.stringify(listingData)
+    });
 
-    let mlResponse: Response;
-    let isUpdate = false;
+    const result = await response.json();
 
-    if (existingMapping?.ml_item_id && !forceUpdate) {
-      isUpdate = true;
-      mlResponse = await fetch(
-        `https://api.mercadolibre.com/items/${existingMapping.ml_item_id}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${mlToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(mlItemData),
-        }
-      );
-    } else {
-      mlResponse = await fetch('https://api.mercadolibre.com/items', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${mlToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(mlItemData),
-      });
+    if (!response.ok) {
+      throw new Error(`ML API Error: ${result.message || 'Unknown error'}`);
     }
 
-    if (!mlResponse.ok) {
-      const errorData = await mlResponse.json();
-      console.error('ML API Error:', errorData);
+    // Update or create mapping
+    const mappingData = {
+      product_id: productId,
+      tenant_id: tenantId,
+      ml_item_id: result.id,
+      ml_listing_type: result.listing_type_id,
+      ml_price: result.price,
+      ml_available_quantity: result.available_quantity,
+      ml_sold_quantity: result.sold_quantity || 0,
+      ml_permalink: result.permalink,
+      sync_status: 'synced',
+      last_sync_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
 
+    if (mapping?.ml_item_id) {
       await supabase
         .from('ml_product_mapping')
-        .upsert(
-          {
-            tenant_id: tenantId,
-            product_id: productId,
-            sync_status: 'error',
-            error_message: JSON.stringify(errorData),
-            last_sync_at: new Date().toISOString(),
-          },
-          { onConflict: 'tenant_id,product_id' }
-        );
-
-      throw new Error(
-        `Mercado Livre API error: ${errorData.message || 'Unknown error'}`
-      );
+        .update(mappingData)
+        .eq('product_id', productId)
+        .eq('tenant_id', tenantId);
+    } else {
+      await supabase
+        .from('ml_product_mapping')
+        .insert(mappingData);
     }
-
-    const mlItem = await mlResponse.json();
-
-    const mappingUpdate = {
-      tenant_id: tenantId,
-      product_id: productId,
-      ml_item_id: mlItem.id,
-      sync_status: 'synced',
-      error_message: null,
-      ml_permalink: mlItem.permalink,
-      ml_title: mlItem.title,
-      ml_price: mlItem.price,
-      ml_category_id: mlItem.category_id,
-      ml_listing_type: mlItem.listing_type_id,
-      ml_condition: mlItem.condition,
-      last_sync_at: new Date().toISOString(),
-    };
-
-    await supabase
-      .from('ml_product_mapping')
-      .upsert(mappingUpdate, { onConflict: 'tenant_id,product_id' });
-
-    await supabase.from('ml_sync_log').insert({
-      tenant_id: tenantId,
-      operation_type: isUpdate ? 'update_product' : 'create_product',
-      entity_type: 'product',
-      entity_id: productId,
-      ml_entity_id: mlItem.id,
-      status: 'success',
-      request_data: mlItemData,
-      response_data: mlItem,
-      execution_time_ms: Date.now() - startTime,
-    });
 
     return {
       success: true,
-      ml_item_id: mlItem.id,
-      ml_permalink: mlItem.permalink,
-      operation: isUpdate ? 'updated' : 'created',
+      message: mapping?.ml_item_id ? 'Item updated successfully' : 'Item created successfully',
+      product: result
     };
   } catch (error) {
-    await supabase.from('ml_sync_log').insert({
-      tenant_id: tenantId,
-      operation_type: 'sync_product',
-      entity_type: 'product',
-      entity_id: productId,
-      status: 'error',
-      error_details: { message: (error as Error).message },
-      execution_time_ms: Date.now() - startTime,
-    });
+    console.error('ML API Error:', error);
+    
+    // Update mapping with error status
+    await supabase
+      .from('ml_product_mapping')
+      .upsert({
+        product_id: productId,
+        tenant_id: tenantId,
+        sync_status: 'error',
+        error_message: (error as Error).message,
+        last_sync_attempt: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
 
-    throw error;
+    return {
+      success: false,
+      message: (error as Error).message
+    };
   }
 }
 
-export async function syncProduct(
-  req: SyncProductRequest,
-  { supabase, tenantId, mlToken }: ActionContext
-): Promise<Response> {
-  if (!req.product_id) {
-    return errorResponse('Product ID required', 400);
-  }
-
-  if (!isMLWriteEnabled()) {
-    return errorResponse('ML write operations disabled', 403);
-  }
-
+async function logSyncOperation(
+  productId: string,
+  tenantId: string,
+  success: boolean,
+  message: string,
+  supabase: any
+) {
   try {
-    const result = await syncSingleProduct(
-      supabase,
-      tenantId,
-      req.product_id,
-      mlToken,
-      req.force_update
-    );
-
-    if (!result.success) {
-      return errorResponse(
-        result.error || 'ML sync failed',
-        result.status || 500
-      );
-    }
-
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    await supabase
+      .from('ml_sync_logs')
+      .insert({
+        tenant_id: tenantId,
+        entity_type: 'product',
+        entity_id: productId,
+        operation: 'sync',
+        status: success ? 'success' : 'error',
+        message,
+        created_at: new Date().toISOString()
+      });
   } catch (error) {
-    return errorResponse('Internal error: ' + (error as Error).message, 500);
+    console.error('Failed to log sync operation:', error);
   }
 }
-
