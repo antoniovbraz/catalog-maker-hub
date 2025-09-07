@@ -1,7 +1,7 @@
 import { ActionContext, SyncProductRequest, errorResponse } from '../types.ts';
 import { corsHeaders } from '../../shared/cors.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
-import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const DEFAULT_IMAGE_PLACEHOLDER =
   'https://http2.mlstatic.com/D_NQ_NP_2X_602223-MLA0000000000_000000-O.webp';
@@ -214,7 +214,7 @@ export async function syncSingleProduct(
 
     const pictures =
       images && images.length > 0
-        ? images.map((img) => ({ source: img.image_url }))
+        ? images.map((img: any) => ({ source: img.image_url }))
         : [{ source: DEFAULT_IMAGE_PLACEHOLDER }];
 
     const missingFields: string[] = [];

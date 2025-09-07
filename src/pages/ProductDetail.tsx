@@ -331,7 +331,7 @@ export default function ProductDetail() {
               {product.warranty && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Garantia</label>
-                  <p>{product.warranty}</p>
+                  <p>{String(product.warranty)}</p>
                 </div>
               )}
             </CardContent>
@@ -396,7 +396,7 @@ export default function ProductDetail() {
                         <Weight className="size-3" />
                         Peso
                       </label>
-                      <p>{formatWeight(product.weight)}</p>
+                      <p>{formatWeight(product.weight as number)}</p>
                     </div>
                   )}
                   {product.dimensions &&
@@ -463,11 +463,11 @@ export default function ProductDetail() {
               <CardContent className="grid gap-2">
                 {attributes.map((attr, index) => (
                   <div
-                    key={attr.id || attr.name || index}
+                    key={(attr as any).id || (attr as any).name || index}
                     className="flex justify-between text-sm"
                   >
-                    <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
-                    <span>{String(attr.value_name || attr.value_id || '-')}</span>
+                     <span className="font-medium">{String((attr as any).name || (attr as any).id || 'N/A')}</span>
+                     <span>{String((attr as any).value_name || (attr as any).value_id || '-')}</span>
                   </div>
                 ))}
               </CardContent>

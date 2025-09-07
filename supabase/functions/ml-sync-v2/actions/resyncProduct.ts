@@ -21,7 +21,7 @@ export async function resyncProduct(
     }
 
     // Get item details from ML
-    const itemResponse = await fetch(`https://api.mercadolibre.com/items/${productMapping.ml_item_id}`, {
+    const itemResponse = await fetch(`https://api.mercadolibre.com/items/${(productMapping as any).ml_item_id}`, {
       headers: { 'Authorization': `Bearer ${mlToken}` }
     });
     
