@@ -157,7 +157,7 @@ export class AssistantsService extends BaseService<Assistant> {
       return data as unknown as Assistant;
     } catch (error) {
       this.logger.error('Erro ao buscar assistente por marketplace', error);
-      throw new Error(`Buscar assistente por marketplace falhou: ${error.message}`);
+      throw new Error(`Buscar assistente por marketplace falhou: ${(error as Error).message}`);
     }
   }
 }

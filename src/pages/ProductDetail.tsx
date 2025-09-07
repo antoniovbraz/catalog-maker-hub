@@ -402,28 +402,28 @@ export default function ProductDetail() {
                   {product.dimensions &&
                     typeof product.dimensions === 'object' &&
                     'length' in product.dimensions &&
-                    (product.dimensions as Record<string, number>).length && (
+                    (product.dimensions as Record<string, any>).length && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                        <p>{(product.dimensions as Record<string, number>).length} cm</p>
+                        <p>{String((product.dimensions as Record<string, any>).length)} cm</p>
                       </div>
                     )}
                   {product.dimensions &&
                     typeof product.dimensions === 'object' &&
                     'width' in product.dimensions &&
-                    (product.dimensions as Record<string, number>).width && (
+                    (product.dimensions as Record<string, any>).width && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                        <p>{(product.dimensions as Record<string, number>).width} cm</p>
+                        <p>{String((product.dimensions as Record<string, any>).width)} cm</p>
                       </div>
                     )}
                   {product.dimensions &&
                     typeof product.dimensions === 'object' &&
                     'height' in product.dimensions &&
-                    (product.dimensions as Record<string, number>).height && (
+                    (product.dimensions as Record<string, any>).height && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                        <p>{(product.dimensions as Record<string, number>).height} cm</p>
+                        <p>{String((product.dimensions as Record<string, any>).height)} cm</p>
                       </div>
                     )}
                 </div>

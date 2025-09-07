@@ -151,7 +151,7 @@ export function ProductModalForm({ product, onSuccess, onSubmitForm }: ProductMo
       ) as "none" | "mercado_livre" | "internal",
       category_id:
         formData.category_id === "none" || formData.category_id === ""
-          ? null
+          ? undefined
           : formData.category_id,
       sku: formData.sku || undefined,
       description: formData.description || undefined,

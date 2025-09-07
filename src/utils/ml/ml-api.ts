@@ -82,12 +82,12 @@ export async function callMLFunction(
     const { data: session } = await supabase.auth.getSession();
     const authHeader = session.session?.access_token
       ? { Authorization: `Bearer ${session.session.access_token}` }
-      : {};
+      : undefined;
 
     const callPromise = supabase.functions
       .invoke(functionName, {
         body: { action, ...params },
-        headers: { ...authHeader, ...headers },
+        headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
       })
       // Evita rejeições não tratadas quando o timeout ocorre primeiro
       .catch((err: { message?: string }) => ({ data: null, error: err }));
