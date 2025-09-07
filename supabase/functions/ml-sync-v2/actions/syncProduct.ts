@@ -56,12 +56,15 @@ export async function syncProduct(
 
     // Check if already synced unless force update
     if (!force_update) {
-      const { data: existing } = await supabase
+      const { data: existingList } = await supabase
         .from('ml_product_mapping')
         .select('ml_item_id, last_sync_at')
         .eq('product_id', product_id)
-        .eq('tenant_id', tenantId)
-        .maybeSingle();
+        .eq('tenant_id', tenantId);
+      
+      const existing = (existingList as any[])?.length > 0 ? (existingList as any[])[0] : null;
+      
+      
 
       if (existing?.ml_item_id) {
         return new Response(
@@ -77,15 +80,14 @@ export async function syncProduct(
 
     // Get category data
     let category = null;
-    if (product.category_id) {
-      const { data: categoryData } = await supabase
+    if ((product as any).category_id) {
+      const { data: categoryList } = await supabase
         .from('categories')
         .select('name, category_ml_id, category_ml_path')
-        .eq('id', product.category_id)
-        .eq('tenant_id', tenantId)
-        .maybeSingle();
+        .eq('id', (product as any).category_id)
+        .eq('tenant_id', tenantId);
       
-      category = categoryData;
+      category = (categoryList as any[])?.length > 0 ? (categoryList as any[])[0] : null;
     }
 
     // Prepare ML listing data
@@ -198,8 +200,8 @@ async function createOrUpdateMLListing(
   tenantId: string
 ): Promise<SyncResult> {
   try {
-    const accessToken = typeof globalThis.Deno !== 'undefined' 
-      ? globalThis.Deno.env.get('ML_ACCESS_TOKEN') 
+    const accessToken = typeof (globalThis as any).Deno !== 'undefined' 
+      ? (globalThis as any).Deno.env.get('ML_ACCESS_TOKEN') 
       : process?.env?.ML_ACCESS_TOKEN;
     
     const token = mlToken || accessToken;
@@ -214,7 +216,7 @@ async function createOrUpdateMLListing(
       .select('ml_item_id')
       .eq('product_id', productId)
       .eq('tenant_id', tenantId)
-      .maybeSingle();
+      .single();
 
     let response;
     let method = 'POST';

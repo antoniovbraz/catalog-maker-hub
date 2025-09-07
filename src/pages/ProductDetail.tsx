@@ -104,19 +104,19 @@ export default function ProductDetail() {
     queryKey: ["product-price", productId],
     queryFn: async () => {
       if (!productId) return null;
-      const { data: mlData } = await supabase
+      const { data: mlDataList } = await supabase
         .from("ml_product_mapping")
         .select("ml_price")
-        .eq("product_id", productId)
-        .maybeSingle();
+        .eq("product_id", productId);
+      const mlData = (mlDataList as any[])?.[0];
       if (mlData?.ml_price) {
         return { price: Number(mlData.ml_price), source: "ml" as const };
       }
-      const { data: productRow } = await supabase
+      const { data: productList } = await supabase
         .from("products")
         .select("price")
-        .eq("id", productId)
-        .maybeSingle();
+        .eq("id", productId);
+      const productRow = (productList as any[])?.[0];
       return {
         price: productRow?.price || 0,
         source: "product" as const,

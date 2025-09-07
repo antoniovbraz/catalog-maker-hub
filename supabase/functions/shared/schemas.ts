@@ -1,4 +1,4 @@
-import { z } from "https://esm.sh/zod@3.22.4";
+import { z } from "zod";
 
 export const generateAdSchema = z.object({
   assistant_id: z.string(),

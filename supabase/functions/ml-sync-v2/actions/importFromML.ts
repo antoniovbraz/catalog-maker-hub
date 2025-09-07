@@ -9,7 +9,7 @@ interface MLAttribute {
   values?: Array<{ name: string }>;
 }
 
-function parseWeight(valueName: string): { value: number; unit: string } | null {
+export function parseWeight(valueName: string): { value: number; unit: string } | null {
   if (!valueName) return null;
   
   const weightRegex = /^(\d+(?:[.,]\d+)?)\s*(g|kg|oz|lbs?)\b/i;
@@ -24,7 +24,7 @@ function parseWeight(valueName: string): { value: number; unit: string } | null 
   return null;
 }
 
-function weightToGrams(value: number, unit: string): number {
+export function weightToGrams(value: number, unit: string): number {
   switch (unit.toLowerCase()) {
     case 'kg': return value * 1000;
     case 'oz': return value * 28.35;
