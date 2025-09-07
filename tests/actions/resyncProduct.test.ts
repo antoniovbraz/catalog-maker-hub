@@ -23,7 +23,7 @@ describe('resyncProduct action', () => {
       category_id: 'CAT1'
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | Request | URL) => {
       const urlStr = url.toString();
       if (urlStr.includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
@@ -89,7 +89,7 @@ describe('resyncProduct action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | Request | URL) => {
       if (url.toString().includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
       }
@@ -150,7 +150,7 @@ describe('resyncProduct action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | Request | URL) => {
       if (url.toString().includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
       }
@@ -208,7 +208,7 @@ describe('resyncProduct action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | Request | URL) => {
       if (url.toString().includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
       }
@@ -268,7 +268,7 @@ describe('resyncProduct action', () => {
       variations: [{ id: 12345, seller_sku: 'VSKU1' }],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | Request | URL) => {
       if (url.toString().includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
       }
@@ -338,7 +338,7 @@ describe('resyncProduct action', () => {
       pictures: [],
     } as any;
 
-    global.fetch = vi.fn((url: RequestInfo) => {
+    global.fetch = vi.fn((url: string | Request | URL) => {
       if (url.toString().includes('/description')) {
         return Promise.resolve({ ok: true, json: async () => ({ plain_text: '' }) } as any);
       }

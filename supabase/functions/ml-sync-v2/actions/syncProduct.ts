@@ -320,3 +320,6 @@ async function logSyncOperation(
     console.error('Failed to log sync operation:', error);
   }
 }
+
+// Additional export alias for backwards compatibility
+export { syncProduct as syncSingleProduct };
