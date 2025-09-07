@@ -2,7 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Package, Play, Loader2 } from "@/components/ui/icons";
+import { Badge } from "@/components/ui/badge";
+import { Package, Play, Loader2, CheckCircle2, Clock, AlertCircle } from "@/components/ui/icons";
 import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -11,7 +12,7 @@ import { MLProductRow } from "./MLProductRow";
 import { toast } from "@/hooks/use-toast";
 
 export function MLProductList() {
-  const { data, isLoading } = useMLProducts();
+  const { data, isLoading, refetch } = useMLProducts();
   const products = useMemo(() => data?.pages.flat() ?? [], [data]);
   const { sync, writeEnabled } = useMLIntegration();
   const { syncProduct, syncBatch, importFromML } = sync;
@@ -34,118 +35,12 @@ export function MLProductList() {
     }
   }, [products]);
 
-  const handleSyncProduct = useCallback((productId: string) => {
-    syncProduct.mutate(productId);
-  }, [syncProduct]);
-
   const handleSyncBatch = useCallback(() => {
     if (selectedProducts.length > 0) {
       syncBatch.mutate(selectedProducts);
       setSelectedProducts([]);
     }
   }, [selectedProducts, syncBatch]);
-
-  const handleImportFromML = async () => {
-    if (!writeEnabled) {
-      toast({
-        title: "Importação Bloqueada",
-        description: "Operações de escrita estão temporariamente desabilitadas.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsImporting(true);
-    setImportProgress(0);
-
-    // Simulate progress for better UX
-    const progressInterval = setInterval(() => {
-      setImportProgress(prev => {
-        if (prev >= 90) return prev; // Stop at 90% until real completion
-        return prev + Math.random() * 10;
-      });
-    }, 500);
-
-    try {
-      await sync.importFromML.mutateAsync({});
-      
-      setImportProgress(100);
-      setTimeout(() => {
-        setIsImporting(false);
-        setImportProgress(0);
-        refetch();
-      }, 1000);
-
-      toast({
-        title: "Importação Concluída",
-        description: "Produtos importados do Mercado Livre com sucesso.",
-      });
-    } catch (error: any) {
-      console.error('Import failed:', error);
-      setIsImporting(false);
-      setImportProgress(0);
-      
-      toast({
-        title: "Erro na Importação",
-        description: error.message || "Falha ao importar produtos do Mercado Livre.",
-        variant: "destructive",
-      });
-    } finally {
-      clearInterval(progressInterval);
-    }
-  };
-
-  const handleSyncProduct = async (product: any) => {
-    if (!writeEnabled) {
-      toast({
-        title: "Sincronização Bloqueada",
-        description: "Operações de escrita estão temporariamente desabilitadas.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await sync.syncProduct.mutateAsync({ product_id: product.id });
-      
-      toast({
-        title: "Produto Sincronizado",
-        description: `${product.title} foi sincronizado com sucesso.`,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro na Sincronização",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleResyncProduct = async (product: any) => {
-    if (!writeEnabled) {
-      toast({
-        title: "Re-sincronização Bloqueada",
-        description: "Operações de escrita estão temporariamente desabilitadas.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await resyncProduct.resyncProduct.mutateAsync({ productId: product.id });
-      
-      toast({
-        title: "Produto Re-sincronizado",
-        description: `${product.title} foi re-sincronizado com sucesso.`,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro na Re-sincronização",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   const getSyncStatusBadge = (product: any) => {
     const status = product.sync_status || 'not_synced';
@@ -193,8 +88,9 @@ export function MLProductList() {
                   onSuccess: (data) => {
                     toast({
                       title: "Importação Concluída",
-                      description: `${data?.updated || 0} produtos atualizados e ${data?.created || 0} produtos importados do Mercado Livre.`,
+                      description: `Produtos importados do Mercado Livre com sucesso.`,
                     });
+                    refetch();
                   },
                 })
               }
@@ -259,7 +155,7 @@ export function MLProductList() {
                     product={product}
                     isSelected={selectedProducts.includes(product.id)}
                     onSelect={handleSelectProduct}
-                    onSync={handleSyncProduct}
+                    onSync={(productId: string) => syncProduct.mutate(productId)}
                     isProcessing={syncProduct.isPending}
                     isLoading={
                       syncProduct.isPending &&

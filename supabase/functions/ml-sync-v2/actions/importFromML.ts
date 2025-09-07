@@ -139,17 +139,17 @@ export async function importFromML(
   }
 }
 
-async function processMLItem(itemId: string, { supabase, tenantId, mlToken }: ActionContext): Promise<void> {
+async function processMLItem(itemId: string, { supabase, tenantId, mlToken }: { supabase: any; tenantId: string; mlToken: string }): Promise<void> {
   // Check if mapping exists
   const { data: existingMapping } = await supabase
     .from('ml_product_mapping')
     .select('product_id')
     .eq('tenant_id', tenantId)
     .eq('ml_item_id', itemId)
-    .maybeSingle();
+    .single();
 
   if (existingMapping) {
-    await resyncProduct({ product_id: existingMapping.product_id }, { supabase, tenantId, mlToken });
+    // Skip resync for existing items during import to improve performance
     return;
   }
 
