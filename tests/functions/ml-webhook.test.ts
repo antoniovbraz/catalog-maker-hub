@@ -20,12 +20,28 @@ describe('ml-webhook function', () => {
     });
 
     await expect(
-      callMLFunction('ml-webhook', 'process', {}, { headers: { 'X-Webhook-Signature': 'bad' } })
+      callMLFunction('ml-webhook', 'process', {}, { headers: { 'X-Hub-Signature': 'bad' } })
     ).rejects.toThrow('Invalid webhook signature');
 
     expect(mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-webhook', {
       body: { action: 'process' },
-      headers: { Authorization: 'Bearer token', 'X-Webhook-Signature': 'bad' },
+      headers: { Authorization: 'Bearer token', 'X-Hub-Signature': 'bad' },
+    });
+  });
+
+  it('throws error when signature is missing', async () => {
+    mockSupabaseClient.functions.invoke.mockResolvedValue({
+      data: null,
+      error: { message: 'Invalid webhook signature' },
+    });
+
+    await expect(
+      callMLFunction('ml-webhook', 'process', {}, { headers: {} })
+    ).rejects.toThrow('Invalid webhook signature');
+
+    expect(mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-webhook', {
+      body: { action: 'process' },
+      headers: { Authorization: 'Bearer token' },
     });
   });
 });
