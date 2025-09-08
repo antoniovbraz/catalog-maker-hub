@@ -88,11 +88,11 @@ export default function ProductDetail() {
 
   // ML sync logs query
   const { data: syncLogs = [] } = useQuery<MLSyncLog[]>({
-    queryKey: ['ml_sync_logs', tenantId, id],
+    queryKey: ['ml_sync_log', tenantId, id],
     queryFn: async () => {
       if (!id) return [];
       const { data, error } = await supabase
-        .from('ml_sync_logs')
+        .from('ml_sync_log')
         .select('*')
         .eq('product_id', id)
         .order('created_at', { ascending: false })
