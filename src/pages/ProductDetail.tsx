@@ -1,8 +1,8 @@
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Package,
-  ArrowLeft,
-  ExternalLink,
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { 
   RefreshCw,
   Edit,
   Tag,
@@ -16,31 +16,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { formatarMoeda } from "@/utils/pricing";
-import { useProduct } from "@/hooks/useProducts";
-import type { ProductWithCategory } from "@/types/products";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProducts } from "@/hooks/useProducts";
 import { useMLProducts } from "@/hooks/useMLProducts";
-import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { useProductImages } from "@/hooks/useProductImages";
+import { useMLIntegration } from "@/hooks/useMLIntegration";
+import { useMLProductResync } from "@/hooks/useMLProductResync";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
-import { ProductModalForm } from "@/components/forms/ProductModalForm";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useMLConnectionStatus } from "@/hooks/useMLIntegration";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { formatarMoeda } from "@/utils/pricing";
 import { useAuth } from '@/contexts/AuthContext';
 
+// Type definitions
 interface MLSyncLog {
   id: string;
   status: string;
@@ -70,79 +61,105 @@ interface ProductPriceInfo {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { showFormModal } = useGlobalModal();
-  
-  const { data: productData, isLoading: productLoading } = useProduct(id!);
-  const product = productData as ProductWithCategory;
-  const productId = product?.id;
-  const { data: mlProductsData } = useMLProducts();
-  const mlProducts = mlProductsData?.pages.flat() ?? [];
-  const { data: productImages = [] } = useProductImages(id!);
-  const { resyncProduct } = useMLProductResync();
-  const { isExpiringSoon, expiresAt } = useMLConnectionStatus();
-
+  const { openModal } = useGlobalModal();
   const { profile } = useAuth();
   const tenantId = profile?.tenant_id;
 
-  const { data: syncLog = [] } = useQuery<MLSyncLog[]>({
-    queryKey: ["ml_sync_log", tenantId, productId],
+  // Data fetching hooks
+  const { data: products, isLoading: isLoadingProducts } = useProducts();
+  const { data: mlProductsPages } = useMLProducts();
+  const { data: productImages = [] } = useProductImages(id || '');
+  const { isConnected, accessToken } = useMLIntegration();
+  const resyncProduct = useMLProductResync();
+
+  // Find the specific product
+  const product = products?.find((p) => p.id === id);
+  const mlProducts = mlProductsPages?.pages.flat() || [];
+
+  // ML sync logs query
+  const { data: syncLogs = [] } = useQuery<MLSyncLog[]>({
+    queryKey: ['ml_sync_logs', tenantId, id],
     queryFn: async () => {
-      if (!productId) return [];
+      if (!id) return [];
       const { data, error } = await supabase
-        .from("ml_sync_log")
-        .select("id, status, operation_type, created_at")
-        .eq("entity_id", productId)
-        .order("created_at", { ascending: false })
+        .from('ml_sync_logs')
+        .select('*')
+        .eq('product_id', id)
+        .order('created_at', { ascending: false })
         .limit(10);
-      if (error) throw new Error(error.message);
-      return data as MLSyncLog[];
+      
+      if (error) {
+        console.error('Error fetching sync logs:', error);
+        return [];
+      }
+      return data || [];
     },
-    enabled: !!productId && !!tenantId,
+    enabled: !!id && !!tenantId,
   });
 
-  const { data: priceInfo } = useQuery<ProductPriceInfo | null>({
-    queryKey: ["product-price", productId],
+  // Product price info query  
+  const { data: priceInfo } = useQuery<ProductPriceInfo>({
+    queryKey: ['product_price_info', tenantId, id],
     queryFn: async () => {
-      if (!productId) return null;
-      const { data: mlDataList } = await supabase
-        .from("ml_product_mapping")
-        .select("ml_price")
-        .eq("product_id", productId);
-      const mlData = (mlDataList as any[])?.[0];
-      if (mlData?.ml_price) {
-        return { price: Number(mlData.ml_price), source: "ml" as const };
+      if (!product) return { price: 0, source: 'product' as const };
+      
+      const mlProduct = mlProducts.find(ml => ml.id === product.id);
+      if (mlProduct && mlProduct.ml_price) {
+        return { price: mlProduct.ml_price, source: 'ml' as const };
       }
-      const { data: productList } = await supabase
-        .from("products")
-        .select("price")
-        .eq("id", productId);
-      const productRow = (productList as any[])?.[0];
-      return {
-        price: productRow?.price || 0,
-        source: "product" as const,
+      
+      return { 
+        price: product.cost_unit || 0, 
+        source: 'product' as const 
       };
     },
-    enabled: !!productId,
+    enabled: !!product,
   });
 
-  if (productLoading) {
+  // Event handlers
+  const handleEdit = () => {
+    if (product) {
+      openModal({
+        type: 'product',
+        mode: 'edit',
+        data: product,
+      });
+    }
+  };
+
+  const handleResync = () => {
+    if (product?.id) {
+      resyncProduct.mutate({ productId: product.id });
+    }
+  };
+
+  // Loading and error states
+  if (isLoadingProducts) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <LoadingSpinner />
+      <div className="container mx-auto p-6">
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-64" />
+            <Skeleton className="h-48" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-48" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-        <Package className="size-12 text-muted-foreground" />
-        <div className="text-center">
-          <h2 className="text-lg font-semibold">Produto não encontrado</h2>
-          <p className="text-muted-foreground">O produto solicitado não existe ou foi removido.</p>
-        </div>
-        <Button onClick={() => navigate('/products')}>
-          <ArrowLeft className="mr-2 size-4" />
+      <div className="container mx-auto p-6">
+        <Button
+          variant="outline"
+          onClick={() => navigate('/produtos')}
+          className="mb-6"
+        >
           Voltar para Produtos
         </Button>
       </div>
@@ -169,146 +186,114 @@ export default function ProductDetail() {
     return `${w.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} g`;
   };
 
-  const handleEdit = () => {
-    let submitForm: (() => Promise<void>) | null = null;
-
-    showFormModal({
-      title: "Editar Produto",
-      description: "Atualize as informações do produto",
-      content: (
-        <ProductModalForm
-          product={product}
-          onSuccess={() => {}}
-          onSubmitForm={(fn) => {
-            submitForm = fn;
-          }}
-        />
-      ),
-      onSave: async () => {
-        if (submitForm) await submitForm();
-      },
-      size: "lg",
-    });
+  // Helper function to safely render dimensions
+  const renderDimension = (value: unknown, unit: string = 'cm'): string => {
+    if (typeof value === 'number') return `${value} ${unit}`;
+    if (typeof value === 'string') return `${value} ${unit}`;
+    return '-';
   };
 
-  const handleResync = () => {
-    if (product.id) {
-      resyncProduct.mutate({ productId: product.id });
+  // Check if token is expiring (30 days)
+  const isTokenExpiring = accessToken && isConnected && (() => {
+    try {
+      const tokenData = JSON.parse(atob(accessToken.split('.')[1]));
+      const expiryTime = tokenData.exp * 1000;
+      const thirtyDaysFromNow = Date.now() + (30 * 24 * 60 * 60 * 1000);
+      return expiryTime < thirtyDaysFromNow;
+    } catch {
+      return false;
     }
-  };
+  })();
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-6">
+    <div className="container mx-auto p-6">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/products')}
+          <Button
+            variant="outline"
+            onClick={() => navigate('/produtos')}
           >
-            <ArrowLeft className="mr-2 size-4" />
-            Voltar
+            Voltar para Produtos
           </Button>
-          <div>
-            <h1 className="flex items-center gap-2 text-2xl font-bold">
-              <Package className="size-6" />
-              {product.name}
-            </h1>
-            <p className="text-muted-foreground">Detalhes do produto</p>
-          </div>
+          <h1 className="text-2xl font-bold">Detalhes do Produto</h1>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={handleEdit}>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleEdit}>
             <Edit className="mr-2 size-4" />
             Editar
           </Button>
+          {isConnected && product.source === 'mercado_livre' && (
+            <Button
+              variant="secondary"
+              onClick={handleResync}
+              disabled={resyncProduct.isPending}
+            >
+              <RefreshCw className={`mr-2 size-4 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+              {resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Alert Token Expiring */}
-      {isExpiringSoon && (
-        <Alert variant="destructive" className="mb-6">
+      {/* Alerts */}
+      {isTokenExpiring && (
+        <Alert className="mb-6">
           <AlertTriangle className="size-4" />
           <AlertDescription>
-            O token do Mercado Livre expira em breve
-            {expiresAt
-              ? ` (${format(new Date(expiresAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })})`
-              : ''}
+            Seu token do Mercado Livre expira em menos de 30 dias. Considere renovar sua integração.
           </AlertDescription>
         </Alert>
       )}
 
-      {/* Alert para dados incompletos */}
       {hasIncompleteData && (
-        <Card className="mb-6 border-orange-200 bg-orange-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-orange-700">
-              <RefreshCw className="size-4" />
-              <span className="font-medium">Dados Incompletos</span>
-            </div>
-            <p className="mt-1 text-sm text-orange-600">
-              Este produto foi importado do Mercado Livre mas alguns dados não foram capturados.
-              Clique em "Re-sincronizar" para atualizar as informações.
-            </p>
-          </CardContent>
-        </Card>
+        <Alert className="mb-6">
+          <Info className="size-4" />
+          <AlertDescription>
+            Este produto importado do Mercado Livre possui dados incompletos. 
+            Considere completar as informações manualmente.
+          </AlertDescription>
+        </Alert>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Coluna Principal */}
-        <div className="space-y-6 lg:col-span-2">
-          {/* Informações Básicas */}
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Basic Information Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="size-5" />
-                Informações Básicas
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Nome</label>
-                  <p className="font-medium">{product.name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">SKU</label>
-                  {product.source === 'mercado_livre' ? (
-                    product.ml_seller_sku ? (
-                      <div className="flex items-center gap-2">
-                        <p>{product.ml_seller_sku}</p>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="outline">SKU Original ML</Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              SKU definido originalmente no Mercado Livre
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    ) : (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="text-muted-foreground">—</span>
-                          </TooltipTrigger>
-                          <TooltipContent>Defina o SKU no ML</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )
-                  ) : (
-                    <p>
-                      {product.sku || (
-                        <span className="text-muted-foreground">Não informado</span>
-                      )}
-                    </p>
-                  )}
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="flex items-center gap-3">
+                    <Box className="size-5" />
+                    <span className="text-xl">{product.name}</span>
+                  </CardTitle>
+                  <div className="flex items-center gap-2 mt-2">
+                    <ProductSourceBadge source={product.source} />
+                    {product.ml_seller_sku && (
+                      <Badge variant="outline">
+                        SKU ML: {product.ml_seller_sku}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Nome</label>
+                <p className="font-medium">{product.name}</p>
+              </div>
+
+              {product.ml_seller_sku && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">SKU ML</label>
+                  <p>{product.ml_seller_sku}</p>
+                </div>
+              )}
+
+              <Separator />
 
               {product.description && (
                 <div>
@@ -317,21 +302,24 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-4">
+              {product.brand && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Marca</label>
-                  <p>{product.brand || <span className="text-muted-foreground">Não informado</span>}</p>
+                  <p>{typeof product.brand === 'string' ? product.brand : String(product.brand)}</p>
                 </div>
+              )}
+
+              {product.model && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Modelo</label>
-                  <p>{product.model || <span className="text-muted-foreground">Não informado</span>}</p>
+                  <p>{String(product.model)}</p>
                 </div>
-              </div>
+              )}
 
               {product.warranty && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Garantia</label>
-                  <p>{String(product.warranty)}</p>
+                  <p>{product.warranty ? String(product.warranty) : 'Não informado'}</p>
                 </div>
               )}
             </CardContent>
@@ -348,27 +336,11 @@ export default function ProductDetail() {
             <CardContent>
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <div className="flex items-center gap-1">
-                    <label className="text-sm font-medium text-muted-foreground">Preço de venda</label>
-                    {priceInfo?.source === "ml" && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="size-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>Preço do Mercado Livre</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                  </div>
-                  <p className="text-lg font-semibold">{formatarMoeda(Number(priceInfo?.price) || 0)}</p>
-                </div>
-                <div>
                   <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
                   <p className="text-lg font-semibold">{formatarMoeda(product.cost_unit)}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Custo Embalagem</label>
+                  <label className="text-sm font-medium text-muted-foreground">Custo de Embalagem</label>
                   <p className="text-lg font-semibold">{formatarMoeda(product.packaging_cost || 0)}</p>
                 </div>
                 <div>
@@ -405,7 +377,7 @@ export default function ProductDetail() {
                     (product.dimensions as Record<string, any>).length && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                        <p>{String((product.dimensions as Record<string, any>).length)} cm</p>
+                        <p>{renderDimension((product.dimensions as Record<string, any>).length)}</p>
                       </div>
                     )}
                   {product.dimensions &&
@@ -414,7 +386,7 @@ export default function ProductDetail() {
                     (product.dimensions as Record<string, any>).width && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                        <p>{String((product.dimensions as Record<string, any>).width)} cm</p>
+                        <p>{renderDimension((product.dimensions as Record<string, any>).width)}</p>
                       </div>
                     )}
                   {product.dimensions &&
@@ -423,7 +395,7 @@ export default function ProductDetail() {
                     (product.dimensions as Record<string, any>).height && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                        <p>{String((product.dimensions as Record<string, any>).height)} cm</p>
+                        <p>{renderDimension((product.dimensions as Record<string, any>).height)}</p>
                       </div>
                     )}
                 </div>
@@ -438,14 +410,13 @@ export default function ProductDetail() {
                 <CardTitle>Imagens do Produto</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {productImages.map((image, index) => (
-                    <div key={index} className="aspect-square overflow-hidden rounded-lg border">
+                    <div key={image.id} className="rounded-lg overflow-hidden border">
                       <img
                         src={image.image_url}
                         alt={`${product.name} - Imagem ${index + 1}`}
-                        className="size-full cursor-pointer object-cover transition-transform hover:scale-105"
-                        onClick={() => window.open(image.image_url, '_blank')}
+                        className="w-full h-32 object-cover"
                       />
                     </div>
                   ))}
@@ -474,13 +445,13 @@ export default function ProductDetail() {
             </Card>
           )}
 
-          {/* Variações */}
-          {(variations.length > 0 || product.ml_variation_id) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Variações</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
+          {/* Variações ML */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Variações ML</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
                 {variations.length > 0 ? (
                   variations.map((variation, index) => (
                     <div
@@ -497,83 +468,70 @@ export default function ProductDetail() {
                       {variation.price && (
                         <div>Preço: {formatarMoeda(variation.price)}</div>
                       )}
-                      {variation.available_quantity != null && (
-                        <div>Estoque: {variation.available_quantity}</div>
+                      {variation.available_quantity !== undefined && (
+                        <div>Quantidade: {variation.available_quantity}</div>
                       )}
                     </div>
                   ))
                 ) : (
                   <p className="text-sm">ID da variação: {product.ml_variation_id}</p>
                 )}
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Coluna Lateral */}
+        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Status e Origem */}
+          {/* Status Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Status</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="size-5" />
+                Status
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Origem</label>
-                <div className="mt-1">
-                  <ProductSourceBadge 
-                    source={product.source} 
-                    mlStatus={mlProduct?.sync_status}
-                    mlItemId={mlProduct?.ml_item_id || undefined}
-                  />
-                </div>
-              </div>
-
+            <CardContent className="space-y-3">
+              <ProductSourceBadge 
+                source={product.source} 
+              />
               {product.categories && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Categoria</label>
-                  <p className="mt-1 flex items-center gap-1">
-                    <Tag className="size-3" />
+                  <p className="text-sm">
                     {product.categories.name}
                   </p>
                 </div>
               )}
-
-              <Separator />
-
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Criado em:</span>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Data de Criação</label>
+                <div className="flex items-center gap-1 text-sm">
+                  <Calendar className="size-3" />
                   <span>{format(new Date(product.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Atualizado:</span>
-                  <span>{format(new Date(product.updated_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
-                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Última Atualização</label>
+                <span>{format(new Date(product.updated_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Informações ML */}
+          {/* ML Product Info */}
           {mlProduct && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Box className="size-5" />
-                  Mercado Livre
-                </CardTitle>
+                <CardTitle>Informações ML</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {mlProduct.ml_item_id && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">ID do Anúncio</label>
-                    <p className="font-mono text-sm">{mlProduct.ml_item_id}</p>
-                  </div>
-                )}
-
+              <CardContent className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">ID do Item ML</label>
+                  <p className="font-mono text-sm">{mlProduct.ml_item_id}</p>
+                </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Estoque ML</label>
+                    <label className="text-sm font-medium text-muted-foreground">Estoque Disponível</label>
                     <p>{product.ml_available_quantity || 0}</p>
                   </div>
                   <div>
@@ -582,59 +540,63 @@ export default function ProductDetail() {
                   </div>
                 </div>
 
-                {mlProduct.last_sync_at && (
-                  <div>
-                    <label className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                      <Calendar className="size-3" />
-                      Última Sincronização
-                    </label>
-                    <p className="text-sm">{format(new Date(mlProduct.last_sync_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</p>
-                  </div>
-                )}
+                <Separator />
+                
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Última Sincronização</label>
+                  <p className="text-sm">{format(new Date(mlProduct.last_sync_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</p>
+                </div>
 
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {mlProduct.ml_permalink && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(mlProduct.ml_permalink!, '_blank')}
-                    >
-                      <ExternalLink className="mr-2 size-4" />
-                      Abrir no Mercado Livre
-                    </Button>
-                  )}
+                {mlProduct.ml_permalink && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleResync}
-                    disabled={resyncProduct.isPending}
+                    className="w-full"
+                    onClick={() => window.open(mlProduct.ml_permalink!, '_blank')}
                   >
-                    <RefreshCw className={`mr-2 size-4 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
-                    {resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
+                    Ver no ML
                   </Button>
-                </div>
+                )}
+
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="w-full"
+                  onClick={handleResync}
+                  disabled={resyncProduct.isPending}
+                >
+                  <RefreshCw className={`mr-2 size-4 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+                  {resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
+                </Button>
               </CardContent>
             </Card>
           )}
 
-          {/* Registro de Sincronizações */}
-          {syncLog.length > 0 && (
+          {/* Sync Logs */}
+          {syncLogs.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Registro de Sincronizações</CardTitle>
+                <CardTitle>Histórico de Sincronizações</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                {syncLog.map((log) => (
-                  <div key={log.id} className="border-b pb-2 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between">
-                      <span>{format(new Date(log.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}</span>
-                      <Badge variant={log.status === 'success' ? 'default' : 'destructive'}>
-                        {log.status}
-                      </Badge>
+              <CardContent>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {syncLogs.map((log) => (
+                    <div key={log.id} className="text-xs p-2 rounded border">
+                      <div className="flex justify-between items-center">
+                        <Badge
+                          variant={log.status === 'success' ? 'default' : 'destructive'}
+                          className="text-xs"
+                        >
+                          {log.status}
+                        </Badge>
+                        <span className="text-muted-foreground">
+                          {format(new Date(log.created_at), 'dd/MM HH:mm', { locale: ptBR })}
+                        </span>
+                      </div>
+                      <p className="mt-1">{log.operation_type}</p>
                     </div>
-                    <p className="text-muted-foreground">{log.operation_type}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
