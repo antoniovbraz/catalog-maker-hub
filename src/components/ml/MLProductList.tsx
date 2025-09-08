@@ -2,8 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Package, Play, Loader2, CheckCircle2, Clock, AlertCircle } from "@/components/ui/icons";
+import { Package, Play, Loader2 } from "@/components/ui/icons";
 import { useMLIntegration } from "@/hooks/useMLIntegration";
 import { useMLProducts } from "@/hooks/useMLProducts";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
@@ -42,21 +41,6 @@ export function MLProductList() {
     }
   }, [selectedProducts, syncBatch]);
 
-  const getSyncStatusBadge = (product: any) => {
-    const status = product.sync_status || 'not_synced';
-    
-    switch (status) {
-      case 'synced':
-        return <Badge variant="default" className="bg-green-100 text-green-800"><CheckCircle2 className="h-3 w-3 mr-1" />Sincronizado</Badge>;
-      case 'pending':
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Pendente</Badge>;
-      case 'error':
-        return <Badge variant="destructive"><AlertCircle className="h-3 w-3 mr-1" />Erro</Badge>;
-      default:
-        return <Badge variant="outline"><Package className="h-3 w-3 mr-1" />Não Sincronizado</Badge>;
-    }
-  };
-
   if (isLoading) {
     return (
       <Card>
@@ -85,7 +69,7 @@ export function MLProductList() {
             <Button
               onClick={() =>
                 importFromML.mutate(undefined, {
-                  onSuccess: (data) => {
+                  onSuccess: () => {
                     toast({
                       title: "Importação Concluída",
                       description: `Produtos importados do Mercado Livre com sucesso.`,

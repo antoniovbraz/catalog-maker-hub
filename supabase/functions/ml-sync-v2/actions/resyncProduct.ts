@@ -1,5 +1,9 @@
 import { ActionContext, ResyncProductRequest } from '../types.ts';
 
+interface ProductMapping {
+  ml_item_id: string;
+}
+
 // Simplified resync function for compatibility
 export async function resyncProduct(
   req: ResyncProductRequest,
@@ -9,19 +13,21 @@ export async function resyncProduct(
   
   try {
     // Get product mapping
-    const { data: productMapping } = await supabase
+    const { data } = await supabase
       .from('ml_product_mapping')
-      .select('*')
+      .select('ml_item_id')
       .eq('tenant_id', tenantId)
       .eq('product_id', req.productId)
       .single();
+
+    const productMapping = data as ProductMapping | null;
 
     if (!productMapping) {
       throw new Error('Product mapping not found');
     }
 
     // Get item details from ML
-    const itemResponse = await fetch(`https://api.mercadolibre.com/items/${(productMapping as any).ml_item_id}`, {
+    const itemResponse = await fetch(`https://api.mercadolibre.com/items/${productMapping.ml_item_id}`, {
       headers: { 'Authorization': `Bearer ${mlToken}` }
     });
     
@@ -54,12 +60,13 @@ export async function resyncProduct(
       headers: { 'Content-Type': 'application/json' }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Resync failed:', error);
-    
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: message
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

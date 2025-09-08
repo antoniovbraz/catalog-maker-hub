@@ -58,6 +58,12 @@ interface ProductPriceInfo {
   source: 'ml' | 'product';
 }
 
+interface Dimensions {
+  length?: number;
+  width?: number;
+  height?: number;
+}
+
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -75,6 +81,10 @@ export default function ProductDetail() {
   // Find the specific product
   const product = products?.find((p) => p.id === id);
   const mlProducts = mlProductsPages?.pages.flat() || [];
+  const dimensions =
+    product?.dimensions && typeof product.dimensions === 'object'
+      ? (product.dimensions as Dimensions)
+      : undefined;
 
   // ML sync logs query
   const { data: syncLogs = [] } = useQuery<MLSyncLog[]>({
@@ -98,7 +108,7 @@ export default function ProductDetail() {
   });
 
   // Product price info query  
-  const { data: priceInfo } = useQuery<ProductPriceInfo>({
+  const { data: _priceInfo } = useQuery<ProductPriceInfo>({
     queryKey: ['product_price_info', tenantId, id],
     queryFn: async () => {
       if (!product) return { price: 0, source: 'product' as const };
@@ -137,9 +147,9 @@ export default function ProductDetail() {
   if (isLoadingProducts) {
     return (
       <div className="container mx-auto p-6">
-        <Skeleton className="h-8 w-48 mb-6" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <Skeleton className="mb-6 h-8 w-48" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             <Skeleton className="h-64" />
             <Skeleton className="h-48" />
           </div>
@@ -208,7 +218,7 @@ export default function ProductDetail() {
   return (
     <div className="container mx-auto p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
@@ -257,9 +267,9 @@ export default function ProductDetail() {
       )}
 
       {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Basic Information Card */}
           <Card>
             <CardHeader>
@@ -269,7 +279,7 @@ export default function ProductDetail() {
                     <Box className="size-5" />
                     <span className="text-xl">{product.name}</span>
                   </CardTitle>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="mt-2 flex items-center gap-2">
                     <ProductSourceBadge source={product.source} />
                     {product.ml_seller_sku && (
                       <Badge variant="outline">
@@ -371,33 +381,24 @@ export default function ProductDetail() {
                       <p>{formatWeight(product.weight as number)}</p>
                     </div>
                   )}
-                  {product.dimensions &&
-                    typeof product.dimensions === 'object' &&
-                    'length' in product.dimensions &&
-                    (product.dimensions as Record<string, any>).length && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                        <p>{renderDimension((product.dimensions as Record<string, any>).length)}</p>
-                      </div>
-                    )}
-                  {product.dimensions &&
-                    typeof product.dimensions === 'object' &&
-                    'width' in product.dimensions &&
-                    (product.dimensions as Record<string, any>).width && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                        <p>{renderDimension((product.dimensions as Record<string, any>).width)}</p>
-                      </div>
-                    )}
-                  {product.dimensions &&
-                    typeof product.dimensions === 'object' &&
-                    'height' in product.dimensions &&
-                    (product.dimensions as Record<string, any>).height && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                        <p>{renderDimension((product.dimensions as Record<string, any>).height)}</p>
-                      </div>
-                    )}
+                  {dimensions?.length && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
+                      <p>{renderDimension(dimensions.length)}</p>
+                    </div>
+                  )}
+                  {dimensions?.width && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Largura</label>
+                      <p>{renderDimension(dimensions.width)}</p>
+                    </div>
+                  )}
+                  {dimensions?.height && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Altura</label>
+                      <p>{renderDimension(dimensions.height)}</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -410,13 +411,13 @@ export default function ProductDetail() {
                 <CardTitle>Imagens do Produto</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {productImages.map((image, index) => (
-                    <div key={image.id} className="rounded-lg overflow-hidden border">
+                    <div key={image.id} className="overflow-hidden rounded-lg border">
                       <img
                         src={image.image_url}
                         alt={`${product.name} - Imagem ${index + 1}`}
-                        className="w-full h-32 object-cover"
+                        className="h-32 w-full object-cover"
                       />
                     </div>
                   ))}
@@ -432,15 +433,15 @@ export default function ProductDetail() {
                 <CardTitle>Atributos ML</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2">
-                {attributes.map((attr, index) => (
-                  <div
-                    key={(attr as any).id || (attr as any).name || index}
-                    className="flex justify-between text-sm"
-                  >
-                     <span className="font-medium">{String((attr as any).name || (attr as any).id || 'N/A')}</span>
-                     <span>{String((attr as any).value_name || (attr as any).value_id || '-')}</span>
-                  </div>
-                ))}
+                  {attributes.map((attr, index) => (
+                    <div
+                      key={attr.id || attr.name || index}
+                      className="flex justify-between text-sm"
+                    >
+                      <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
+                      <span>{String(attr.value_name || attr.value_id || '-')}</span>
+                    </div>
+                  ))}
               </CardContent>
             </Card>
           )}
@@ -579,10 +580,10 @@ export default function ProductDetail() {
                 <CardTitle>Histórico de Sincronizações</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
+                <div className="max-h-64 space-y-2 overflow-y-auto">
                   {syncLogs.map((log) => (
-                    <div key={log.id} className="text-xs p-2 rounded border">
-                      <div className="flex justify-between items-center">
+                    <div key={log.id} className="rounded border p-2 text-xs">
+                      <div className="flex items-center justify-between">
                         <Badge
                           variant={log.status === 'success' ? 'default' : 'destructive'}
                           className="text-xs"
