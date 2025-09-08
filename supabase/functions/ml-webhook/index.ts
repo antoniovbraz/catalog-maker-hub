@@ -1,12 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.45.4";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
 import { updateProductFromItem } from './updateProductFromItem.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
-import type { z } from 'zod';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { verifySignature } from './verifySignature.ts';
 
-type MLWebhookPayload = z.infer<typeof mlWebhookSchema>;
+interface MLWebhookPayload {
+  topic: string;
+  resource: string;
+  user_id: number;
+  application_id: number;
+  attempts: number;
+  sent: string;
+  received: string;
+}
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
@@ -14,13 +22,25 @@ serve(async (req) => {
 
   setupLogger(req.headers);
   try {
+    const rawBody = await req.text();
+    const signature = req.headers.get('X-Hub-Signature');
+    const secret = Deno.env.get('ML_WEBHOOK_SECRET')!;
+    const isValid = await verifySignature(rawBody, signature, secret);
+    if (!isValid) {
+      console.error('Invalid ML webhook signature');
+      return new Response('Invalid webhook signature', {
+        status: 401,
+        headers: corsHeaders,
+      });
+    }
+
+    const payload = mlWebhookSchema.parse(JSON.parse(rawBody));
+    console.log('Received ML webhook:', payload);
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const payload = mlWebhookSchema.parse(await req.json());
-    console.log('Received ML webhook:', payload);
 
     // Find tenant by ML user ID
     const { data: tenantData, error: tenantError } = await supabase
@@ -98,7 +118,7 @@ serve(async (req) => {
 });
 
 async function processOrderWebhook(
-  supabase: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient,
   tenantId: string,
   payload: MLWebhookPayload
 ): Promise<{ error?: Error }> {
@@ -157,7 +177,7 @@ async function processOrderWebhook(
 }
 
 async function processItemWebhook(
-  supabase: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient,
   tenantId: string,
   payload: MLWebhookPayload
 ): Promise<{ updatedFields?: string[]; error?: Error }> {
