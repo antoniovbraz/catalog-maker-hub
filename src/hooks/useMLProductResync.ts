@@ -73,7 +73,15 @@ export function useMLProductResync() {
   });
 
   return {
-    resyncProduct,
-    resyncBatch,
+    resyncProduct: {
+      mutate: resyncProduct.mutate,
+      isPending: resyncProduct.isPending,
+      variables: resyncProduct.variables,
+    },
+    resyncBatch: {
+      mutate: resyncBatch.mutate,
+      isPending: resyncBatch.isPending,
+      variables: resyncBatch.variables,
+    },
   };
 }

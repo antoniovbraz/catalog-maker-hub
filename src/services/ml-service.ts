@@ -38,6 +38,7 @@ export interface MLSyncProduct {
   image_url?: string;
   ml_item_id?: string | null;
   ml_permalink?: string | null;
+  ml_price?: number;
   sync_status: 'pending' | 'syncing' | 'synced' | 'error' | 'not_synced';
   last_sync?: string | null;
   last_sync_at?: string | null;

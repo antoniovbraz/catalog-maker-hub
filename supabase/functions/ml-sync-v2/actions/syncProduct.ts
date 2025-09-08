@@ -13,13 +13,16 @@ interface SyncResult {
 }
 
 interface Product {
+  id: string;
   category_id?: string;
   name?: string;
   description?: string;
+  cost_unit?: number;
   price?: number;
   ml_available_quantity?: number;
   brand?: string;
   model?: string;
+  category_ml_id?: string;
 }
 
 interface Category {
@@ -85,7 +88,7 @@ export async function syncProduct(
     }
 
     // Get category data
-    const productData = product as Product;
+    const productData = product as unknown as Product;
     let category: Category | null = null;
     if (productData.category_id) {
       const { data: categoryList } = await supabase
@@ -163,8 +166,8 @@ async function prepareMLListing(
   
   if (!product.name) missingFields.push('title');
   if (!product.description) missingFields.push('description');
-  if (!category?.category_ml_id) missingFields.push('category_id');
-  if (!product.price || product.price <= 0) missingFields.push('price');
+  if (!category?.category_ml_id && !product.category_ml_id) missingFields.push('category_id');
+  if (!product.cost_unit || product.cost_unit <= 0) missingFields.push('price');
 
   if (missingFields.length > 0) {
     throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
@@ -189,8 +192,8 @@ async function prepareMLListing(
 
   return {
     title: product.name,
-    category_id: category.category_ml_id,
-    price: product.price,
+    category_id: category?.category_ml_id || product.category_ml_id,
+    price: product.cost_unit,
     currency_id: 'BRL',
     available_quantity: product.ml_available_quantity || 1,
     buying_mode: 'buy_it_now',

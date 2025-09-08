@@ -1,19 +1,7 @@
+import { createClient } from '@supabase/supabase-js'
 import { corsHeaders } from '../shared/cors.ts';
 
-interface QueryBuilder {
-  select: (columns?: string) => QueryBuilder;
-  update: (values: Record<string, unknown>) => QueryBuilder;
-  insert: (values: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
-  upsert: (values: Record<string, unknown> | Record<string, unknown>[], options?: { onConflict?: string }) => QueryBuilder;
-  eq: (column: string, value: unknown) => QueryBuilder;
-  single: () => QueryBuilder;
-  data?: unknown;
-  error?: { message: string } | null;
-}
-
-interface SupabaseClient {
-  from: (table: string) => QueryBuilder;
-}
+type SupabaseClient = ReturnType<typeof createClient>
 
 export type SyncAction =
   | 'sync_product'
