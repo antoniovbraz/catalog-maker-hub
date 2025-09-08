@@ -217,7 +217,10 @@ async function createOrUpdateMLListing(
     const denoGlobal = globalThis as typeof globalThis & {
       Deno?: { env: { get(key: string): string | undefined } };
     };
-    const accessToken = denoGlobal.Deno?.env.get('ML_ACCESS_TOKEN') ?? process?.env?.ML_ACCESS_TOKEN;
+    const nodeAccessToken =
+      typeof process !== 'undefined' ? process.env?.ML_ACCESS_TOKEN : undefined;
+    const accessToken =
+      denoGlobal.Deno?.env.get('ML_ACCESS_TOKEN') ?? nodeAccessToken;
     
     const token = mlToken || accessToken;
     
