@@ -134,4 +134,11 @@ describe('updateProductFromItem', () => {
     expect(updateArg.sku_source).toBe('mercado_livre');
     expect(updateArg.ml_variation_id).toBe('67890');
   });
+
+  it('throws when product mapping is missing (disconnected)', async () => {
+    mappingQuery.single.mockResolvedValueOnce({ data: null, error: { message: 'not found' } });
+    await expect(
+      updateProductFromItem(supabase, 'tenant1', { id: 'MLX' }, 'token')
+    ).rejects.toThrow('Product mapping not found');
+  });
 });

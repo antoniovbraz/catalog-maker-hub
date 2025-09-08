@@ -86,7 +86,7 @@ serve(async (req) => {
     const tenantId = profile.tenant_id;
     console.log('Successfully retrieved tenant_id:', tenantId);
 
-    // Tentar ler body JSON, mas permitir se estiver vazio
+    // Tentar ler body JSON
     let body: z.infer<typeof mlAuthSchema>;
     try {
       const bodyText = await req.text();
@@ -94,7 +94,7 @@ serve(async (req) => {
       body = mlAuthSchema.parse(json);
     } catch (error) {
       console.error('Error parsing request body:', error);
-      body = mlAuthSchema.parse({});
+      return errorResponse('Invalid request body', 400);
     }
 
     switch (body.action) {
