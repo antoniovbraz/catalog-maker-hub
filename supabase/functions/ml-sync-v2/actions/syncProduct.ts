@@ -329,11 +329,12 @@ async function logSyncOperation(
       .from('ml_sync_log')
       .insert({
         tenant_id: tenantId,
+        operation_type: 'sync_product',
         entity_type: 'product',
         entity_id: productId,
-        operation: 'sync',
         status: success ? 'success' : 'error',
-        message,
+        response_data: success ? { message } : null,
+        error_details: success ? null : { message },
         created_at: new Date().toISOString()
       });
   } catch (error) {
