@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const mlAuthStatusResponseSchema = z.object({
   connected: z.boolean().optional().default(false),
-  user_id_ml: z.number().optional(),
-  ml_nickname: z.string().optional(),
+  user_id_ml: z.number().nullable().optional(),
+  ml_nickname: z.string().nullable().optional(),
   expires_at: z.string().optional().nullable(),
 });
 

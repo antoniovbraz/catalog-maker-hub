@@ -37,6 +37,20 @@ describe('MLService', () => {
       expect(callMLFunction).toHaveBeenCalledWith('ml-auth', 'get_status', {}, {});
     });
 
+    it('deve aceitar metadados nulos quando conectado', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({
+        connected: true,
+        user_id_ml: null,
+        ml_nickname: null,
+      });
+
+      const status = await MLService.getAuthStatus();
+
+      expect(status.isConnected).toBe(true);
+      expect(status.user_id_ml).toBeUndefined();
+      expect(status.ml_nickname).toBeUndefined();
+    });
+
     it('deve retornar desconectado quando há erro', async () => {
       vi.mocked(callMLFunction).mockRejectedValue(new Error('Token expired'));
 
