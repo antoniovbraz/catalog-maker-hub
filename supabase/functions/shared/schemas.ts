@@ -33,7 +33,7 @@ export const assistantUpdateSchema = z.object({
 
 export const mlAuthSchema = z.object({
   action: z
-    .enum(['start_auth', 'handle_callback', 'refresh_token', 'get_status'])
+    .enum(['start_auth', 'handle_callback', 'refresh_token', 'disconnect', 'get_status'])
     .default('get_status'),
   code: z.string().optional(),
   state: z.string().optional(),
