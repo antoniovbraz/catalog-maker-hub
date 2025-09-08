@@ -4,6 +4,8 @@ import {
   mlAdvancedSettingsSchema,
   type MLAdvancedSettings,
 } from '@/types/ml/advanced-settings';
+import { mlAuthStatusResponseSchema } from '@/types/ml/auth';
+import { ZodError } from 'zod';
 
 // ==================== TIPOS ====================
 
@@ -71,16 +73,21 @@ export class MLService {
 
   static async getAuthStatus(): Promise<MLAuthStatus> {
     try {
-      const data = await callMLFunction('ml-auth', 'get_status', {}, {}) as Record<string, unknown>;
+      const raw = await callMLFunction('ml-auth', 'get_status', {}, {});
+      const data = mlAuthStatusResponseSchema.parse(raw);
       return {
-        isConnected: (data?.connected as boolean) || false,
-        user_id_ml: data?.user_id_ml as number,
-        ml_nickname: data?.ml_nickname as string,
-        expires_at: data?.expires_at as string,
+        isConnected: data.connected,
+        user_id_ml: data.user_id_ml,
+        ml_nickname: data.ml_nickname,
+        expires_at: data.expires_at || undefined,
       };
     } catch (error) {
       console.error('ML Auth Status Exception:', error);
-      const message = error instanceof Error ? error.message : 'Failed to check auth status';
+      const message = error instanceof ZodError
+        ? 'Invalid auth status response'
+        : error instanceof Error
+          ? error.message
+          : 'Failed to check auth status';
       if (message.toLowerCase().includes('network')) {
         return {
           isConnected: false,
