@@ -8,17 +8,24 @@ const DEFAULT_IMAGE_PLACEHOLDER =
 interface SyncResult {
   success: boolean;
   message: string;
-  product?: any;
-  sync_log?: any;
+  product?: Record<string, unknown>;
+  sync_log?: Record<string, unknown>;
 }
 
-interface SyncContext {
-  supabase: any;
-  tenantId: string;
-  authToken: string;
-  mlToken: string;
-  mlClientId: string;
-  jwt: string;
+interface Product {
+  category_id?: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  ml_available_quantity?: number;
+  brand?: string;
+  model?: string;
+}
+
+interface Category {
+  category_ml_id?: string;
+  name?: string;
+  category_ml_path?: string;
 }
 
 export async function syncProduct(
@@ -39,7 +46,7 @@ export async function syncProduct(
   }
 
   const { product_id, force_update } = req;
-  const { supabase, tenantId, authToken, mlToken } = context;
+  const { supabase, tenantId, mlToken } = context;
 
   try {
     // Get product data
@@ -61,10 +68,9 @@ export async function syncProduct(
         .select('ml_item_id, last_sync_at')
         .eq('product_id', product_id)
         .eq('tenant_id', tenantId);
-      
-      const existing = (existingList as any[])?.length > 0 ? (existingList as any[])[0] : null;
-      
-      
+
+      const existingArray = existingList as Array<{ ml_item_id?: string; last_sync_at?: string }> | null;
+      const existing = existingArray && existingArray.length > 0 ? existingArray[0] : null;
 
       if (existing?.ml_item_id) {
         return new Response(
@@ -79,19 +85,21 @@ export async function syncProduct(
     }
 
     // Get category data
-    let category = null;
-    if ((product as any).category_id) {
+    const productData = product as Product;
+    let category: Category | null = null;
+    if (productData.category_id) {
       const { data: categoryList } = await supabase
         .from('categories')
         .select('name, category_ml_id, category_ml_path')
-        .eq('id', (product as any).category_id)
+        .eq('id', productData.category_id)
         .eq('tenant_id', tenantId);
-      
-      category = (categoryList as any[])?.length > 0 ? (categoryList as any[])[0] : null;
+
+      const categories = categoryList as Category[] | null;
+      category = categories && categories.length > 0 ? categories[0] : null;
     }
 
     // Prepare ML listing data
-    const listingData = await prepareMLListing(product, category, supabase, tenantId);
+    const listingData = await prepareMLListing(productData, category, supabase, tenantId);
 
     // Create or update ML listing
     const mlResponse = await createOrUpdateMLListing(
@@ -103,13 +111,13 @@ export async function syncProduct(
     );
 
     // Log sync operation
-    await logSyncOperation(
-      product_id,
-      tenantId,
-      mlResponse.success,
-      mlResponse.message,
-      supabase
-    );
+      await logSyncOperation(
+        product_id,
+        tenantId,
+        mlResponse.success,
+        mlResponse.message,
+        supabase
+      );
 
     return new Response(
       JSON.stringify(mlResponse),
@@ -131,7 +139,12 @@ export async function syncProduct(
   }
 }
 
-async function prepareMLListing(product: any, category: any, supabase: any, tenantId: string) {
+async function prepareMLListing(
+  product: Product,
+  category: Category | null,
+  supabase: ActionContext['supabase'],
+  tenantId: string
+) {
   // Get product images
   const { data: images } = await supabase
     .from('product_images')
@@ -140,9 +153,10 @@ async function prepareMLListing(product: any, category: any, supabase: any, tena
     .eq('tenant_id', tenantId)
     .order('created_at');
 
+  const imageArray = images as Array<{ image_url: string }> | null;
   const pictures =
-    images && images.length > 0
-      ? images.map((img: any) => ({ source: img.image_url }))
+    imageArray && imageArray.length > 0
+      ? imageArray.map((img) => ({ source: img.image_url }))
       : [{ source: DEFAULT_IMAGE_PLACEHOLDER }];
 
   const missingFields: string[] = [];
@@ -193,16 +207,17 @@ async function prepareMLListing(product: any, category: any, supabase: any, tena
 }
 
 async function createOrUpdateMLListing(
-  listingData: any,
+  listingData: Record<string, unknown>,
   mlToken: string,
   productId: string,
-  supabase: any,
+  supabase: ActionContext['supabase'],
   tenantId: string
 ): Promise<SyncResult> {
   try {
-    const accessToken = typeof (globalThis as any).Deno !== 'undefined' 
-      ? (globalThis as any).Deno.env.get('ML_ACCESS_TOKEN') 
-      : process?.env?.ML_ACCESS_TOKEN;
+    const denoGlobal = globalThis as typeof globalThis & {
+      Deno?: { env: { get(key: string): string | undefined } };
+    };
+    const accessToken = denoGlobal.Deno?.env.get('ML_ACCESS_TOKEN') ?? process?.env?.ML_ACCESS_TOKEN;
     
     const token = mlToken || accessToken;
     
@@ -218,7 +233,6 @@ async function createOrUpdateMLListing(
       .eq('tenant_id', tenantId)
       .single();
 
-    let response;
     let method = 'POST';
     let url = 'https://api.mercadolibre.com/items';
 
@@ -228,7 +242,7 @@ async function createOrUpdateMLListing(
       url = `https://api.mercadolibre.com/items/${mapping.ml_item_id}`;
     }
 
-    response = await fetch(url, {
+    const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -302,7 +316,7 @@ async function logSyncOperation(
   tenantId: string,
   success: boolean,
   message: string,
-  supabase: any
+  supabase: ActionContext['supabase']
 ) {
   try {
     await supabase

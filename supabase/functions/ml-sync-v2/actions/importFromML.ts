@@ -1,13 +1,6 @@
 import { ActionContext, ImportFromMLRequest } from '../types.ts';
-import { resyncProduct } from './resyncProduct.ts';
 
 // Weight parsing helpers
-interface MLAttribute {
-  id: string;
-  name: string;
-  value_name?: string;
-  values?: Array<{ name: string }>;
-}
 
 export function parseWeight(valueName: string): { value: number; unit: string } | null {
   if (!valueName) return null;
@@ -46,7 +39,7 @@ function parseCost(saleTerms: Array<{ id: string; value_name?: string }>): numbe
 
 export async function importFromML(
   _req: ImportFromMLRequest,
-  { supabase, tenantId, authToken, mlToken }: ActionContext
+  { supabase, tenantId, mlToken }: ActionContext
 ): Promise<Response> {
   console.log('Starting ML import with optimized batch processing');
   
@@ -124,13 +117,14 @@ export async function importFromML(
       headers: { 'Content-Type': 'application/json' }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     const executionTime = Date.now() - startTime;
     console.error('Import failed:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
 
     return new Response(JSON.stringify({
       success: false,
-      error: error.message,
+      error: message,
       execution_time: executionTime
     }), {
       status: 500,
@@ -139,7 +133,10 @@ export async function importFromML(
   }
 }
 
-async function processMLItem(itemId: string, { supabase, tenantId, mlToken }: { supabase: any; tenantId: string; mlToken: string }): Promise<void> {
+async function processMLItem(
+  itemId: string,
+  { supabase, tenantId, mlToken }: { supabase: ActionContext['supabase']; tenantId: string; mlToken: string }
+): Promise<void> {
   // Check if mapping exists
   const { data: existingMapping } = await supabase
     .from('ml_product_mapping')
