@@ -54,6 +54,15 @@ describe('MLService', () => {
       expect(status.isConnected).toBe(false);
       expect(status.error).toBe('Network error while checking auth status');
     });
+
+    it('deve tratar resposta inválida do backend', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({ connected: 'yes' });
+
+      const status = await MLService.getAuthStatus();
+
+      expect(status.isConnected).toBe(false);
+      expect(status.error).toBe('Invalid auth status response');
+    });
   });
 
   describe('Sync Operations', () => {
