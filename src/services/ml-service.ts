@@ -77,9 +77,9 @@ export class MLService {
       const data = mlAuthStatusResponseSchema.parse(raw);
       return {
         isConnected: data.connected,
-        user_id_ml: data.user_id_ml,
-        ml_nickname: data.ml_nickname,
-        expires_at: data.expires_at || undefined,
+        user_id_ml: data.user_id_ml ?? undefined,
+        ml_nickname: data.ml_nickname ?? undefined,
+        expires_at: data.expires_at ?? undefined,
       };
     } catch (error) {
       console.error('ML Auth Status Exception:', error);
