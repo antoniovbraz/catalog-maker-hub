@@ -326,7 +326,7 @@ async function logSyncOperation(
 ) {
   try {
     await supabase
-      .from('ml_sync_logs')
+      .from('ml_sync_log')
       .insert({
         tenant_id: tenantId,
         entity_type: 'product',
