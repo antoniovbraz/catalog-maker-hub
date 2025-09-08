@@ -16,8 +16,14 @@ export async function verifySignature(
     ['sign'],
   );
   const digest = await crypto.subtle.sign('HMAC', key, encoder.encode(body));
-  const expected = Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-  return received === expected;
+  const expected = new Uint8Array(digest);
+  const receivedBytes = Uint8Array.from(
+    received.match(/.{1,2}/g)?.map((b) => parseInt(b, 16)) ?? [],
+  );
+  if (receivedBytes.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) {
+    diff |= expected[i] ^ receivedBytes[i];
+  }
+  return diff === 0;
 }
