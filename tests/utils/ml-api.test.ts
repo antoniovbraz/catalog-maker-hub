@@ -30,7 +30,8 @@ describe('ML API Utils', () => {
       expect(result).toEqual({ success: true });
       expect(testUtils.mockSupabaseClient.functions.invoke).toHaveBeenCalledWith('ml-sync-v2', {
         body: { action: 'sync_product', productId: '123' },
-        headers: { Authorization: 'Bearer test-token' }
+        headers: { Authorization: 'Bearer test-token' },
+        signal: expect.any(AbortSignal)
       });
     });
 
@@ -79,9 +80,17 @@ describe('ML API Utils', () => {
     });
 
     it('deve tratar timeout corretamente', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve({ data: null, error: null }), 2000))
-      );
+      let abortSignal: AbortSignal | undefined;
+      testUtils.mockSupabaseClient.functions.invoke.mockImplementation((_, { signal }) => {
+        abortSignal = signal;
+        return new Promise((resolve, reject) => {
+          const id = setTimeout(() => resolve({ data: null, error: null }), 2000);
+          signal?.addEventListener('abort', () => {
+            clearTimeout(id);
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      });
 
       const promise = callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' }, { timeout: 1000 });
       const handled = promise.catch(err => err);
@@ -89,6 +98,7 @@ describe('ML API Utils', () => {
       const error = await handled;
       expect(error).toBeInstanceOf(Error);
       expect((error as Error).message).toBe('Operação sync_product demorou muito para responder');
+      expect(abortSignal?.aborted).toBe(true);
     });
 
     it('deve tratar erros do Supabase', async () => {
@@ -232,8 +242,12 @@ describe('ML API Utils', () => {
     });
 
     it('deve melhorar mensagens de erro de timeout', async () => {
-      testUtils.mockSupabaseClient.functions.invoke.mockImplementation(() =>
-        new Promise(() => {}) // Never resolves
+      testUtils.mockSupabaseClient.functions.invoke.mockImplementation((_, { signal }) =>
+        new Promise((_, reject) => {
+          signal?.addEventListener('abort', () => {
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        })
       );
 
       const promise = callMLFunction('ml-sync-v2', 'sync_product', { productId: '123' }, { timeout: 100 });
