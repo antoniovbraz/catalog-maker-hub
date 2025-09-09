@@ -106,7 +106,7 @@ serve(async (req) => {
           // Gerar PKCE
           const { codeVerifier, codeChallenge } = await generatePKCE();
           const redirectUri = Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
-          const state = `${tenantId}_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+          const state = `${tenantId}_${Date.now()}_${crypto.randomUUID()}`;
 
           // Armazenar PKCE na base de dados
           const { error: pkceError } = await supabase
