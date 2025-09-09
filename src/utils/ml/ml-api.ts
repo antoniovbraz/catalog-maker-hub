@@ -88,22 +88,25 @@ export async function callMLFunction(
       ? { Authorization: `Bearer ${session.session.access_token}` }
       : undefined;
 
+    const invokePromise = supabase.functions.invoke(functionName, {
+      body: { action, ...params },
+      headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
+      signal: controller.signal,
+    });
+
     let data: unknown;
     let error: { message?: string; name?: string; context?: unknown } | null = null;
 
     try {
       const response = await Promise.race([
-        supabase.functions.invoke(functionName, {
-          body: { action, ...params },
-          headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
-          signal: controller.signal,
-        }),
+        invokePromise,
         timeoutPromise,
       ]) as Awaited<ReturnType<typeof supabase.functions.invoke>>;
       data = response.data;
       error = response.error;
     } finally {
       clearTimeout(timeoutId);
+      controller.abort();
     }
 
     if (error) {
