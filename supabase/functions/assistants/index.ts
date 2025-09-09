@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { assistantCreateSchema, assistantUpdateSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -22,6 +23,8 @@ serve(async (req) => {
     console.log('Handling OPTIONS request');
     return corsResponse;
   }
+
+  checkEnv();
 
   try {
     // Validar configurações essenciais

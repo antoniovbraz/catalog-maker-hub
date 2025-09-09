@@ -16,6 +16,7 @@ import { getProducts } from './actions/getProducts.ts';
 import { createAd } from './actions/createAd.ts';
 import { resyncProduct } from './actions/resyncProduct.ts';
 import { setupLogger } from '../shared/logger.ts';
+import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 
 type Handler = (req: SyncRequest, ctx: ActionContext) => Promise<Response>;
 const actions: Record<SyncRequest['action'], Handler> = {
@@ -32,6 +33,8 @@ const actions: Record<SyncRequest['action'], Handler> = {
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
+
+  checkEnv();
 
   try {
     setupLogger(req.headers);

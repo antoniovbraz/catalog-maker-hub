@@ -4,10 +4,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.53.0';
 import { generateAdChatSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
+
+  checkEnv();
 
   setupLogger(req.headers);
   try {
