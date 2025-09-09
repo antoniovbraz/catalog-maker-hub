@@ -28,7 +28,7 @@
 **Critérios de Aceite:**
 - ✅ 15 tabelas ML criadas com RLS habilitado
 - ✅ 3 Edge Functions deployadas e funcionais
-- ✅ ML_CLIENT_ID e ML_CLIENT_SECRET configurados
+- ✅ MELI_CLIENT_ID e MELI_CLIENT_SECRET configurados
 - ✅ Pipeline Supabase automático
 
 **Status:** ✅ **100% Implementado**  

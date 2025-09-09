@@ -22,9 +22,9 @@ A integração do Catalog Maker Hub com o Mercado Livre centraliza o gerenciamen
 A integração requer as seguintes variáveis:
 
 - `VITE_ML_CLIENT_ID`: ID da aplicação para uso no frontend.
-- `ML_APP_ID` e `ML_CLIENT_SECRET`: credenciais da aplicação utilizadas nas Edge Functions.
-- `ML_REDIRECT_URL`: URL de redirecionamento configurada no DevCenter.
-- `ML_WEBHOOK_SECRET`: segredo utilizado para validar webhooks.
+- `MELI_CLIENT_ID` e `MELI_CLIENT_SECRET`: credenciais da aplicação utilizadas nas Edge Functions.
+- `MELI_REDIRECT_URI`: URL de redirecionamento configurada no DevCenter.
+- `MELI_WEBHOOK_SECRET`: segredo utilizado para validar webhooks.
 
-As variáveis `ML_APP_ID`, `ML_CLIENT_SECRET`, `ML_REDIRECT_URL` e `ML_WEBHOOK_SECRET` devem ser definidas em `supabase/.env` e carregadas como secrets com `supabase secrets set --env-file supabase/.env`.
+As variáveis `MELI_CLIENT_ID`, `MELI_CLIENT_SECRET`, `MELI_REDIRECT_URI` e `MELI_WEBHOOK_SECRET` devem ser definidas em `supabase/.env` e carregadas como secrets com `supabase secrets set --env-file supabase/.env`.
 

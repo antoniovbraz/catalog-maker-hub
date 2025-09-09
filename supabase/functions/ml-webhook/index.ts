@@ -24,7 +24,7 @@ serve(async (req) => {
   try {
     const rawBody = await req.text();
     const signature = req.headers.get('X-Hub-Signature');
-    const secret = Deno.env.get('ML_WEBHOOK_SECRET')!;
+    const secret = Deno.env.get('MELI_WEBHOOK_SECRET')!;
     const isValid = await verifySignature(rawBody, signature, secret);
     if (!isValid) {
       console.error('Invalid ML webhook signature');

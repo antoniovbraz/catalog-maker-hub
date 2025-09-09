@@ -46,8 +46,8 @@ serve(async (req) => {
   setupLogger(req.headers);
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const mlClientId = Deno.env.get('ML_CLIENT_ID')!;
-  const mlClientSecret = Deno.env.get('ML_CLIENT_SECRET')!;
+  const mlClientId = Deno.env.get('MELI_CLIENT_ID')!;
+  const mlClientSecret = Deno.env.get('MELI_CLIENT_SECRET')!;
 
   // Use service role for cron operations
   const supabase = createClient(supabaseUrl, supabaseServiceKey);

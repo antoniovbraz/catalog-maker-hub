@@ -57,10 +57,16 @@ Siga estas instruções para obter uma cópia do projeto e executá-lo em sua m�
     ```
 
 3.  **Configure as Variáveis de Ambiente:**
-    Crie um arquivo `.env` na raiz do projeto, copiando o `.env.example`. Preencha com suas chaves do Supabase:
+    Crie um arquivo `.env` na raiz do projeto, copiando o `.env.example`. Preencha com suas chaves do Supabase e credenciais do Mercado Livre:
     ```
     VITE_SUPABASE_URL=https://<seu-projeto>.supabase.co
     VITE_SUPABASE_ANON_KEY=<sua-chave-anon>
+    VITE_ML_CLIENT_ID=<seu-client-id-ml>
+
+    MELI_CLIENT_ID=<seu-client-id-ml>
+    MELI_CLIENT_SECRET=<seu-client-secret>
+    MELI_REDIRECT_URI=http://localhost:54321/api/ml/callback
+    MELI_WEBHOOK_SECRET=<seu-webhook-secret>
     ```
 
 4.  **Execute a aplicação:**

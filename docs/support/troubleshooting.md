@@ -19,8 +19,8 @@ Error: invalid_grant - Authorization code expired or invalid
 ```typescript
 // 1. Verificar configuração da aplicação ML
 const config = {
-  client_id: process.env.ML_CLIENT_ID,
-  client_secret: process.env.ML_CLIENT_SECRET,
+  client_id: process.env.MELI_CLIENT_ID,
+  client_secret: process.env.MELI_CLIENT_SECRET,
   redirect_uri: 'https://peepers-hub.lovable.app/api/ml/callback'
 };
 
