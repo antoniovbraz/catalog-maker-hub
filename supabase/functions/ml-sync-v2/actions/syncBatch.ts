@@ -11,6 +11,8 @@ export async function syncBatch(
     return errorResponse('Product IDs array required', 400);
   }
 
+  const productIds = Array.from(new Set(req.product_ids));
+
   if (!isMLWriteEnabled()) {
     return errorResponse('ML write operations disabled', 403);
   }
@@ -18,7 +20,7 @@ export async function syncBatch(
     const startTime = Date.now();
     try {
       const results: Array<{ product_id: string; success: boolean; [key: string]: unknown }> = [];
-    for (const productId of req.product_ids) {
+    for (const productId of productIds) {
       try {
         const result = await syncSingleProduct(
           {
@@ -49,7 +51,7 @@ export async function syncBatch(
       operation_type: 'sync_batch',
       entity_type: 'batch',
       status,
-      request_data: { product_count: req.product_ids.length },
+      request_data: { product_count: productIds.length },
       response_data: { results },
       execution_time_ms: Date.now() - startTime,
     });
@@ -63,7 +65,7 @@ export async function syncBatch(
       operation_type: 'sync_batch',
       entity_type: 'batch',
       status: 'error',
-      request_data: { product_count: req.product_ids.length },
+      request_data: { product_count: productIds.length },
       error_details: { message: (error as Error).message },
       execution_time_ms: Date.now() - startTime,
     });

@@ -1,4 +1,5 @@
 import { ActionContext, ResyncProductRequest } from '../types.ts';
+import { fetchWithRetry } from '../../shared/fetchWithRetry.ts';
 
 interface ProductMapping {
   ml_item_id: string;
@@ -27,7 +28,7 @@ export async function resyncProduct(
     }
 
     // Get item details from ML
-    const itemResponse = await fetch(`https://api.mercadolibre.com/items/${productMapping.ml_item_id}`, {
+    const itemResponse = await fetchWithRetry(`https://api.mercadolibre.com/items/${productMapping.ml_item_id}`, {
       headers: { 'Authorization': `Bearer ${mlToken}` }
     });
     
@@ -45,12 +46,14 @@ export async function resyncProduct(
     }).eq('id', req.productId);
 
     // Update mapping
-    await supabase.from('ml_product_mapping').update({
+    await supabase.from('ml_product_mapping').upsert({
+      product_id: req.productId,
+      tenant_id: tenantId,
       ml_title: itemData.title,
       ml_price: itemData.price,
       sync_status: 'synced',
       last_sync_at: new Date().toISOString(),
-    }).eq('product_id', req.productId);
+    }, { onConflict: 'tenant_id,product_id' });
 
     return new Response(JSON.stringify({
       success: true,

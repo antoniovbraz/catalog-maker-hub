@@ -1,6 +1,7 @@
 import { ActionContext, SyncProductRequest, errorResponse } from '../types.ts';
 import { corsHeaders } from '../../shared/cors.ts';
 import { isMLWriteEnabled } from '../../shared/write-guard.ts';
+import { fetchWithRetry } from '../../shared/fetchWithRetry.ts';
 
 const DEFAULT_IMAGE_PLACEHOLDER =
   'https://http2.mlstatic.com/D_NQ_NP_2X_602223-MLA0000000000_000000-O.webp';
@@ -248,7 +249,7 @@ async function createOrUpdateMLListing(
       url = `https://api.mercadolibre.com/items/${mapping.ml_item_id}`;
     }
 
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -278,17 +279,9 @@ async function createOrUpdateMLListing(
       updated_at: new Date().toISOString()
     };
 
-    if (mapping?.ml_item_id) {
-      await supabase
-        .from('ml_product_mapping')
-        .update(mappingData)
-        .eq('product_id', productId)
-        .eq('tenant_id', tenantId);
-    } else {
-      await supabase
-        .from('ml_product_mapping')
-        .insert(mappingData);
-    }
+    await supabase
+      .from('ml_product_mapping')
+      .upsert(mappingData, { onConflict: 'tenant_id,product_id' });
 
     return {
       success: true,

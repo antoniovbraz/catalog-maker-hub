@@ -4,41 +4,34 @@ import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 import { requiredEnv } from '../../../env/required.ts';
+import { fetchWithRetry } from '../shared/fetchWithRetry.ts';
 
 console.log('ML Token Renewal Service initialized');
 
-async function refreshWithRetry(refreshToken: string, mlClientId: string, mlClientSecret: string) {
-  const maxRetries = 3;
-  const baseDelay = 500; // ms
+async function refreshTokenWithRetry(
+  refreshToken: string,
+  mlClientId: string,
+  mlClientSecret: string,
+) {
+  const response = await fetchWithRetry('https://api.mercadolibre.com/oauth/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      grant_type: 'refresh_token',
+      client_id: mlClientId,
+      client_secret: mlClientSecret,
+      refresh_token: refreshToken,
+    }),
+  });
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const response = await fetch('https://api.mercadolibre.com/oauth/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          grant_type: 'refresh_token',
-          client_id: mlClientId,
-          client_secret: mlClientSecret,
-          refresh_token: refreshToken,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      if (attempt === maxRetries - 1) throw error;
-      const delay = baseDelay * Math.pow(2, attempt);
-      console.log(`Retrying token refresh in ${delay}ms due to error:`, error);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
   }
+
+  return await response.json();
 }
 
 serve(async (req) => {
@@ -86,7 +79,7 @@ serve(async (req) => {
         console.log(`Renewing token for tenant: ${token.tenant_id}`);
 
         // Refresh token with retry/backoff
-        const tokenData = await refreshWithRetry(token.refresh_token, mlClientId, mlClientSecret);
+        const tokenData = await refreshTokenWithRetry(token.refresh_token, mlClientId, mlClientSecret);
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + tokenData.expires_in);
 

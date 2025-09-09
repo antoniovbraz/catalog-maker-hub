@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
 import { updateProductFromItem, type ItemData } from './updateProductFromItem.ts';
+import { fetchWithRetry } from '../shared/fetchWithRetry.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
@@ -57,10 +58,10 @@ serve(async (req) => {
 
     const tenantId = tenantData;
 
-    // Log webhook event
-    const { error: logError } = await supabase
+    // Log webhook event and ensure idempotency
+    const { data: existingEvent, error: logError } = await supabase
       .from('ml_webhook_events')
-      .insert({
+      .upsert({
         tenant_id: tenantId,
         user_id_ml: payload.user_id,
         application_id: payload.application_id,
@@ -68,10 +69,17 @@ serve(async (req) => {
         resource: payload.resource,
         attempts: payload.attempts,
         raw_payload: payload,
-      });
+      }, { onConflict: 'tenant_id,topic,resource' })
+      .select('processed_at')
+      .single();
 
     if (logError) {
       console.error('Failed to log webhook event:', logError);
+    }
+
+    if (existingEvent?.processed_at) {
+      console.log('Webhook already processed, skipping');
+      return new Response('OK', { status: 200, headers: corsHeaders });
     }
 
     // Process webhook based on topic
@@ -141,7 +149,7 @@ async function processOrderWebhook(
     }
 
     // Fetch order details from ML API
-    const orderResponse = await fetch(`https://api.mercadolibre.com${payload.resource}`, {
+    const orderResponse = await fetchWithRetry(`https://api.mercadolibre.com${payload.resource}`, {
       headers: {
         'Authorization': `Bearer ${authToken.access_token}`,
         'Content-Type': 'application/json',
@@ -200,7 +208,7 @@ async function processItemWebhook(
     }
 
     // Fetch item details from ML API
-    const itemResponse = await fetch(`https://api.mercadolibre.com${payload.resource}`, {
+    const itemResponse = await fetchWithRetry(`https://api.mercadolibre.com${payload.resource}`, {
       headers: {
         'Authorization': `Bearer ${authToken.access_token}`,
         'Content-Type': 'application/json',

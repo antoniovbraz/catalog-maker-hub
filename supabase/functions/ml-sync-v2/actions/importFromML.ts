@@ -1,4 +1,5 @@
 import { ActionContext, ImportFromMLRequest } from '../types.ts';
+import { fetchWithRetry } from '../../shared/fetchWithRetry.ts';
 
 // Weight parsing helpers
 
@@ -57,7 +58,7 @@ export async function importFromML(
     while (hasMore) {
       console.log(`Fetching items batch: offset=${offset}, limit=${limit}`);
       
-      const response = await fetch(
+      const response = await fetchWithRetry(
         `https://api.mercadolibre.com/users/me/items/search?status=active&offset=${offset}&limit=${limit}`,
         { headers: { 'Authorization': `Bearer ${mlToken}` } }
       );
@@ -67,7 +68,7 @@ export async function importFromML(
       }
 
       const data = await response.json();
-      const items = data.results || [];
+      const items = Array.from(new Set(data.results || []));
       const total = data.paging?.total ?? 0;
 
       if (items.length === 0) break;
@@ -152,7 +153,7 @@ async function processMLItem(
   }
 
   // Get item details
-  const itemResponse = await fetch(`https://api.mercadolibre.com/items/${itemId}`, {
+  const itemResponse = await fetchWithRetry(`https://api.mercadolibre.com/items/${itemId}`, {
     headers: { 'Authorization': `Bearer ${mlToken}` }
   });
   
