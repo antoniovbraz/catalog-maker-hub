@@ -2,6 +2,7 @@
 // Shared ML Service Layer - Implementa princípios SOLID e DRY
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders, handleCors } from './cors.ts'
+import { logger } from './logger.ts'
 
 // Types e Interfaces
 export interface MLAuthData {
@@ -67,7 +68,7 @@ export class MLService {
       .single();
 
     if (error || !tokenData) {
-      console.error('ML token not found or expired:', error);
+      logger.error('ML token not found or expired', undefined, { error });
       return null;
     }
 
@@ -81,7 +82,7 @@ export class MLService {
     });
 
     if (error) {
-      console.warn('Rate limit check failed:', error);
+      logger.warn('Rate limit check failed', { error });
       return true; // Allow operation if check fails
     }
 
@@ -115,7 +116,7 @@ export class MLService {
         execution_time_ms: executionTimeMs
       });
     } catch (error) {
-      console.error('Failed to log operation:', error);
+      logger.error('Failed to log operation', undefined, { error });
     }
   }
 
@@ -245,7 +246,7 @@ export class MLService {
 
   // Error handler padronizado
   handleError(error: any, operation: string): Response {
-    console.error(`Error in ${operation}:`, error);
+    logger.error(`Error in ${operation}`, error as Error);
 
     const errorResponse = {
       error: error.message || 'Internal server error',
