@@ -1,19 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { updateProductFromItem } from './updateProductFromItem';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import { updateProductFromItem, type SupabaseClient, type ItemData } from './updateProductFromItem';
+import type { PostgrestQueryMock } from '../../../tests/types/postgrest';
 
 const mappingQuery = {
   select: vi.fn(),
   eq: vi.fn(),
   single: vi.fn(),
-};
+} as unknown as PostgrestQueryMock<{ product_id: string; ml_variation_id: string }>;
 let eqCall = 0;
 const productsQuery = {
   update: vi.fn(),
   eq: vi.fn(),
-};
+} as unknown as PostgrestQueryMock<unknown>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const supabase: any = {
+const supabase = {
   from: vi.fn((table: string) => {
     if (table === 'ml_product_mapping') {
       return mappingQuery;
@@ -22,29 +22,28 @@ const supabase: any = {
       return productsQuery;
     }
   }),
-};
+} as unknown as SupabaseClient & { from: Mock };
 
 describe('updateProductFromItem', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mappingQuery.select.mockReturnValue(mappingQuery);
-    mappingQuery.eq.mockReturnValue(mappingQuery);
-    mappingQuery.single.mockResolvedValue({ data: { product_id: 'prod-1', ml_variation_id: 'VAR1' }, error: null });
+    (mappingQuery.select as Mock).mockReturnValue(mappingQuery);
+    (mappingQuery.eq as Mock).mockReturnValue(mappingQuery);
+    (mappingQuery.single as Mock).mockResolvedValue({ data: { product_id: 'prod-1', ml_variation_id: 'VAR1' }, error: null });
     eqCall = 0;
-    productsQuery.update.mockReturnValue(productsQuery);
-    productsQuery.eq.mockImplementation(() => {
+    (productsQuery.update as Mock).mockReturnValue(productsQuery);
+    (productsQuery.eq as Mock).mockImplementation(() => {
       eqCall += 1;
       if (eqCall === 2) {
         return Promise.resolve({ error: null });
       }
       return productsQuery;
     });
-    supabase.from.mockImplementation((table: string) => {
+    (supabase.from as Mock).mockImplementation((table: string) => {
       if (table === 'ml_product_mapping') return mappingQuery;
       if (table === 'products') return productsQuery;
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (globalThis as any).fetch = vi.fn((url: RequestInfo) => {
+    globalThis.fetch = vi.fn((url: RequestInfo) => {
       const urlStr = url.toString();
       if (urlStr.includes('/description')) {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ plain_text: 'desc' }) });
@@ -53,11 +52,11 @@ describe('updateProductFromItem', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ path_from_root: [{ name: 'Root' }] }) });
       }
       return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
-    });
+    }) as unknown as typeof fetch;
   });
 
   it('updates product fields from item data', async () => {
-    const itemData = {
+    const itemData: ItemData = {
       id: 'ML1',
       seller_custom_field: 'SCF1',
       attributes: [],
@@ -79,10 +78,9 @@ describe('updateProductFromItem', () => {
   });
 
   it('skips description update when fetch fails', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (globalThis as any).fetch = vi.fn().mockResolvedValue({ ok: false });
+    globalThis.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
 
-    const itemData = {
+    const itemData: ItemData = {
       id: 'ML2',
       seller_custom_field: 'SCF2',
       attributes: [],
@@ -98,7 +96,7 @@ describe('updateProductFromItem', () => {
   });
 
   it('sets sku to null when ML does not provide', async () => {
-    const itemData = {
+    const itemData: ItemData = {
       id: 'ML3',
       attributes: [],
       pictures: [],
@@ -118,7 +116,7 @@ describe('updateProductFromItem', () => {
       data: { product_id: 'prod-2', ml_variation_id: '67890' },
       error: null,
     });
-    const itemData = {
+    const itemData: ItemData = {
       id: 'ML4',
       attributes: [],
       pictures: [],
@@ -138,7 +136,7 @@ describe('updateProductFromItem', () => {
   it('throws when product mapping is missing (disconnected)', async () => {
     mappingQuery.single.mockResolvedValueOnce({ data: null, error: { message: 'not found' } });
     await expect(
-      updateProductFromItem(supabase, 'tenant1', { id: 'MLX' }, 'token')
+      updateProductFromItem(supabase, 'tenant1', { id: 'MLX' } as ItemData, 'token')
     ).rejects.toThrow('Product mapping not found');
   });
 });

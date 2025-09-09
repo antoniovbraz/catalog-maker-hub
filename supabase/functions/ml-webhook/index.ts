@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
-import { updateProductFromItem } from './updateProductFromItem.ts';
+import { updateProductFromItem, type ItemData } from './updateProductFromItem.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
@@ -207,7 +207,7 @@ async function processItemWebhook(
       throw new Error(`Failed to fetch item: ${itemResponse.status}`);
     }
 
-    const itemData = await itemResponse.json();
+    const itemData: ItemData = await itemResponse.json();
 
     const updatedFields = await updateProductFromItem(
       supabase,
