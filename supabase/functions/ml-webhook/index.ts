@@ -8,6 +8,7 @@ import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { verifySignature } from './verifySignature.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 import { requiredEnv } from '../../../env/required.ts';
+import { v5 } from "https://deno.land/std@0.168.0/uuid/mod.ts";
 
 interface MLWebhookPayload {
   topic: string;
@@ -58,10 +59,16 @@ serve(async (req) => {
 
     const tenantId = tenantData;
 
-    // Log webhook event and ensure idempotency
+    // Log webhook event and ensure idempotency using event timestamp
+    const eventId = v5.generate(
+      v5.NAMESPACE_URL,
+      `${payload.user_id}:${payload.topic}:${payload.resource}:${payload.sent}`,
+    );
+
     const { data: existingEvent, error: logError } = await supabase
       .from('ml_webhook_events')
       .upsert({
+        id: eventId,
         tenant_id: tenantId,
         user_id_ml: payload.user_id,
         application_id: payload.application_id,
@@ -69,7 +76,7 @@ serve(async (req) => {
         resource: payload.resource,
         attempts: payload.attempts,
         raw_payload: payload,
-      }, { onConflict: 'tenant_id,topic,resource' })
+      }, { onConflict: 'id' })
       .select('processed_at')
       .single();
 
@@ -107,9 +114,7 @@ serve(async (req) => {
           ? { message: result.error.message, stack: result.error.stack }
           : null,
       })
-      .eq('tenant_id', tenantId)
-      .eq('resource', payload.resource)
-      .eq('topic', payload.topic);
+      .eq('id', eventId);
 
     return new Response('OK', { 
       status: 200,
