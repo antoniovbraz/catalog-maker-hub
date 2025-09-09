@@ -35,7 +35,7 @@ jobs:
         run: supabase login --token "$SUPABASE_ACCESS_TOKEN"
 
       - name: Push database changes
-        run: supabase db push
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Deploy functions
-        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF" --all
