@@ -68,7 +68,8 @@ export async function importFromML(
 
       const data = await response.json();
       const items = data.results || [];
-      
+      const total = data.paging?.total ?? 0;
+
       if (items.length === 0) break;
 
       // Process items in parallel batches of 5
@@ -90,7 +91,7 @@ export async function importFromML(
         totalProcessed += batch.length;
       }
 
-      hasMore = items.length === limit && offset < 1000;
+      hasMore = offset + limit < total;
       offset += limit;
     }
 
