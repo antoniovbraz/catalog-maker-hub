@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.4";
 import { updateProductFromItem, type ItemData } from './updateProductFromItem.ts';
 import { mlWebhookSchema } from '../shared/schemas.ts';
-import { setupLogger } from '../shared/logger.ts';
+import { setupLogger, logger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { verifySignature } from './verifySignature.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
@@ -19,6 +19,7 @@ interface MLWebhookPayload {
 }
 
 serve(async (req) => {
+  const requestId = crypto.randomUUID();
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
@@ -31,7 +32,7 @@ serve(async (req) => {
     const secret = Deno.env.get('MELI_WEBHOOK_SECRET')!;
     const isValid = await verifySignature(rawBody, signature, secret);
     if (!isValid) {
-      console.error('Invalid ML webhook signature');
+      logger.error('Invalid ML webhook signature', undefined, { requestId, action: 'verify-signature' });
       return new Response('Invalid webhook signature', {
         status: 401,
         headers: corsHeaders,
@@ -39,7 +40,7 @@ serve(async (req) => {
     }
 
     const payload = mlWebhookSchema.parse(JSON.parse(rawBody));
-    console.log('Received ML webhook:', payload);
+    logger.info('Received ML webhook', { requestId, action: 'parse-webhook', topic: payload.topic });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -51,7 +52,7 @@ serve(async (req) => {
       .rpc('get_tenant_by_ml_user_id', { p_user_id_ml: payload.user_id });
 
     if (tenantError || !tenantData) {
-      console.error('Tenant not found for ML user:', payload.user_id);
+      logger.error('Tenant not found for ML user', undefined, { requestId, action: 'lookup-tenant', userId: payload.user_id });
       return new Response('Tenant not found', { status: 404 });
     }
 
@@ -71,22 +72,22 @@ serve(async (req) => {
       });
 
     if (logError) {
-      console.error('Failed to log webhook event:', logError);
+      logger.error('Failed to log webhook event', undefined, { requestId, tenantId, action: 'log-webhook', error: logError });
     }
 
     // Process webhook based on topic
     let result: { updatedFields?: string[]; error?: Error } | undefined;
     switch (payload.topic) {
       case 'orders_v2':
-        result = await processOrderWebhook(supabase, tenantId, payload);
+        result = await processOrderWebhook(supabase, tenantId, payload, requestId);
         break;
 
       case 'items':
-        result = await processItemWebhook(supabase, tenantId, payload);
+        result = await processItemWebhook(supabase, tenantId, payload, requestId);
         break;
 
       default:
-        console.log('Unhandled webhook topic:', payload.topic);
+        logger.warn('Unhandled webhook topic', { requestId, tenantId, action: 'handle-webhook', topic: payload.topic });
     }
 
     // Mark webhook as processed with results
@@ -109,7 +110,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('ML Webhook Error:', error);
+    logger.error('ML Webhook Error', error as Error, { requestId, action: 'webhook-handler' });
     
     return new Response(
       JSON.stringify({ error: error.message }),
@@ -124,9 +125,10 @@ serve(async (req) => {
 async function processOrderWebhook(
   supabase: SupabaseClient,
   tenantId: string,
-  payload: MLWebhookPayload
+  payload: MLWebhookPayload,
+  requestId: string
 ): Promise<{ error?: Error }> {
-  console.log('Processing order webhook for tenant:', tenantId);
+  logger.info('Processing order webhook for tenant', { requestId, tenantId, action: 'process-order' });
 
   try {
     // Get ML auth token for this tenant
@@ -175,7 +177,7 @@ async function processOrderWebhook(
     return {};
 
   } catch (error) {
-    console.error('Error processing order webhook:', error);
+    logger.error('Error processing order webhook', error as Error, { requestId, tenantId, action: 'process-order' });
     return { error: error as Error };
   }
 }
@@ -183,9 +185,10 @@ async function processOrderWebhook(
 async function processItemWebhook(
   supabase: SupabaseClient,
   tenantId: string,
-  payload: MLWebhookPayload
+  payload: MLWebhookPayload,
+  requestId: string
 ): Promise<{ updatedFields?: string[]; error?: Error }> {
-  console.log('Processing item webhook for tenant:', tenantId);
+  logger.info('Processing item webhook for tenant', { requestId, tenantId, action: 'process-item' });
 
   try {
     // Get ML auth token
@@ -235,7 +238,7 @@ async function processItemWebhook(
     return { updatedFields };
 
   } catch (error) {
-    console.error('Error processing item webhook:', error);
+    logger.error('Error processing item webhook', error as Error, { requestId, tenantId, action: 'process-item' });
     return { error: error as Error };
   }
 }

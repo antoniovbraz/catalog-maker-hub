@@ -1,3 +1,5 @@
+import { logger } from '../shared/logger.ts';
+
 export interface PostgrestResponse<T> {
   data: T | null;
   error: unknown;
@@ -72,7 +74,7 @@ export async function updateProductFromItem(
       description = descData.plain_text || '';
     }
   } catch (e) {
-    console.warn('Could not fetch description:', e);
+    logger.warn('Could not fetch description', { tenantId, error: e });
   }
 
   let categoryPath = '';
@@ -89,7 +91,7 @@ export async function updateProductFromItem(
           .join(' > ');
       }
     } catch (e) {
-      console.warn('Could not fetch category:', e);
+      logger.warn('Could not fetch category', { tenantId, error: e });
     }
   }
 

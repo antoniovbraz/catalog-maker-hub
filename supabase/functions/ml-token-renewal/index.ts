@@ -1,13 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { setupLogger } from '../shared/logger.ts';
+import { setupLogger, logger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 import { requiredEnv } from '../../../env/required.ts';
 
-console.log('ML Token Renewal Service initialized');
+logger.info('ML Token Renewal Service initialized');
 
-async function refreshWithRetry(refreshToken: string, mlClientId: string, mlClientSecret: string) {
+async function refreshWithRetry(refreshToken: string, mlClientId: string, mlClientSecret: string, requestId: string) {
   const maxRetries = 3;
   const baseDelay = 500; // ms
 
@@ -35,13 +35,14 @@ async function refreshWithRetry(refreshToken: string, mlClientId: string, mlClie
     } catch (error) {
       if (attempt === maxRetries - 1) throw error;
       const delay = baseDelay * Math.pow(2, attempt);
-      console.log(`Retrying token refresh in ${delay}ms due to error:`, error);
+      logger.warn('Retrying token refresh', { delay, error, action: 'refresh-token', requestId });
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 }
 
 serve(async (req) => {
+  const requestId = crypto.randomUUID();
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
@@ -57,7 +58,7 @@ serve(async (req) => {
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {
-    console.log('Starting automatic token renewal process...');
+    logger.info('Starting automatic token renewal process', { requestId, action: 'token-renewal' });
     
     // Find tokens that expire in less than 2 hours
     const twoHoursFromNow = new Date();
@@ -71,11 +72,11 @@ serve(async (req) => {
       .not('refresh_token', 'is', null); // Has refresh token
 
     if (queryError) {
-      console.error('Error querying expiring tokens:', queryError);
+      logger.error('Error querying expiring tokens', undefined, { requestId, action: 'token-renewal', error: queryError });
       throw queryError;
     }
 
-    console.log(`Found ${expiringSoonTokens?.length || 0} tokens expiring soon`);
+    logger.info('Found tokens expiring soon', { requestId, count: expiringSoonTokens?.length || 0, action: 'token-renewal' });
 
     let renewedCount = 0;
     let failedCount = 0;
@@ -83,10 +84,10 @@ serve(async (req) => {
     // Process each token
     for (const token of expiringSoonTokens || []) {
       try {
-        console.log(`Renewing token for tenant: ${token.tenant_id}`);
+        logger.info('Renewing token for tenant', { requestId, tenantId: token.tenant_id, action: 'token-renewal' });
 
         // Refresh token with retry/backoff
-        const tokenData = await refreshWithRetry(token.refresh_token, mlClientId, mlClientSecret);
+        const tokenData = await refreshWithRetry(token.refresh_token, mlClientId, mlClientSecret, requestId);
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + tokenData.expires_in);
 
@@ -102,7 +103,7 @@ serve(async (req) => {
           .eq('id', token.id);
 
         if (updateError) {
-          console.error(`Failed to update token in DB for tenant ${token.tenant_id}:`, updateError);
+          logger.error('Failed to update token in DB', undefined, { requestId, tenantId: token.tenant_id, action: 'token-renewal', error: updateError });
           failedCount++;
           continue;
         }
@@ -121,10 +122,10 @@ serve(async (req) => {
         });
 
         renewedCount++;
-        console.log(`Successfully renewed token for tenant: ${token.tenant_id}`);
+        logger.info('Successfully renewed token for tenant', { requestId, tenantId: token.tenant_id, action: 'token-renewal' });
 
       } catch (error) {
-        console.error(`Unexpected error renewing token for tenant ${token.tenant_id}:`, error);
+        logger.error('Unexpected error renewing token', error as Error, { requestId, tenantId: token.tenant_id, action: 'token-renewal' });
         
         // Log unexpected errors
         await supabase.from('ml_sync_log').insert({
@@ -144,7 +145,7 @@ serve(async (req) => {
     }
 
     // Summary log
-    console.log(`Token renewal completed: ${renewedCount} renewed, ${failedCount} failed`);
+    logger.info('Token renewal completed', { requestId, renewed: renewedCount, failed: failedCount, action: 'token-renewal' });
 
     return new Response(
       JSON.stringify({
@@ -160,7 +161,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Fatal error in token renewal process:', error);
+    logger.error('Fatal error in token renewal process', error as Error, { requestId, action: 'token-renewal' });
     
     return new Response(
       JSON.stringify({ 

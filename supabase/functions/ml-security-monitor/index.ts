@@ -1,13 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { setupLogger } from '../shared/logger.ts';
+import { setupLogger, logger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 import { requiredEnv } from '../../../env/required.ts';
 
-console.log('ML Security Monitor initialized');
+logger.info('ML Security Monitor initialized');
 
 serve(async (req) => {
+  const requestId = crypto.randomUUID();
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
@@ -21,7 +22,7 @@ serve(async (req) => {
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {
-    console.log('Starting ML security and health monitoring...');
+    logger.info('Starting ML security and health monitoring', { requestId, action: 'security-scan' });
     
     const securityReport = {
       timestamp: new Date().toISOString(),
@@ -135,7 +136,7 @@ serve(async (req) => {
     // 6. Alert on critical issues
     const criticalIssues = securityReport.issues.filter(issue => issue.severity === 'high');
     if (criticalIssues.length > 0) {
-      console.warn('CRITICAL SECURITY ISSUES DETECTED:', criticalIssues);
+      logger.warn('CRITICAL SECURITY ISSUES DETECTED', { requestId, issues: criticalIssues, action: 'security-scan' });
       
       // In a real implementation, you would send alerts via email/Slack/etc
       await supabase.from('ml_sync_log').insert({
@@ -150,7 +151,7 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Security scan completed: ${securityReport.issues.length} issues found`);
+    logger.info('Security scan completed', { requestId, issuesFound: securityReport.issues.length, action: 'security-scan' });
 
     return new Response(
       JSON.stringify({
@@ -165,7 +166,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Fatal error in security monitoring:', error);
+    logger.error('Fatal error in security monitoring', error as Error, { requestId, action: 'security-scan' });
     
     return new Response(
       JSON.stringify({ 
