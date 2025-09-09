@@ -21,11 +21,15 @@ export async function syncBatch(
     for (const productId of req.product_ids) {
       try {
         const result = await syncSingleProduct(
-          supabase,
-          tenantId,
-          productId,
-          mlToken,
-          req.force_update
+          {
+            product_id: productId,
+            force_update: req.force_update
+          },
+          {
+            supabase,
+            tenantId,
+            mlToken
+          }
         );
         results.push({ product_id: productId, ...result });
       } catch (error) {

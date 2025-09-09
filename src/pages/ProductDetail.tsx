@@ -306,21 +306,21 @@ export default function ProductDetail() {
               {product.brand && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Marca</label>
-                  <p>{typeof product.brand === 'string' ? product.brand : String(product.brand)}</p>
+                  <p>{product.brand || 'Não informado'}</p>
                 </div>
               )}
 
               {product.model && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Modelo</label>
-                  <p>{String(product.model)}</p>
+                  <p>{product.model || 'Não informado'}</p>
                 </div>
               )}
 
               {product.warranty && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Garantia</label>
-                  <p>{product.warranty ? String(product.warranty) : 'Não informado'}</p>
+                  <p>{typeof product.warranty === 'string' ? product.warranty : 'Não informado'}</p>
                 </div>
               )}
             </CardContent>
@@ -369,7 +369,7 @@ export default function ProductDetail() {
                         <Weight className="size-3" />
                         Peso
                       </label>
-                      <p>{formatWeight(product.weight as number)}</p>
+                      <p>{typeof product.weight === 'number' ? formatWeight(product.weight) : 'Não informado'}</p>
                     </div>
                   )}
                   {dimensions?.length && (
@@ -528,7 +528,7 @@ export default function ProductDetail() {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Vendidos</label>
-                    <p>{product.ml_sold_quantity || 0}</p>
+                    <p>{typeof product.ml_sold_quantity === 'number' ? product.ml_sold_quantity : 0}</p>
                   </div>
                 </div>
 
