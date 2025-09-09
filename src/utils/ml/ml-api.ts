@@ -73,32 +73,29 @@ export async function callMLFunction(
   
   try {
     console.log(`[ML API] Calling ${action} with params:`, params);
-    
-    // Criar uma promise com timeout
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error(`Timeout após ${timeout}ms`)), timeout);
-    });
-    
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
     const { data: session } = await supabase.auth.getSession();
     const authHeader = session.session?.access_token
       ? { Authorization: `Bearer ${session.session.access_token}` }
       : undefined;
 
-    const callPromise = supabase.functions
-      .invoke(functionName, {
+    let data: unknown;
+    let error: { message?: string; name?: string; context?: unknown } | null = null;
+
+    try {
+      const response = await supabase.functions.invoke(functionName, {
         body: { action, ...params },
         headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
-      })
-      // Evita rejeições não tratadas quando o timeout ocorre primeiro
-      .catch((err: { message?: string }) => ({ data: null, error: err }));
-
-    const { data, error } = (await Promise.race([
-      callPromise,
-      timeoutPromise,
-    ])) as {
-      data: unknown;
-      error: { message?: string; name?: string; context?: unknown } | null;
-    };
+        signal: controller.signal,
+      });
+      data = response.data;
+      error = response.error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (error) {
       console.error(`[ML API] Error in ${action}:`, error);
@@ -165,15 +162,17 @@ export async function callMLFunction(
     
     // Melhorar a mensagem de erro
     let errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-    
-    if (errorMessage.toLowerCase().includes('timeout')) {
+
+    if (error instanceof Error && error.name === 'AbortError') {
+      errorMessage = `Operação ${action} demorou muito para responder`;
+    } else if (errorMessage.toLowerCase().includes('timeout')) {
       errorMessage = `Operação ${action} demorou muito para responder`;
     } else if (errorMessage.includes('network')) {
       errorMessage = `Erro de conexão durante ${action}`;
     } else if (errorMessage.includes('unauthorized')) {
       errorMessage = 'Token do Mercado Livre expirado ou inválido';
     }
-    
+
     throw new Error(errorMessage);
   }
 }
