@@ -75,8 +75,12 @@ export async function callMLFunction(
     console.log(`[ML API] Calling ${action} with params:`, params);
 
     let timeoutId: ReturnType<typeof setTimeout>;
+    const controller = new AbortController();
     const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error('timeout')), timeout);
+      timeoutId = setTimeout(() => {
+        controller.abort();
+        reject(new Error('timeout'));
+      }, timeout);
     });
 
     const { data: session } = await supabase.auth.getSession();
@@ -92,6 +96,7 @@ export async function callMLFunction(
         supabase.functions.invoke(functionName, {
           body: { action, ...params },
           headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
+          signal: controller.signal,
         }),
         timeoutPromise,
       ]) as Awaited<ReturnType<typeof supabase.functions.invoke>>;
