@@ -326,11 +326,9 @@ export default function ProductDetail() {
             </CardContent>
           </Card>
 
-          {/* Costs and Taxes */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Tag className="size-5" />
+              <CardTitle>
                 Custos e Impostos
               </CardTitle>
             </CardHeader>
