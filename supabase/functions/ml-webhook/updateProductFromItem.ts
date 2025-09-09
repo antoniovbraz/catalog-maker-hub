@@ -1,7 +1,49 @@
+export interface PostgrestResponse<T> {
+  data: T | null;
+  error: unknown;
+}
+
+export interface PostgrestQuery<T>
+  extends Promise<PostgrestResponse<T>> {
+  select(columns: string): PostgrestQuery<T>;
+  update(values: Record<string, unknown>): PostgrestQuery<T>;
+  eq(
+    column: string,
+    value: unknown
+  ): PostgrestQuery<T> | Promise<PostgrestResponse<T>>;
+  single(): Promise<PostgrestResponse<T>>;
+}
+
+export interface SupabaseClient {
+  from<T>(table: string): PostgrestQuery<T>;
+}
+
+export interface ItemAttribute {
+  id: string;
+  value_name?: string;
+}
+
+export interface ItemVariation {
+  id: string | number;
+  seller_custom_field?: string;
+  seller_sku?: string;
+  attributes?: ItemAttribute[];
+}
+
+export interface ItemData {
+  id: string;
+  seller_custom_field?: string;
+  attributes?: ItemAttribute[];
+  pictures?: { url: string }[];
+  available_quantity?: number;
+  category_id?: string;
+  variations?: ItemVariation[];
+}
+
 export async function updateProductFromItem(
-  supabase: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient,
   tenantId: string,
-  itemData: any, // eslint-disable-line @typescript-eslint/no-explicit-any
+  itemData: ItemData,
   mlToken: string
 ): Promise<string[]> {
   const updatedFields: string[] = [];
@@ -55,22 +97,15 @@ export async function updateProductFromItem(
     mapping?.ml_variation_id
       ? itemData.variations?.find(
           // Normalize IDs because ML API returns numbers and Supabase stores strings
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (v: any) => String(v.id) === String(mapping.ml_variation_id)
+          (v) => String(v.id) === String(mapping.ml_variation_id)
         )
       : itemData.variations?.[0];
   const mlSku =
     itemData.seller_custom_field ||
-    itemData.attributes?.find(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (attr: any) => attr.id === 'SELLER_SKU'
-    )?.value_name ||
+    itemData.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
     variation?.seller_custom_field ||
     variation?.seller_sku ||
-    variation?.attributes?.find(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (attr: any) => attr.id === 'SELLER_SKU'
-    )?.value_name ||
+    variation?.attributes?.find((attr) => attr.id === 'SELLER_SKU')?.value_name ||
     variation?.id ||
     null;
   const skuSource = mlSku ? 'mercado_livre' : 'none';
