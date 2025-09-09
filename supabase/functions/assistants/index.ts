@@ -5,6 +5,7 @@ import { assistantCreateSchema, assistantUpdateSchema } from '../shared/schemas.
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
+import { requiredEnv } from '../../../env/required.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -24,7 +25,7 @@ serve(async (req) => {
     return corsResponse;
   }
 
-  checkEnv();
+  checkEnv(requiredEnv.edge.assistants);
 
   try {
     // Validar configurações essenciais

@@ -6,6 +6,7 @@ import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { verifySignature } from './verifySignature.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
+import { requiredEnv } from '../../../env/required.ts';
 
 interface MLWebhookPayload {
   topic: string;
@@ -21,7 +22,7 @@ serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
-  checkEnv();
+  checkEnv(requiredEnv.edge.mlWebhook);
 
   setupLogger(req.headers);
   try {
