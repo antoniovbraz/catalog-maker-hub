@@ -230,8 +230,8 @@ export default function ProductDetail() {
               onClick={handleResync}
               disabled={resyncProduct.resyncProduct.isPending}
             >
-              <RefreshCw className={`mr-2 size-4 ${resyncProduct.resyncProduct.isPending ? 'animate-spin' : ''}`} />
-              {resyncProduct.resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
+              <RefreshCw className={`mr-2 size-4 ${resyncProduct.resyncProduct.isPending ? "animate-spin" : ""}`} />
+              {resyncProduct.resyncProduct.isPending ? "Re-sincronizando..." : "Re-sincronizar"}
             </Button>
           )}
         </div>
@@ -306,27 +306,27 @@ export default function ProductDetail() {
               {product.brand && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Marca</label>
-                  <p>{typeof product.brand === 'string' ? product.brand : 'Não informado'}</p>
+                  <p>{typeof product.brand === 'string' ? product.brand : "Não informado"}</p>
                 </div>
               )}
 
               {product.model && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Modelo</label>
-                  <p>{typeof product.model === 'string' ? product.model : 'Não informado'}</p>
+                  <p>{typeof product.model === 'string' ? product.model : "Não informado"}</p>
                 </div>
               )}
 
               {product.warranty && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Garantia</label>
-                  <p>{typeof product.warranty === 'string' ? product.warranty : 'Não informado'}</p>
+                  <p>{typeof product.warranty === 'string' ? product.warranty : "Não informado"}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Costs and Taxes Section */}
+          {/* Costs and Taxes */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -369,7 +369,7 @@ export default function ProductDetail() {
                         <Weight className="size-3" />
                         Peso
                       </label>
-                      <p>{typeof product.weight === 'number' ? formatWeight(product.weight) : 'Não informado'}</p>
+                      <p>{typeof product.weight === 'number' ? formatWeight(product.weight) : "Não informado"}</p>
                     </div>
                   )}
                   {dimensions?.length && (
@@ -429,7 +429,7 @@ export default function ProductDetail() {
                       key={attr.id || attr.name || index}
                       className="flex justify-between text-sm"
                     >
-                      <span className="font-medium">{attr.name || attr.id || 'N/A'}</span>
+                      <span className="font-medium">{attr.name || attr.id || "N/A"}</span>
                       <span>{attr.value_name || attr.value_id || '-'}</span>
                     </div>
                   ))}
@@ -536,7 +536,7 @@ export default function ProductDetail() {
                 
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Última Sincronização</label>
-                  <p className="text-sm">{mlProduct.last_sync_at ? format(new Date(mlProduct.last_sync_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : 'Nunca sincronizado'}</p>
+                  <p className="text-sm">{mlProduct.last_sync_at ? format(new Date(mlProduct.last_sync_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : "Nunca sincronizado"}</p>
                 </div>
 
                 {mlProduct.ml_permalink && (
@@ -557,8 +557,8 @@ export default function ProductDetail() {
                   onClick={handleResync}
                   disabled={resyncProduct.resyncProduct.isPending}
                 >
-                  <RefreshCw className={`mr-2 size-4 ${resyncProduct.resyncProduct.isPending ? 'animate-spin' : ''}`} />
-                  {resyncProduct.resyncProduct.isPending ? 'Re-sincronizando...' : 'Re-sincronizar'}
+                  <RefreshCw className={`mr-2 size-4 ${resyncProduct.resyncProduct.isPending ? "animate-spin" : ""}`} />
+                  {resyncProduct.resyncProduct.isPending ? "Re-sincronizando..." : "Re-sincronizar"}
                 </Button>
               </CardContent>
             </Card>
@@ -576,7 +576,7 @@ export default function ProductDetail() {
                     <div key={log.id} className="rounded border p-2 text-xs">
                       <div className="flex items-center justify-between">
                         <Badge
-                          variant={log.status === 'success' ? 'default' : 'destructive'}
+                          variant={log.status === "success" ? "default" : "destructive"}
                           className="text-xs"
                         >
                           {log.status}
