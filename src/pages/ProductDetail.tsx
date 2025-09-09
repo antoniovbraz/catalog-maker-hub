@@ -5,7 +5,6 @@ import { ptBR } from "date-fns/locale";
 import { 
   RefreshCw,
   Edit,
-  Tag,
   Calendar,
   Box,
   Ruler,
