@@ -6,6 +6,7 @@ import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 import { requiredEnv } from '../../../env/required.ts';
+import { fetchWithRetry } from '../shared/fetchWithRetry.ts';
 
 // PKCE Helper Functions - Compatível com Deno
 async function generateRandomString(length: number): Promise<string> {
@@ -214,7 +215,7 @@ serve(async (req) => {
             code_verifier: pkceData.code_verifier, // CRÍTICO: Incluir code_verifier
           });
 
-          const tokenResponse = await fetch('https://api.mercadolibre.com/oauth/token', {
+          const tokenResponse = await fetchWithRetry('https://api.mercadolibre.com/oauth/token', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
@@ -258,7 +259,7 @@ serve(async (req) => {
           console.log('Token exchange successful, fetching user info...');
 
           // Obter informações do usuário ML
-          const userResponse = await fetch('https://api.mercadolibre.com/users/me', {
+          const userResponse = await fetchWithRetry('https://api.mercadolibre.com/users/me', {
             headers: {
               'Authorization': `Bearer ${tokenData.access_token}`,
             },
@@ -363,7 +364,7 @@ serve(async (req) => {
         }
 
         // Refresh the token
-        const refreshResponse = await fetch('https://api.mercadolibre.com/oauth/token', {
+        const refreshResponse = await fetchWithRetry('https://api.mercadolibre.com/oauth/token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -463,7 +464,7 @@ serve(async (req) => {
           try {
             console.log('Auto-recuperando ml_nickname para tenant:', tenantId);
 
-            const mlUserResponse = await fetch('https://api.mercadolibre.com/users/me', {
+            const mlUserResponse = await fetchWithRetry('https://api.mercadolibre.com/users/me', {
               headers: {
                 'Authorization': `Bearer ${token.access_token}`,
                 'Content-Type': 'application/json',

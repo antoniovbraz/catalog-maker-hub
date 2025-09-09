@@ -40,6 +40,8 @@ export interface ItemData {
   variations?: ItemVariation[];
 }
 
+import { fetchWithRetry } from '../shared/fetchWithRetry.ts';
+
 export async function updateProductFromItem(
   supabase: SupabaseClient,
   tenantId: string,
@@ -61,7 +63,7 @@ export async function updateProductFromItem(
 
   let description: string | undefined;
   try {
-    const descResponse = await fetch(
+    const descResponse = await fetchWithRetry(
       `https://api.mercadolibre.com/items/${itemData.id}/description`,
       {
         headers: { Authorization: `Bearer ${mlToken}` }
@@ -78,7 +80,7 @@ export async function updateProductFromItem(
   let categoryPath = '';
   if (itemData.category_id) {
     try {
-      const catResponse = await fetch(
+      const catResponse = await fetchWithRetry(
         `https://api.mercadolibre.com/categories/${itemData.category_id}`,
         { headers: { Authorization: `Bearer ${mlToken}` } }
       );

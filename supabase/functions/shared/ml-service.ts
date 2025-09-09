@@ -2,6 +2,7 @@
 // Shared ML Service Layer - Implementa princípios SOLID e DRY
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders, handleCors } from './cors.ts'
+import { fetchWithRetry } from './fetchWithRetry.ts'
 
 // Types e Interfaces
 export interface MLAuthData {
@@ -126,21 +127,15 @@ export class MLService {
     data?: any,
     timeout: number = 30000
   ): Promise<MLApiResponse> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-
     try {
-      const response = await fetch(`https://api.mercadolibre.com${endpoint}`, {
+      const response = await fetchWithRetry(`https://api.mercadolibre.com${endpoint}`, {
         method,
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/json',
         },
         body: data ? JSON.stringify(data) : undefined,
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
+      }, { timeoutMs: timeout });
 
       const responseData = await response.json();
 
@@ -159,9 +154,7 @@ export class MLService {
         status_code: response.status
       };
     } catch (error) {
-      clearTimeout(timeoutId);
-      
-      if (error.name === 'AbortError') {
+      if ((error as Error).name === 'AbortError') {
         return {
           success: false,
           error: 'Request timeout',
@@ -171,36 +164,10 @@ export class MLService {
 
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
         status_code: 500
       };
     }
-  }
-
-  // Retry logic com backoff exponencial
-  async withRetry<T>(
-    operation: () => Promise<T>,
-    maxRetries: number = 3,
-    baseDelay: number = 1000
-  ): Promise<T> {
-    let lastError: Error;
-
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        return await operation();
-      } catch (error) {
-        lastError = error;
-        
-        if (attempt === maxRetries) {
-          throw lastError;
-        }
-
-        const delay = baseDelay * Math.pow(2, attempt);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-
-    throw lastError!;
   }
 
   // Validação de dados antes de enviar para ML
