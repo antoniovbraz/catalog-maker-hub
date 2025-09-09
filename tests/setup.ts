@@ -7,10 +7,10 @@ import '@/lib/i18n';
 // Inject environment variables for tests
 process.env.SUPABASE_URL = 'https://test.supabase.co';
 process.env.SUPABASE_ANON_KEY = 'test-anon-key';
-process.env.ML_CLIENT_ID = 'test-client-id';
-process.env.ML_CLIENT_SECRET = 'test-client-secret';
-process.env.ML_REDIRECT_URL = 'https://example.com/callback';
-process.env.ML_WEBHOOK_SECRET = 'test-webhook-secret';
+process.env.MELI_CLIENT_ID = 'test-client-id';
+process.env.MELI_CLIENT_SECRET = 'test-client-secret';
+process.env.MELI_REDIRECT_URI = 'https://example.com/callback';
+process.env.MELI_WEBHOOK_SECRET = 'test-webhook-secret';
 
 // Limpa e reseta mocks após cada teste
 afterEach(() => {

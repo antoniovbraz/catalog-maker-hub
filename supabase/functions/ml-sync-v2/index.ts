@@ -37,7 +37,7 @@ serve(async (req) => {
     setupLogger(req.headers);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const mlClientId = Deno.env.get('ML_CLIENT_ID')!;
+    const mlClientId = Deno.env.get('MELI_CLIENT_ID')!;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

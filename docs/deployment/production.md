@@ -28,10 +28,10 @@ supabase link --project-ref <project-ref>
 ```bash
 # Definir secrets de produção
 supabase secrets set \
-  ML_CLIENT_ID="<client-id-prod>" \
-  ML_CLIENT_SECRET="<client-secret-prod>" \
-  ML_REDIRECT_URL="https://peepers-hub.lovable.app/auth/ml/callback" \
-  ML_WEBHOOK_SECRET="<webhook-secret-prod>" \
+  MELI_CLIENT_ID="<client-id-prod>" \
+  MELI_CLIENT_SECRET="<client-secret-prod>" \
+  MELI_REDIRECT_URI="https://peepers-hub.lovable.app/auth/ml/callback" \
+  MELI_WEBHOOK_SECRET="<webhook-secret-prod>" \
   OPENAI_API_KEY="<openai-key>"
 ```
 

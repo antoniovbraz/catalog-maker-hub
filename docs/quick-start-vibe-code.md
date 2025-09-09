@@ -18,8 +18,8 @@ npm run dev
 ### **2. Configurar Credenciais ML** 
 ```bash
 # Secrets já configurados no Supabase:
-# ✅ ML_CLIENT_ID 
-# ✅ ML_CLIENT_SECRET
+# ✅ MELI_CLIENT_ID
+# ✅ MELI_CLIENT_SECRET
 
 # Verificar no dashboard:
 # https://supabase.com/dashboard/project/ngkhzbzynkhgezkqykeb/settings/functions

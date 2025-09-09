@@ -39,8 +39,8 @@ serve(async (req) => {
     setupLogger(req.headers);
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const mlClientId = Deno.env.get('ML_CLIENT_ID')!;
-    const mlClientSecret = Deno.env.get('ML_CLIENT_SECRET')!;
+    const mlClientId = Deno.env.get('MELI_CLIENT_ID')!;
+    const mlClientSecret = Deno.env.get('MELI_CLIENT_SECRET')!;
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -105,7 +105,7 @@ serve(async (req) => {
 
           // Gerar PKCE
           const { codeVerifier, codeChallenge } = await generatePKCE();
-          const redirectUri = Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
+          const redirectUri = Deno.env.get('MELI_REDIRECT_URI') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback';
           const state = `${tenantId}_${Date.now()}_${crypto.randomUUID()}`;
 
           // Armazenar PKCE na base de dados
@@ -206,7 +206,7 @@ serve(async (req) => {
             client_id: mlClientId,
             client_secret: mlClientSecret,
             code: body.code,
-            redirect_uri: Deno.env.get('ML_REDIRECT_URL') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback',
+            redirect_uri: Deno.env.get('MELI_REDIRECT_URI') || 'https://peepers-hub.lovable.app/integrations/mercado-livre/callback',
             code_verifier: pkceData.code_verifier, // CRÍTICO: Incluir code_verifier
           });
 
