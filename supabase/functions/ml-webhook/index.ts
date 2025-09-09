@@ -5,6 +5,7 @@ import { mlWebhookSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { verifySignature } from './verifySignature.ts';
+import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 
 interface MLWebhookPayload {
   topic: string;
@@ -19,6 +20,8 @@ interface MLWebhookPayload {
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
+
+  checkEnv();
 
   setupLogger(req.headers);
   try {

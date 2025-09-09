@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
+    "check-env": "tsx scripts/check-env.ts",
+    "dev": "npm run check-env && vite",
+    "build": "npm run check-env && vite build",
+    "build:dev": "npm run check-env && vite build --mode development",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix --cache",
     "type-check": "tsc --noEmit",
@@ -21,7 +22,7 @@
     "build-storybook": "storybook build",
     "prepare": "husky",
     "align:ml": "node scripts/align-ml-data.mjs",
-    "build:analyze": "vite build && npx source-map-explorer 'dist/assets/*.js'"
+    "build:analyze": "npm run check-env && vite build && npx source-map-explorer 'dist/assets/*.js'"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -114,7 +115,8 @@
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "tsx": "^4.20.5"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"

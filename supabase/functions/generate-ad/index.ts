@@ -3,10 +3,13 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { generateAdSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
+import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
+
+  checkEnv();
 
   try {
     setupLogger(req.headers);
