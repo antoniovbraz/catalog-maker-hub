@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 import { mlAuthSchema } from '../shared/schemas.ts';
-import type { z } from 'zod';
+import { z } from "zod";
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 

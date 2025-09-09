@@ -197,6 +197,7 @@ export default function ProductDetail() {
   };
 
   // Helper function to safely render dimensions
+  console.log('Product warranty type:', typeof product?.warranty, 'value:', product?.warranty);
   const renderDimension = (value: unknown, unit: string = 'cm'): string => {
     if (typeof value === 'number') return `${value} ${unit}`;
     if (typeof value === 'string') return `${value} ${unit}`;
@@ -326,7 +327,7 @@ export default function ProductDetail() {
             </CardContent>
           </Card>
 
-          {/* Costs and Taxes Section */}
+          {/* Costs and Taxes */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -338,15 +339,15 @@ export default function ProductDetail() {
               <div className="grid grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
-                  <p className="text-lg font-semibold">{formatarMoeda(product.cost_unit)}</p>
+                  <p className="text-lg font-semibold">{formatarMoeda(typeof product.cost_unit === 'number' ? product.cost_unit : 0)}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Custo de Embalagem</label>
-                  <p className="text-lg font-semibold">{formatarMoeda(product.packaging_cost || 0)}</p>
+                  <p className="text-lg font-semibold">{formatarMoeda(typeof product.packaging_cost === 'number' ? product.packaging_cost : 0)}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Taxa de Imposto</label>
-                  <p className="text-lg font-semibold">{product.tax_rate || 0}%</p>
+                  <p className="text-lg font-semibold">{typeof product.tax_rate === 'number' ? product.tax_rate : 0}%</p>
                 </div>
               </div>
             </CardContent>
@@ -524,7 +525,7 @@ export default function ProductDetail() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Estoque Disponível</label>
-                    <p>{product.ml_available_quantity || 0}</p>
+                    <p>{typeof product.ml_available_quantity === 'number' ? product.ml_available_quantity : 0}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Vendidos</label>
