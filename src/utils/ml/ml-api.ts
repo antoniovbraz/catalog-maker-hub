@@ -74,8 +74,10 @@ export async function callMLFunction(
   try {
     console.log(`[ML API] Calling ${action} with params:`, params);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error('timeout')), timeout);
+    });
 
     const { data: session } = await supabase.auth.getSession();
     const authHeader = session.session?.access_token
@@ -86,11 +88,13 @@ export async function callMLFunction(
     let error: { message?: string; name?: string; context?: unknown } | null = null;
 
     try {
-      const response = await supabase.functions.invoke(functionName, {
-        body: { action, ...params },
-        headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
-        signal: controller.signal,
-      });
+      const response = await Promise.race([
+        supabase.functions.invoke(functionName, {
+          body: { action, ...params },
+          headers: authHeader && typeof authHeader === 'object' ? { ...authHeader, ...headers } : headers,
+        }),
+        timeoutPromise,
+      ]) as Awaited<ReturnType<typeof supabase.functions.invoke>>;
       data = response.data;
       error = response.error;
     } finally {
@@ -163,9 +167,7 @@ export async function callMLFunction(
     // Melhorar a mensagem de erro
     let errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
 
-    if (error instanceof Error && error.name === 'AbortError') {
-      errorMessage = `Operação ${action} demorou muito para responder`;
-    } else if (errorMessage.toLowerCase().includes('timeout')) {
+    if (errorMessage.toLowerCase().includes('timeout')) {
       errorMessage = `Operação ${action} demorou muito para responder`;
     } else if (errorMessage.includes('network')) {
       errorMessage = `Erro de conexão durante ${action}`;
