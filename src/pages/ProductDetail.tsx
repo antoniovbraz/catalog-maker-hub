@@ -119,7 +119,7 @@ export default function ProductDetail() {
       }
       
       return { 
-        price: product.cost_unit || 0, 
+        price: typeof product.cost_unit === 'number' ? product.cost_unit : 0, 
         source: 'product' as const 
       };
     },
@@ -197,7 +197,6 @@ export default function ProductDetail() {
   };
 
   // Helper function to safely render dimensions
-  console.log('Product warranty type:', typeof product?.warranty, 'value:', product?.warranty);
   const renderDimension = (value: unknown, unit: string = 'cm'): string => {
     if (typeof value === 'number') return `${value} ${unit}`;
     if (typeof value === 'string') return `${value} ${unit}`;
@@ -307,14 +306,14 @@ export default function ProductDetail() {
               {product.brand && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Marca</label>
-                  <p>{product.brand || 'Não informado'}</p>
+                  <p>{typeof product.brand === 'string' ? product.brand : 'Não informado'}</p>
                 </div>
               )}
 
               {product.model && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Modelo</label>
-                  <p>{product.model || 'Não informado'}</p>
+                  <p>{typeof product.model === 'string' ? product.model : 'Não informado'}</p>
                 </div>
               )}
 
@@ -327,7 +326,7 @@ export default function ProductDetail() {
             </CardContent>
           </Card>
 
-          {/* Costs and Taxes */}
+          {/* Costs and Taxes Section */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -430,8 +429,8 @@ export default function ProductDetail() {
                       key={attr.id || attr.name || index}
                       className="flex justify-between text-sm"
                     >
-                      <span className="font-medium">{String(attr.name || attr.id || 'N/A')}</span>
-                      <span>{String(attr.value_name || attr.value_id || '-')}</span>
+                      <span className="font-medium">{attr.name || attr.id || 'N/A'}</span>
+                      <span>{attr.value_name || attr.value_id || '-'}</span>
                     </div>
                   ))}
               </CardContent>
