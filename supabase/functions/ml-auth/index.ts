@@ -5,6 +5,7 @@ import { z } from "zod";
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
+import { requiredEnv } from '../../../env/required.ts';
 
 // PKCE Helper Functions - Compatível com Deno
 async function generateRandomString(length: number): Promise<string> {
@@ -36,7 +37,7 @@ serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
-  checkEnv();
+  checkEnv(requiredEnv.edge.mlAuth);
 
   try {
     setupLogger(req.headers);

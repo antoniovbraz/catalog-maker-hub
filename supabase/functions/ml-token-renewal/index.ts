@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
+import { requiredEnv } from '../../../env/required.ts';
 
 console.log('ML Token Renewal Service initialized');
 
@@ -44,7 +45,7 @@ serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
-  checkEnv();
+  checkEnv(requiredEnv.edge.mlTokenRenewal);
 
   setupLogger(req.headers);
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

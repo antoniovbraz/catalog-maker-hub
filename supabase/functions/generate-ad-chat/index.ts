@@ -5,12 +5,13 @@ import { generateAdChatSchema } from '../shared/schemas.ts';
 import { setupLogger } from '../shared/logger.ts';
 import { corsHeaders, handleCors } from '../shared/cors.ts';
 import { checkEnv } from '../../../edges/_shared/checkEnv.ts';
+import { requiredEnv } from '../../../env/required.ts';
 
 serve(async (req) => {
   const corsResponse = handleCors(req);
   if (corsResponse) return corsResponse;
 
-  checkEnv();
+  checkEnv(requiredEnv.edge.generateAdChat);
 
   setupLogger(req.headers);
   try {
