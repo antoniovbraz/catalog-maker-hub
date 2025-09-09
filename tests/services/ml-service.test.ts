@@ -115,6 +115,62 @@ describe('MLService', () => {
       expect(result.updated).toBe(2);
       expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'import_from_ml', {}, {});
     });
+
+    it('deve obter status de sincronização', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({
+        total_products: 10,
+        synced_products: 5,
+        pending_products: 3,
+        error_products: 2,
+        last_sync: '2023-01-01',
+        successful_24h: 4,
+        failed_24h: 1,
+        total_24h: 5,
+        health_status: 'good',
+        products: [],
+      });
+
+      const status = await MLService.getSyncStatus();
+
+      expect(status.total_products).toBe(10);
+      expect(status.total).toBe(10);
+      expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'get_status', {}, {});
+    });
+
+    it('deve lançar erro para status inválido', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({ total_products: 'invalid' });
+
+      await expect(MLService.getSyncStatus()).rejects.toThrow('Invalid sync status response');
+    });
+
+    it('deve obter produtos do ML', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({
+        products: [{ id: '1', name: 'P1', sync_status: 'pending' }],
+      });
+
+      const products = await MLService.getMLProducts();
+
+      expect(products.length).toBe(1);
+      expect(callMLFunction).toHaveBeenCalledWith('ml-sync-v2', 'get_products', {}, {});
+    });
+
+    it('deve lançar erro para produtos inválidos', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({ products: [{ id: 1 }] });
+
+      await expect(MLService.getMLProducts()).rejects.toThrow('Invalid products response');
+    });
+
+    it('deve lançar erro para resposta inválida de sync_batch', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({ success: 1 });
+
+      await expect(MLService.syncBatch(['p1'])).rejects.toThrow('Invalid batch sync response');
+    });
+
+    it('deve lançar erro para import_from_ml inválido', async () => {
+      vi.mocked(callMLFunction).mockResolvedValue({ created: 'five' });
+
+      await expect(MLService.importFromML()).rejects.toThrow('Invalid import response');
+    });
   });
 
   describe('Utility Functions', () => {

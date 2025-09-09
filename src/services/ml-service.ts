@@ -5,9 +5,19 @@ import {
   type MLAdvancedSettings,
 } from '@/types/ml/advanced-settings';
 import { mlAuthStatusResponseSchema } from '@/types/ml/auth';
+import {
+  mlSyncStatusResponseSchema,
+  mlProductsResponseSchema,
+  mlBatchSyncResultSchema,
+  mlImportResultSchema,
+  type MLSyncProduct,
+  type MLBatchSyncResult,
+} from '@/types/ml/sync';
 import { ZodError } from 'zod';
 
 // ==================== TIPOS ====================
+
+export type { MLSyncProduct, MLBatchSyncResult };
 
 export interface MLSyncStatus {
   total_products: number;
@@ -27,27 +37,6 @@ export interface MLSyncStatus {
   error?: number;
   status_counts?: MLSyncStatus;
   products?: MLSyncProduct[];
-}
-
-export interface MLSyncProduct {
-  id: string;
-  name: string;
-  sku?: string;
-  description?: string;
-  cost_unit?: number;
-  image_url?: string;
-  ml_item_id?: string | null;
-  ml_permalink?: string | null;
-  ml_price?: number;
-  sync_status: 'pending' | 'syncing' | 'synced' | 'error' | 'not_synced';
-  last_sync?: string | null;
-  last_sync_at?: string | null;
-  error_message?: string | null;
-}
-
-export interface MLBatchSyncResult {
-  successful: number;
-  failed: number;
 }
 
 export interface MLAuthStatus {
@@ -146,36 +135,50 @@ export class MLService {
   // ====== SINCRONIZAÇÃO ======
 
   static async getSyncStatus(): Promise<MLSyncStatus> {
-    const data = await callMLFunction('ml-sync-v2', 'get_status', {}, {}) as Record<string, unknown>;
+    try {
+      const raw = await callMLFunction('ml-sync-v2', 'get_status', {}, {});
+      const data = mlSyncStatusResponseSchema.parse(raw);
 
-    const baseStatus = {
-      total_products: (data?.total_products as number) || 0,
-      synced_products: (data?.synced_products as number) || 0,
-      pending_products: (data?.pending_products as number) || 0,
-      error_products: (data?.error_products as number) || 0,
-      last_sync: (data?.last_sync as string) || null,
-      successful_24h: (data?.successful_24h as number) || 0,
-      failed_24h: (data?.failed_24h as number) || 0,
-      total_24h: (data?.total_24h as number) || 0,
-      health_status: (data?.health_status as string) || 'unknown',
-    };
+      const baseStatus = {
+        total_products: data.total_products,
+        synced_products: data.synced_products,
+        pending_products: data.pending_products,
+        error_products: data.error_products,
+        last_sync: data.last_sync,
+        successful_24h: data.successful_24h,
+        failed_24h: data.failed_24h,
+        total_24h: data.total_24h,
+        health_status: data.health_status,
+      };
 
-    return {
-      ...baseStatus,
-      // Aliases para compatibilidade
-      total: baseStatus.total_products,
-      synced: baseStatus.synced_products,
-      pending: baseStatus.pending_products,
-      error: baseStatus.error_products,
-      status_counts: baseStatus,
-      products: []
-    };
+      return {
+        ...baseStatus,
+        total: baseStatus.total_products,
+        synced: baseStatus.synced_products,
+        pending: baseStatus.pending_products,
+        error: baseStatus.error_products,
+        status_counts: baseStatus,
+        products: data.products ?? [],
+      };
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error('Invalid sync status response');
+      }
+      throw error;
+    }
   }
 
   static async getMLProducts(): Promise<MLSyncProduct[]> {
-    const data = await callMLFunction('ml-sync-v2', 'get_products', {}, {}) as { products?: MLSyncProduct[] };
-
-    return data?.products || [];
+    try {
+      const raw = await callMLFunction('ml-sync-v2', 'get_products', {}, {});
+      const data = mlProductsResponseSchema.parse(raw);
+      return data.products;
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error('Invalid products response');
+      }
+      throw error;
+    }
   }
 
   static async syncProduct(productId: string): Promise<void> {
@@ -183,12 +186,15 @@ export class MLService {
   }
 
   static async syncBatch(productIds: string[]): Promise<MLBatchSyncResult> {
-    const data = await callMLFunction('ml-sync-v2', 'sync_batch', { product_ids: productIds }, {}) as { successful?: number; failed?: number };
-
-    return {
-      successful: data?.successful ?? 0,
-      failed: data?.failed ?? 0
-    };
+    try {
+      const raw = await callMLFunction('ml-sync-v2', 'sync_batch', { product_ids: productIds }, {});
+      return mlBatchSyncResultSchema.parse(raw);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error('Invalid batch sync response');
+      }
+      throw error;
+    }
   }
 
   static async resyncProduct(productId: string): Promise<void> {
@@ -213,15 +219,15 @@ export class MLService {
   }
 
   static async importFromML(): Promise<{ created: number; updated: number }> {
-    const data = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {}) as {
-      created?: number;
-      updated?: number;
-    };
-
-    return {
-      created: data?.created || 0,
-      updated: data?.updated || 0,
-    };
+    try {
+      const raw = await callMLFunction('ml-sync-v2', 'import_from_ml', {}, {});
+      return mlImportResultSchema.parse(raw);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new Error('Invalid import response');
+      }
+      throw error;
+    }
   }
 
   static async linkProduct(productId: string, mlItemId: string): Promise<void> {
