@@ -68,7 +68,7 @@ export async function importFromML(
       }
 
       const data = await response.json();
-      const items = Array.from(new Set(data.results || []));
+      const items = Array.from(new Set((data.results || []) as string[]));
       const total = data.paging?.total ?? 0;
 
       if (items.length === 0) break;
@@ -77,7 +77,7 @@ export async function importFromML(
       for (let i = 0; i < items.length; i += 5) {
         const batch = items.slice(i, i + 5);
         const batchResults = await Promise.allSettled(
-          batch.map((itemId: string) => processMLItem(itemId, { supabase, tenantId, mlToken }))
+          batch.map((itemId) => processMLItem(itemId, { supabase, tenantId, mlToken }))
         );
         
         batchResults.forEach((result, index) => {

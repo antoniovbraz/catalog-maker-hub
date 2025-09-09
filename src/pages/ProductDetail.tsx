@@ -327,9 +327,7 @@ export default function ProductDetail() {
 
           <Card>
             <CardHeader>
-              <CardTitle>
-                Custos e Impostos
-              </CardTitle>
+              <CardTitle>Custos e Impostos</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-4 gap-4">
