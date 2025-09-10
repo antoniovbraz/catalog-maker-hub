@@ -11,6 +11,7 @@ import {
   Weight,
   AlertTriangle,
   Info,
+  Calculator,
 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +29,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
 import { useGlobalModal } from "@/hooks/useGlobalModal";
 import { formatarMoeda } from "@/utils/pricing";
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/useAuth';
 
 // Type definitions
 interface MLSyncLog {
@@ -196,7 +197,7 @@ export default function ProductDetail() {
   };
 
   // Helper function to safely render dimensions
-  const renderDimension = (value: unknown, unit: string = 'cm'): string => {
+  const renderDimension = (value: number | string | null | undefined, unit: string = 'cm'): string => {
     if (typeof value === 'number') return `${value} ${unit}`;
     if (typeof value === 'string') return `${value} ${unit}`;
     return '-';
@@ -341,7 +342,7 @@ export default function ProductDetail() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Taxa de Imposto</label>
-                  <p className="text-lg font-semibold">{typeof product.tax_rate === 'number' ? product.tax_rate : 0}%</p>
+                  <p className="text-lg font-semibold">{String(typeof product.tax_rate === 'number' ? product.tax_rate : 0)}%</p>
                 </div>
               </div>
             </CardContent>
