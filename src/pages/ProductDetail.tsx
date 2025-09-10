@@ -326,7 +326,7 @@ export default function ProductDetail() {
             </CardContent>
           </Card>
 
-          <Card>
+          <div>
             <CardHeader>
               <CardTitle>Custos e Impostos</CardTitle>
             </CardHeader>
