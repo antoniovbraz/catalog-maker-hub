@@ -1,4 +1,8 @@
+import { config } from 'dotenv';
 import { requiredEnv } from '../env/required.ts';
+
+// Load environment variables from .env file
+config();
 
 function checkEnv(vars: readonly string[], runtime: string) {
   const missing = vars.filter((name) => !process.env[name]);
