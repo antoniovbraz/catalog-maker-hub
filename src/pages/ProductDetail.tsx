@@ -27,7 +27,7 @@ import { useMLProductResync } from "@/hooks/useMLProductResync";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ProductSourceBadge } from "@/components/common/ProductSourceBadge";
-import { useGlobalModal } from "@/hooks/useGlobalModal";
+import { useModal } from "@/contexts/ModalContext";
 import { formatarMoeda } from "@/utils/pricing";
 import { useAuth } from '@/contexts/useAuth';
 
@@ -37,14 +37,6 @@ interface MLSyncLog {
   status: string;
   operation_type: string;
   created_at: string;
-}
-
-interface MLProduct {
-  id: string;
-  title: string;
-  price?: number;
-  available_quantity?: number;
-  attribute_combinations?: { name: string; value_name: string }[];
 }
 
 interface ProductPriceInfo {
@@ -61,7 +53,7 @@ interface Dimensions {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const globalModal = useGlobalModal();
+  const { openModal } = useModal();
   const { profile } = useAuth();
   const tenantId = profile?.tenant_id;
 
@@ -103,12 +95,12 @@ export default function ProductDetail() {
   });
 
   // Find ML product data
-  const mlProduct = mlProducts.find((p) => p.id === product?.ml_item_id);
+  const mlProduct = mlProducts.find((p) => p.ml_item_id === product?.ml_item_id);
 
   // Get price information with source
   const getPriceInfo = (): ProductPriceInfo | null => {
-    if (mlProduct?.price) {
-      return { price: mlProduct.price, source: 'ml' };
+    if (mlProduct?.ml_price) {
+      return { price: mlProduct.ml_price, source: 'ml' };
     }
     if (product?.price) {
       return { price: product.price, source: 'product' };
@@ -148,16 +140,14 @@ export default function ProductDetail() {
   const latestActivity = syncLogs?.[0] ? formatLatestActivity(syncLogs[0]) : null;
 
   const handleEdit = () => {
-    globalModal.openModal('productForm', { 
-      productId: id, 
-      mode: 'edit'
-    });
+    // TODO: Implement product edit modal
+    console.log('Edit product:', id);
   };
 
   const handleRefresh = async () => {
     if (id && tenantId) {
       try {
-        await resyncProduct.mutateAsync({ productId: id });
+        resyncProduct.resyncProduct.mutate({ productId: id });
       } catch (error) {
         console.error("Error resyncing product:", error);
       }
@@ -165,11 +155,13 @@ export default function ProductDetail() {
   };
 
   const handleSyncToML = async () => {
-    globalModal.openModal('mlAdvertiseModal', { productId: id });
+    // TODO: Implement ML advertise modal
+    console.log('Sync to ML:', id);
   };
 
   const handleCalculatePrice = () => {
-    globalModal.openModal('pricingCalculator', { productId: id });
+    // TODO: Implement pricing calculator modal
+    console.log('Calculate price for:', id);
   };
 
   const formatWeight = (w: number) => {
@@ -218,9 +210,9 @@ export default function ProductDetail() {
                   <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
                   <ProductSourceBadge source={product.source} />
                 </div>
-                {product.category_name && (
+                {product.category_id && (
                   <p className="text-muted-foreground">
-                    Categoria: {product.category_name}
+                    Categoria: {product.category_id}
                   </p>
                 )}
               </div>
@@ -234,9 +226,9 @@ export default function ProductDetail() {
                     <Button 
                       variant="outline" 
                       onClick={handleRefresh}
-                      disabled={resyncProduct.isPending}
+                      disabled={resyncProduct.resyncProduct.isPending}
                     >
-                      <RefreshCw className={`size-4 mr-2 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`size-4 mr-2 ${resyncProduct.resyncProduct.isPending ? 'animate-spin' : ''}`} />
                       Sincronizar
                     </Button>
                     <Button onClick={handleSyncToML}>
@@ -285,10 +277,10 @@ export default function ProductDetail() {
                       </div>
                     )}
 
-                    {mlProduct?.available_quantity !== undefined && (
+                    {product.ml_available_quantity !== undefined && (
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Estoque ML</label>
-                        <p className="text-lg font-semibold">{mlProduct.available_quantity} unidades</p>
+                        <p className="text-lg font-semibold">{product.ml_available_quantity} unidades</p>
                       </div>
                     )}
 
@@ -378,7 +370,7 @@ export default function ProductDetail() {
                         {productImages.map((image, index) => (
                           <div key={index} className="aspect-square rounded-lg overflow-hidden border">
                             <img
-                              src={image.url}
+                              src={image.image_url}
                               alt={`Imagem ${index + 1} do produto`}
                               className="w-full h-full object-cover"
                             />
@@ -465,9 +457,9 @@ export default function ProductDetail() {
                         variant="outline" 
                         className="w-full justify-start"
                         onClick={handleRefresh}
-                        disabled={resyncProduct.isPending}
+                        disabled={resyncProduct.resyncProduct.isPending}
                       >
-                        <RefreshCw className={`size-4 mr-2 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`size-4 mr-2 ${resyncProduct.resyncProduct.isPending ? 'animate-spin' : ''}`} />
                         Sincronizar ML
                       </Button>
                     )}
