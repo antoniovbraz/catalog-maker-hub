@@ -1,0 +1,86 @@
+{
+  "platform": "lovable",
+  "project_type": "saas_marketplace_pricing",
+  "architecture": {
+    "type": "serverless",
+    "frontend": "react-spa",
+    "backend": "supabase-edge-functions",
+    "database": "postgresql-rls"
+  },
+  "technology_constraints": {
+    "frontend": {
+      "allowed": ["react", "typescript", "vite", "tailwindcss", "shadcn-ui"],
+      "prohibited": ["next.js", "angular", "vue", "svelte", "webpack", "css-in-js"]
+    },
+    "backend": {
+      "allowed": ["supabase-edge-functions", "deno"],
+      "prohibited": ["node.js", "express", "fastify", "nestjs", "django", "rails"]
+    },
+    "database": {
+      "allowed": ["postgresql", "supabase"],
+      "prohibited": ["mongodb", "mysql", "sqlite", "redis-primary"]
+    },
+    "styling": {
+      "allowed": ["tailwindcss", "shadcn-ui", "css-custom"],
+      "prohibited": ["styled-components", "emotion", "bootstrap", "material-ui"]
+    }
+  },
+  "development_methodology": {
+    "name": "vibe-code",
+    "principles": [
+      "code-first-polish-later",
+      "progressive-enhancement", 
+      "real-world-ready",
+      "ship-fast-code-smart"
+    ]
+  },
+  "security_requirements": {
+    "rls_mandatory": true,
+    "auth_provider": "supabase",
+    "secrets_management": "supabase-vault"
+  },
+  "file_structure": {
+    "src/components/ui/": "readonly-shadcn",
+    "src/services/": "supabase-layer",
+    "src/hooks/": "react-query-hooks",
+    "src/types/": "typescript-definitions"
+  },
+  "environment_variables": {
+    "public_prefix": "VITE_",
+    "private_storage": "supabase-secrets",
+    "prohibited_in_env": [
+      "API_KEYS",
+      "DATABASE_PASSWORDS", 
+      "PRIVATE_TOKENS",
+      "WEBHOOK_SECRETS"
+    ]
+  },
+  "quality_gates": {
+    "typescript_strict": true,
+    "rls_policies": "required",
+    "edge_functions_only": true,
+    "react_query_state": true
+  },
+  "ai_instructions": {
+    "always_check": [
+      "Is this using React + TypeScript + Vite?",
+      "Are we using Edge Functions for backend?",
+      "Are RLS policies implemented?",
+      "Are secrets properly managed?",
+      "Does this follow Vibe Code methodology?"
+    ],
+    "never_suggest": [
+      "Node.js backend setup",
+      "Express server creation",
+      "Custom CSS-in-JS solutions",
+      "Alternative frameworks",
+      "Secrets in .env files"
+    ]
+  },
+  "project_specifics": {
+    "domain": "marketplace_pricing_calculator",
+    "key_entities": ["products", "marketplaces", "categories", "commissions", "sales"],
+    "business_logic": "pricing_formulas_margin_calculations",
+    "integrations": ["mercado_livre_api"]
+  }
+}
