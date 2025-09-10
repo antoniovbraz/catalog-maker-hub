@@ -39,15 +39,9 @@ interface MLSyncLog {
   created_at: string;
 }
 
-interface MLAttribute {
-  id?: string;
-  name?: string;
-  value_name?: string;
-  value_id?: string;
-}
-
-interface MLVariation {
-  id?: string;
+interface MLProduct {
+  id: string;
+  title: string;
   price?: number;
   available_quantity?: number;
   attribute_combinations?: { name: string; value_name: string }[];
@@ -102,92 +96,81 @@ export default function ProductDetail() {
         console.error('Error fetching sync logs:', error);
         return [];
       }
+      
       return data || [];
     },
-    enabled: !!id && !!tenantId,
+    enabled: !!id,
   });
 
-  // Product price info query  
-  const { data: _priceInfo } = useQuery<ProductPriceInfo>({
-    queryKey: ['product_price_info', tenantId, id],
-    queryFn: async () => {
-      if (!product) return { price: 0, source: 'product' as const };
-      
-      const mlProduct = mlProducts.find(ml => ml.id === product.id);
-      if (mlProduct && mlProduct.ml_price) {
-        return { price: mlProduct.ml_price, source: 'ml' as const };
-      }
-      
-      return { 
-        price: typeof product.cost_unit === 'number' ? product.cost_unit : 0, 
-        source: 'product' as const 
-      };
-    },
-    enabled: !!product,
-  });
+  // Find ML product data
+  const mlProduct = mlProducts.find((p) => p.id === product?.ml_item_id);
 
-  // Event handlers
+  // Get price information with source
+  const getPriceInfo = (): ProductPriceInfo | null => {
+    if (mlProduct?.price) {
+      return { price: mlProduct.price, source: 'ml' };
+    }
+    if (product?.price) {
+      return { price: product.price, source: 'product' };
+    }
+    return null;
+  };
+
+  const priceInfo = getPriceInfo();
+
+  const formatLatestActivity = (activity: MLSyncLog) => {
+    if (!activity) return null;
+    
+    const date = format(new Date(activity.created_at), "dd/MM/yyyy 'às' HH:mm", {
+      locale: ptBR,
+    });
+    
+    const statusMap: { [key: string]: string } = {
+      'success': 'Sucesso',
+      'error': 'Erro',
+      'pending': 'Pendente',
+      'in_progress': 'Em Progresso'
+    };
+    
+    const operationMap: { [key: string]: string } = {
+      'sync': 'Sincronização',
+      'create': 'Criação',
+      'update': 'Atualização'
+    };
+    
+    return {
+      date,
+      status: statusMap[activity.status] || activity.status,
+      operation: operationMap[activity.operation_type] || activity.operation_type
+    };
+  };
+
+  const latestActivity = syncLogs?.[0] ? formatLatestActivity(syncLogs[0]) : null;
+
   const handleEdit = () => {
-    if (product) {
-      globalModal.showFormModal({
-        title: 'Editar Produto',
-        content: <div>Editar produto {product.name}</div>,
-        onSave: () => Promise.resolve(),
-      });
+    globalModal.openModal('productForm', { 
+      productId: id, 
+      mode: 'edit'
+    });
+  };
+
+  const handleRefresh = async () => {
+    if (id && tenantId) {
+      try {
+        await resyncProduct.mutateAsync({ productId: id });
+      } catch (error) {
+        console.error("Error resyncing product:", error);
+      }
     }
   };
 
-  const handleResync = () => {
-    if (product?.id) {
-      resyncProduct.resyncProduct.mutate({ productId: product.id });
-    }
+  const handleSyncToML = async () => {
+    globalModal.openModal('mlAdvertiseModal', { productId: id });
   };
 
-  // Loading and error states
-  if (isLoadingProducts) {
-    return (
-      <div className="container mx-auto p-6">
-        <Skeleton className="mb-6 h-8 w-48" />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            <Skeleton className="h-64" />
-            <Skeleton className="h-48" />
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-32" />
-            <Skeleton className="h-48" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="container mx-auto p-6">
-        <Button
-          variant="outline"
-          onClick={() => navigate('/produtos')}
-          className="mb-6"
-        >
-          Voltar para Produtos
-        </Button>
-      </div>
-    );
-  }
-
-  const attributes: MLAttribute[] = Array.isArray(product.ml_attributes)
-    ? (product.ml_attributes as MLAttribute[])
-    : [];
-
-  const variations: MLVariation[] = Array.isArray(product.ml_variations)
-    ? (product.ml_variations as MLVariation[])
-    : [];
-
-  const mlProduct = mlProducts.find(ml => ml.id === product.id);
-  const hasIncompleteData =
-    product.source === 'mercado_livre' &&
-    (!product.description || !product.ml_seller_sku || !product.brand);
+  const handleCalculatePrice = () => {
+    globalModal.openModal('pricingCalculator', { productId: id });
+  };
 
   const formatWeight = (w: number) => {
     if (w >= 1000) {
@@ -203,392 +186,332 @@ export default function ProductDetail() {
     return '-';
   };
 
-  // Check if token is expiring (30 days)
-  const isTokenExpiring = false; // Simplified for now
-
   return (
-    <div className="container mx-auto p-6">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/produtos')}
-          >
-            Voltar para Produtos
-          </Button>
-          <h1 className="text-2xl font-bold">Detalhes do Produto</h1>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleEdit}>
-            <Edit className="mr-2 size-4" />
-            Editar
-          </Button>
-          {isConnected && product.source === 'mercado_livre' && (
-            <Button
-              variant="secondary"
-              onClick={handleResync}
-              disabled={resyncProduct.resyncProduct.isPending}
-            >
-              <RefreshCw className={`mr-2 size-4 ${resyncProduct.resyncProduct.isPending ? "animate-spin" : ""}`} />
-              {resyncProduct.resyncProduct.isPending ? "Re-sincronizando..." : "Re-sincronizar"}
-            </Button>
-          )}
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Loading state */}
+        {isLoadingProducts && (
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+        )}
 
-      {/* Alerts */}
-      {isTokenExpiring && (
-        <Alert className="mb-6">
-          <AlertTriangle className="size-4" />
-          <AlertDescription>
-            Seu token do Mercado Livre expira em menos de 30 dias. Considere renovar sua integração.
-          </AlertDescription>
-        </Alert>
-      )}
+        {/* Product not found */}
+        {!isLoadingProducts && !product && (
+          <Alert>
+            <AlertTriangle className="size-4" />
+            <AlertDescription>
+              Produto não encontrado ou você não tem acesso a ele.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {hasIncompleteData && (
-        <Alert className="mb-6">
-          <Info className="size-4" />
-          <AlertDescription>
-            Este produto importado do Mercado Livre possui dados incompletos. 
-            Considere completar as informações manualmente.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Main Content */}
-        <div className="space-y-6 lg:col-span-2">
-          {/* Basic Information Card */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <CardTitle className="flex items-center gap-3">
-                    <Box className="size-5" />
-                    <span className="text-xl">{product.name}</span>
-                  </CardTitle>
-                  <div className="mt-2 flex items-center gap-2">
-                    <ProductSourceBadge source={product.source} />
-                    {product.ml_seller_sku && (
-                      <Badge variant="outline">
-                        SKU ML: {product.ml_seller_sku}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Nome</label>
-                <p className="font-medium">{product.name}</p>
-              </div>
-
-              {product.ml_seller_sku && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">SKU ML</label>
-                  <p>{product.ml_seller_sku}</p>
-                </div>
-              )}
-
-              <Separator />
-
-              {product.description && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Descrição</label>
-                  <p className="mt-1 text-sm leading-relaxed">{product.description}</p>
-                </div>
-              )}
-
-              {product.brand && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Marca</label>
-                  <p>{typeof product.brand === 'string' ? product.brand : "Não informado"}</p>
-                </div>
-              )}
-
-              {product.model && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Modelo</label>
-                  <p>{typeof product.model === 'string' ? product.model : "Não informado"}</p>
-                </div>
-              )}
-
-              {product.warranty && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Garantia</label>
-                  <p>{typeof product.warranty === 'string' ? product.warranty : "Não informado"}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <div>
-            <CardHeader>
-              <CardTitle>Custos e Impostos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-4 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
-                  <p className="text-lg font-semibold">{formatarMoeda(typeof product.cost_unit === 'number' ? product.cost_unit : 0)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Custo de Embalagem</label>
-                  <p className="text-lg font-semibold">{formatarMoeda(typeof product.packaging_cost === 'number' ? product.packaging_cost : 0)}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Taxa de Imposto</label>
-                  <p className="text-lg font-semibold">{String(typeof product.tax_rate === 'number' ? product.tax_rate : 0)}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Dimensões e Peso */}
-          {(product.weight || product.dimensions) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Ruler className="size-5" />
-                  Dimensões e Peso
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {product.weight && (
-                    <div>
-                      <label className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                        <Weight className="size-3" />
-                        Peso
-                      </label>
-                      <p>{typeof product.weight === 'number' ? formatWeight(product.weight) : "Não informado"}</p>
-                    </div>
-                  )}
-                  {dimensions?.length && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
-                      <p>{renderDimension(dimensions?.length)}</p>
-                    </div>
-                  )}
-                  {dimensions?.width && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Largura</label>
-                      <p>{renderDimension(dimensions?.width)}</p>
-                    </div>
-                  )}
-                  {dimensions?.height && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Altura</label>
-                      <p>{renderDimension(dimensions?.height)}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Imagens do Produto */}
-          {productImages.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Imagens do Produto</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {productImages.map((image, index) => (
-                    <div key={image.id} className="overflow-hidden rounded-lg border">
-                      <img
-                        src={image.image_url}
-                        alt={`${product.name} - Imagem ${index + 1}`}
-                        className="h-32 w-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Atributos ML */}
-          {attributes.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Atributos ML</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-2">
-                  {attributes.map((attr, index) => (
-                    <div
-                      key={attr.id || attr.name || index}
-                      className="flex justify-between text-sm"
-                    >
-                      <span className="font-medium">{attr.name || attr.id || "N/A"}</span>
-                      <span>{attr.value_name || attr.value_id || '-'}</span>
-                    </div>
-                  ))}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Variações ML */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Variações ML</CardTitle>
-            </CardHeader>
-            <CardContent>
+        {/* Product found */}
+        {!isLoadingProducts && product && (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between">
               <div className="space-y-2">
-                {variations.length > 0 ? (
-                  variations.map((variation, index) => (
-                    <div
-                      key={variation.id || index}
-                      className="rounded-md border p-2 text-sm"
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
+                  <ProductSourceBadge source={product.source} />
+                </div>
+                {product.category_name && (
+                  <p className="text-muted-foreground">
+                    Categoria: {product.category_name}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleEdit}>
+                  <Edit className="size-4 mr-2" />
+                  Editar
+                </Button>
+                {isConnected && (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleRefresh}
+                      disabled={resyncProduct.isPending}
                     >
-                      {variation.attribute_combinations && (
-                        <div className="mb-1">
-                          {variation.attribute_combinations.map((comb, idx) => (
-                            <div key={idx}>{`${comb.name}: ${comb.value_name}`}</div>
-                          ))}
+                      <RefreshCw className={`size-4 mr-2 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+                      Sincronizar
+                    </Button>
+                    <Button onClick={handleSyncToML}>
+                      Anunciar no ML
+                    </Button>
+                  </>
+                )}
+                <Button variant="secondary" onClick={handleCalculatePrice}>
+                  Calcular Preço
+                </Button>
+              </div>
+            </div>
+
+            {/* Main content grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left column - Product details */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Product information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informações do Produto</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {product.description && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Descrição</label>
+                        <p className="mt-1">{product.description}</p>
+                      </div>
+                    )}
+                    
+                    {product.sku && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">SKU</label>
+                        <p className="font-mono">{product.sku}</p>
+                      </div>
+                    )}
+
+                    {priceInfo && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Preço {priceInfo.source === 'ml' ? '(Mercado Livre)' : '(Produto)'}
+                        </label>
+                        <p className="text-2xl font-bold text-green-600">
+                          {formatarMoeda(priceInfo.price)}
+                        </p>
+                      </div>
+                    )}
+
+                    {mlProduct?.available_quantity !== undefined && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Estoque ML</label>
+                        <p className="text-lg font-semibold">{mlProduct.available_quantity} unidades</p>
+                      </div>
+                    )}
+
+                    {product.warranty && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Garantia</label>
+                        <p>{typeof product.warranty === 'string' ? product.warranty : "Não informado"}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Costs and Taxes Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Custos e Impostos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-4 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Custo Unitário</label>
+                        <p className="text-lg font-semibold">{formatarMoeda(typeof product.cost_unit === 'number' ? product.cost_unit : 0)}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Custo de Embalagem</label>
+                        <p className="text-lg font-semibold">{formatarMoeda(typeof product.packaging_cost === 'number' ? product.packaging_cost : 0)}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Taxa de Imposto</label>
+                        <p className="text-lg font-semibold">{String(typeof product.tax_rate === 'number' ? product.tax_rate : 0)}%</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Dimensions and Weight */}
+                {(dimensions || typeof product.weight === 'number') && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Ruler className="size-4" />
+                        Dimensões e Peso
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {typeof product.weight === 'number' && (
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                              <Weight className="size-3" />
+                              Peso
+                            </label>
+                            <p>{formatWeight(product.weight)}</p>
+                          </div>
+                        )}
+                        {dimensions?.length && (
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Comprimento</label>
+                            <p>{renderDimension(dimensions.length)}</p>
+                          </div>
+                        )}
+                        {dimensions?.width && (
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Largura</label>
+                            <p>{renderDimension(dimensions.width)}</p>
+                          </div>
+                        )}
+                        {dimensions?.height && (
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Altura</label>
+                            <p>{renderDimension(dimensions.height)}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Product Images */}
+                {productImages.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Imagens do Produto</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {productImages.map((image, index) => (
+                          <div key={index} className="aspect-square rounded-lg overflow-hidden border">
+                            <img
+                              src={image.url}
+                              alt={`Imagem ${index + 1} do produto`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              {/* Right column - ML Integration status */}
+              <div className="space-y-6">
+                {/* ML Status */}
+                {isConnected && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Info className="size-4" />
+                        Status Mercado Livre
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {product.ml_item_id ? (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Status</span>
+                            <Badge variant="secondary">Sincronizado</Badge>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">ID do Item</span>
+                            <span className="font-mono text-sm">{product.ml_item_id}</span>
+                          </div>
+                          {latestActivity && (
+                            <div className="space-y-2">
+                              <span className="text-sm text-muted-foreground">Última Atividade</span>
+                              <div className="text-sm">
+                                <p>{latestActivity.operation} - {latestActivity.status}</p>
+                                <p className="text-muted-foreground">{latestActivity.date}</p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Produto não sincronizado com o Mercado Livre
+                          </p>
+                          <Button size="sm" onClick={handleSyncToML}>
+                            Anunciar no ML
+                          </Button>
                         </div>
                       )}
-                      {variation.price && (
-                        <div>Preço: {formatarMoeda(variation.price)}</div>
-                      )}
-                      {variation.available_quantity !== undefined && (
-                        <div>Quantidade: {variation.available_quantity}</div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm">ID da variação: {product.ml_variation_id}</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Status Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Info className="size-5" />
-                Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <ProductSourceBadge 
-                source={product.source} 
-              />
-              {product.category_id && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Categoria</label>
-                  <p className="text-sm">
-                    Categoria: {product.category_id}
-                  </p>
-                </div>
-              )}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Data de Criação</label>
-                <div className="flex items-center gap-1 text-sm">
-                  <Calendar className="size-3" />
-                  <span>{format(new Date(product.created_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Última Atualização</label>
-                <span>{format(new Date(product.updated_at), 'dd/MM/yyyy', { locale: ptBR })}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ML Product Info */}
-          {mlProduct && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Informações ML</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">ID do Item ML</label>
-                  <p className="font-mono text-sm">{mlProduct.ml_item_id}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Estoque Disponível</label>
-                    <p>{typeof product.ml_available_quantity === 'number' ? product.ml_available_quantity : 0}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Vendidos</label>
-                    <p>{typeof product.ml_sold_quantity === 'number' ? product.ml_sold_quantity : 0}</p>
-                  </div>
-                </div>
-
-                <Separator />
-                
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Última Sincronização</label>
-                  <p className="text-sm">{mlProduct.last_sync_at ? format(new Date(mlProduct.last_sync_at), 'dd/MM/yyyy HH:mm', { locale: ptBR }) : "Nunca sincronizado"}</p>
-                </div>
-
-                {mlProduct.ml_permalink && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => window.open(mlProduct.ml_permalink!, '_blank')}
-                  >
-                    Ver no ML
-                  </Button>
+                    </CardContent>
+                  </Card>
                 )}
 
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="w-full"
-                  onClick={handleResync}
-                  disabled={resyncProduct.resyncProduct.isPending}
-                >
-                  <RefreshCw className={`mr-2 size-4 ${resyncProduct.resyncProduct.isPending ? "animate-spin" : ""}`} />
-                  {resyncProduct.resyncProduct.isPending ? "Re-sincronizando..." : "Re-sincronizar"}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+                {/* Quick actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Ações Rápidas</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start" 
+                      onClick={handleCalculatePrice}
+                    >
+                      <Calculator className="size-4 mr-2" />
+                      Calcular Preço
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start" 
+                      onClick={handleEdit}
+                    >
+                      <Edit className="size-4 mr-2" />
+                      Editar Produto
+                    </Button>
+                    
+                    {isConnected && product.ml_item_id && (
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start"
+                        onClick={handleRefresh}
+                        disabled={resyncProduct.isPending}
+                      >
+                        <RefreshCw className={`size-4 mr-2 ${resyncProduct.isPending ? 'animate-spin' : ''}`} />
+                        Sincronizar ML
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
 
-          {/* Sync Logs */}
-          {syncLogs.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Histórico de Sincronizações</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="max-h-64 space-y-2 overflow-y-auto">
-                  {syncLogs.map((log) => (
-                    <div key={log.id} className="rounded border p-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <Badge
-                          variant={log.status === "success" ? "default" : "destructive"}
-                          className="text-xs"
-                        >
-                          {log.status}
-                        </Badge>
-                        <span className="text-muted-foreground">
-                          {format(new Date(log.created_at), 'dd/MM HH:mm', { locale: ptBR })}
-                        </span>
+                {/* Recent sync history */}
+                {syncLogs.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Calendar className="size-4" />
+                        Histórico de Sincronização
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {syncLogs.slice(0, 5).map((log) => {
+                          const activity = formatLatestActivity(log);
+                          if (!activity) return null;
+                          
+                          return (
+                            <div key={log.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                              <div>
+                                <p className="text-sm font-medium">{activity.operation}</p>
+                                <p className="text-xs text-muted-foreground">{activity.date}</p>
+                              </div>
+                              <Badge 
+                                variant={log.status === 'success' ? 'default' : 'destructive'}
+                                className="text-xs"
+                              >
+                                {activity.status}
+                              </Badge>
+                            </div>
+                          );
+                        })}
                       </div>
-                      <p className="mt-1">{log.operation_type}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
