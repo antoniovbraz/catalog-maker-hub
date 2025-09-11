@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { callMLFunction } from '@/utils/ml/ml-api';
+import { logger } from '@/lib/logger';
 import {
   mlAdvancedSettingsSchema,
   type MLAdvancedSettings,
@@ -72,7 +73,9 @@ export class MLService {
         expires_at: data.expires_at ?? undefined,
       };
     } catch (error) {
-      console.error('ML Auth Status Exception:', error);
+      logger.error('MLService.getAuthStatus', 'Auth status check failed', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
       const message = error instanceof ZodError
         ? 'Invalid auth status response'
         : error instanceof Error
@@ -205,15 +208,18 @@ export class MLService {
     let successful = 0;
     let failed = 0;
 
-    for (const id of productIds) {
-      try {
-        await MLService.resyncProduct(id);
-        successful++;
-      } catch (err) {
-        console.error('Failed to re-sync product:', id, err);
-        failed++;
+      for (const id of productIds) {
+        try {
+          await MLService.resyncProduct(id);
+          successful++;
+        } catch (err) {
+          logger.error('MLService.resyncBatch', 'Failed to resync product', {
+            productId: id,
+            error: err instanceof Error ? err.message : 'Unknown error'
+          });
+          failed++;
+        }
       }
-    }
 
     return { successful, failed };
   }
@@ -306,7 +312,10 @@ export class MLService {
     });
 
     if (error) {
-      console.error('Rate limit check error:', error);
+      logger.error('MLService.checkRateLimit', 'Rate limit check failed', {
+        operationType,
+        error: error.message
+      });
       return false;
     }
 

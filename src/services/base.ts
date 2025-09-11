@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
+import { logger } from "@/lib/logger";
 
 export abstract class BaseService<T = Record<string, unknown>> {
   protected tableName: string;
@@ -80,8 +81,12 @@ export abstract class BaseService<T = Record<string, unknown>> {
   }
 
   protected handleError(error: PostgrestError, operation: string): never {
-    // CORREÇÃO: Log do erro mas não throw automático para evitar cascata de erros
-    console.error(`${operation} falhou:`, error.message);
+    logger.error(`BaseService.${this.tableName}`, `${operation} falhou`, {
+      errorCode: error.code,
+      errorMessage: error.message,
+      operation,
+      table: this.tableName
+    });
     throw new Error(`${operation} falhou: ${error.message}`);
   }
 }
